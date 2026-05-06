@@ -1,0 +1,91 @@
+:root {
+    --sidebar-width: 250px;
+    --transition-speed: 0.3s;
+    --card-radius: 20px;
+}
+
+body {
+    /* DYNAMIC: Flips between white and dark gray */
+    background-color: var(--bs-tertiary-bg); 
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    color: var(--bs-body-color);
+}
+
+/* Sidebar Styling - Usually remains dark for Admin Apps */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    background-color: #1a1d20; /* Keep high contrast dark sidebar */
+    color: white;
+    transition: all var(--transition-speed);
+    border-right: 1px solid var(--bs-border-color-translucent);
+}
+
+.nav-link {
+    color: rgba(255,255,255,.75);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    transition: background var(--transition-speed);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+    background-color: rgba(255,255,255,.1);
+}
+
+.nav-link.active {
+    border-left: 4px solid #0d6efd;
+}
+
+.nav-link i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+/* Main Content Wrapper */
+#main-wrapper {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* DYNAMIC: Ensures the background behind cards is correct */
+    background-color: var(--bs-tertiary-bg); 
+}
+
+/* Top Navbar - DYNAMIC */
+.navbar {
+    background-color: var(--bs-body-bg) !important;
+    border-bottom: 1px solid var(--bs-border-color) !important;
+}
+
+/* --- Shared Task/Card Logic from User Layout --- */
+.admin-card, .task-item {
+    background-color: var(--bs-card-bg) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    border-radius: var(--card-radius);
+    transition: all var(--transition-speed) ease;
+}
+
+/* Green background when checked - Matches UserLayout logic */
+[data-bs-theme="light"] label.task-item:has(input:checked) {
+    background-color: #f0fff4 !important;
+    border-color: #198754 !important;
+}
+[data-bs-theme="dark"] label.task-item:has(input:checked) {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+    border-color: #198754 !important;
+}
+
+@media (max-width: 992px) {
+    #sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
+    #main-wrapper { margin-left: 0; }
+    #sidebar.show { margin-left: 0; }
+}

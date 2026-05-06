@@ -1,0 +1,55 @@
+{{ form.hidden_tag()}}
+
+<div class="mb-3">
+    {{ form.goal_cost.label(class="form-label") }}
+    {{ form.goal_cost(class="form-control") }}
+</div>
+
+<div class="mb-3">
+    {{ form.income.label(class="form-label") }}
+    {{ form.income(class="form-control") }}
+</div>
+
+<div class="mb-3">
+    {{ form.expense.label(class="form-label") }}
+    {{ form.expense(class="form-control") }}
+</div>
+
+<div class="mb-3">
+    {{ form.martial_status.label(class="form-label") }}
+    {{ form.martial_status(class="form-control") }}
+</div>
+
+<div class="mb-4">
+    <label class="form-label text-danger h5">{{ form.employment_status.label.text }}</label>
+    {% for subfield in form.employment_status %}
+        <div class="form-check">
+            {{ subfield(class="form-check-input") }}
+            {{ subfield.label(class="form-check-label") }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mb-4">
+    <label class="form-label text-danger h5">{{ form.debt_status.label.text }}</label>
+    {% for subfield in form.debt_status %}
+        <div class="form-check">
+            {{ subfield(class="form-check-input") }}
+            {{ subfield.label(class="form-check-label") }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mb-4">
+    <label class="form-label text-danger h5">{{ form.spending_habit.label.text }}</label>
+    {% for subfield in form.spending_habit %}
+        <div class="form-check">
+            {{ subfield(class="form-check-input") }}
+            {{ subfield.label(class="form-check-label") }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="d-none justify-content-center btn btn-success mt-4">
+    {{ form.submit(class="btn btn-success") }}
+</div>

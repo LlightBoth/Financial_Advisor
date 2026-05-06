@@ -1,0 +1,189 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %} My Profile {% endblock %}
+
+{% block content %}
+
+<style>
+/* --- Design Tokens --- */
+:root {
+    --intelli-indigo: #6366f1;
+    --intelli-indigo-soft: rgba(99, 102, 241, 0.1);
+}
+
+/* --- Global Text Fixes --- */
+/* This forces headers and paragraphs to respect the Bootstrap theme color */
+.profile-header h2, 
+.profile-header h5, 
+.stat-card h5,
+.stat-card h6 {
+    color: var(--bs-heading-color) !important;
+}
+
+.profile-header p, 
+.stat-card p, 
+.stat-card span {
+    color: var(--bs-body-color) !important;
+}
+
+/* --- Container Adjustments --- */
+.profile-header {
+    background-color: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Custom contrast for Light Mode header */
+[data-bs-theme="light"] .profile-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* Custom contrast for Dark Mode header */
+[data-bs-theme="dark"] .profile-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+
+/* --- Stat Cards --- */
+.stat-card {
+    background-color: var(--bs-card-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--bs-box-shadow-sm);
+}
+
+/* --- Form Inputs --- */
+.profile-input {
+    background-color: var(--bs-body-bg) !important;
+    border: 2px solid var(--bs-border-color) !important;
+    color: var(--bs-body-color) !important; /* Fixes invisible input text */
+    border-radius: 12px;
+}
+
+.profile-input:focus {
+    border-color: var(--intelli-indigo) !important;
+    background-color: var(--bs-card-bg) !important;
+    box-shadow: 0 0 0 4px var(--intelli-indigo-soft) !important;
+}
+
+/* --- Secondary Text (The "Muted" Fix) --- */
+.text-muted-alt {
+    color: var(--bs-secondary-color) !important;
+    opacity: 0.8;
+}
+
+/* --- Buttons --- */
+.btn-advisor-glow {
+    background-color: var(--intelli-indigo);
+    color: #ffffff !important; /* Always white on indigo background */
+    border: none;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-advisor-glow:hover {
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+</style>
+
+<div class="container py-5">
+    <div class="profile-header shadow-lg">
+        <div class="row align-items-center">
+            <div class="col-md-auto text-center text-md-start mb-3 mb-md-0">
+                <div class="avatar-wrapper rounded-circle d-inline-block">
+                    <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&size=120&background=6366f1&color=fff" 
+                         class="rounded-circle img-fluid" alt="User Avatar">
+                </div>
+            </div>
+            <div class="col-md">
+                <h2 class="fw-bold mb-1">{{ current_user.username }}</h2>
+                <p class="info mb-1"><i class="bi bi-envelope"></i>  {{current_user.email}} </p>
+                <p class="info mb-3"><i class="bi bi-calendar-check"></i>  {{current_user.created_at.strftime("%b/%m")}} </p>
+            </div>
+            <div class="col-md-auto mt-3 mt-md-0 text-md-end">
+                <button class="btn btn-light rounded-pill px-4 fw-bold">
+                    <i class="bi bi-pencil-square"></i>Edit Banner
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="stat-card p-4 mb-4">
+                <h6 class="small text-uppercase fw-bold mb-4">Quick Stats</h6>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Plans</span>
+                    <span class="fw-bold"> {{ user_plan_count }} </span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Member Since</span>
+                    <span class="fw-bold"> {{ current_user.created_at.strftime('%b/%m/%Y') }} </span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Risk Level</span>
+                    <span class="text-success fw-bold">High</span>
+                </div>
+            </div>
+
+            <div class="stat-card p-4">
+                <h6 class=" small text-uppercase fw-bold mb-4">Connected Accounts</h6>
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fab fa-github fa-lg  me-3"></i>
+                    <span>github.com/{{ current_user.username }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="fab fa-linkedin fa-lg text-info me-3"></i>
+                    <span>linkedin.com/in/{{ current_user.username }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="stat-card p-4 h-100">
+                <h5 class=" mb-4">Personal Information</h5>
+                <form action="/profiles/{{ current_user.id }}/edit" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label  small">Display Name</label>
+                            <input 
+                                type="text" 
+                                name="username" 
+                                class="form-control profile-input" 
+                                value="{{ current_user.username }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label  small">Email Address</label>
+                            <input 
+                                type="email" 
+                                name="email" 
+                                class="form-control profile-input" 
+                                value="{{ current_user.email }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label  small">Professional Bio</label>
+                            <textarea 
+                                name="bio"
+                                class="form-control profile-input" 
+                                placeholder="Describe yourself..."
+                                rows="5">{{ current_user.bio or '' }}
+                            </textarea>
+                        </div>
+                        <div class="col-md-12 text-end mt-4">
+                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

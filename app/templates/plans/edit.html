@@ -1,0 +1,102 @@
+{% extends "layouts/clientBase.html" %}
+
+{% block title %} Edit Plan {% endblock %}
+
+{% block content %}
+<style>
+    /* Theme-adaptive Form Styling */
+    .workspace-wrapper {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .step-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        color: var(--bs-primary);
+        font-size: 1.2rem;
+    }
+
+    .breadcrumb-custom {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        font-weight: 700;
+        color: var(--bs-secondary-color);
+    }
+</style>
+<div class="container-fluid pt-0 px-4">
+    <div class="workspace-wrapper py-5">
+        
+        <div class="mb-5 text-center">
+            <span class="breadcrumb-custom mb-2 d-block">Planning / New Strategy</span>
+            <h1 class="display-6 fw-bold mb-2">Upadte Your Strategy</h1>
+            <p class="text-muted mx-auto" style="max-width: 500px;">
+                Define your financial milestones. We'll help you track the progress and visualize the timeline.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card form-card-modern border-0">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <div class="d-flex align-items-center mb-5">
+                            <div class="step-icon me-3">
+                                <i class="bi bi-bullseye"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Strategy Framework</h5>
+                                <small class="text-muted">Enter the core details of your financial goal</small>
+                            </div>
+                        </div>
+
+                        <form method="post" novalidate class="row g-4">
+                            {% include "plans/_form.html" %}
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start p-3">
+                            <i class="bi bi-check2-circle text-success fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1 small">Real-time Tracking</h6>
+                                <p class="text-muted x-small mb-0">Monitor days remaining automatically.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start p-3">
+                            <i class="bi bi-shield-lock text-primary fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1 small">Secure Data</h6>
+                                <p class="text-muted x-small mb-0">Your financial goals are encrypted and private.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start p-3">
+                            <i class="bi bi-lightbulb text-warning fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1 small">Flexible Edits</h6>
+                                <p class="text-muted x-small mb-0">Adjust targets as your income changes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

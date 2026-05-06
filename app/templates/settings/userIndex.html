@@ -1,0 +1,168 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %} Account Settings {% endblock %}
+
+{% block content %}
+<style>
+/* --- Theme Variables --- */
+:root {
+    --settings-indigo: #3b82f6;
+}
+
+/* 1. Target only the navigation inside the SETTINGS content area */
+/* This prevents the main layout sidebar from being affected */
+.tab-content-wrapper .nav-pills .nav-link {
+    color: var(--bs-secondary-color);
+    background: transparent;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+.tab-content-wrapper .nav-pills .nav-link.active {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: var(--settings-indigo) !important;
+    border-left: 4px solid var(--settings-indigo);
+}
+
+/* 2. Adaptive Settings Card */
+.settings-card {
+    background: var(--bs-tertiary-bg) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--bs-border-color) !important;
+    border-radius: 16px;
+    padding: 2rem;
+    color: var(--bs-body-color);
+}
+
+/* 3. Global Text Fixes (Only for Settings) */
+.settings-card h4, .settings-card h5, .settings-card h6 {
+    color: var(--bs-heading-color) !important;
+}
+
+/* 4. Form Control Fix */
+.form-control-glass {
+    background-color: var(--bs-body-bg) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    color: var(--bs-body-color) !important;
+}
+
+/* 5. Fix for labels in Light Mode */
+.settings-card {
+    color: var(--bs-secondary-color) !important;
+}
+</style>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="settings-card p-3 shadow-sm">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+                    <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#tab-app" type="button">
+                        <i class="fas fa-sliders-h me-2"></i> Preferences
+                    </button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-security" type="button">
+                        <i class="fas fa-shield-alt me-2"></i> Password & Security
+                    </button>
+                    <button class="nav-link text-start text-danger" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Danger Zone
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="tab-content" id="v-pills-tabContent">
+                
+                <div class="tab-pane fade show active" id="tab-app">
+                    <div class="settings-card">
+                        <h4 class="mb-4">App Preferences</h4>
+                        <form action="{{ url_for('settings.userIndex') }}" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small uppercase">Display Language</label>
+                                    <select name="language" class="form-select form-control-glass">
+                                        <option value="en" selected>English (US)</option>
+                                        <option value="es">Español</option>
+                                        <option value="vi">Tiếng Việt</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <!-- Future Update -->
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-4 px-4">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-security">
+                    <div class="settings-card">
+                        <h4 class="mb-4">Update Password</h4>
+                        <form action="/profiles/{{current_user.id}}/change_pw" method="POST">
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                <label class="form-label small">Current Password</label>
+                                {{ form.current_password(class="form-control form-control-glass") }}
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small">New Password</label>
+                                    {{ form.new_password(class="form-control form-control-glass") }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label small">Confirm New Password</label>
+                                    {{ form.confirm_password(class="form-control form-control-glass") }}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning px-4">
+                                Change Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-danger">
+                    <div class="settings-card border-danger">
+                        <h4 class="text-danger mb-4">Danger Zone</h4>
+                        <div class="danger-zone p-4">
+                            <h6 class="text-white">Delete Account</h6>
+                            <p class="small">Once you delete your account, all your data will be permanently removed. This action cannot be undone.</p>
+                            
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                Delete My Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">Are you sure?</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Please type your username to confirm deletion.
+                <input type="text" class="form-control mt-2 form-control-glass" placeholder="{{ current_user.username }}">
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="/users/{{current_user.id}}/delete" method="POST">
+                    {{form.hidden_tag()}}
+                    <button type="submit" class="btn btn-danger">Confirm Deletion</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

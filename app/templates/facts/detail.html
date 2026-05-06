@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %}
+{% block title %} Fact Detail {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"> fact Detail</h1>
+    <div>
+        <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
+        <a href="{{ url_for('facts.index') }}" class="btn btn-sm btn-outline-secondary"> Back to list </a>
+    </div>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3"> description</dt>
+    <dd class="col-sm-9"> {{fact.description}} </dd>
+
+    <dt class="col-sm-3"> Tags </dt>
+    <dd class="col-sm-9"> {{fact.tags}} </dd>
+
+    <dt class="col-sm-3"> Value</dt>
+    <dd class="col-sm-9"> 
+        {% if fact.value %} 
+        <span class="badge text-bg-success"> Active </span>
+        {% else %}
+        <span class="badge text-bg-secondary"> Inactive </span>
+        {% endif %}
+    </dd>
+
+    <dt class="col-sm-3"> Created at</dt>
+    <dd class="col-sm-9"> {{fact.created_at}} </dd>
+
+    <dt class="col-sm-3"> Last updated</dt>
+    <dd class="col-sm-9"> {{fact.updated_at}} </dd>
+</dl>
+{% endblock %}

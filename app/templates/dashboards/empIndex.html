@@ -1,0 +1,254 @@
+{% extends "layouts/base.html" %}
+{% block title %} Admin Command Center {% endblock %}
+
+{% block content %}
+<style>
+    /* Admin Specific Styles */
+.admin-card {
+    border-left: 5px solid var(--bs-primary);
+    background: var(--bs-card-bg);
+}
+.border-success-left { border-left-color: var(--bs-success) !important; }
+.border-warning-left { border-left-color: var(--bs-warning) !important; }
+.border-danger-left { border-left-color: var(--bs-danger) !important; }
+
+.table-hover tbody tr:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    cursor: pointer;
+}
+
+.avatar-sm {
+    width: 32px; height: 32px;
+    background-color: var(--bs-primary-subtle);
+    color: var(--bs-primary);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-weight: bold; font-size: 0.8rem;
+}
+/* --- 3. Card Decorations --- */
+    .icon-box {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+    
+    .status-icon {
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+</style>
+<div class="container-fluid pb-5">
+    
+    <header class="dash-header mb-4">
+        <div>
+            <h3 class="fw-bold mb-0 text-uppercase tracking-wider">Admin Overview</h3>
+            <span class="text-muted small">System status: <span class="text-success fw-bold">Active</span></span>
+        </div>
+    </header>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card shadow-sm p-4 rounded-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="icon-box bg-primary-subtle text-primary"><i class="bi bi-wallet2"></i></div>
+                    <i class="bi bi-arrow-up-right status-icon text-success"></i>
+                </div>
+                <div class="text-label-caps">Total Users</div>
+                <div class="h2 fw-bold mb-0"> {{ total_users }} </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card shadow-sm p-4 rounded-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="icon-box bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
+                    <i class="bi bi-activity status-icon text-success"></i>
+                </div>
+                <div class="text-label-caps">Total Plan</div>
+                <div class="h2 fw-bold mb-0"> {{ total_plans }} </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card shadow-sm p-4 rounded-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="icon-box bg-warning-subtle text-warning"><i class="bi bi-shield-check"></i></div>
+                    <i class="bi bi-patch-check status-icon text-muted"></i>
+                </div>
+                <div class="text-label-caps">Risk Status</div>
+                <div class="h2 fw-bold mb-0 text-warning">Moderate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid pb-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card admin-card border-0 shadow-sm p-4 h-100">
+                <h6 class="fw-bold text-uppercase text-muted mb-4" style="font-size: 0.8rem;">User Acquisition Trend</h6>
+                <div id="chart_admin_growth" style="width: 100%; height: 300px;">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card admin-card border-warning-left border-0 shadow-sm p-4 h-100">
+                <h6 class="fw-bold text-uppercase text-muted mb-4" style="font-size: 0.8rem;">Distribution</h6>
+                <div id="chart_admin_dist" style="width: 100%; height: 300px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-dark">Recent User Registrations</h6>
+                    <a href="#" class="btn btn-link btn-sm text-decoration-none">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <thead>
+                                <tr class="text-uppercase small fw-bold text-muted">
+                                    <th class="border-0 px-4">User</th>
+                                    <th class="border-0">Email</th>
+                                    <th class="border-0">Active</th> 
+                                    <th class="border-0">Status</th>       
+                                </tr>
+                            </thead>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2">JD</div>
+                                        <span class="fw-bold">John Doe</span>
+                                    </div>
+                                </td>
+                                <td>john@example.com</td>
+                                <td><span class="text-secondary"> 02-06-2026 </span></td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                
+                            </tr>
+                            <tr>
+                                <td class="px-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-2 bg-info-subtle text-info">AS</div>
+                                        <span class="fw-bold">Alice Smith</span>
+                                    </div>
+                                </td>
+                                <td>alice@web.com</td>
+                                <td><span class="text-secondary">03-06-2026</span></td>
+                                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h6 class="fw-bold mb-4">System Activity</h6>
+                <div class="vstack gap-4">
+                    <div class="d-flex gap-3">
+                        <div class="text-primary"><i class="bi bi-plus-circle-fill"></i></div>
+                        <div>
+                            <div class="small fw-bold">New Plan Created</div>
+                            <div class="text-muted small">User 'John Doe' added 'Car 2026'</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">2 mins ago</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="text-danger"><i class="bi bi-shield-lock-fill"></i></div>
+                        <div>
+                            <div class="small fw-bold">Failed Login Attempt</div>
+                            <div class="text-muted small">IP: 192.168.1.1 (3 attempts)</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">15 mins ago</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="text-success"><i class="bi bi-check-circle-fill"></i></div>
+                        <div>
+                            <div class="small fw-bold">New Plan Created</div>
+                            <div class="text-muted small">User 'Jake Dog' added 'House 2026'</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">2 hour ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const textColor = isDark ? '#adb5bd' : '#6c757d';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+    // Bar Chart
+    const barCtx = document.getElementById('barChart');
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+                datasets: [{
+                    label: 'New Clients',
+                    data: [100, 450, 300, 800],
+                    backgroundColor: '#0d6efd'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { labels: { color: textColor } } },
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                }
+            }
+        });
+    }
+
+    // Radar Chart
+    const radarCtx = document.getElementById('radarChart');
+    if (radarCtx) {
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Plan', 'Advise', 'Loan'],
+                datasets: [{
+                    label: 'Client Distribution',
+                    data: [50, 32, 26],
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    borderColor: '#0d6efd',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        grid: { color: gridColor },
+                        angleLines: { color: gridColor },
+                        pointLabels: { color: textColor, font: { size: 14 } }
+                    }
+                },
+                plugins: { legend: { labels: { color: textColor } } }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

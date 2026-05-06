@@ -1,0 +1,27 @@
+{% extends "layouts/base.html" %}
+{% block title %} Permission {{permission.code}} {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"> Permission Detail</h1>
+    <div>
+        <a href="{{ url_for('permissions.edit', permission_id=permission.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
+        <a href="{{ url_for('permissions.index') }}" class="btn btn-sm btn-outline-secondary"> Back </a>
+    </div>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3"> Code</dt>
+    <dd class="col-sm-9"> {{permission.code}} </dd>
+
+    <dt class="col-sm-3"> Name</dt>
+    <dd class="col-sm-9"> {{permission.name}} </dd>
+
+    <dt class="col-sm-3"> Module</dt>
+    <dd class="col-sm-9"> {{permission.module}} </dd>
+
+    <dt class="col-sm-3"> Descriptions </dt>
+    <dd class="col-sm-9"> {{permission.descriptions}} </dd>
+
+</dl>
+{% endblock %}

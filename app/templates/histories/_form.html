@@ -1,0 +1,95 @@
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+    {{ form.goal_cost.label(class="form-label") }}
+    {{ form.goal_cost(class="form-control") }}
+
+    {% if form.goal_cost.errors %}
+        <div class="text-danger small">
+            {% for error in form.goal_cost.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.income.label(class="form-label") }}
+    {{ form.income(class="form-control") }}
+
+    {% if form.income.errors %}
+        <div class="text-danger small">
+            {% for error in form.income.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.expense.label(class="form-label") }}
+    {{ form.expense(class="form-control") }}
+
+    {% if form.expense.errors %}
+        <div class="text-danger small">
+            {% for error in form.expense.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.martial_status.label(class="form-label") }}
+    {{ form.martial_status(class="form-control") }}
+</div>
+
+<div class="mb-4">
+    <label class="form-label text-danger h5">{{ form.employment_status.label.text }}</label>
+    {% for subfield in form.employment_status %}
+        <div class="form-check">
+            {{ subfield(class="form-check-input") }}
+            {{ subfield.label(class="form-check-label") }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mb-4">
+    <label class="form-label text-danger h5">{{ form.debt_status.label.text }}</label>
+    {% for subfield in form.debt_status %}
+        <div class="form-check">
+            {{ subfield(class="form-check-input") }}
+            {{ subfield.label(class="form-check-label") }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mb-4">
+    <label class="form-label text-danger h5">{{ form.spending_habit.label.text }}</label>
+    {% for subfield in form.spending_habit %}
+        <div class="form-check">
+            {{ subfield(class="form-check-input") }}
+            {{ subfield.label(class="form-check-label") }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="mb-3">
+    {{ form.get_advice.label(class="form-label") }}
+    {{ form.get_advice(class="form-control") }}
+
+    {% if form.get_advice.errors %}
+        <div class="text-danger small">
+            {% for error in form.get_advice.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mt-4">
+    {{ form.close(class="btn btn-primary") }}
+</div>
+<div class="mt-4">
+    {{ form.remove(class="btn btn-primary") }}
+</div>

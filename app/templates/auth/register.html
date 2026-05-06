@@ -1,0 +1,66 @@
+{% extends "layouts/authBase.html" %}
+{% block title %} Register {% endblock %}
+
+{% block auth_content %}
+<div class="text-center mb-4">
+    <h3 class="text-white fw-bold">Create New Account</h3>
+    <p class="text-white-50 small">Join our community and shape the future</p>
+</div>
+
+<form method="post">
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+        <div class="col-12">
+            {{ form.email.label(class="form-label text-white-50 small") }}
+            {{ form.email(class="form-control form-control-auth", placeholder="name@example.com") }}
+            {% for error in form.email.errors %}
+                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.username.label(class="form-label text-white-50 small") }}
+            {{ form.username(class="form-control form-control-auth", placeholder="johndoe") }}
+            {% for error in form.username.errors %}
+                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.full_name.label(class="form-label text-white-50 small") }}
+            {{ form.full_name(class="form-control form-control-auth", placeholder="John Doe") }}
+            {% for error in form.full_name.errors %}
+                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.password.label(class="form-label text-white-50 small") }}
+            {{ form.password(class="form-control form-control-auth", placeholder="••••••••") }}
+            {% for error in form.password.errors %}
+                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form.confirm_password.label(class="form-label text-white-50 small") }}
+            {{ form.confirm_password(class="form-control form-control-auth", placeholder="••••••••") }}
+            {% for error in form.confirm_password.errors %}
+                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {{ form.is_active(class="d-none") }}
+
+    <div class="d-grid mt-4">
+        {{ form.submit(class="btn btn-auth btn-auth-primary btn-lg rounded-pill shadow") }}
+    </div>
+
+    <div class="mt-4 text-center small text-white-50">
+        Already have an account? 
+        <a href="{{ url_for('auth.login') }}" class="text-white fw-bold text-decoration-none ms-1">Login</a>
+    </div>
+</form>
+{% endblock %}

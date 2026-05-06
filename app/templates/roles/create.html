@@ -1,0 +1,12 @@
+{% extends "layouts/base.html" %}
+{% block title %} Create Role {% endblock %}
+
+
+{% block content %}
+<h1 class="h3 mb-3"> Create Role </h1>
+<form method="post">
+    {% set permissions = permissions %}
+    {% include "roles/_form.html" %}
+</form>
+
+{% endblock %}

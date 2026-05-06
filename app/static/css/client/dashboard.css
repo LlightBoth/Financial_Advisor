@@ -1,0 +1,107 @@
+/* --- 1. Global Dashboard Theme --- */
+:root {
+    --dash-spacing: 1.5rem;
+    --card-radius: 20px;
+    --transition-speed: 0.3s;
+}
+
+/* --- 2. Header & Layout --- */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    margin-bottom: 1rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.stat-card {
+    border: none;
+    border-radius: var(--card-radius);
+    transition: all var(--transition-speed) cubic-bezier(0.25, 0.8, 0.25, 1);
+    background-color: var(--bs-card-bg);
+    color: var(--bs-body-color);
+    overflow: hidden;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12) !important;
+}
+
+/* --- 3. Card Decorations --- */
+.icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.status-icon {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.text-label-caps {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    color: var(--bs-secondary-color);
+    text-transform: uppercase;
+}
+
+/* --- 4. Row 3: Side-Label Layout --- */
+.side-layout-card {
+    display: grid !important;
+    grid-template-columns: 140px 1fr !important; 
+    padding: 0 !important;
+    min-height: 150px;
+}
+.card-side-header {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--bs-border-color);
+}
+.side-label {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    margin-top: 0.5rem;
+}
+
+/* --- 5. Task & Interaction Logic --- */
+.transition-hover {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.transition-hover:hover {
+    transform: scale(1.01);
+    border-color: var(--bs-primary-border-subtle) !important;
+}
+
+label.task-item:has(input:checked) {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+    border-color: var(--bs-success) !important;
+    opacity: 0.9;
+}
+
+label:has(input:checked) h6 {
+    text-decoration: line-through;
+    color: var(--bs-secondary-color) !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: var(--bs-body-color) !important;
+}
+
+.task-container-card {
+    background: var(--bs-card-bg) !important;
+}

@@ -1,0 +1,244 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %}Financial Advisor{% endblock %}
+
+
+{% block content %}
+
+<link href="{{ url_for('static', filename='css/client/advisor.css') }}" rel="stylesheet">
+
+
+<div class="advisor-container py-5">
+
+    {% if not advice %}
+    <div class="stepper-wrapper mb-5 animate__animated animate__fadeIn">
+        <div class="step-item active" id="step-1-indicator">
+            <div class="step-counter">1</div>
+            <div class="step-name">Financials</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item" id="step-2-indicator">
+            <div class="step-counter">2</div>
+            <div class="step-name">Advice</div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if advice %}
+    <div class="results-report animate__animated animate__zoomIn">
+        <div class="report-header-banner p-4 bg-indigo text-white rounded-top-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="fw-bold mb-0">Analysis Complete</h4>
+                <p class="mb-0 opacity-75 small">AI-Financial Calculate</p>
+            </div>
+            <div class="status-badge-white">
+                <span class="pulse-dot-white"></span> Live Scan
+            </div>
+        </div>
+
+        <div class="p-4 p-md-5">
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="metric-mini-card border-0 bg-light py-4 shadow-sm">
+                <span class="label text-muted fw-bold small text-uppercase">Savings Potential</span>
+                <span class="value text-success d-block h2 fw-bold mt-2">{{ advice.remain_percentage|round(1) }}%</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-mini-card border-0 bg-light py-4 shadow-sm">
+                <span class="label text-muted fw-bold small text-uppercase">Expense Load</span>
+                <span class="value text-orange d-block h2 fw-bold mt-2">{{ advice.expense_percentage|round(1) }}%</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-mini-card highlight border-0 py-4 shadow-sm" style="background-color: #f5f3ff;">
+                <span class="label text-indigo fw-bold small text-uppercase">Goal Timeline</span>
+                <span class="value d-block h2 fw-bold mt-2 text-indigo">
+                    {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal">Months</small>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5 opacity-25">
+
+    <div class="report-content px-lg-4">
+        <div class="mb-5">
+            <h6 class="text-center text-uppercase fw-bold tracking-widest text-indigo mb-3">Expert Conclusion</h6>
+            <h4 class="text-dark">{{ advice.get_advice.conclusion }}</h4>
+        </div>
+
+        <div class="advice-box p-4 bg-white border border-light shadow-sm rounded-4 mb-5 position-relative">
+            <div class="position-absolute top-0 start-0 h-100 bg-indigo rounded-start" style="width: 6px;"></div>
+            <h6 class="text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">Strategic Roadmap</h6>
+            <p class="advice-text mb-0 ps-2 text-secondary lh-lg">{{ advice.get_advice.advice }}</p>
+        </div>
+
+        <div class="confidence-section bg-light p-4 rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-shield-check text-indigo me-2"></i>
+                    <span class="small fw-bold text-muted text-uppercase">AI Confidence Rating</span>
+                </div>
+                <span class="badge bg-indigo rounded-pill px-3">{{ (advice.get_advice.certainty * 100)|round|int }}%</span>
+            </div>
+            <div class="progress bg-white" style="height: 10px; border-radius: 20px;">
+                <div class="progress-bar bg-indigo progress-bar-striped" 
+                     style="width: {{ advice.get_advice.certainty * 100 }}%"></div>
+            </div>
+            <p class="small text-muted mt-3 mb-0 text-center italic">
+                *Analysis based on your specific lifestyle context and current market rules.
+            </p>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <button id="btn-close" class="btn-refresh-long mt-3">
+            <i class="fas fa-redo me-2"></i> Generate New Advise
+        </button>
+    </div>
+</div>
+    </div>
+    {% endif %}
+
+    <form method="POST" id="advisor-form" class="advisor-form-box {% if advice %}d-none{% endif %} shadow-lg">
+        {{ form.hidden_tag() }}
+
+        <div id="advisor-step-1" class="form-step animate__animated animate__fadeIn">
+            <div class="mb-4">
+                <h4 class="fw-bold">Financial Standing</h4>
+                <p class="text-muted small">Enter your monthly figures to begin the scan.</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="custom-label">Target Goal Amount ($)</label>
+                {{ form.goal_cost(class="custom-input", type="number") }}
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <label class="custom-label">Monthly Income</label>
+                    {{ form.income(class="custom-input") }}
+                </div>
+                <div class="col-6">
+                    <label class="custom-label">Monthly Expense</label>
+                    {{ form.expense(class="custom-input") }}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="custom-label">Marital Status</label>
+                {{ form.martial_status(class="custom-select") }}
+            </div>
+            <hr class="my-5">
+            <button id="btn-next" type="button" class="btn text-light fw-bold btn-primary-glow w-100 py-3">
+                Next <i class="fas fa-chevron-right ms-2"></i>
+            </button>
+        </div>
+
+        <div id="advisor-step-2" class="form-step d-none animate__animated animate__fadeIn">
+            <div class="mb-4">
+                <h4 class="fw-bold">Lifestyle Details</h4>
+                <p class="text-muted small">Contextual factors improve advice accuracy.</p>
+            </div>
+
+            {% for field in [form.employment_status, form.debt_status, form.spending_habit] %}
+            <div class="mb-4">
+                <label class="section-subtitle fw-bold text-uppercase small text-indigo">{{ field.label.text }}</label>
+                <div class="options-grid mt-2">
+                    {% for subfield in field %}
+                    <label class="option-pill-modern">
+                        {{ subfield(class="d-none") }}
+                        <div class="pill-design">{{ subfield.label.text }}</div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            
+            <hr class="my-5">
+            <div class="d-flex gap-3 mt-5">
+                <button id="btn-back" type="button" class="btn btn-outline-secondary flex-fill rounded-2 p-3">Back</button>
+                {{ form.submit(class="btn btn-success-glow flex-fill rounded-2", value="Generate Advice") }}
+            </div>
+        </div>
+    </form>
+</div>
+<div class="col-12 mt-4 advisor-footer-wrap">
+    <div class="row g-4 justify-content-evenly">
+        <div class="col-md-5">
+            <div class="d-flex align-items-start p-2">
+                <i class="bi bi-shield-check text-indigo fs-4 me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-1 small">Privacy-First Analysis</h6>
+                    <p class="text-muted x-small mb-0">Financial datasets are processed via encrypted protocols ensuring total data anonymity.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="d-flex align-items-start p-2">
+                <i class="bi bi-arrow-repeat text-warning fs-4 me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-1 small">Dynamic Goal Scaling</h6>
+                    <p class="text-muted x-small mb-0">Seamlessly recalibrate your strategic roadmap as your liquidity and income profiles evolve.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const s1 = document.getElementById("advisor-step-1");
+    const s2 = document.getElementById("advisor-step-2");
+    const l1 = document.getElementById("step-1-indicator");
+    const l2 = document.getElementById("step-2-indicator");
+    const form = document.getElementById("advisor-form");
+
+    document.getElementById("btn-next")?.addEventListener("click", () => {
+        // Trigger HTML5 validation check
+        const inputs = s1.querySelectorAll('input, select');
+        let valid = true;
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                input.reportValidity();
+                valid = false;
+            }
+        });
+
+        if (valid) {
+            s1.classList.add("animate__fadeOutLeft");
+            setTimeout(() => {
+                s1.classList.add("d-none");
+                s1.classList.remove("animate__fadeOutLeft");
+                s2.classList.remove("d-none");
+                s2.classList.add("animate__fadeInRight");
+                l1.classList.remove("active");
+                l2.classList.add("active");
+            }, 300);
+        }
+    });
+
+    document.getElementById("btn-back")?.addEventListener("click", () => {
+        // Transition Step 2 to 1
+        s2.classList.add("animate__fadeOutRight");
+        setTimeout(() => {
+            s2.classList.add("d-none");
+            s2.classList.remove("animate__fadeOutRight");
+            s1.classList.remove("d-none");
+            s1.classList.add("animate__fadeInLeft");
+            l2.classList.remove("active");
+            l1.classList.add("active");
+        }, 300);
+    });
+
+    document.getElementById("btn-close")?.addEventListener('click', () => {
+        window.location.href = window.location.pathname;
+    });
+
+    
+    // Back button and Refresh button logic remains the same...
+});
+
+</script>
+{% endblock %}

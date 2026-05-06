@@ -1,0 +1,9 @@
+{% extends "layouts/base.html" %}
+{% block title %} Edit Permission {% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3"> Edit Permission </h1>
+<form method="post" novalidate>
+    {% include "permissions/_form.html" %}
+</form>
+{% endblock %}

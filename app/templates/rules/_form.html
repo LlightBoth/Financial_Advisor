@@ -1,0 +1,64 @@
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+    {{ form.conclusion.label(class="form-label") }}
+    {{ form.conclusion(class="form-control") }}
+
+    {% if form.conclusion.errors %}
+        <div class="text-danger small">
+            {% for error in form.conclusion.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.certainty.label(class="form-label") }}
+    {{ form.certainty(class="form-control") }}
+
+    {% if form.certainty.errors %}
+        <div class="text-danger small">
+            {% for error in form.certainty.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.advice.label(class="form-label") }}
+    {{ form.advice(class="form-control") }}
+
+    {% if form.advice.errors %}
+        <div class="text-danger small">
+            {% for error in form.advice.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    <label style="padding-bottom: 12px;">Conditions</label>
+    <div style="padding: 8px 12px; border: 1px solid rgba(128, 128, 128, 0.796); border-radius: 8px;">
+        {% for fact in facts | sort(attribute='module') %}
+            <div class="form-check ms-3 mb-2">
+                <input type="checkbox"
+                    class="form-check-input"
+                    name="fact_ids"
+                    value="{{ fact.id }}"
+                    {% if fact.id in current_fact_ids %} checked {% endif %}
+                >
+                <label class="form-check-label">
+                    <strong style="color: palevioletred;">{{ fact.description }}</strong> - {{ fact.tags }}
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<div class="mt-4">
+    {{ form.submit(class="btn btn-primary") }}
+</div>

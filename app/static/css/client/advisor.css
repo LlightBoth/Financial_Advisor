@@ -1,0 +1,137 @@
+:root {
+    --indigo: #6366f1;
+    --indigo-soft: #f5f3ff;
+    --text-main: #1e293b;
+}
+
+/* Container & Layout */
+.advisor-container { max-width: 750px; margin: 0 auto; }
+.bg-indigo { background-color: var(--indigo) !important; }
+.text-indigo { color: var(--indigo) !important; }
+
+/* Stepper UI */
+.stepper-wrapper { display: flex; align-items: center; justify-content: center; }
+.step-item { text-align: center; color: #94a3b8; }
+.step-item.active { color: var(--indigo); }
+.step-counter { 
+    width: 36px; height: 36px; border-radius: 50%; border: 2px solid #e2e8f0; 
+    display: flex; align-items: center; justify-content: center; font-weight: 700; margin: 0 auto 8px;
+}
+.step-item.active .step-counter { background: var(--indigo); color: white; border-color: var(--indigo); box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
+.step-connector { flex: 0 0 80px; height: 2px; background: #e2e8f0; margin-bottom: 25px; }
+
+/* Report & Form Cards */
+.results-report, .advisor-form-box {
+    background: white;
+    border-radius: 2rem;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+.advisor-form-box { padding: 3rem; }
+
+/* Metrics */
+.metric-mini-card { padding: 1.25rem; background: #f8fafc; border-radius: 1.25rem; text-align: center; }
+.metric-mini-card.highlight { background: var(--indigo-soft); border: 1px solid #c4b5fd; }
+.metric-mini-card .label { display: block; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 4px; }
+.metric-mini-card .value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+
+/* Custom Form Inputs */
+.custom-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #475569; margin-bottom: 8px; display: block; }
+.custom-input, .custom-select {
+    width: 100%; padding: 0.8rem 1.2rem; border-radius: 12px; border: 2px solid #f1f5f9; background: #fdfdfd; transition: 0.2s;
+}
+.custom-input:focus { outline: none; border-color: var(--indigo); background: white; }
+
+/* Modern Pill Selection */
+.options-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.option-pill-modern { cursor: pointer; flex: 1 1 calc(50% - 10px); }
+.pill-design {
+    padding: 12px; text-align: center; background: #f8fafc; border: 2px solid #f1f5f9; 
+    border-radius: 12px; font-size: 0.85rem; font-weight: 600; color: #475569; transition: 0.2s;
+}
+input:checked + .pill-design { background: var(--indigo-soft); border-color: var(--indigo); color: var(--indigo); }
+
+/* Buttons & Animations */
+.btn-primary-glow {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+.btn-success-glow {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    font-weight: 700; 
+    transition: 0.3s;
+}
+
+.btn-success-glow:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3); 
+    color: white; /* Ensures text stays white on hover */
+}
+.pulse-dot-white {
+    display: inline-block; width: 8px; height: 8px; background: white; border-radius: 50%;
+    margin-right: 6px; animation: pulse-white 2s infinite;
+}
+@keyframes pulse-white {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+
+.tracking-widest { letter-spacing: 0.1em; }
+.btn-refresh-long { width: 100%; padding: 14px; border-radius: 14px; border: 1px dashed #cbd5e1; background: #f8fafc; color: #64748b; font-weight: 600; transition: 0.2s; }
+.btn-refresh-long:hover { background: #f1f5f9; color: var(--indigo); border-color: var(--indigo); }
+
+/* --- Dark Mode Support Extensions --- */
+
+[data-bs-theme="dark"] .results-report, 
+[data-bs-theme="dark"] .advisor-form-box {
+    background-color: var(--bs-card-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .custom-input, 
+[data-bs-theme="dark"] .custom-select {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .pill-design {
+    background-color: var(--bs-tertiary-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-secondary-color);
+}
+
+[data-bs-theme="dark"] .metric-mini-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .metric-mini-card .value {
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .advice-box {
+    background-color: var(--bs-tertiary-bg);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .step-counter {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .btn-refresh-long {
+    background-color: var(--bs-tertiary-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-secondary-color);
+}
+
+/* Fix for the placeholder colors in dark mode */
+[data-bs-theme="dark"] .custom-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}

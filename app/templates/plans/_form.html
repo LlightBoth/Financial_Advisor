@@ -1,0 +1,52 @@
+{{ form.hidden_tag() }}
+
+<div class="mb-2">
+    <label class="form-label small fw-bold text-uppercase text-muted tracking-wide">Plan Objective</label>
+    {{ form.goal(class="form-control border-0 bg-light shadow-none", style="border-radius: 10px; padding: 0.75rem; font-size: 18px;") }}
+    {% if form.goal.errors %}
+        {% for error in form.goal.errors %}
+            <div class="text-danger x-small mt-2 fw-semibold"><i class="bi bi-exclamation-circle-fill"></i> {{ error }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <label class="form-label small fw-bold text-uppercase text-muted">Target Date</label>
+        {{ form.in_between(class="form-control border-0 bg-light", style="border-radius: 10px; padding: 0.75rem;") }}
+        {% if form.in_between.errors %}
+            {% for error in form.in_between.errors %}
+                <div class="text-danger x-small mt-1">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label small fw-bold text-uppercase text-muted">Estimated Budget</label>
+        <div class="input-group">
+            <span class="input-group-text border-0 bg-light text-muted" style="border-radius: 10px 0 0 10px;">$</span>
+            {{ form.goal_cost(class="form-control border-0 bg-light", style="border-radius: 0 10px 10px 0; padding: 0.75rem;") }}
+        </div>
+        {% if form.goal_cost.errors %}
+            {% for error in form.goal_cost.errors %}
+                <div class="text-danger x-small mt-1">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="mb-5">
+    <label class="form-label small fw-bold text-uppercase text-muted">Detailed Description</label>
+    {{ form.description(class="form-control border-0 bg-light", style="border-radius: 10px;", rows="5") }}
+    {% if form.description.errors %}
+        {% for error in form.description.errors %}
+            <div class="text-danger x-small mt-1">{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="mt-4 pt-4 border-top d-flex justify-content-end">
+    <button type="reset" class="btn btn-link text-muted text-decoration-none me-3 small">Discard Draft</button>
+    
+    {{ form.submit(class="btn btn-dark px-5 py-2 fw-semibold", style="border-radius: 8px; background: #1a1a1a;") }}
+</div>

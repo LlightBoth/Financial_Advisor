@@ -1,0 +1,39 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %} Plan Detail {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="h3 mb-0"> Plan Detail</h1>
+    <div>
+        <a href="{{ url_for('plans.edit', plan_id=plan.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
+        <a href="{{ url_for('plans.index') }}" class="btn btn-sm btn-outline-secondary"> Back to list </a>
+    </div>
+</div>
+
+<dl class="row pt-4 pb-4">
+    <dt class="col-sm-3"> goal</dt>
+    <dd class="col-sm-9"> {{plan.goal}} </dd>
+
+    <dt class="col-sm-3"> in_between </dt>
+    <dd class="col-sm-9"> {{plan.in_between}} </dd>
+
+    <dt class="col-sm-3"> goal_cost</dt>
+    <dd class="col-sm-9"> {{plan.goal_cost}} </dd>
+    
+
+    <dt class="col-sm-3"> Value</dt>
+    <dd class="col-sm-9"> 
+        {% if plan.value %} 
+        <span class="badge text-bg-success"> Completed </span>
+        {% else %}
+        <span class="badge text-bg-secondary"> Incompleted </span>
+        {% endif %}
+    </dd>
+
+    <dt class="col-sm-3"> Created at</dt>
+    <dd class="col-sm-9"> {{plan.created_at}} </dd>
+
+    <dt class="col-sm-3"> Last updated</dt>
+    <dd class="col-sm-9"> {{plan.updated_at}} </dd>
+</dl>
+{% endblock %}

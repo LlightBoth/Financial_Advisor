@@ -1,0 +1,10 @@
+{% extends "layouts/base.html" %}
+{% block title %} Create Permission {% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3"> Create Permission </h1>
+<form method="post">
+    {% include "permissions/_form.html" %}
+</form>
+
+{% endblock %}

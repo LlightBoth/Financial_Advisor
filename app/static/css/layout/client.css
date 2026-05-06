@@ -1,0 +1,75 @@
+:root { --card-radius: 20px; --transition-speed: 0.3s; }
+
+.app-wrapper {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: auto 1fr auto; /* Header, Body, Footer */
+    grid-template-areas: "sidebar header" 
+                         "sidebar body" 
+                         "sidebar footer";
+    min-height: 100vh;
+}
+
+.sidebar { grid-area: sidebar; background-color: #1a1d20; color: white; height: 100vh; position: sticky; top: 0; z-index: 1000; }
+header   { grid-area: header; background-color: var(--bs-body-bg); border-bottom: 1px solid var(--bs-border-color); }
+main     { grid-area: body; padding: 2rem; background-color: var(--bs-tertiary-bg); }
+
+/* --- Global Task Item Theme --- */
+.task-item {
+    background-color: var(--bs-card-bg);
+    transition: all var(--transition-speed) ease;
+    border: 2px solid var(--bs-primary-border-subtle) !important;
+}
+.nav-link {
+    color: rgba(255,255,255,.75);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    transition: background var(--transition-speed);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: white;
+    background-color: rgba(255,255,255,.1);
+}
+
+/* Green background when checked - Adapts to Light/Dark */
+[data-bs-theme="light"] label.task-item:has(input:checked) {
+    background-color: #f0fff4 !important;
+    border-color: #198754 !important;
+}
+[data-bs-theme="dark"] label.task-item:has(input:checked) {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+    border-color: #198754 !important;
+}
+
+label.task-item:has(input:checked) h6 {
+    text-decoration: line-through;
+}
+
+/* Form COntrol Decoration */
+
+/* This targets the placeholder across all browsers */
+.form-control::placeholder {
+    color: rgba(46, 43, 43, 0.925);
+}
+
+/* for Dark Mode if you want a custom subtle grey */
+[data-bs-theme="dark"] .form-control {
+    color: rgba(46, 43, 43, 0.847);
+}
+
+/* for Light Mode */
+[data-bs-theme="light"] .form-control{
+    color: rgba(0, 0, 0, 0.721);
+}
+
+/* Specifically for Dark Mode if you want a custom subtle grey */
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: rgba(46, 43, 43, 0.541);
+}
+
+/* Specifically for Light Mode */
+[data-bs-theme="light"] .form-control::placeholder {
+    color: rgba(0, 0, 0, 0.59);
+}

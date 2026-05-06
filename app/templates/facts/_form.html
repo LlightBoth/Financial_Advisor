@@ -1,0 +1,36 @@
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+    {{ form.description.label(class="form-label") }}
+    {{ form.description(class="form-control") }}
+
+    {% if form.description.errors %}
+        <div class="text-danger small">
+            {% for error in form.description.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.tags.label(class="form-label") }}
+    {{ form.tags(class="form-control") }}
+
+    {% if form.tags.errors %}
+        <div class="text-danger small">
+            {% for error in form.tags.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="form-check mb-3">
+    {{ form.value(class="form-check-input") }}
+    {{ form.value.label(class="form-check-label") }}
+</div>
+
+<div class="mt-4">
+    {{ form.submit(class="btn btn-primary") }}
+</div>

@@ -1,0 +1,9 @@
+{% extends "layouts/base.html" %}
+{% block title %} Edit Fact {% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3"> Edit Fact </h1>
+<form method="post" novalidate>
+    {% include "facts/_form.html" %}
+</form>
+{% endblock %}

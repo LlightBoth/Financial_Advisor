@@ -1,0 +1,29 @@
+{% extends "layouts/base.html" %}
+{% block title %} Rule Detail {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0"> Rule Detail</h1>
+    <div>
+        <a href="{{ url_for('rules.edit', rule_id=rule.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
+        <a href="{{ url_for('rules.index') }}" class="btn btn-sm btn-outline-secondary"> Back to list </a>
+    </div>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3"> Conclusion</dt>
+    <dd class="col-sm-9"> {{rule.conclusion}} </dd>
+
+    <dt class="col-sm-3"> Certainty </dt>
+    <dd class="col-sm-9"> {{rule.certainty}} </dd>
+
+    <dt class="col-sm-3"> Advice </dt>
+    <dd class="col-sm-9"> {{rule.advice}} </dd>
+
+    <dt class="col-sm-3"> Created at</dt>
+    <dd class="col-sm-9"> {{rule.created_at}} </dd>
+
+    <dt class="col-sm-3"> Last updated</dt>
+    <dd class="col-sm-9"> {{rule.updated_at}} </dd>
+</dl>
+{% endblock %}

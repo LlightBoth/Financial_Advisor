@@ -1,0 +1,58 @@
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+    {{ form.code.label(class="form-label") }}
+    {{ form.code(class="form-control") }}
+
+    {% if form.code.errors %}
+        <div class="text-danger small">
+            {% for error in form.code.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.name.label(class="form-label") }}
+    {{ form.name(class="form-control") }}
+
+    {% if form.name.errors %}
+        <div class="text-danger small">
+            {% for error in form.name.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.module.label(class="form-label") }}
+    {{ form.module(class="form-control") }}
+
+    {% if form.module.errors %}
+        <div class="text-danger small">
+            {% for error in form.module.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.descriptions.label(class="form-label") }}
+    {{ form.descriptions(class="form-control") }}
+
+    {% if form.descriptions.errors %}
+        <div class="text-danger small">
+            {% for error in form.descriptions.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mt-4">
+    {{ form.submit(class="btn btn-primary") }}
+    <a href="{{ url_for('users.index') }}" class="btn btn-outline-secondary">Cancel</a>
+</div>

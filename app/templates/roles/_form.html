@@ -1,0 +1,50 @@
+{{ form.hidden_tag() }}
+
+<div class="mb-3">
+    {{ form.name.label(class="form-label") }}
+    {{ form.name(class="form-control") }}
+
+    {% if form.name.errors %}
+        <div class="text-danger small">
+            {% for error in form.name.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<div class="mb-3">
+    {{ form.descriptions.label(class="form-label") }}
+    {{ form.descriptions(class="form-control") }}
+
+    {% if form.descriptions.errors %}
+        <div class="text-danger small">
+            {% for error in form.descriptions.errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+{% if permissions %}
+<label class="mb-3">Permissions</label>
+<div style="padding: 8px 12px; border: 1px solid rgba(128, 128, 128, 0.796); border-radius: 8px;">
+    {% for permission in permissions | sort(attribute='module') %}
+        <div class="form-check ms-3 mb-2">
+            <input type="checkbox"
+                class="form-check-input"
+                name="permission_ids"
+                value="{{ permission.id }}"
+                {% if permission.id in current_permission_ids %} checked {% endif %}
+                >
+            <label class="form-check-label">
+                <strong style="color: palevioletred;">{{ permission.code }}</strong> - {{ permission.name }}
+            </label>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="mt-4">
+    {{ form.submit(class="btn btn-primary") }}
+</div>
