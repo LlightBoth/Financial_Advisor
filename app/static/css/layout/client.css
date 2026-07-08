@@ -73,3 +73,67 @@ label.task-item:has(input:checked) h6 {
 [data-bs-theme="light"] .form-control::placeholder {
     color: rgba(0, 0, 0, 0.59);
 }
+
+/* Default Burger */
+
+.mobile-hide {
+    display: block;
+}
+
+.burger-menu {
+    cursor: pointer;
+    display: none;
+    align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+    body { max-width: 768px;}
+    .app-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr auto;
+
+        grid-template-areas:
+            "sidebar"
+            "header"
+            "body"
+            "footer";
+
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        height: auto;
+        position: sticky;
+        box-shadow: -1px 1px 4px #f0fff49b;
+    }
+
+    header {
+        border-bottom: 1px solid var(--bs-border-color);
+        height: auto;
+        position: relative;
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    /* Mobile section */
+    .sidebar-nav, .sidebar-footer {
+        max-height:0;
+        overflow: hidden;
+        transition:max-height .3s ease;
+    }
+
+    .mobile-hide {
+        display: none;
+    }
+
+    .burger-menu {
+        display: flex;
+    }
+
+    .sidebar-nav.active, .sidebar-footer.active {
+        max-height: 600px;
+    }
+}

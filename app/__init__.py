@@ -108,10 +108,10 @@ def create_app(config_class: type[Config] = Config):
         if not user_admin:
             user_admin = User(
                 username="admin",
-                email="admin",
+                email="admin123@gmail.com",
                 full_name="admin",
             )
-            user_admin.set_password("admin")
+            user_admin.set_password("Admin123")
             user_admin.roles.append(admin_role)
             db.session.add(user_admin)
 

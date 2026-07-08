@@ -13,141 +13,158 @@
 </head>
 <body>
 
-<nav id="sidebar" class="d-flex flex-column p-3">
-    <a href="/" class="d-flex align-items-center mb-4 px-2 text-white text-decoration-none">
-        <span class="fs-4 fw-bold">Financial Advisor</span>
-    </a>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <a class="nav-link {% if request.endpoint == 'dashboards.empIndex' %}active{% endif %}" href="{{ url_for('dashboards.empIndex') }}">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-        </li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'rules.index' %}active{% endif %}" href="{{ url_for('rules.index') }}">
-                <i class="bi bi-list-check"></i> Rules
-            </a>
-        </li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'facts.index' %}active{% endif %}" href="{{ url_for('facts.index') }}">
-                <i class="bi bi-info-circle"></i> Facts
-            </a>
-        </li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'permissions.index' %}active{% endif %}" href="{{ url_for('permissions.index') }}">
-                <i class="bi bi-shield-lock"></i> Permissions
-            </a>
-        </li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'roles.index' %}active{% endif %}" href="{{ url_for('roles.index') }}">
-                <i class="bi bi-people"></i> Roles
-            </a>
-        </li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'users.index' %}active{% endif %}" href="{{ url_for('users.index') }}">
-                <i class="bi bi-person-gear"></i> Users
-            </a>
-        </li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}" href="{{ url_for('dashboards.userIndex') }}">
-                <i class="bi bi-cash-coin"></i> Financial App
-            </a>
-        </li>
-        <li><hr class="link"></li>
-        <li>
-            <a class="nav-link {% if request.endpoint == 'settings.empIndex' %}active{% endif %}" href="{{ url_for('settings.empIndex') }}">
-                <i class="bi bi-gear"></i> Setting
-            </a>
-        </li>
-    </ul>
-    <div class="mt-auto border-top border-secondary pt-3">
-        <div class="form-check form-switch d-flex justify-content-between align-items-center p-0">
-            <label class="small text-white-50" for="modeToggle">Dark Mode</label>
-            <input class="form-check-input m-0" type="checkbox" id="modeToggle" style="cursor:pointer">
-        </div>
-    </div>
-</nav>
-
-<div id="main-wrapper">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4">
-    <div class="container-fluid">
-
-        <!-- Role display (LEFT SIDE) -->
-        <button class="btn btn-sm btn-light border shadow-sm d-flex align-items-center rounded-pill px-3">
-            <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-            <span class="fw-semibold text-secondary mx-1">Role:</span>
-            <span class="ms-1 fw-bold text-dark">
-                {{ current_user.roles[0].name if current_user.roles else "None" }}
-            </span>
-        </button>
-
-        <!-- RIGHT SIDE CONTENT -->
-        <div class="ms-auto d-flex align-items-center">
-
-            <!-- Notification dropdown -->
-            <div class="dropdown">
-                <button class="btn btn-sm dropdown-toggle mx-3" data-bs-toggle="dropdown">
-                    <i class="bi bi-bell fs-6"></i>
-                </button>
-
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li><span class="dropdown-item text-center">1 message</span></li>
-                    <li><hr class="dropdown-divider"></li>
-
-                    <li><span class="dropdown-item text-center">2 message</span></li>
-                    <li><hr class="dropdown-divider"></li>
-
-                    <li><span class="dropdown-item text-center">3 message</span></li>
-                </ul>
+<div class="app-wrapper">
+    <nav id="sidebar" class="sidebar d-flex flex-column ">
+        <div class="d-flex align-items-center justify-content-between mb-4 text-white text-decoration-none px-3">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-currency-dollar fs-4 me-2 text-info"></i>
+                <span class="fs-5 fw-bold">Financial Advisor</span>
             </div>
 
-            <!-- User dropdown (WITH ROLE) -->
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary shadow-sm mx-2 dropdown-toggle" data-bs-toggle="dropdown">
-                    {{ current_user.email if current_user.is_authenticated else "Guest" }}
-                </button>
-
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li>
-                        <a class="dropdown-item" href="/profiles/emp">
-                            <i class="bi bi-person me-2"></i> My Profile
-                        </a>
-                    </li>
-                </ul>
+            <div class="burger-menu">
+                <i class="bi bi-list fs-1 text-info"></i>
             </div>
-
-            <!-- Logout -->
-            <a class="btn btn-sm {% if not current_user.is_authenticated %}btn-primary{% else %}btn-outline-danger{% endif %}" 
-               href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}">
-                <i class="bi {% if not current_user.is_authenticated %}bi-box-arrow-in-right{% else %}bi-box-arrow-right{% endif %} me-1"></i>
-                {{"Sign-In" if not current_user.is_authenticated else "Logout"}}
-            </a>
-
         </div>
-    </div>
-</nav>
+        <ul class="sidebar-nav nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'dashboards.empIndex' %}active{% endif %}" href="{{ url_for('dashboards.empIndex') }}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'rules.index' %}active{% endif %}" href="{{ url_for('rules.index') }}">
+                    <i class="bi bi-list-check"></i> Rules
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'facts.index' %}active{% endif %}" href="{{ url_for('facts.index') }}">
+                    <i class="bi bi-info-circle"></i> Facts
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'permissions.index' %}active{% endif %}" href="{{ url_for('permissions.index') }}">
+                    <i class="bi bi-shield-lock"></i> Permissions
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'roles.index' %}active{% endif %}" href="{{ url_for('roles.index') }}">
+                    <i class="bi bi-people"></i> Roles
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'users.index' %}active{% endif %}" href="{{ url_for('users.index') }}">
+                    <i class="bi bi-person-gear"></i> Users
+                </a>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}" href="{{ url_for('dashboards.userIndex') }}">
+                    <i class="bi bi-cash-coin"></i> Financial App
+                </a>
+            </li>
+            <li>
+                <hr>
+            </li>
+            <li>
+                <a class="nav-link {% if request.endpoint == 'settings.empIndex' %}active{% endif %}" href="{{ url_for('settings.empIndex') }}">
+                    <i class="bi bi-gear"></i> Setting
+                </a>
+            </li>
+        </ul>
 
-    <main class="container-fluid px-4">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="sidebar-footer mt-auto px-3">
+            <hr class="border-top border-secondary pt-2">
+            <div class="form-check form-switch d-flex justify-content-between align-items-center p-0">
+                <label class="small text-white-50" for="modeToggle">Dark Mode</label>
+                <input class="form-check-input m-0 p-2" type="checkbox" id="modeToggle" style="cursor:pointer">
+            </div>
+        </div>
+    </nav>
+
+    <header id="main-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-4">
+            <div class="container-fluid">
+    
+                <!-- Role display (LEFT SIDE) -->
+                <button class="btn btn-sm btn-light border shadow-sm d-flex align-items-center rounded-pill px-3">
+                    <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+                    <span class="fw-semibold text-secondary mx-1">Role:</span>
+                    <span class="ms-1 fw-bold text-dark">
+                        {{ current_user.roles[0].name if current_user.roles else "None" }}
+                    </span>
+                </button>
+    
+                <!-- RIGHT SIDE CONTENT -->
+                <div class="ms-auto d-flex align-items-center">
+    
+                    <!-- Notification dropdown -->
+                    <div class="mobile-hide dropdown">
+                        <button class="btn btn-sm dropdown-toggle mx-3" data-bs-toggle="dropdown">
+                            <i class="bi bi-bell fs-6"></i>
+                        </button>
+    
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li><span class="dropdown-item text-center">1 message</span></li>
+                            <li><hr class="dropdown-divider"></li>
+    
+                            <li><span class="dropdown-item text-center">2 message</span></li>
+                            <li><hr class="dropdown-divider"></li>
+    
+                            <li><span class="dropdown-item text-center">3 message</span></li>
+                        </ul>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        {% block content %}{% endblock %}
-    </main>
+    
+                    <!-- User dropdown (WITH ROLE) -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary shadow-sm mx-2 dropdown-toggle" data-bs-toggle="dropdown">
+                            {{ current_user.email if current_user.is_authenticated else "Guest" }}
+                        </button>
+    
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item" href="/profiles/emp">
+                                    <i class="bi bi-person me-2"></i> My Profile
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+    
+                    <!-- Logout -->
+                    <a class="btn btn-sm {% if not current_user.is_authenticated %}btn-primary{% else %}btn-outline-danger{% endif %}" 
+                    href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}">
+                        <i class="bi {% if not current_user.is_authenticated %}bi-box-arrow-in-right{% else %}bi-box-arrow-right{% endif %} me-1"></i>
+                        {{"Sign-In" if not current_user.is_authenticated else "Logout"}}
+                    </a>
+    
+                </div>
+            </div>
+        </nav>
+    
+        <main class="container-fluid px-4">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+    
+            {% block content %}{% endblock %}
+        </main>
+    </header>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const modeToggle = document.getElementById('modeToggle');
     const html = document.documentElement;
+    const burger_menu = document.querySelector(".burger-menu");
+    const sidebarNav = document.querySelector(".sidebar-nav");
+    const sidebarFooter = document.querySelector(".sidebar-footer");
+
 
     const savedTheme = localStorage.getItem('theme') || 'light';
     html.setAttribute('data-bs-theme', savedTheme);
@@ -158,6 +175,11 @@
         html.setAttribute('data-bs-theme', theme);
         localStorage.setItem('theme', theme);
     });
+
+    burger_menu.addEventListener('click', ()=> {
+        sidebarNav.classList.toggle("active");
+        sidebarFooter.classList.toggle("active");
+    })
 </script>
 </body>
 </html>

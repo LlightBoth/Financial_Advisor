@@ -14,14 +14,20 @@
 
 <div class="app-wrapper">
     
-    <nav class="sidebar d-flex flex-column p-3">
-        <div class="d-flex align-items-center mb-4 text-white text-decoration-none">
-            <i class="bi bi-currency-dollar fs-4 me-2 text-info"></i>
-            <span class="fs-5 fw-bold">Financial Advisor</span>
+    <nav class="sidebar d-flex flex-column py-2 px-3">
+        <div class="d-flex align-items-center justify-content-between mb-4 text-white text-decoration-none">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-currency-dollar fs-4 me-2 text-info"></i>
+                <span class="fs-5 fw-bold">Financial Advisor</span>
+            </div>
+
+            <div class="burger-menu">
+                <i class="bi bi-list fs-1 text-info"></i>
+            </div>
         </div>
-        <hr class="text-secondary opacity-25">
         
-        <ul class="nav nav-pills flex-column mb-auto">
+        <ul class="sidebar-nav nav nav-pills flex-column mb-auto">
+            <li><hr></li>
             <li>
                 <a href="{{ url_for('dashboards.userIndex') }}" class="nav-link {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}">
                     <i class="bi bi-house me-2"></i> Dashboard
@@ -39,11 +45,11 @@
                 </a>
             </li>
 
-            <li>
+            <!-- <li>
                 <a href="{{ url_for('loans.index') }}" class="nav-link {% if 'loans' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-cash-stack me-2"></i> Loan
                 </a>
-            </li>
+            </li> -->
 
             <li>
                 <a href="{{ url_for('history.index') }}" class="nav-link {% if 'history' in request.endpoint %}active{% endif %}">
@@ -52,7 +58,8 @@
             </li>
         </ul>
 
-        <div class="mt-auto border-top border-secondary pt-3">
+        <div class="sidebar-footer mt-auto">
+            <hr class="border-top border-secondary pt-2">
             <div class="form-check form-switch d-flex justify-content-between align-items-center p-0">
                 <label class="small text-white-50" for="modeToggle">Dark Mode</label>
                 <input class="form-check-input m-0 p-2" type="checkbox" id="modeToggle" style="cursor:pointer">
@@ -61,37 +68,80 @@
     </nav>
 
     <header class="px-4 py-2 d-flex justify-content-between align-items-center">
-        <nav aria-label="breadcrumb"><ol class="breadcrumb mb-0 small"><li class="breadcrumb-item">Home</li><li class="breadcrumb-item active">Current Page</li></ol></nav>
-        <div class="dropdown">
-            
-            <button class="btn btn-sm dropdown-toggle mx-4" data-bs-toggle="dropdown">
-                <i class="bi bi-bell fs-6"></i>
-            </button>
-            <!-- Drop down for the user profile -->
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li class="text-center">1 message</li><li><hr class="dropdown-divider"></li>
-                <li class="text-center">2 message</li><hr class="dropdown-divider"></li>
-                <li class="text-center">3 message</li>          
-            </ul>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item">Home</li>
+                <li class="mobile-hide breadcrumb-item active">Current Page</li>
+            </ol>
+        </nav>
 
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                {{ current_user.email if current_user.is_authenticated else "Guest" }}
-            </button>
-            <!-- Drop down for the user profile -->
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li><a class="dropdown-item" href="/profiles"><i class="bi bi-person me-2"></i> My Profile </a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/settings"><i class="bi bi-gear me-2"></i>Settings</a></li>
-                
-            </ul>
+        <div class="d-flex align-items-center gap-2">
 
-            <!-- Logout button -->
+            <!-- Notification Dropdown -->
+            <div class="dropdown">
+
+                <button class="btn btn-sm dropdown-toggle mx-2"
+                        data-bs-toggle="dropdown">
+                    <i class="bi bi-bell fs-6"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li class="dropdown-item text-center">1 message</li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li class="dropdown-item text-center">2 message</li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li class="dropdown-item text-center">3 message</li>
+                </ul>
+
+            </div>
+
+            <!-- User Dropdown -->
+            <div class="dropdown">
+
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown">
+
+                    {{ current_user.email if current_user.is_authenticated else "Guest" }}
+
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+
+                    <li>
+                        <a class="dropdown-item" href="/profiles">
+                            <i class="bi bi-person me-2"></i>
+                            My Profile
+                        </a>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+                        <a class="dropdown-item" href="/settings">
+                            <i class="bi bi-gear me-2"></i>
+                            Settings
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <!-- Logout -->
             {% if current_user.is_authenticated %}
-            <button class="btn btn-sm btn-outline-danger">
-                <a class="dropdown-item" href="/auth/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
-            </button>
+            <a href="/auth/logout"
+            class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Logout
+            </a>
             {% endif %}
+
         </div>
+
     </header>
 
     <main>
@@ -114,7 +164,11 @@
 <script>
     const modeToggle = document.getElementById('modeToggle');
     const html = document.documentElement;
+    const burger_menu = document.querySelector(".burger-menu");
+    const sidebarNav = document.querySelector(".sidebar-nav");
+    const sidebarFooter = document.querySelector(".sidebar-footer");
 
+    // Fetch from localstorage
     const savedTheme = localStorage.getItem('theme') || 'light';
     html.setAttribute('data-bs-theme', savedTheme);
     modeToggle.checked = (savedTheme === 'dark');
@@ -124,6 +178,12 @@
         html.setAttribute('data-bs-theme', theme);
         localStorage.setItem('theme', theme);
     });
+
+    burger_menu.addEventListener('click', ()=> {
+        sidebarNav.classList.toggle("active");
+        sidebarFooter.classList.toggle("active");
+    })
+
 </script>
 </body>
 </html>

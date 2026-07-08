@@ -5,36 +5,36 @@
 <div class="advisor-container py-5">
     <div class="results-report animate__animated animate__zoomIn shadow-lg">
         
-        <div class="report-header-banner p-4 bg-indigo text-white rounded-top-4 d-flex justify-content-between align-items-center">
+        <div class="report-header-banner p-4 bg-indigo rounded-top-4 d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="fw-bold mb-0">Analysis Record</h4>
-                <p class="mb-0 opacity-75 small">Reference ID: #{{ history.id }}</p>
+                <h4 class="fw-bold mb-0 text-light">Analysis Record</h4>
+                <p class="mb-0 opacity-75 small text-light">Reference ID: #{{ history.id }}</p>
             </div>
-            <div class="status-badge-white">
+            <div class="status-badge-white text-light">
                 <i class="fas fa-calendar-alt me-2"></i> {{ history.created_at.strftime("%d %b %Y") }}
             </div>
         </div>
 
-        <div class="p-4 p-md-5 bg-white">
+        <div class="p-4 p-md-5">
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
-                    <div class="metric-mini-card border-0 bg-light py-4 shadow-sm">
+                    <div class="metric-mini-card py-4 shadow-sm border border-light">
                         <span class="label text-muted fw-bold small text-uppercase">Savings Potential</span>
                         <span class="value text-success d-block h2 fw-bold mt-2">
-                            {{ "%.1f"|format(history.remain_percentage * 100) }}%
+                            {{ "%.1f"|format(history.remain_percentage) }}%
                         </span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="metric-mini-card border-0 bg-light py-4 shadow-sm">
+                    <div class="metric-mini-card py-4 shadow-sm border border-light">
                         <span class="label text-muted fw-bold small text-uppercase">Expense Load</span>
                         <span class="value text-orange d-block h2 fw-bold mt-2">
-                            {{ "%.1f"|format(history.expense_percentage * 100) }}%
+                            {{ "%.1f"|format(history.expense_percentage) }}%
                         </span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="metric-mini-card highlight border-0 py-4 shadow-sm" style="background-color: #f5f3ff;">
+                    <div class="metric-mini-card py-4 shadow-sm border border-light">
                         <span class="label text-indigo fw-bold small text-uppercase">Monthly Income</span>
                         <span class="value d-block h2 fw-bold mt-2 text-indigo">
                             <small class="fs-6 fw-normal">$</small>{{ "{:,}".format(history.income|int) }}
@@ -46,7 +46,7 @@
             <div class="row g-3 mb-5 px-2">
                 <div class="col-md-4">
                     <p class="text-label mb-1">Status</p>
-                    <span class="fw-bold text-dark">{{ history.martial_status }}</span>
+                    <span class="fw-bold">{{ history.martial_status }}</span>
                 </div>
                 <div class="col-md-4">
                     <p class="text-label mb-1">Employment</p>
@@ -70,7 +70,7 @@
                     <h6 class="fw-bold tracking-widest text-muted mb-4">{{ history.get_conclusion }}</h6>
                 </div>
 
-                <div class="advice-box p-4 bg-white border border-light shadow-sm rounded-4 mb-5 position-relative">
+                <div class="advice-box p-4 border border-light shadow-sm rounded-4 mb-5 position-relative">
                     <div class="position-absolute top-0 start-0 h-100 bg-indigo rounded-start" style="width: 6px;"></div>
                     <h6 class="text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">Strategic Roadmap</h6>
                     <p class="advice-text mb-0 ps-2 text-secondary lh-lg">
@@ -107,7 +107,7 @@
     
     .metric-mini-card { 
         padding: 1rem; 
-        background: #f8fafc; 
+        border: 1px solid #fff;
         border-radius: 1.25rem; 
         text-align: center; 
     }

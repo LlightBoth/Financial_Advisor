@@ -14,7 +14,7 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 @auth_bp.route("/login", methods=["GET", "POST"])
 # @prevent_dos.limit("10 per minute")
 def login():
-    form = LoginForm()
+    form = LoginForm() 
 
     if form.validate_on_submit():
         # AuthService returns a User object + access/refresh tokens

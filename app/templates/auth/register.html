@@ -13,7 +13,7 @@
     <div class="row g-3">
         <div class="col-12">
             {{ form.email.label(class="form-label text-white-50 small") }}
-            {{ form.email(class="form-control form-control-auth", placeholder="name@example.com") }}
+            {{ form.email(class="form-control form-control-auth", placeholder="someone@example.com") }}
             {% for error in form.email.errors %}
                 <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
             {% endfor %}
@@ -21,7 +21,7 @@
 
         <div class="col-md-6">
             {{ form.username.label(class="form-label text-white-50 small") }}
-            {{ form.username(class="form-control form-control-auth", placeholder="johndoe") }}
+            {{ form.username(class="form-control form-control-auth", placeholder="darah") }}
             {% for error in form.username.errors %}
                 <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
             {% endfor %}
@@ -29,7 +29,7 @@
 
         <div class="col-md-6">
             {{ form.full_name.label(class="form-label text-white-50 small") }}
-            {{ form.full_name(class="form-control form-control-auth", placeholder="John Doe") }}
+            {{ form.full_name(class="form-control form-control-auth", placeholder="Darah Reach") }}
             {% for error in form.full_name.errors %}
                 <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
             {% endfor %}

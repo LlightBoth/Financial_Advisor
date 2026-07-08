@@ -56,11 +56,11 @@
     <div class="row g-4">
         <div class="col-lg-3">
             <div class="settings-card p-3 shadow-sm">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-                    <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#tab-app" type="button">
+                <div class="nav flex-column nav-pills " id="v-pills-tab" role="tablist">
+                    <button class="nav-link active text-start text-muted" data-bs-toggle="pill" data-bs-target="#tab-app" type="button">
                         <i class="fas fa-sliders-h me-2"></i> Preferences
                     </button>
-                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-security" type="button">
+                    <button class="nav-link text-start text-muted" data-bs-toggle="pill" data-bs-target="#tab-security" type="button">
                         <i class="fas fa-shield-alt me-2"></i> Password & Security
                     </button>
                     <button class="nav-link text-start text-danger" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button">
@@ -76,21 +76,21 @@
                 <div class="tab-pane fade show active" id="tab-app">
                     <div class="settings-card">
                         <h4 class="mb-4">App Preferences</h4>
-                        <form action="{{ url_for('settings.userIndex') }}" method="POST">
+                        <!-- <form action="{{ url_for('settings.userIndex') }}" method="POST"> -->
+                        <form >
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label small uppercase">Display Language</label>
                                     <select name="language" class="form-select form-control-glass">
                                         <option value="en" selected>English (US)</option>
-                                        <option value="es">Español</option>
-                                        <option value="vi">Tiếng Việt</option>
+                                        <option value="kh">Khmer</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <!-- Future Update -->
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary mt-4 px-4">Save Changes</button>
+                            <button onclick="alert('On Working...')" class="btn btn-primary mt-4 px-4">Save Changes</button>
                         </form>
                     </div>
                 </div>
