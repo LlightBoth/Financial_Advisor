@@ -100,11 +100,10 @@ def create_app(config_class: type[Config] = Config):
             if not Role.query.filter_by(name=role_name).first():
                 role = Role(name=role_name)
                 db.session.add(role)
-
+    
         admin_role = Role.query.filter_by(name="admin").first()
-        user_admin = User.query.filter_by(username="admin").first()
 
-        # Add admin username and role 
+        user_admin = User.query.filter_by(username="admin").first()
         if not user_admin:
             user_admin = User(
                 username="admin",
@@ -114,6 +113,17 @@ def create_app(config_class: type[Config] = Config):
             user_admin.set_password("Admin123")
             user_admin.roles.append(admin_role)
             db.session.add(user_admin)
+
+        user2_admin = User.query.filter_by(username="Dara").first()
+        if not user2_admin:
+            user2_admin = User(
+                username="Dara",
+                email="dara123@gmail.com",
+                full_name="Dara",
+            )
+            user2_admin.set_password("Dara123")
+            user2_admin.roles.append(admin_role)
+            db.session.add(user2_admin)
 
         db.session.commit()
     

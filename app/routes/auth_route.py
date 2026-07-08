@@ -73,5 +73,5 @@ def register():
 @auth_bp.route("/logout")
 @login_required
 def logout():
-    logout_user()
+    # logout_user()
     return remove_cookie()

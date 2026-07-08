@@ -12,7 +12,7 @@
 
     <div class="mb-3">
         {{ form.email.label(class="form-label text-white-50 small") }}
-        {{ form.email(class="form-control form-control-auth", placeholder="Enter your email") }}
+        {{ form.email(class="form-control form-control-auth", placeholder="Enter your email", id="email") }}
         {% for error in form.email.errors %}
             <div class="text-danger small mt-1">{{ error }}</div>
         {% endfor %}
@@ -20,14 +20,14 @@
 
     <div class="mb-3">
         {{ form.password.label(class="form-label text-white-50 small") }}
-        {{ form.password(class="form-control form-control-auth", placeholder="Enter your password") }}
+        {{ form.password(class="form-control form-control-auth", placeholder="Enter your password", id="password") }}
         {% for error in form.password.errors %}
             <div class="text-danger small mt-1">{{ error }}</div>
         {% endfor %}
     </div>
 
     <div class="form-check mb-4">
-        {{ form.is_remember(class="form-check-input") }}
+        {{ form.is_remember(class="form-check-input", id="remember") }}
         {{ form.is_remember.label(class="form-check-label text-white-50 small") }}
     </div>
 
@@ -40,4 +40,40 @@
         <a href="{{ url_for('auth.register') }}" class="text-white fw-bold text-decoration-none ms-1">Create an Account</a>
     </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Script loaded");
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const rememberCheckbox = document.getElementById("remember");
+
+    const saved = JSON.parse(
+        localStorage.getItem("user_detail") || "null"
+    );
+
+    if (saved) {
+        emailInput.value = saved.email || "";
+        passwordInput.value = saved.password || "";
+        rememberCheckbox.checked = true;
+    }
+
+    document.querySelector("form").addEventListener("submit", function () {
+        if (rememberCheckbox.checked) {
+            localStorage.setItem(
+                "user_detail",
+                JSON.stringify({
+                    email: emailInput.value,
+                    password: passwordInput.value
+                })
+            );
+        } else {
+            localStorage.removeItem("user_detail");
+        }
+    });
+});
+</script>
 {% endblock %}
