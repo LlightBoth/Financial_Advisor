@@ -9,7 +9,7 @@ def get_cookie(redirect_url, access_token, refresh_token):
         access_token,
         httponly=True,
         secure=True,
-        samesite="Strict"
+        samesite="Lax"
     )
     res.set_cookie(
         "access_token",
