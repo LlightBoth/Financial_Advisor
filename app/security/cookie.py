@@ -12,11 +12,11 @@ def get_cookie(redirect_url, access_token, refresh_token):
         samesite="Strict"
     )
     res.set_cookie(
-        "refresh_token",
-        refresh_token,
+        "access_token",
+        access_token,
         httponly=True,
         secure=True,
-        samesite="Strict"
+        samesite="Lax"
     )
     return res
 

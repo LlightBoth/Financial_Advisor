@@ -23,11 +23,16 @@ def login():
         )
 
         if user:
+            print("LOGIN SUCCESS")
+            print("USER:", user.username)
+
             login_user(user, remember=form.is_remember.data)
             flash("Login successful", "success")
 
             # Decide redirect based on role
             current_user_role = get_current_user_role()
+
+            print("ROLE:", current_user_role)
 
             if current_user_role == "user":
                 redirect_url = url_for("dashboards.userIndex")
@@ -35,6 +40,8 @@ def login():
                 redirect_url = url_for("rules.index")
             else:
                 redirect_url = url_for("dashboards.empIndex")
+
+            print("REDIRECT:", redirect_url)
 
             # ✅ RETURN with cookies
             return get_cookie(redirect_url, access_token, refresh_token)
