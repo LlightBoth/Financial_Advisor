@@ -1,1 +1,26 @@
-migrations/
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Flask instance folder (contains database and secrets)
+instance/
+
+# Environment variables
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Database files
+*.db
+*.sqlite3
+
+# Logs
+*.log
