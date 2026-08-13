@@ -14,3 +14,5 @@ from .loan_route import loan_bp
 from .history_route import history_bp
 from .setting_route import setting_bp
 from .profile_route import profile_bp
+from .income_route import income_bp
+from .expense_route import expense_bp

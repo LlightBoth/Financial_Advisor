@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 
 # Create Database model From Code -> Table
 from extension import db
-from app.models.associations import user_roles, user_plans, user_histories
+from app.models.associations import user_roles, user_plans, user_histories, user_incomes, user_expenses
 
 
 class User(UserMixin, db.Model):
@@ -14,7 +14,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(30), nullable=False)
-    full_name = db.Column(db.String(80), unique=True, nullable=False)
+    full_name = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     refresh_token = db.Column(db.Text, unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -24,6 +24,8 @@ class User(UserMixin, db.Model):
     roles = db.relationship("Role", secondary=user_roles, back_populates="users")
     plans = db.relationship("Plan", secondary=user_plans, back_populates="users")
     histories = db.relationship("History", secondary=user_histories, back_populates="users")
+    incomes = db.relationship("Income", secondary=user_incomes, back_populates="users")
+    expenses = db.relationship("Expense", secondary=user_expenses, back_populates="users")
 
 
     # Methods To Help

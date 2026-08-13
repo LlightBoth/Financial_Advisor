@@ -55,6 +55,8 @@ def create_app(config_class: type[Config] = Config):
     from app.routes.history_route import history_bp
     from app.routes.setting_route import setting_bp
     from app.routes.profile_route import profile_bp
+    from app.routes.income_route import income_bp
+    from app.routes.expense_route import expense_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(auth_bp)
@@ -69,6 +71,8 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(setting_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(loan_bp)
+    app.register_blueprint(income_bp)
+    app.register_blueprint(expense_bp)
 
     # Add "/" so it goes to Users list
     @app.route("/")
@@ -114,7 +118,7 @@ def create_app(config_class: type[Config] = Config):
             user_admin.roles.append(admin_role)
             db.session.add(user_admin)
 
-        user2_admin = User.query.filter_by(username="Dara").first()
+        user2_admin = User.query.filter_by(full_name="Dara").first()
         if not user2_admin:
             user2_admin = User(
                 username="Dara",

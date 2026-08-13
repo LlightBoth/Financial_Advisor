@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, redirect, url_for, abort, flash
 from flask_login import login_required, current_user
 
 from app.services.dashboard_services import DashboardServices
+from app.services.income_services import IncomeServices
+from app.services.expense_services import ExpenseServices
 
 dashboard_bp = Blueprint("dashboards", __name__, url_prefix="/dashboards")
 
@@ -9,7 +11,16 @@ dashboard_bp = Blueprint("dashboards", __name__, url_prefix="/dashboards")
 @dashboard_bp.route("/", methods=["GET"])
 @login_required
 def userIndex():
-    sum_saving = DashboardServices.user_sum_saving(current_user.id)
+    # Saving Math Formula
+    total_income = IncomeServices.get_income_total(current_user)
+    total_expense = ExpenseServices.get_expense_total(current_user)
+
+    sum_saving = total_income - total_expense
+    if sum_saving > 0:
+        sum_saving_rate = (sum_saving*100)/total_income
+    else:
+        sum_saving_rate = 0
+
     weekly_saving = DashboardServices.user_weekly_saving(current_user.id)
 
     # ensure a saving dict is always working and return value back
@@ -21,7 +32,10 @@ def userIndex():
 
     return render_template(
         "dashboards/index.html", 
-        sum_saving = sum_saving, 
+        sum_saving = sum_saving,
+        sum_saving_rate = sum_saving_rate,
+        total_income = total_income,
+        total_expense = total_expense,
         weekly_saving = weekly_saving,
         user_plans = user_plans
         )

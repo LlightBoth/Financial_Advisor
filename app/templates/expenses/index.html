@@ -1,0 +1,313 @@
+{% extends "layouts/clientBase.html" %}
+
+{% block title %} My Expenses | Intelli App {% endblock %}
+
+{% block content %}
+
+<style>
+    .rounded-4-custom { border-radius: 1rem !important; }
+    .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08) !important;
+    }
+    .icon-shape {
+        width: 48px;
+        height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+</style>
+
+<div class="container py-4 py-md-4">
+
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Expenses Dashboard</h2>
+            <p class="text-muted mb-0">
+                Track and manage all of your expenses.
+            </p>
+        </div>
+
+        <a href="{{ url_for('expenses.create') }}" class="btn btn-dark px-4 py-2 mt-3 mt-md-0 rounded-3 shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i> Add Expense
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+
+        <!-- Total Expenses -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-uppercase text-muted fw-bold">Total Expense</small>
+                        <div class="icon-shape bg-danger-subtle text-primary">
+                            <i class="bi bi-cash-stack text-danger fs-4"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0 text-danger">
+                        ${{ "%.2f"|format(expenses|sum(attribute="amount")|float) }}
+                    </h3>
+                    <div class="text-muted small">
+                        Cumulative recorded spending
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Records -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-uppercase text-muted fw-bold">Expense Records</small>
+                        <div class="icon-shape bg-primary-subtle text-primary">
+                            <i class="bi bi-receipt-cutoff fs-4"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">
+                        {{ expenses|length }}
+                    </h3>
+                    <div class="text-muted small">
+                        Transaction entries logged
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recurring Expenses -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 rounded-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-uppercase text-muted fw-bold">Recurring Expenses</small>
+                        <div class="icon-shape bg-warning-subtle text-warning">
+                            <i class="bi bi-arrow-repeat fs-4"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mb-0">
+                        {{ expenses|selectattr("recurring_period")|list|length }}
+                    </h3>
+                    <div class="text-muted small">
+                        Active recurring expense streams
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Expense History Card -->
+    <div class="card border-0 shadow-sm rounded-4-custom overflow-hidden">
+        
+        <div class="card-header bg-body border-bottom p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-0">Transaction History</h5>
+                    <small class="text-muted">A detailed log of all your expense items.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            {% if expenses %}
+
+                <!-- ======================================================= -->
+                <!-- 1. MOBILE VIEW: Dynamic Cards (< 768px)                -->
+                <!-- ======================================================= -->
+                <div class="d-md-none divide-y">
+                    {% for expense in expenses %}
+                        <div class="p-3 border-bottom bg-body">
+                            
+                            <!-- Header: Badge & Amount -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                {% if expense.category == "Food" %}
+                                    <span class="badge bg-danger-subtle text-danger px-2.5 py-1.5 fw-medium"><i class="bi bi-egg-fried me-1"></i> Food</span>
+                                {% elif expense.category == "Transportation" %}
+                                    <span class="badge bg-primary-subtle text-primary px-2.5 py-1.5 fw-medium"><i class="bi bi-car-front me-1"></i> Transportation</span>
+                                {% elif expense.category == "Housing" %}
+                                    <span class="badge bg-warning-subtle text-warning px-2.5 py-1.5 fw-medium"><i class="bi bi-house me-1"></i> Housing</span>
+                                {% elif expense.category == "Utilities" %}
+                                    <span class="badge bg-info-subtle text-info px-2.5 py-1.5 fw-medium"><i class="bi bi-lightning-charge me-1"></i> Utilities</span>
+                                {% elif expense.category == "Education" %}
+                                    <span class="badge bg-success-subtle text-success px-2.5 py-1.5 fw-medium"><i class="bi bi-book me-1"></i> Education</span>
+                                {% elif expense.category == "Healthcare" %}
+                                    <span class="badge bg-danger-subtle text-danger px-2.5 py-1.5 fw-medium"><i class="bi bi-heart-pulse me-1"></i> Healthcare</span>
+                                {% elif expense.category == "Shopping" %}
+                                    <span class="badge bg-secondary-subtle text-secondary px-2.5 py-1.5 fw-medium"><i class="bi bi-cart me-1"></i> Shopping</span>
+                                {% elif expense.category == "Entertainment" %}
+                                    <span class="badge bg-dark-subtle text-dark px-2.5 py-1.5 fw-medium"><i class="bi bi-controller me-1"></i> Entertainment</span>
+                                {% elif expense.category == "Debt" %}
+                                    <span class="badge bg-warning-subtle text-warning px-2.5 py-1.5 fw-medium"><i class="bi bi-credit-card me-1"></i> Debt</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border px-2.5 py-1.5 fw-medium"><i class="bi bi-three-dots me-1"></i> {{ expense.category }}</span>
+                                {% endif %}
+
+                                <span class="fw-bold text-danger fs-5">
+                                    -${{ "%.2f"|format(expense.amount|float) }}
+                                </span>
+                            </div>
+
+                            <!-- Description & Metadata -->
+                            <div class="mb-3">
+                                {% if expense.description %}
+                                    <div class="fw-semibold text-dark mb-2">{{ expense.description }}</div>
+                                {% else %}
+                                    <div class="text-muted fst-italic small mb-2">No description</div>
+                                {% endif %}
+
+                                <div class="d-flex align-items-center gap-2 text-muted small">
+                                    <span><i class="bi bi-calendar3 me-1"></i>{{ expense.expense_date.strftime('%b %d, %Y') }}</span>
+                                    {% if expense.recurring_period %}
+                                        <span>&bull;</span>
+                                        <span class="text-warning"><i class="bi bi-arrow-repeat me-1"></i>{{ expense.recurring_period }}</span>
+                                    {% else %}
+                                        <span>&bull;</span>
+                                        <span>One-time</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Action Bar -->
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('expenses.detail', expense_id=expense.id) }}" class="btn btn-sm btn-light border flex-fill text-center fw-medium py-1.5">
+                                    <i class="bi bi-eye me-1"></i> View
+                                </a>
+                                <a href="{{ url_for('expenses.edit', expense_id=expense.id) }}" class="btn btn-sm btn-light border flex-fill text-center fw-medium py-1.5">
+                                    <i class="bi bi-pencil me-1"></i> Edit
+                                </a>
+                                <a href="{{ url_for('expenses.delete', expense_id=expense.id) }}" class="btn btn-light text-center text-danger">
+                                    <i class="bi bi-trash3 me-2"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- ======================================================= -->
+                <!-- 2. DESKTOP VIEW: Table (≥ 768px)                       -->
+                <!-- ======================================================= -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light border-top-0">
+                            <tr class="text-uppercase text-muted small">
+                                <th class="ps-4 py-3">Date</th>
+                                <th class="py-3">Category</th>
+                                <th class="py-3">Description</th>
+                                <th class="py-3">Recurring</th>
+                                <th class="text-end py-3">Amount</th>
+                                <th class="text-end py-3 pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in expenses %}
+                                <tr>
+                                    <!-- Date -->
+                                    <td class="ps-4 fw-medium text-body">
+                                        {{ expense.expense_date.strftime('%b %d, %Y') }}
+                                    </td>
+
+                                    <!-- Category -->
+                                    <td>
+                                        {% if expense.category == "Food" %}
+                                            <span class="badge bg-danger-subtle text-danger"><i class="bi bi-egg-fried me-1"></i> Food</span>
+                                        {% elif expense.category == "Transportation" %}
+                                            <span class="badge bg-primary-subtle text-primary"><i class="bi bi-car-front me-1"></i> Transportation</span>
+                                        {% elif expense.category == "Housing" %}
+                                            <span class="badge bg-warning-subtle text-warning"><i class="bi bi-house me-1"></i> Housing</span>
+                                        {% elif expense.category == "Utilities" %}
+                                            <span class="badge bg-info-subtle text-info"><i class="bi bi-lightning-charge me-1"></i> Utilities</span>
+                                        {% elif expense.category == "Education" %}
+                                            <span class="badge bg-success-subtle text-success"><i class="bi bi-book me-1"></i> Education</span>
+                                        {% elif expense.category == "Healthcare" %}
+                                            <span class="badge bg-danger-subtle text-danger"><i class="bi bi-heart-pulse me-1"></i> Healthcare</span>
+                                        {% elif expense.category == "Shopping" %}
+                                            <span class="badge bg-secondary-subtle text-secondary"><i class="bi bi-cart me-1"></i> Shopping</span>
+                                        {% elif expense.category == "Entertainment" %}
+                                            <span class="badge bg-dark-subtle text-dark"><i class="bi bi-controller me-1"></i> Entertainment</span>
+                                        {% elif expense.category == "Debt" %}
+                                            <span class="badge bg-warning-subtle text-warning"><i class="bi bi-credit-card me-1"></i> Debt</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark border"><i class="bi bi-three-dots me-1"></i> {{ expense.category }}</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Description -->
+                                    <td>
+                                        {% if expense.description %}
+                                            <span class="text-body">{{ expense.description }}</span>
+                                        {% else %}
+                                            <span class="text-muted fst-italic small">No description</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Recurring -->
+                                    <td>
+                                        {% if expense.recurring_period %}
+                                            <span class="badge rounded-pill bg-light text-dark border fw-normal px-2 py-1">
+                                                <i class="bi bi-arrow-repeat text-warning me-1"></i>{{ expense.recurring_period }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted small">One-time</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Amount -->
+                                    <td class="text-end fw-semibold text-danger">
+                                        -${{ "%.2f"|format(expense.amount|float) }}
+                                    </td>
+
+                                    <!-- Actions (Inline Button Group) -->
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group btn-group-sm shadow-sm rounded-3 overflow-hidden border">
+                                            <a href="{{ url_for('expenses.detail', expense_id=expense.id) }}" class="btn btn-white text-secondary" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('expenses.edit', expense_id=expense.id) }}" class="btn btn-white text-secondary" title="Edit Record">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{{ url_for('expenses.delete', expense_id=expense.id) }}" class="btn btn-light text-center text-danger">
+                                                <i class="bi bi-trash3 me-2"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Delete Modals Loop (Shared by Mobile & Desktop) -->
+                
+
+            {% else %}
+
+                <!-- Empty State -->
+                <div class="text-center py-5 px-4">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-wallet2 fs-2 text-muted"></i>
+                    </div>
+                    <h5 class="fw-bold">No expense records yet</h5>
+                    <p class="text-muted mb-4">Start tracking your expenses by adding your first expense record.</p>
+                    <a href="{{ url_for('expenses.create') }}" class="btn btn-dark px-4 py-2 rounded-3 shadow-sm">
+                        <i class="bi bi-plus-lg me-2"></i> Add Your First Expense
+                    </a>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -24,7 +24,6 @@ history_bp = Blueprint("history", __name__, url_prefix="/histories")
 @history_bp.before_request
 def check_token():
     check_cookie_token(current_user)
-    role_user_only()
 
 
 @history_bp.route('/')

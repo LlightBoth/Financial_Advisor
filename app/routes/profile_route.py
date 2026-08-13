@@ -8,6 +8,8 @@ from app.security.cookie import check_cookie_token
 from app.security.role_check import check_user_role
 from app.services.user_services import UserServices
 from app.services.plan_services import PlanServices
+from app.services.income_services import IncomeServices
+from app.services.expense_services import ExpenseServices
 
 profile_bp = Blueprint("profiles", __name__, url_prefix="/profiles")
 # Middleware route
@@ -102,12 +104,19 @@ def edit_emp_password(user_id):
 def userIndex():
     form = EditProfileForm(obj=current_user)
     user_plan_count = PlanServices.get_user_all_plan_count(current_user)
+    # Saving Math Formula
+    total_income = IncomeServices.get_income_total(current_user)
+    total_expense = ExpenseServices.get_expense_total(current_user)
+
+    sum_saving = total_income - total_expense
+    sum_saving_rate = (sum_saving*100)/total_income
 
     return render_template(
         "profiles/userIndex.html",
         form=form,
         current_user=current_user,
-        user_plan_count = user_plan_count
+        sum_saving_rate = sum_saving_rate,
+        user_plan_count = user_plan_count,
     )
 
 
@@ -120,6 +129,12 @@ def edit_profile(user_id):
 
     form = EditProfileForm(obj=user)
     user_plan_count = PlanServices.get_user_all_plan_count(current_user)
+    # Saving Math Formula
+    total_income = IncomeServices.get_income_total(current_user)
+    total_expense = ExpenseServices.get_expense_total(current_user)
+
+    sum_saving = total_income - total_expense
+    sum_saving_rate = (sum_saving*100)/total_income
 
     if form.validate_on_submit():
         data = {
@@ -137,7 +152,8 @@ def edit_profile(user_id):
         "profiles/userIndex.html",
         form=form,
         current_user=user,
-        user_plan_count = user_plan_count
+        user_plan_count = user_plan_count,
+        sum_saving_rate=sum_saving_rate
     )
 
 

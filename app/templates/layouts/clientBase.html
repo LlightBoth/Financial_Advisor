@@ -34,6 +34,16 @@
                 </a>
             </li>
             <li>
+                <a href="{{ url_for('incomes.index') }}" class="nav-link {% if request.endpoint == 'incomes.index' %}active{% endif %}">
+                    <i class="bi bi-wallet2 me-2"></i> Income
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('expenses.index') }}" class="nav-link {% if request.endpoint == 'expenses.index' %}active{% endif %}">
+                    <i class="bi bi-cash-stack me-2"></i> Expense
+                </a>
+            </li>
+            <li>
                 <a href="{{ url_for('plans.index') }}" class="nav-link {% if 'plans' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-map me-2"></i> My Plans
                 </a>
@@ -41,7 +51,7 @@
 
             <li>
                 <a href="{{ url_for('advisors.index') }}" class="nav-link {% if 'advisors' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-person-badge me-2"></i> Advisor
+                    <i class="bi bi-person-badge me-2"></i> Analyse
                 </a>
             </li>
 
@@ -96,15 +106,9 @@
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li class="dropdown-item text-center">1 message</li>
-
+                    <li class="dropdown-item text-center">Complete Daily Tasks</li>
                     <li><hr class="dropdown-divider"></li>
-
-                    <li class="dropdown-item text-center">2 message</li>
-
-                    <li><hr class="dropdown-divider"></li>
-
-                    <li class="dropdown-item text-center">3 message</li>
+                    <li class="dropdown-item text-center">Analyse Plan</li>
                 </ul>
 
             </div>

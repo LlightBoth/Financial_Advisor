@@ -1,0 +1,56 @@
+from app.models.expense import Expense
+from extension import db
+from sqlalchemy import func
+
+
+class ExpenseServices:
+    @staticmethod
+    def get_all_expense(current_user):
+        return Expense.query.filter(Expense.users.any(id=current_user.id)).all()
+
+    @staticmethod
+    def get_expense_count(current_user):
+        return Expense.query.filter(Expense.users.any(id=current_user.id)).count()
+
+    @staticmethod
+    def get_expense_total(current_user):
+        return (
+            db.session.query(func.sum(Expense.amount)).filter(Expense.users.any(id=current_user.id)).scalar()
+            or 0
+        )
+
+    @staticmethod
+    def get_expense_id(expense_id):
+        return Expense.query.get(expense_id)
+
+    @staticmethod
+    def create_expense(data: dict, user:int):
+        expense = Expense(
+            amount=data["amount"],
+            description=data.get("description"),
+            category=data["category"],
+            expense_date=data["expense_date"],
+            recurring_period=data.get("recurring_period") or None,
+        )
+        expense.users.append(user)
+        db.session.add(expense)
+        db.session.commit()
+
+        return expense
+
+    @staticmethod
+    def update_expense(expense: Expense, data: dict):
+        expense.amount = data["amount"]
+        expense.description = data.get("description")
+        expense.category = data["category"]
+        expense.expense_date = data["expense_date"]
+        expense.recurring_period = data.get("recurring_period") or None
+
+        db.session.commit()
+
+        return expense
+
+    @staticmethod
+    def delete_expense(expense: Expense):
+        db.session.delete(expense)
+        db.session.commit()

@@ -105,7 +105,7 @@
                 <p class="info mb-3"><i class="bi bi-calendar-check"></i>  {{current_user.created_at.strftime("%b/%m")}} </p>
             </div>
             <div class="col-md-auto mt-3 mt-md-0 text-md-end">
-                <button class="btn btn-light rounded-pill px-4 fw-bold">
+                <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="alert('Coming Soon...')">
                     <i class="bi bi-pencil-square"></i>Edit Banner
                 </button>
             </div>
@@ -126,7 +126,13 @@
                 </div>
                 <div class="d-flex justify-content-between">
                     <span class="text-muted">Risk Level</span>
-                    <span class="text-success fw-bold">High</span>
+                    {% if sum_saving_rate >= 75 %}
+                        <span class="text-success fw-bold">Excellent</span>
+                    {% elif sum_saving_rate >= 25 %}
+                        <span class="text-warning fw-bold">Moderate</span>
+                    {% else %}
+                        <span class="text-danger fw-bold">Moderate</span>
+                    {% endif %}
                 </div>
             </div>
 

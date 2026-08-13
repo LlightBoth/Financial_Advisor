@@ -27,7 +27,11 @@
                     <i class="bi bi-arrow-up-right status-icon text-success"></i>
                 </div>
                 <div class="text-label-caps">Total Balance Saving</div>
-                <div class="h2 fw-bold mb-0">${{ "{:,.2f}".format(sum_saving or 0) }}</div>
+                <div class="h2 fw-bold mb-0 {% if sum_saving >= 0 %} text-success
+                                            {% else %} text-danger
+                                            {% endif %}
+                "> ${{ "{:,.2f}".format(sum_saving or 0) }}
+                </div>
             </div>
         </div>
         <div class="col-md-4">
@@ -36,8 +40,8 @@
                     <div class="icon-box bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
                     <i class="bi bi-activity status-icon text-success"></i>
                 </div>
-                <div class="text-label-caps">Market Growth</div>
-                <div class="h2 fw-bold mb-0">8.42%</div>
+                <div class="text-label-caps">Income Growth</div>
+                <div class="h2 fw-bold mb-0">{{ "{:,.2f}".format(sum_saving_rate or 0) }}%</div>
             </div>
         </div>
         <div class="col-md-4">
@@ -47,24 +51,50 @@
                     <i class="bi bi-patch-check status-icon text-muted"></i>
                 </div>
                 <div class="text-label-caps">Risk Status</div>
-                <div class="h2 fw-bold mb-0 text-warning">Moderate</div>
+                {% if sum_saving_rate >= 75 %}
+                    <div class="h2 fw-bold mb-0 text-success">Excellent</div>
+                {% elif sum_saving_rate >= 25 %}
+                    <div class="h2 fw-bold mb-0 text-warning">Moderate</div>
+                {% elif sum_saving_rate == 0 %}
+                    <div class="h2 fw-bold mb-0 text-muted">None</div>
+                {% else %}
+                    <div class="h2 fw-bold mb-0 text-danger">Risky</div>
+                {% endif %}
             </div>
         </div>
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-md-8">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <h6 class="fw-bold mb-4 text-uppercase text-muted" style="font-size: 0.8rem;">Weekly Performance</h6>
-                <div id="chart_main" style="width: 100%; height: 300px;"></div>
+        <!-- Weekly Performance -->
+        <div class="col-12 col-lg-8">
+            <div class="card stat-card shadow-sm p-3 p-md-4 h-100">
+                <h6 class="fw-bold mb-3 mb-md-4 text-uppercase text-muted"
+                    style="font-size: 0.8rem;">
+                    Weekly Performance
+                </h6>
+
+                <div id="chart_main"
+                    class="w-100"
+                    style="height: 280px;">
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <h6 class="fw-bold mb-4 text-uppercase text-muted" style="font-size: 0.8rem;">Progess Percentage</h6>
-                <div id="chart_side" style="width: 100%; height: 300px;"></div>
+
+        <!-- Progress -->
+        <div class="col-12 col-lg-4">
+            <div class="card stat-card shadow-sm p-3 p-md-4 h-100">
+                <h6 class="fw-bold mb-3 mb-md-4 text-uppercase text-muted"
+                    style="font-size: 0.8rem;">
+                    Progress Percentage
+                </h6>
+
+                <div id="chart_side"
+                    class="w-100"
+                    style="height: 280px;">
+                </div>
             </div>
         </div>
+
     </div>
 
     <div class="row g-4">
@@ -152,6 +182,8 @@
     google.charts.setOnLoadCallback(drawCharts);
 
     const weeklySaving = {{ weekly_saving | tojson | safe }};
+    const totalIncome = Number({{ total_income | default(0) | tojson }}) || 0;
+    const totalExpense = Number({{ total_expense | default(0) | tojson }}) || 0;
     // const userPlan = {{ user_plans | tojson | safe }};
 
     function drawCharts() {
@@ -181,8 +213,21 @@
         new google.visualization.AreaChart(document.getElementById('chart_main')).draw(dataMain, { ...options, colors: ['#0d6efd'] });
 
         // 2/ Bar chart
+        // No financial data yet
+        if (totalIncome === 0 && totalExpense === 0) {
+            chart_side.innerHTML = `
+                <div class="d-flex flex-column justify-content-center 
+                            align-items-center h-100 text-body-secondary">
+                    <i class="bi bi-pie-chart fs-1 mb-3 opacity-50"></i>
+                    <div class="fw-semibold">No financial data yet</div>
+                    <small>Add income or expense records to see your progress.</small>
+                </div>
+            `;
+            return;
+        }
+
         var dataSide = google.visualization.arrayToDataTable([
-            ['Type', 'Val'], ['Equity', 70], ['Cash', 30]
+            ['Type', 'Amount'], ['Expense', Number(totalExpense)], ['Income', Number(totalIncome)]
         ]);
 
         new google.visualization.PieChart(document.getElementById('chart_side')).draw(dataSide, { ...options, pieHole: 0.7, colors: ['#0d6efd', '#20c997'] });

@@ -8,7 +8,7 @@ class Plan(UserMixin, db.Model):
     __tablename__ = "plans"
 
     id = db.Column(db.Integer, primary_key=True)
-    goal = db.Column(db.String(80), unique=True, nullable=False)
+    goal = db.Column(db.String(80), nullable=False)
     in_between = db.Column(db.Date, nullable=False)
     goal_cost = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(120), nullable=False)

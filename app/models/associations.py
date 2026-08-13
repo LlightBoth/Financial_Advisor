@@ -25,6 +25,17 @@ user_plans = db.Table(
     db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
     db.Column("plan_id", db.Integer, db.ForeignKey("plans.id"), primary_key=True),
 )
+# Client-Side
+user_incomes = db.Table(
+    "user_incomes",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("income_id", db.Integer, db.ForeignKey("incomes.id"), primary_key=True),
+)
+user_expenses = db.Table(
+    "user_expenses",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("expense_id", db.Integer, db.ForeignKey("expenses.id"), primary_key=True),
+)
 user_histories = db.Table(
     "user_histories",
     db.Column("user_id", db.Integer, db.ForeignKey('users.id'), primary_key=True),

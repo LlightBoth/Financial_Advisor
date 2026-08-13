@@ -12,3 +12,5 @@ from .plan_forms import PlanForm, EditPlanForm, ConfirmDeleteForm
 from .advisor_forms import AdvisorForm
 from .loan_forms import LoanForm
 from .history_forms import ConfirmDeleteForm
+from .income_forms import IncomeForm, EditIncomeForm, IncomeDeleteForm
+from .expense_forms import ExpenseForm, EditExpenseForm, ExpenseDeleteForm

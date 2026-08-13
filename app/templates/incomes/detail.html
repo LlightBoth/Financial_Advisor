@@ -1,0 +1,159 @@
+{% extends "layouts/clientBase.html" %}
+
+{% block title %} Income Detail {% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center">
+
+    <h1 class="h3 mb-0">Income Detail</h1>
+
+    <div>
+        <a href="{{ url_for('incomes.edit', income_id=income.id) }}"
+           class="btn btn-sm btn-outline-secondary">
+            Edit
+        </a>
+
+        <a href="{{ url_for('incomes.index') }}"
+           class="btn btn-sm btn-outline-secondary">
+            Back to list
+        </a>
+    </div>
+
+</div>
+
+
+<dl class="row pt-4 pb-4">
+
+    <!-- Amount -->
+    <dt class="col-sm-3">
+        Amount
+    </dt>
+
+    <dd class="col-sm-9">
+        ${{ "%.2f"|format(income.amount|float) }}
+    </dd>
+
+
+    <!-- Category -->
+    <dt class="col-sm-3">
+        Category
+    </dt>
+
+    <dd class="col-sm-9">
+
+        {% if income.category == "Salary" %}
+
+            <span class="badge text-bg-primary">
+                Salary
+            </span>
+
+        {% elif income.category == "Business" %}
+
+            <span class="badge text-bg-success">
+                Business
+            </span>
+
+        {% elif income.category == "Freelance" %}
+
+            <span class="badge text-bg-info">
+                Freelance
+            </span>
+
+        {% elif income.category == "Investment" %}
+
+            <span class="badge text-bg-warning">
+                Investment
+            </span>
+
+        {% elif income.category == "Rental" %}
+
+            <span class="badge text-bg-secondary">
+                Rental
+            </span>
+
+        {% else %}
+
+            <span class="badge text-bg-dark">
+                {{ income.category }}
+            </span>
+
+        {% endif %}
+
+    </dd>
+
+
+    <!-- Income Date -->
+    <dt class="col-sm-3">
+        Income Date
+    </dt>
+
+    <dd class="col-sm-9">
+        {{ income.income_date }}
+    </dd>
+
+
+    <!-- Recurring Period -->
+    <dt class="col-sm-3">
+        Recurring Period
+    </dt>
+
+    <dd class="col-sm-9">
+
+        {% if income.recurring_period %}
+
+            <span class="badge text-bg-light">
+                {{ income.recurring_period }}
+            </span>
+
+        {% else %}
+
+            <span class="badge text-bg-secondary">
+                One-time
+            </span>
+
+        {% endif %}
+
+    </dd>
+
+
+    <!-- Description -->
+    <dt class="col-sm-3">
+        Description
+    </dt>
+
+    <dd class="col-sm-9">
+
+        {% if income.description %}
+            {{ income.description }}
+        {% else %}
+            <span class="text-muted">
+                No description provided.
+            </span>
+        {% endif %}
+
+    </dd>
+
+
+    <!-- Created At -->
+    <dt class="col-sm-3">
+        Created at
+    </dt>
+
+    <dd class="col-sm-9">
+        {{ income.created_at }}
+    </dd>
+
+
+    <!-- Updated At -->
+    <dt class="col-sm-3">
+        Last updated
+    </dt>
+
+    <dd class="col-sm-9">
+        {{ income.updated_at }}
+    </dd>
+
+</dl>
+
+{% endblock %}

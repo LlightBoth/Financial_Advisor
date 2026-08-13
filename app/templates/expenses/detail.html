@@ -1,0 +1,189 @@
+{% extends "layouts/clientBase.html" %}
+
+{% block title %} Expense Detail {% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center">
+
+    <h1 class="h3 mb-0">Expense Detail</h1>
+
+    <div>
+
+        <a href="{{ url_for('expenses.edit', expense_id=expense.id) }}"
+           class="btn btn-sm btn-outline-secondary">
+            Edit
+        </a>
+
+        <a href="{{ url_for('expenses.index') }}"
+           class="btn btn-sm btn-outline-secondary">
+            Back to list
+        </a>
+
+    </div>
+
+</div>
+
+
+<dl class="row pt-4 pb-4">
+
+    <!-- Amount -->
+    <dt class="col-sm-3">
+        Amount
+    </dt>
+
+    <dd class="col-sm-9">
+        ${{ "%.2f"|format(expense.amount|float) }}
+    </dd>
+
+
+    <!-- Category -->
+    <dt class="col-sm-3">
+        Category
+    </dt>
+
+    <dd class="col-sm-9">
+
+        {% if expense.category == "Food" %}
+
+            <span class="badge text-bg-danger">
+                Food
+            </span>
+
+        {% elif expense.category == "Transportation" %}
+
+            <span class="badge text-bg-primary">
+                Transportation
+            </span>
+
+        {% elif expense.category == "Housing" %}
+
+            <span class="badge text-bg-warning">
+                Housing
+            </span>
+
+        {% elif expense.category == "Utilities" %}
+
+            <span class="badge text-bg-info">
+                Utilities
+            </span>
+
+        {% elif expense.category == "Education" %}
+
+            <span class="badge text-bg-success">
+                Education
+            </span>
+
+        {% elif expense.category == "Healthcare" %}
+
+            <span class="badge text-bg-danger">
+                Healthcare
+            </span>
+
+        {% elif expense.category == "Shopping" %}
+
+            <span class="badge text-bg-secondary">
+                Shopping
+            </span>
+
+        {% elif expense.category == "Entertainment" %}
+
+            <span class="badge text-bg-dark">
+                Entertainment
+            </span>
+
+        {% elif expense.category == "Debt" %}
+
+            <span class="badge text-bg-warning">
+                Debt
+            </span>
+
+        {% else %}
+
+            <span class="badge text-bg-secondary">
+                {{ expense.category }}
+            </span>
+
+        {% endif %}
+
+    </dd>
+
+
+    <!-- Expense Date -->
+    <dt class="col-sm-3">
+        Expense Date
+    </dt>
+
+    <dd class="col-sm-9">
+        {{ expense.expense_date }}
+    </dd>
+
+
+    <!-- Recurring Period -->
+    <dt class="col-sm-3">
+        Recurring Period
+    </dt>
+
+    <dd class="col-sm-9">
+
+        {% if expense.recurring_period %}
+
+            <span class="badge text-bg-light">
+                {{ expense.recurring_period }}
+            </span>
+
+        {% else %}
+
+            <span class="badge text-bg-secondary">
+                One-time
+            </span>
+
+        {% endif %}
+
+    </dd>
+
+
+    <!-- Description -->
+    <dt class="col-sm-3">
+        Description
+    </dt>
+
+    <dd class="col-sm-9">
+
+        {% if expense.description %}
+
+            {{ expense.description }}
+
+        {% else %}
+
+            <span class="text-muted">
+                No description provided.
+            </span>
+
+        {% endif %}
+
+    </dd>
+
+
+    <!-- Created At -->
+    <dt class="col-sm-3">
+        Created at
+    </dt>
+
+    <dd class="col-sm-9">
+        {{ expense.created_at }}
+    </dd>
+
+
+    <!-- Updated At -->
+    <dt class="col-sm-3">
+        Last updated
+    </dt>
+
+    <dd class="col-sm-9">
+        {{ expense.updated_at }}
+    </dd>
+
+</dl>
+
+{% endblock %}
