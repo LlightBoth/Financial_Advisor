@@ -1,16 +1,55 @@
 from app.models.plan import Plan
 from app.models.user import User
+from app.models.income import Income
+from app.models.expense import Expense
+from app.models.history import History
 
 import random
 from datetime import date, datetime
 from config import Config
 from extension import db
+from sqlalchemy import func
 
 class DashboardServices:
     @staticmethod
     def emp_get_all_users():
         return User.query.count()
     
+    @staticmethod
+    def emp_get_all_incomes():
+        return Income.query.count()
+    
+    @staticmethod
+    def emp_get_all_expenses():
+        return Expense.query.count()
+    
+    @staticmethod
+    def emp_get_all_analyse_advisor():
+        return History.query.count()
+    
+    @staticmethod
+    def emp_get_all_active_users():
+        return User.query.filter(User.is_active==True).all()
+    
+    @staticmethod
+    def emp_get_all_users_registered():
+        results = db.session.query(
+            func.strftime('%Y-%m', User.created_at).label('month'),
+            func.count(User.id).label('count')
+        ).group_by(
+            func.strftime('%Y-%m', User.created_at)
+        ).order_by(
+            func.strftime('%Y-%m', User.created_at)
+        ).all()
+
+        return [
+            {
+                "month": row.month,
+                "count": row.count
+            }
+            for row in results
+        ]
+        
     @staticmethod
     def emp_get_all_plans():
         return Plan.query.count()

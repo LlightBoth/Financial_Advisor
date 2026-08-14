@@ -7,6 +7,7 @@ from app.services.history_services import HistoryServices
 from app.security.cookie import check_cookie_token
 from app.security.role_check import role_user_only
 
+
 history_bp = Blueprint("history", __name__, url_prefix="/history")
 
 
@@ -65,4 +66,10 @@ def delete(history_id):
     if form.validate_on_submit():
         HistoryServices.delete_history(history)
         flash("History deleted successfully", "success")
+    return redirect(url_for("history.index"))
+
+@history_bp.route('/delete_all', methods=['GET'])
+@login_required
+def delete_all():
+    HistoryServices.delete_all_history(current_user)
     return redirect(url_for("history.index"))

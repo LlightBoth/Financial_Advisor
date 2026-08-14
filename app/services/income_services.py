@@ -5,6 +5,10 @@ from sqlalchemy import func
 
 class IncomeServices:
     @staticmethod
+    def get_all_total_income():
+        return Income.query.all()
+    
+    @staticmethod
     def get_all_income(current_user):
         return Income.query.filter(Income.users.any(id=current_user.id)).all()
 

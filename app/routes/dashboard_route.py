@@ -59,14 +59,26 @@ def user_test_saving(plan_id, amount):
     DashboardServices.test_saving(current_user.id, plan_id, amount)
     
 
+
+# Employee Route
 @dashboard_bp.route("/emp", methods=["GET"])
 @login_required
 def empIndex():
     total_users = DashboardServices.emp_get_all_users()
     total_plans = DashboardServices.emp_get_all_plans()
+    total_incomes = DashboardServices.emp_get_all_incomes()
+    total_expenses = DashboardServices.emp_get_all_expenses()
+    total_anayses = DashboardServices.emp_get_all_analyse_advisor()
+    total_active_users = DashboardServices.emp_get_all_active_users()
+    monthly_users_registered = DashboardServices.emp_get_all_users_registered()
 
     return render_template(
         "dashboards/empIndex.html",
         total_users = total_users,
-        total_plans = total_plans
+        total_plans = total_plans,
+        total_incomes = total_incomes,
+        total_expenses = total_expenses,
+        total_anayses = total_anayses,
+        total_active_users=total_active_users,
+        monthly_users_registered = monthly_users_registered
         )

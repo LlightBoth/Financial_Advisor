@@ -50,6 +50,18 @@ class UserServices:
         return user
 
     @staticmethod
+    def update_user_online(user: User):
+        user.is_active = True
+        db.session.commit()
+        return user
+    
+    @staticmethod
+    def update_user_offline(user: User):
+        user.is_active = False
+        db.session.commit()
+        return user
+    
+    @staticmethod
     def delete(user):
         db.session.delete(user)
         db.session.commit()

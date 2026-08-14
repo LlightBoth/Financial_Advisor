@@ -13,10 +13,21 @@
             <span class="text-muted small">Real-time performance metrics</span>
         </div>
         <div class="d-flex gap-2">
-            <a href="/plans" class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm text-decoration-none">
-                <i class="bi bi-plus-lg me-1"></i> Add Plan
-            </a>
-        </div>
+    <form action="{{ url_for('advisors.analyseIndex') }}" method="POST" class="d-inline">
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+        
+        <!-- Use total_income and total_expense here -->
+        <input type="hidden" name="income" value="{{ total_income | default(0) }}">
+        <input type="hidden" name="expense" value="{{ total_expense | default(0) }}">
+        <input type="hidden" name="goal_cost" value="{{ (total_income | default(0)) }}">
+
+        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Analyse Now
+        </button>
+    </form>
+</div>
     </header>
 
     <div class="row g-4 mb-4">

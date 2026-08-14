@@ -8,6 +8,10 @@ from extension import db
 
 class HistoryServices:
     @staticmethod
+    def get_all_total_history():
+        return History.query.all()
+    
+    @staticmethod
     def get_all_history(current_user_id):
         return History.query.filter(History.users.any(id=current_user_id.id)).all()
 
@@ -58,3 +62,15 @@ class HistoryServices:
             db.session.commit()
             return True
         return False
+
+    @staticmethod
+    def delete_all_history(user):
+        # 1. Grab all history objects linked to this user
+        user_histories_list = list(user.histories)
+        
+        # 2. Delete each History object (SQLAlchemy handles clearing user_histories automatically)
+        for history_item in user_histories_list:
+            db.session.delete(history_item)
+            
+        # 3. Save changes
+        db.session.commit()

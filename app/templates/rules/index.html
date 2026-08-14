@@ -2,64 +2,184 @@
 {% block title %} Rules - Rule Management {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0"> rules</h1>
-    <a href="{{ url_for('rules.create') }}" class="btn btn-primary"> New rule </a>
-</div>
+<style>
+    /* Clamp long texts to maximum 3 lines with ellipsis */
+    .text-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+    }
 
-{% if rules %}
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle shadow-sm">
-            <thead class="table-light">
-                <tr>
-                    <th style="width: 50px;"> # </th>
-                    <th> conclusion </th>
-                    <th> certainty </th>
-                    <th> advice </th>
-                    <th class="text-end" style="width: 160px;"> Actions </th>
-                </tr>
-            </thead>
-            <tbody>
+    .rule-icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="container-fluid px-3 px-sm-4 py-3 py-md-4 pb-5">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1 text-body">Rules</h1>
+            <p class="text-body-secondary small mb-0">Manage decision logic, certainty factors, and advice</p>
+        </div>
+        <a href="{{ url_for('rules.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Rule</span>
+        </a>
+    </div>
+
+    {% if rules %}
+        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 overflow-hidden">
+
+            <!-- Desktop / Tablet Table View (hidden on mobile) -->
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-uppercase small fw-bold text-body-secondary border-bottom border-subtle" style="font-size: 0.725rem; letter-spacing: 0.05em;">
+                            <th class="border-0 px-4 py-3 bg-transparent" style="width: 50px;">#</th>
+                            <th class="border-0 py-3 bg-transparent">Conclusion</th>
+                            <th class="border-0 py-3 bg-transparent text-center" style="width: 140px;">Certainty</th>
+                            <th class="border-0 py-3 bg-transparent">Advice</th>
+                            <th class="border-0 px-4 py-3 bg-transparent text-end" style="width: 130px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rule in rules %}
+                            <tr class="border-bottom border-subtle">
+                                <td class="px-4 py-3 text-body-tertiary small fw-medium">
+                                    {{ loop.index }}
+                                </td>
+                                <td class="py-3">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="rule-icon-box bg-primary-subtle text-primary flex-shrink-0 mt-1">
+                                            <i class="bi bi-diagram-3"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" 
+                                               class="text-decoration-none fw-semibold text-body text-clamp-3" 
+                                               title="{{ rule.conclusion }}">
+                                                {{ rule.conclusion }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-2.5 py-1 fw-medium">
+                                        <i class="bi bi-percent me-1"></i>{{ rule.certainty }}
+                                    </span>
+                                </td>
+                                <td class="py-3 text-body-secondary small">
+                                    {% if rule.advice %}
+                                        <div class="text-clamp-3" title="{{ rule.advice }}">
+                                            {{ rule.advice }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-body-tertiary">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-end">
+                                    <div class="btn-group gap-1">
+                                        <a href="{{ url_for('rules.edit', rule_id=rule.id) }}" 
+                                           class="btn btn-sm btn-outline-secondary rounded-2"
+                                           title="Edit Rule">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ url_for('rules.delete_confirm', rule_id=rule.id) }}" 
+                                           class="btn btn-sm btn-outline-danger rounded-2"
+                                           title="Delete Rule">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile View (Cards list on screens < md) -->
+            <div class="d-md-none p-3 vstack gap-3">
                 {% for rule in rules %}
-                    <tr>
-                        <td> {{loop.index}} </td>
-                        <td>
-                            <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" class="text-decoration-none fw-semibold"> {{rule.conclusion}} </a>
-                        </td>
-
-                        <td> {{ rule.certainty }} </td>
-                        <td> {{ rule.advice }} </td>
+                    <div class="p-3 bg-body rounded-3 border border-subtle shadow-sm">
                         
-                        
-                        <td class="text-end">
-                            <!-- Edit -->
-                            <a 
-                                href="{{ url_for('rules.edit', rule_id=rule.id) }}" 
-                                class="btn btn-sm btn-outline-secondary"
-                                title="Edit"
-                            >
-                                ✏️
-                            </a>
+                        <!-- Top Row: Icon + Actions -->
+                        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rule-icon-box bg-primary-subtle text-primary flex-shrink-0" style="width:32px; height:32px; font-size:0.875rem;">
+                                    <i class="bi bi-diagram-3"></i>
+                                </div>
+                                <span class="text-body-tertiary small fw-medium">Rule #{{ loop.index }}</span>
+                            </div>
+                            <div class="btn-group gap-1 flex-shrink-0">
+                                <a href="{{ url_for('rules.edit', rule_id=rule.id) }}" 
+                                   class="btn btn-sm btn-outline-secondary rounded-2 px-2 py-1"
+                                   title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{{ url_for('rules.delete_confirm', rule_id=rule.id) }}" 
+                                   class="btn btn-sm btn-outline-danger rounded-2 px-2 py-1"
+                                   title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </div>
 
-                            <a 
-                                href="{{ url_for('rules.delete_confirm', rule_id=rule.id) }}" 
-                                class="btn btn-sm btn-outline-danger"
-                                title="Danger"
-                            >
-                                ❌
+                        <!-- Rule Conclusion -->
+                        <div class="mb-2">
+                            <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" 
+                               class="text-decoration-none fw-semibold text-body text-clamp-3 d-block" 
+                               title="{{ rule.conclusion }}">
+                                {{ rule.conclusion }}
                             </a>
-                        </td>
+                        </div>
 
-                    </tr>
+                        <!-- Rule Advice (if present) -->
+                        {% if rule.advice %}
+                            <div class="mb-3 text-body-secondary small text-clamp-3">
+                                <i class="bi bi-chat-left-text me-1 text-body-tertiary"></i>{{ rule.advice }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Footer Badge: Certainty -->
+                        <div class="d-flex align-items-center justify-content-between pt-2 border-top border-subtle">
+                            <span class="text-body-tertiary small">Certainty Rating</span>
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-2.5 py-1">
+                                {{ rule.certainty }}
+                            </span>
+                        </div>
+
+                    </div>
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% else %}
-    <div class="alert alert-info">
-        No rules found.
-        <a href="{{ url_for('rules.create') }}"> Create first rule</a>
-    </div>
-{% endif %}
+            </div>
 
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 p-5 text-center">
+            <div class="mb-3 text-body-tertiary fs-1">
+                <i class="bi bi-diagram-3"></i>
+            </div>
+            <h5 class="fw-bold text-body mb-2">No Rules Found</h5>
+            <p class="text-body-secondary mb-4 small" style="max-width: 380px; margin: 0 auto;">
+                No decision rules have been defined yet. Get started by creating your first rule.
+            </p>
+            <div>
+                <a href="{{ url_for('rules.create') }}" class="btn btn-primary rounded-3 px-4 shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Create First Rule
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}

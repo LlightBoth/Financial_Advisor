@@ -81,4 +81,5 @@ def register():
 @login_required
 def logout():
     # logout_user()
+    AuthService.logout_user(current_user)
     return remove_cookie()

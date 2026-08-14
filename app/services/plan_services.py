@@ -1,7 +1,12 @@
 from app.models.plan import Plan
 from extension import db
+from sqlalchemy import func
 
 class PlanServices:
+    @staticmethod
+    def get_all_total_plan():
+        return Plan.query.all()
+    
     @staticmethod
     def get_all_plan(current_user):
         return Plan.query.filter(Plan.users.any(id=current_user.id)).all()
@@ -9,7 +14,12 @@ class PlanServices:
     @staticmethod
     def get_user_all_plan_count(current_user):
         return Plan.query.filter(Plan.users.any(id=current_user.id)).count()
-
+    
+    @staticmethod
+    def get_user_all_plan_total(current_user):
+        total = db.session.query(func.sum(Plan.goal_cost)).filter(Plan.users.any(id=current_user.id)).scalar()
+        return total or 0
+    
     @staticmethod
     def get_plan_id(plan_id):
         return Plan.query.get(plan_id)

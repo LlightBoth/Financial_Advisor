@@ -5,6 +5,10 @@ from sqlalchemy import func
 
 class ExpenseServices:
     @staticmethod
+    def get_all_total_expense():
+        return Expense.query.all()
+    
+    @staticmethod
     def get_all_expense(current_user):
         return Expense.query.filter(Expense.users.any(id=current_user.id)).all()
 
