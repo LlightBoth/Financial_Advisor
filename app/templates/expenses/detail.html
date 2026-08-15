@@ -3,187 +3,94 @@
 {% block title %} Expense Detail {% endblock %}
 
 {% block content %}
-
-<div class="d-flex justify-content-between align-items-center">
-
-    <h1 class="h3 mb-0">Expense Detail</h1>
-
-    <div>
-
-        <a href="{{ url_for('expenses.edit', expense_id=expense.id) }}"
-           class="btn btn-sm btn-outline-secondary">
-            Edit
-        </a>
-
-        <a href="{{ url_for('expenses.index') }}"
-           class="btn btn-sm btn-outline-secondary">
-            Back to list
-        </a>
-
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 fw-bold">Expense Overview</h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('expenses.edit', expense_id=expense.id) }}" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('expenses.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to list
+            </a>
+        </div>
     </div>
 
-</div>
-
-
-<dl class="row pt-4 pb-4">
-
-    <!-- Amount -->
-    <dt class="col-sm-3">
-        Amount
-    </dt>
-
-    <dd class="col-sm-9">
-        ${{ "%.2f"|format(expense.amount|float) }}
-    </dd>
-
-
-    <!-- Category -->
-    <dt class="col-sm-3">
-        Category
-    </dt>
-
-    <dd class="col-sm-9">
-
-        {% if expense.category == "Food" %}
-
-            <span class="badge text-bg-danger">
-                Food
-            </span>
-
-        {% elif expense.category == "Transportation" %}
-
-            <span class="badge text-bg-primary">
-                Transportation
-            </span>
-
-        {% elif expense.category == "Housing" %}
-
-            <span class="badge text-bg-warning">
-                Housing
-            </span>
-
-        {% elif expense.category == "Utilities" %}
-
-            <span class="badge text-bg-info">
-                Utilities
-            </span>
-
-        {% elif expense.category == "Education" %}
-
-            <span class="badge text-bg-success">
-                Education
-            </span>
-
-        {% elif expense.category == "Healthcare" %}
-
-            <span class="badge text-bg-danger">
-                Healthcare
-            </span>
-
-        {% elif expense.category == "Shopping" %}
-
-            <span class="badge text-bg-secondary">
-                Shopping
-            </span>
-
-        {% elif expense.category == "Entertainment" %}
-
-            <span class="badge text-bg-dark">
-                Entertainment
-            </span>
-
-        {% elif expense.category == "Debt" %}
-
-            <span class="badge text-bg-warning">
-                Debt
-            </span>
-
-        {% else %}
-
-            <span class="badge text-bg-secondary">
+    <!-- Main Detail Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Record ID: #{{ expense.id }}</span>
+            
+            {# Dynamic Category Badge Mapping #}
+            {% set category_classes = {
+                'Food': 'text-bg-danger',
+                'Transportation': 'text-bg-primary',
+                'Housing': 'text-bg-warning',
+                'Utilities': 'text-bg-info',
+                'Education': 'text-bg-success',
+                'Healthcare': 'text-bg-danger',
+                'Shopping': 'text-bg-secondary',
+                'Entertainment': 'text-bg-dark',
+                'Debt': 'text-bg-warning'
+            } %}
+            <span class="badge {{ category_classes.get(expense.category, 'text-bg-secondary') }} px-3 py-2 fs-6">
                 {{ expense.category }}
             </span>
+        </div>
 
-        {% endif %}
+        <div class="card-body p-4 bg-body">
+            <div class="row g-4">
+                
+                <!-- Amount Highlight Box -->
+                <div class="col-md-12">
+                    <div class="p-3 bg-body-tertiary border rounded-3 d-flex align-items-center justify-content-between">
+                        <span class="text-muted fw-medium text-uppercase fs-7">Total Amount</span>
+                        <h2 class="text-success fw-bold mb-0">${{ "%.2f"|format(expense.amount|float) }}</h2>
+                    </div>
+                </div>
 
-    </dd>
+                <!-- Detail Grid -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Expense Date</span>
+                        <span class="fw-medium fs-6">{{ expense.expense_date.strftime("%b, %d, %Y") }}</span>
+                    </div>
+                </div>
 
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Recurring Period</span>
+                        {% if expense.recurring_period %}
+                            <span class="badge bg-body-secondary text-body border px-2 py-1">{{ expense.recurring_period }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary px-2 py-1">One-time</span>
+                        {% endif %}
+                    </div>
+                </div>
 
-    <!-- Expense Date -->
-    <dt class="col-sm-3">
-        Expense Date
-    </dt>
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description</span>
+                        <p class="mb-0 {% if not expense.description %}text-muted fst-italic{% else %}text-body{% endif %}">
+                            {{ expense.description if expense.description else "No description provided." }}
+                        </p>
+                    </div>
+                </div>
 
-    <dd class="col-sm-9">
-        {{ expense.expense_date }}
-    </dd>
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Created: <strong class="text-body">{{ expense.created_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
+                        <span>Last updated: <strong class="text-body">{{ expense.updated_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
+                    </div>
+                </div>
 
-
-    <!-- Recurring Period -->
-    <dt class="col-sm-3">
-        Recurring Period
-    </dt>
-
-    <dd class="col-sm-9">
-
-        {% if expense.recurring_period %}
-
-            <span class="badge text-bg-light">
-                {{ expense.recurring_period }}
-            </span>
-
-        {% else %}
-
-            <span class="badge text-bg-secondary">
-                One-time
-            </span>
-
-        {% endif %}
-
-    </dd>
-
-
-    <!-- Description -->
-    <dt class="col-sm-3">
-        Description
-    </dt>
-
-    <dd class="col-sm-9">
-
-        {% if expense.description %}
-
-            {{ expense.description }}
-
-        {% else %}
-
-            <span class="text-muted">
-                No description provided.
-            </span>
-
-        {% endif %}
-
-    </dd>
-
-
-    <!-- Created At -->
-    <dt class="col-sm-3">
-        Created at
-    </dt>
-
-    <dd class="col-sm-9">
-        {{ expense.created_at }}
-    </dd>
-
-
-    <!-- Updated At -->
-    <dt class="col-sm-3">
-        Last updated
-    </dt>
-
-    <dd class="col-sm-9">
-        {{ expense.updated_at }}
-    </dd>
-
-</dl>
-
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

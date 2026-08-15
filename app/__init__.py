@@ -1,30 +1,27 @@
 import flask
-from config import Config
 from flask_migrate import Migrate
+from flask_mail import Mail
+from config import Config
 from extension import db, csrf, login_manager
 # from werkzeug.middleware.proxy_fix import ProxyFix
 # from app.security.anti_dos import prevent_dos
 from sqlalchemy import text
 
+# Create Mail To Send
+mail = Mail()
+
+# Initail App
 def create_app(config_class: type[Config] = Config):
     app = flask.Flask(__name__)
     app.config.from_object(config_class)
     migrate = Migrate(app, db)
 
-
-    # Allow Http-Header Package 
-    # app.wsgi_app = ProxyFix( app.wsgi_app,
-    #     x_for=1,    # X-Forwarded-For (IP)
-    #     x_proto=1, # X-Forwarded-Proto (http/https)
-    #     x_host=1,  # X-Forwarded-Host
-    #     x_port=1,  # X-Forwarded-Port
-    # )
     
-
     # Initialize DB,CSRF For App
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
     # prevent_dos.init_app(app)
 
     # Optional setting

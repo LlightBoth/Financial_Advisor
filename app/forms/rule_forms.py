@@ -42,7 +42,7 @@ class EditRuleForm(FlaskForm):
         validators=[DataRequired()],
         render_kw={"placeholder": "Advice for users"}
     )
-    submit = SubmitField('Create')
+    submit = SubmitField('Update')
 
     def __init__(self, original_rule: Rule, *args, **kwargs):
         super().__init__(*args, **kwargs)

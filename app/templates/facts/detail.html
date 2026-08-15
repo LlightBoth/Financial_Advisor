@@ -1,35 +1,74 @@
 {% extends "layouts/base.html" %}
+
 {% block title %} Fact Detail {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"> fact Detail</h1>
-    <div>
-        <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
-        <a href="{{ url_for('facts.index') }}" class="btn btn-sm btn-outline-secondary"> Back to list </a>
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 fw-bold">Fact Overview</h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('facts.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to list
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Detail Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Record ID: #{{ fact.id }}</span>
+            
+            <!-- Status Badge Display -->
+            {% if fact.value %} 
+                <span class="badge text-bg-success px-3 py-2 fs-6">Active</span>
+            {% else %}
+                <span class="badge text-bg-secondary px-3 py-2 fs-6">Inactive</span>
+            {% endif %}
+        </div>
+
+        <div class="card-body p-4 bg-body">
+            <div class="row g-4">
+                
+                <!-- Description Section -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description : </span>
+                        <p class="mb-0 {% if not fact.description %}text-muted fst-italic{% else %}text-body fs-5{% endif %}">
+                            {{ fact.description if fact.description else "No description provided." }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Tags Section -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Tags : </span>
+                        {% if fact.tags %}
+                            <span class="badge bg-body-secondary text-body border px-2 py-1">{{ fact.tags }}</span>
+                        {% else %}
+                            <span class="text-muted fst-italic">No tags provided.</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Timestamps -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Created: <strong class="text-body">{{ fact.created_at.strftime("%b %d, %Y, %I:%M %p") if fact.created_at else "N/A" }}</strong></span>
+                        <span>Last updated: <strong class="text-body">{{ fact.updated_at.strftime("%b %d, %Y, %I:%M %p") if fact.updated_at else "N/A" }}</strong></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
-
-<dl class="row">
-    <dt class="col-sm-3"> description</dt>
-    <dd class="col-sm-9"> {{fact.description}} </dd>
-
-    <dt class="col-sm-3"> Tags </dt>
-    <dd class="col-sm-9"> {{fact.tags}} </dd>
-
-    <dt class="col-sm-3"> Value</dt>
-    <dd class="col-sm-9"> 
-        {% if fact.value %} 
-        <span class="badge text-bg-success"> Active </span>
-        {% else %}
-        <span class="badge text-bg-secondary"> Inactive </span>
-        {% endif %}
-    </dd>
-
-    <dt class="col-sm-3"> Created at</dt>
-    <dd class="col-sm-9"> {{fact.created_at}} </dd>
-
-    <dt class="col-sm-3"> Last updated</dt>
-    <dd class="col-sm-9"> {{fact.updated_at}} </dd>
-</dl>
 {% endblock %}

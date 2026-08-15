@@ -6,17 +6,19 @@ from app.services import UserServices
 from werkzeug.security import check_password_hash
 from sqlalchemy import text
 from flask import make_response
+from flask_mail import Message
 # from http.cookies import mak
 
 from app.security.token import Token
 from extension import db
+from app import mail
 
 class AuthService:
     @staticmethod
     def login_user(email, password):
         find_user_email = User.query.filter_by(email=email).first()
         if find_user_email and find_user_email.check_password(password):
-            print("find_user_email", find_user_email)
+            # print("find_user_email", find_user_email)
             UserServices.update_user_online(find_user_email)
             access_token = Token.get_new_token()
             refresh_token = Token.generate_refresh_token(find_user_email)
@@ -33,17 +35,26 @@ class AuthService:
 
     @staticmethod
     def logout_user(user: User):
-        print("offline_email", user)
+        # print("offline_email", user)
         UserServices.update_user_offline(user)
 
+
+    ### Helper function
     @staticmethod
     def find_user_email(email):
         user_email = User.query.filter_by(email=email).first()
         if user_email:
-            print("forgot_user_email_found")
+            # print("forgot_user_email_found")
             
             return user_email
         return None
+
+
+    @staticmethod
+    def send_email(to, subject, body, html=None):
+        msg = Message(subject=subject, recipients=[to], body=body, html=html)
+        mail.send(msg)
+
     
     @staticmethod
     def auth_role(user_role):

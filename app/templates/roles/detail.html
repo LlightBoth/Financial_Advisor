@@ -1,41 +1,98 @@
 {% extends "layouts/base.html" %}
-{% block title %} Role {{role.name}} {% endblock %}
+
+{% block title %} Role: {{ role.name }} {% endblock %}
 
 {% block content %}
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 fw-bold">Role Profile</h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('roles.edit', role_id=role.id) }}" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('roles.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to list
+            </a>
+        </div>
+    </div>
 
-<!-- <div style="width: 100%; border: 1px solid grey; border-radius: 4px;">
+    <!-- Main Detail Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Record ID: #{{ role.id }}</span>
+            <span class="badge text-bg-dark px-3 py-2 fs-6"> {{ role.name }}</span>
+        </div>
 
-</div> -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">{{role.name}} </h1>
-    <div>
-        <a href="{{ url_for('roles.edit', role_id=role.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
+        <div class="card-body p-4 bg-body">
+            <div class="row g-4">
+                
+                <!-- Description Section -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description : </span>
+                        <h5 class="mb-0 {% if not role.descriptions %}text-muted fst-italic{% else %}text-body{% endif %}">
+                            {{ role.descriptions if role.descriptions else "No description provided." }}
+                        </h5>
+                    </div>
+                </div>
+
+                <!-- Permissions Section -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-2">Assigned Permissions : </span>
+                        {% if current_permission %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for p in current_permission %}
+                                    <span class="badge bg-body-secondary text-body border px-3 py-2">
+                                        <strong class="text-primary">{{ p.code }}</strong>: {{ p.name }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted fst-italic mb-0">No permissions assigned to this role.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Users with this Role Section -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-2">Users with this Role</span>
+                        {% if users %}
+                            <ul class="list-group list-group-flush border rounded-3 overflow-hidden bg-body">
+                                {% for u in users %}
+                                    <li class="list-group-item bg-body d-flex justify-content-between align-items-center px-3 py-2">
+                                        <span class="text-body fw-medium">{{ u.username }}</span>
+                                        <a href="{{ url_for('users.detail', user_id=u.id) }}" class="btn btn-sm btn-outline-secondary px-3">
+                                            View User
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted fst-italic mb-0">No users currently assigned to this role.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Timestamps -->
+                {% if role.created_at or role.updated_at %}
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Created: <strong class="text-body">{{ role.created_at.strftime("%b %d, %Y, %I:%M %p") if role.created_at else "N/A" }}</strong></span>
+                        <span>Last updated: <strong class="text-body">{{ role.updated_at.strftime("%b %d, %Y, %I:%M %p") if role.updated_at else "N/A" }}</strong></span>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
     </div>
 </div>
-
-<div class="d-flex">    
-    <p><strong> Description: </strong></p>
-    <p> - {{role.descriptions}} </p>
-</div>
-
-<div class="mb-3 pt-4 pb-4" style="width: 100%; border-top: 1px solid gray; border-bottom: 1px solid gray;">
-    <h3>Permissions</h3>
-    <ul>
-        {% for p in current_permission %}
-            <li>{{ p.code }} - {{ p.name }}</li>
-        {% endfor %}
-    </ul>
-</div>
-
-<div class="mb-3">
-    <h1 class="h3 mb-0"> Users with this Role</h1>
-    <!-- For User with role -->
-     <ul class="pt-4 pb-4">
-        {% for u in users %}
-        <li><a href="{{url_for('users.detail', user_id=u.id)}}"> {{u.username}}</a></li>
-        {% endfor %}
-     </ul>
-</div>
-<a href="{{ url_for('roles.index') }}" class="btn btn-sm btn-outline-secondary"> Back </a>
-
 {% endblock %}

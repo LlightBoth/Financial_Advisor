@@ -27,8 +27,8 @@ def login():
         )
 
         if user:
-            print("LOGIN SUCCESS")
-            print("USER:", user.username)
+            # print("LOGIN SUCCESS")
+            # print("USER:", user.username)
 
             login_user(user, remember=form.is_remember.data)
             flash("Login successful", "success")
@@ -36,7 +36,7 @@ def login():
             # Decide redirect based on role
             current_user_role = get_current_user_role()
 
-            print("ROLE:", current_user_role)
+            # print("ROLE:", current_user_role)
 
             if current_user_role == "user":
                 redirect_url = url_for("dashboards.userIndex")
@@ -45,7 +45,7 @@ def login():
             else:
                 redirect_url = url_for("dashboards.empIndex")
 
-            print("REDIRECT:", redirect_url)
+            # print("REDIRECT:", redirect_url)
 
             # ✅ RETURN with cookies
             return get_cookie(redirect_url, access_token, refresh_token)
@@ -82,20 +82,103 @@ def register():
     return render_template("auth/register.html", form=form)
 
 
+## Decorate OTP Email
+def generate_otp_email(otp_code):
+    # Plain text version for non-HTML email clients
+    text_body = f"Your Financial Consultant OTP verification code is: {otp_code}. This code expires in 5 minutes."
+
+    # Professional HTML version
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+            <tr>
+                <td align="center" style="padding: 40px 10px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 500px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;">
+                        
+                        <!-- Header Banner -->
+                        <tr>
+                            <td align="center" style="background-color: #0f172a; padding: 24px; color: #ffffff;">
+                                <h1 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px;">Financial Consultant</h1>
+                            </td>
+                        </tr>
+
+                        <!-- Main Content -->
+                        <tr>
+                            <td style="padding: 32px 24px; text-align: center;">
+                                <h2 style="margin: 0 0 12px 0; font-size: 18px; color: #1e293b; font-weight: 600;">Verification Code</h2>
+                                <p style="margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-line: 1.5;">
+                                    Please use the following One-Time Password (OTP) to complete your password reset. This code will expire in <strong>5 minutes</strong>.
+                                </p>
+                                
+                                <!-- OTP Badge Box -->
+                                <div style="display: inline-block; background-color: #f1f5f9; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 16px 32px; margin-bottom: 24px;">
+                                    <span style="font-family: 'Courier New', Courier, monospace; font-size: 32px; font-weight: 700; letter-spacing: 6px; color: #0f172a;">{otp_code}</span>
+                                </div>
+
+                                <p style="margin: 0; font-size: 13px; color: #94a3b8; line-height: 1.4;">
+                                    If you did not request this verification code, please ignore this email or contact support.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color: #f8fafc; padding: 16px 24px; text-align: center; border-top: 1px solid #e2e8f0;">
+                                <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                                    &copy; Financial Consultant App. All rights reserved.
+                                </p>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+    return text_body, html_body
+
+
+###    Email OTP and Session   ###
 def get_session(user_email):
     """
     Helper function to generate OTP and set up session timer.
-    Accepts a string email address (never a database object).
+    Accepts a string email address.
+    Returns True if successful, False if email sending failed.
     """
     otp_code = str(secrets.randbelow(900000) + 100000)  # 6-digit OTP
     
+    # Try sending the email First before writing to the session
+    try:
+        text_body, html_body = generate_otp_email(otp_code)
+
+        AuthService.send_email(
+            to=user_email, 
+            subject="Your Verification Code - Financial Consultant", 
+            body=text_body,
+            html=html_body
+        )
+    except Exception as e:
+        print(f"[ERROR] Failed to send OTP email to {user_email}: {e}")
+        return False
+
+    # Only set session variables if the email was sent successfully
     session["pending_user_email"] = user_email
     session["generated_otp"] = otp_code
     session["otp_expiry"] = time.time() + 300  # 5 minutes expiry
     session.pop("otp_verified", None)          # Ensure state is unverified until OTP is checked
 
-    print(f"[DEBUG] Email: {user_email} | OTP: {otp_code}")
+    # print(f"[DEBUG] Email: {user_email} | OTP: {otp_code}")
+    return True
 
+### -------------------- ###
 
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -108,10 +191,15 @@ def forgot_password():
         flash('If an account exists with that email, a password reset code has been sent.', 'info')
 
         if user:
-            get_session(user.email)
-            # TODO: Send password reset email here
-            # send_otp_email(user.email, session['generated_otp'])
-            return redirect(url_for('auth.verify_otp'))
+            # Check if email successfully sent
+            if get_session(user.email):
+                return redirect(url_for('auth.verify_otp'))
+            else:
+                # Handle email server failure (flash an error or keep them on the page)
+                flash('An error occurred while sending the email. Please try again later.', 'danger')
+                return redirect(url_for('auth.forgot_password'))
+        else:
+            return redirect(url_for('auth.forgot_password'))
 
     return render_template('auth/forgot_password.html', form=form)
 
@@ -146,7 +234,7 @@ def verify_otp():
         else:
             flash('Invalid OTP code. Please try again.', 'error')
 
-    return render_template('auth/verify_otp.html', email=email)
+    return render_template('auth/verify_otp.html')
 
 
 @auth_bp.route('/resend-otp', methods=['POST'])

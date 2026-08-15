@@ -1,27 +1,80 @@
 {% extends "layouts/base.html" %}
-{% block title %} Permission {{permission.code}} {% endblock %}
+
+{% block title %} Permission {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"> Permission Detail</h1>
-    <div>
-        <a href="{{ url_for('permissions.edit', permission_id=permission.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
-        <a href="{{ url_for('permissions.index') }}" class="btn btn-sm btn-outline-secondary"> Back </a>
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 fw-bold">Permission Overview</h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('permissions.edit', permission_id=permission.id) }}" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('permissions.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Detail Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Record ID: #{{ permission.id }}</span>
+            
+            <!-- Module Badge -->
+            {% if permission.module %}
+                <span class="badge text-bg-primary px-3 py-2 fs-6">{{ permission.module }}</span>
+            {% else %}
+                <span class="badge text-bg-secondary px-3 py-2 fs-6">General</span>
+            {% endif %}
+        </div>
+
+        <div class="card-body p-4 bg-body">
+            <div class="row g-4">
+                
+                <!-- Code Highlight Box -->
+                <div class="col-md-12">
+                    <div class="p-3 bg-body-tertiary border rounded-3 d-flex align-items-center justify-content-between">
+                        <span class="text-muted fw-medium text-uppercase fs-7">Permission Code</span>
+                        <code class="fs-5 fw-bold text-body px-2 py-1 bg-body rounded">{{ permission.code }}</code>
+                    </div>
+                </div>
+
+                <!-- Name Section -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Name : </span>
+                        <h5 class="text-body fw-semibold mb-0">{{ permission.name }}</h5>
+                    </div>
+                </div>
+
+                <!-- Descriptions Section -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Descriptions : </span>
+                        <p class="mb-0 {% if not permission.descriptions %}text-muted fst-italic{% else %}text-body{% endif %}">
+                            {{ permission.descriptions if permission.descriptions else "No description provided." }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Timestamps (Included if your model tracks them) -->
+                {% if permission.created_at or permission.updated_at %}
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Created: <strong class="text-body">{{ permission.created_at.strftime("%b %d, %Y, %I:%M %p") if permission.created_at else "N/A" }}</strong></span>
+                        <span>Last updated: <strong class="text-body">{{ permission.updated_at.strftime("%b %d, %Y, %I:%M %p") if permission.updated_at else "N/A" }}</strong></span>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
     </div>
 </div>
-
-<dl class="row">
-    <dt class="col-sm-3"> Code</dt>
-    <dd class="col-sm-9"> {{permission.code}} </dd>
-
-    <dt class="col-sm-3"> Name</dt>
-    <dd class="col-sm-9"> {{permission.name}} </dd>
-
-    <dt class="col-sm-3"> Module</dt>
-    <dd class="col-sm-9"> {{permission.module}} </dd>
-
-    <dt class="col-sm-3"> Descriptions </dt>
-    <dd class="col-sm-9"> {{permission.descriptions}} </dd>
-
-</dl>
 {% endblock %}

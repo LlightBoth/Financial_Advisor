@@ -1,42 +1,93 @@
 {% extends "layouts/base.html" %}
-{% block title %} User {{user.username}} {% endblock %}
+
+{% block title %} User {{ user.username }} {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"> User Detail</h1>
-    <div>
-        <a href="{{ url_for('users.edit', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary"> Edit </a>
-        <a href="{{ url_for('users.index') }}" class="btn btn-sm btn-outline-secondary"> Back to list </a>
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 fw-bold">User Profile</h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('users.edit', user_id=user.id) }}" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('users.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to list
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Detail Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Record ID: #{{ user.id }}</span>
+            
+            <!-- Status Badge Display -->
+            {% if user.is_active %} 
+                <span class="badge text-bg-success px-3 py-2 fs-6">Active</span>
+            {% else %}
+                <span class="badge text-bg-secondary px-3 py-2 fs-6">Inactive</span>
+            {% endif %}
+        </div>
+
+        <div class="card-body p-4 bg-body">
+            <div class="row g-4">
+                
+                <!-- Username Highlight Box -->
+                <div class="col-md-12">
+                    <div class="p-3 bg-body-tertiary border rounded-3 d-flex align-items-center justify-content-between">
+                        <span class="text-muted fw-medium text-uppercase fs-7">Username</span>
+                        <h4 class="text-body fw-bold mb-0">@{{ user.username }}</h4>
+                    </div>
+                </div>
+
+                <!-- Full Name & Email Grid -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Full Name : </span>
+                        <span class="fw-medium text-body fs-6">{{ user.full_name if user.full_name else "Not provided" }}</span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Email Address : </span>
+                        <span class="fw-medium text-body fs-6">
+                            {% if user.email %}
+                                <a href="mailto:{{ user.email }}" class="text-decoration-none text-body">{{ user.email }}</a>
+                            {% else %}
+                                <span class="text-muted fst-italic">Not provided</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Role Section -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Assigned Role</span>
+                        {% if user.roles %}
+                            <span class="badge bg-body-secondary text-body border px-3 py-2 fs-6">{{ user.roles[0].name }}</span>
+                        {% else %}
+                            <span class="text-muted fst-italic">No role assigned</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Timestamps -->
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Created: <strong class="text-body">{{ user.created_at.strftime("%b %d, %Y, %I:%M %p") if user.created_at else "N/A" }}</strong></span>
+                        <span>Last updated: <strong class="text-body">{{ user.updated_at.strftime("%b %d, %Y, %I:%M %p") if user.updated_at else "N/A" }}</strong></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>
-
-<dl class="row">
-    <dt class="col-sm-3"> Username</dt>
-    <dd class="col-sm-9"> {{user.username}} </dd>
-
-    <dt class="col-sm-3"> Full Name</dt>
-    <dd class="col-sm-9"> {{user.full_name}} </dd>
-
-    <dt class="col-sm-3"> Email</dt>
-    <dd class="col-sm-9"> {{user.email}} </dd>
-
-    <dt class="col-sm-3"> Role</dt>
-    <dd class="col-sm-9"> {{user.roles[0].name}} </dd>
-
-    
-    <dt class="col-sm-3"> Status</dt>
-    <dd class="col-sm-9"> 
-        {% if user.is_active %} 
-        <span class="badge text-bg-success"> Active </span>
-        {% else %}
-        <span class="badge text-bg-secondary"> Inactive </span>
-        {% endif %}
-    </dd>
-
-    <dt class="col-sm-3"> Created at</dt>
-    <dd class="col-sm-9"> {{user.created_at}} </dd>
-
-    <dt class="col-sm-3"> Last updated</dt>
-    <dd class="col-sm-9"> {{user.updated_at}} </dd>
-</dl>
 {% endblock %}

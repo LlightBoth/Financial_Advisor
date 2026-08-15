@@ -3,157 +3,90 @@
 {% block title %} Income Detail {% endblock %}
 
 {% block content %}
-
-<div class="d-flex justify-content-between align-items-center">
-
-    <h1 class="h3 mb-0">Income Detail</h1>
-
-    <div>
-        <a href="{{ url_for('incomes.edit', income_id=income.id) }}"
-           class="btn btn-sm btn-outline-secondary">
-            Edit
-        </a>
-
-        <a href="{{ url_for('incomes.index') }}"
-           class="btn btn-sm btn-outline-secondary">
-            Back to list
-        </a>
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 fw-bold">Income Overview</h1>
+        </div>
+        <div class="btn-group shadow-sm">
+            <a href="{{ url_for('incomes.edit', income_id=income.id) }}" class="btn btn-outline-primary btn-sm px-3">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </a>
+            <a href="{{ url_for('incomes.index') }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to list
+            </a>
+        </div>
     </div>
 
-</div>
-
-
-<dl class="row pt-4 pb-4">
-
-    <!-- Amount -->
-    <dt class="col-sm-3">
-        Amount
-    </dt>
-
-    <dd class="col-sm-9">
-        ${{ "%.2f"|format(income.amount|float) }}
-    </dd>
-
-
-    <!-- Category -->
-    <dt class="col-sm-3">
-        Category
-    </dt>
-
-    <dd class="col-sm-9">
-
-        {% if income.category == "Salary" %}
-
-            <span class="badge text-bg-primary">
-                Salary
-            </span>
-
-        {% elif income.category == "Business" %}
-
-            <span class="badge text-bg-success">
-                Business
-            </span>
-
-        {% elif income.category == "Freelance" %}
-
-            <span class="badge text-bg-info">
-                Freelance
-            </span>
-
-        {% elif income.category == "Investment" %}
-
-            <span class="badge text-bg-warning">
-                Investment
-            </span>
-
-        {% elif income.category == "Rental" %}
-
-            <span class="badge text-bg-secondary">
-                Rental
-            </span>
-
-        {% else %}
-
-            <span class="badge text-bg-dark">
+    <!-- Main Detail Card -->
+    <div class="card border shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Record ID: #{{ income.id }}</span>
+            
+            {# Dynamic Category Badge Mapping #}
+            {% set category_classes = {
+                'Salary': 'text-bg-primary',
+                'Business': 'text-bg-success',
+                'Freelance': 'text-bg-info',
+                'Investment': 'text-bg-warning',
+                'Rental': 'text-bg-secondary'
+            } %}
+            <span class="badge {{ category_classes.get(income.category, 'text-bg-dark') }} px-3 py-2 fs-6">
                 {{ income.category }}
             </span>
+        </div>
 
-        {% endif %}
+        <div class="card-body p-4 bg-body">
+            <div class="row g-4">
+                
+                <!-- Amount Highlight Box (Using text-primary/success for income) -->
+                <div class="col-md-12">
+                    <div class="p-3 bg-body-tertiary border rounded-3 d-flex align-items-center justify-content-between">
+                        <span class="text-muted fw-medium text-uppercase fs-7">Total Amount</span>
+                        <h2 class="text-success fw-bold mb-0">${{ "%.2f"|format(income.amount|float) }}</h2>
+                    </div>
+                </div>
 
-    </dd>
+                <!-- Detail Grid -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Income Date</span>
+                        <span class="fw-medium fs-6">{{ income.income_date.strftime("%b %d, %Y") }}</span>
+                    </div>
+                </div>
 
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Recurring Period</span>
+                        {% if income.recurring_period %}
+                            <span class="badge bg-body-secondary text-body border px-2 py-1">{{ income.recurring_period }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary px-2 py-1">One-time</span>
+                        {% endif %}
+                    </div>
+                </div>
 
-    <!-- Income Date -->
-    <dt class="col-sm-3">
-        Income Date
-    </dt>
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="mb-3">
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description</span>
+                        <p class="mb-0 {% if not income.description %}text-muted fst-italic{% else %}text-body{% endif %}">
+                            {{ income.description if income.description else "No description provided." }}
+                        </p>
+                    </div>
+                </div>
 
-    <dd class="col-sm-9">
-        {{ income.income_date }}
-    </dd>
+                <div class="col-12">
+                    <hr class="text-muted opacity-25">
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Created: <strong class="text-body">{{ income.created_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
+                        <span>Last updated: <strong class="text-body">{{ income.updated_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
+                    </div>
+                </div>
 
-
-    <!-- Recurring Period -->
-    <dt class="col-sm-3">
-        Recurring Period
-    </dt>
-
-    <dd class="col-sm-9">
-
-        {% if income.recurring_period %}
-
-            <span class="badge text-bg-light">
-                {{ income.recurring_period }}
-            </span>
-
-        {% else %}
-
-            <span class="badge text-bg-secondary">
-                One-time
-            </span>
-
-        {% endif %}
-
-    </dd>
-
-
-    <!-- Description -->
-    <dt class="col-sm-3">
-        Description
-    </dt>
-
-    <dd class="col-sm-9">
-
-        {% if income.description %}
-            {{ income.description }}
-        {% else %}
-            <span class="text-muted">
-                No description provided.
-            </span>
-        {% endif %}
-
-    </dd>
-
-
-    <!-- Created At -->
-    <dt class="col-sm-3">
-        Created at
-    </dt>
-
-    <dd class="col-sm-9">
-        {{ income.created_at }}
-    </dd>
-
-
-    <!-- Updated At -->
-    <dt class="col-sm-3">
-        Last updated
-    </dt>
-
-    <dd class="col-sm-9">
-        {{ income.updated_at }}
-    </dd>
-
-</dl>
-
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
