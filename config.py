@@ -23,8 +23,8 @@ class Config:
     # CALL SERVER OTP 
     MAIL_SERVER = os.getenv("MAIL_SERVER")
     MAIL_PORT = os.getenv("MAIL_PORT")
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
     
     MAIL_USERNAME = os.getenv("SENDER_MAIL")
     MAIL_PASSWORD = os.getenv("SENDER_PASSWORD")

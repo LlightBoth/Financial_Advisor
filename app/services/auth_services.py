@@ -1,4 +1,5 @@
 from typing import Optional, List
+from threading import Thread
 
 from app.models.user import User
 from app.services import UserServices
@@ -7,11 +8,22 @@ from werkzeug.security import check_password_hash
 from sqlalchemy import text
 from flask import make_response
 from flask_mail import Message
+from flask import current_app
+
 # from http.cookies import mak
 
 from app.security.token import Token
 from extension import db
 from app import mail
+
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print("[INFO] Email sent successfully.")
+        except Exception as e:
+            print(f"[ERROR] Async email failed: {e}")
+
 
 class AuthService:
     @staticmethod
@@ -49,11 +61,14 @@ class AuthService:
             return user_email
         return None
 
-
     @staticmethod
     def send_email(to, subject, body, html=None):
         msg = Message(subject=subject, recipients=[to], body=body, html=html)
-        mail.send(msg)
+        app = current_app._get_current_object()
+        
+        # Dispatch email to background thread so HTTP worker doesn't freeze
+        Thread(target=send_async_email, args=(app, msg)).start()
+        return True
 
     
     @staticmethod
