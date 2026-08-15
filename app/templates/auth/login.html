@@ -26,9 +26,14 @@
         {% endfor %}
     </div>
 
-    <div class="form-check mb-4">
-        {{ form.is_remember(class="form-check-input", id="remember") }}
-        {{ form.is_remember.label(class="form-check-label text-white-50 small") }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="form-check mb-4">
+            {{ form.is_remember(class="form-check-input", id="remember") }}
+            {{ form.is_remember.label(class="form-check-label text-white-50 small") }}
+        </div>
+        <div class="mb-4">
+            <a href="{{ url_for('auth.forgot_password') }}" class="text-white-50 small text-decoration-none">Forget Password?</a>
+        </div>
     </div>
 
     <div class="d-grid">

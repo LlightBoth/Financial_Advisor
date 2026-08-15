@@ -16,3 +16,8 @@ class RegisterForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), Length(min=7)])
     is_active = BooleanField("Remember ", default=True)
     submit = SubmitField('Sign-up')
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('Email Address', validators=[DataRequired(), Email()])
+    submit = SubmitField('Send Reset Link')

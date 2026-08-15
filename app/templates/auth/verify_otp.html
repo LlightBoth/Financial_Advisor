@@ -1,0 +1,163 @@
+{% extends "layouts/authBase.html" %}
+{% block title %}Verify OTP{% endblock %}
+
+{% block auth_content %}
+<style>
+    .otp-input-group input {
+        width: 100%;
+        height: 54px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        border-radius: 12px;
+    }
+    .otp-input-group input::-webkit-outer-spin-button,
+    .otp-input-group input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .otp-input-group input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<!-- Header & Icon -->
+<div class="text-center mb-4">
+    <div class="mb-3">
+        <span class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle" style="width: 60px; height: 60px; font-size: 1.5rem;">
+            <i class="fa-solid fa-shield-halved"></i>
+        </span>
+    </div>
+    <h3 class="fw-bold text-white mb-2">Security Verification</h3>
+    <p class="text-white-50 small mb-0">
+        We sent a 6-digit code to <br>
+        <strong class="text-white">{{ email if email else 'your email address' }}</strong>
+    </p>
+</div>
+
+<!-- Main OTP Submission Form -->
+<form method="POST" action="" id="otpForm">
+    {% if form and form.hidden_tag is defined %}
+        {{ form.hidden_tag() }}
+    {% elif csrf_token is defined %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% endif %}
+
+    <!-- Hidden input that holds full 6-digit code -->
+    <input type="hidden" name="otp" id="fullOtp">
+
+    <!-- 6 Digit Input Boxes -->
+    <div class="d-flex justify-content-between gap-2 mb-4 otp-input-group">
+        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" autofocus required>
+        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
+    </div>
+
+    {% if form and form.otp.errors %}
+        <div class="text-danger small text-center mb-3">
+            {{ form.otp.errors[0] }}
+        </div>
+    {% endif %}
+
+    <!-- Submit Button -->
+    <div class="d-grid gap-2 mb-4">
+        <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold fs-6 py-2 shadow-sm">
+            <i class="fa-solid fa-circle-check me-2"></i>Verify & Proceed
+        </button>
+    </div>
+</form>
+
+<!-- Navigation Links & Resend Section (Outside #otpForm to prevent nested form bugs) -->
+<div class="text-center">
+    <!-- Resend Code Container -->
+    <div class="d-flex align-items-center justify-content-center gap-1 text-white-50 small mb-3">
+        <span>Didn't receive the code?</span>
+        
+        <form id="resendForm" method="POST" action="{{ url_for('auth.resend_otp') }}" class="d-inline">
+            {% if form and form.hidden_tag is defined %}
+                {{ form.hidden_tag() }}
+            {% elif csrf_token is defined %}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% endif %}
+            
+            <button type="submit" id="resendBtn" class="btn btn-link text-primary text-decoration-none fw-medium p-0 border-0 opacity-50 pe-none" disabled>
+                Resend Code <span id="timer">(60s)</span>
+            </button>
+        </form>
+    </div>
+    
+    <a href="{{ url_for('auth.login') }}" class="text-white-50 small text-decoration-none fw-medium">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Login
+    </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const inputs = document.querySelectorAll(".otp-field");
+    const fullOtpInput = document.getElementById("fullOtp");
+    const form = document.getElementById("otpForm");
+
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            if (input.value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+            updateFullOtp();
+        });
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !input.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        input.addEventListener("paste", (e) => {
+            e.preventDefault();
+            const pasteData = (e.clipboardData || window.clipboardData).getData("text").trim();
+            const digits = pasteData.replace(/[^0-9]/g, '').slice(0, 6);
+
+            if (digits.length > 0) {
+                digits.split('').forEach((char, i) => {
+                    if (inputs[i]) inputs[i].value = char;
+                });
+                const nextFocus = Math.min(digits.length - 1, inputs.length - 1);
+                inputs[nextFocus].focus();
+                updateFullOtp();
+            }
+        });
+    });
+
+    function updateFullOtp() {
+        let otpValue = "";
+        inputs.forEach(i => otpValue += i.value);
+        fullOtpInput.value = otpValue;
+    }
+
+    form.addEventListener("submit", function () {
+        updateFullOtp();
+    });
+
+    // 60-Second Resend Countdown
+    let timeLeft = 60;
+    const timerElement = document.getElementById("timer");
+    const resendBtn = document.getElementById("resendBtn");
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            timerElement.textContent = "";
+            resendBtn.classList.remove("opacity-50", "pe-none");
+            resendBtn.removeAttribute("disabled");
+        } else {
+            timerElement.textContent = `(${timeLeft}s)`;
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}

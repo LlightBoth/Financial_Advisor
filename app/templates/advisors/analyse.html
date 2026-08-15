@@ -12,7 +12,7 @@
             </h3>
         </div>
 
-        <a href="{{ url_for('advisors.index') }}" class="btn btn-outline-secondary rounded-3 btn-sm shadow-sm align-self-start align-self-md-auto">
+        <a href="{{ url_for('dashboards.userIndex') }}" class="btn btn-outline-secondary rounded-3 btn-sm shadow-sm align-self-start align-self-md-auto">
             <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
         </a>
     </div>
@@ -21,7 +21,7 @@
     <div class="row g-3 mb-4">
         <!-- Monthly Income -->
         <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary">
+            <div class="card border border-body-subtle shadow-sm rounded-4 bg-body">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
                     <div class="rounded-circle bg-success-subtle p-3 text-success">
                         <i class="bi bi-wallet2 fs-4"></i>
@@ -36,7 +36,7 @@
 
         <!-- Monthly Expenses -->
         <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary">
+            <div class="card border border-body-subtle shadow-sm rounded-4 bg-body">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
                     <div class="rounded-circle bg-danger-subtle p-3 text-danger">
                         <i class="bi bi-credit-card fs-4"></i>
@@ -51,7 +51,7 @@
 
         <!-- Savings Rate -->
         <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary">
+            <div class="card border border-body-subtle shadow-sm rounded-4 bg-body">
                 <div class="card-body p-3 d-flex align-items-center gap-3">
                     <div class="rounded-circle bg-primary-subtle p-3 text-primary">
                         <i class="bi bi-piggy-bank fs-4"></i>
@@ -71,7 +71,7 @@
             
             <!-- Primary Advice Card -->
             <div class="col-12 col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary h-100">
+                <div class="card border shadow-sm rounded-4 bg-body-tertiary h-100">
                     <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center gap-3">
                         <div class="rounded-circle bg-primary-subtle p-2 text-primary">
                             <i class="bi bi-robot fs-4"></i>
@@ -142,7 +142,7 @@
 
             <!-- Financial Overview Chart -->
             <div class="col-12 col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary h-100">
+                <div class="card shadow-sm rounded-4 bg-body h-100 border border-body-subtle">
                     <div class="card-header bg-transparent border-0 pt-4 px-4">
                         <h6 class="fw-bold text-body mb-0">Financial Overview</h6>
                     </div>
@@ -193,58 +193,67 @@
     const income = {{ income|default(0)|tojson }};
     const expense = {{ expense|default(0)|tojson }};
 
-    const ctx = document.getElementById('financialChart');
+    const container = document.getElementById('financialChart').parentElement;
 
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Expenses', 'Remaining'],
-            datasets: [{
-                data: [
-                    expense,
-                    Math.max(income - expense, 0)
-                ],
-                backgroundColor: [
-                    '#dc3545',
-                    '#198754'
-                ],
-                borderWidth: 0,
-                hoverOffset: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
-                    }
-                },
-
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = context.raw;
-
-                            return context.label + ': $' +
-                                Number(value).toLocaleString(
-                                    undefined,
-                                    {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    }
-                                );
+    // If both are 0, replace the canvas container with a friendly empty state message
+    if (income === 0 && expense === 0) {
+        container.innerHTML = `
+            <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary">
+                <i class="bi bi-pie-chart fs-1 mb-3 opacity-50"></i>
+                <div class="fw-semibold">No financial data yet</div>
+                <small>Add income or expense records to see your progress.</small>
+            </div>
+        `;
+    } else {
+        const ctx = document.getElementById('financialChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Expenses', 'Remaining'],
+                datasets: [{
+                    data: [
+                        expense,
+                        Math.max(income - expense, 0)
+                    ],
+                    backgroundColor: [
+                        '#dc3545',
+                        '#198754'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                return context.label + ': $' +
+                                    Number(value).toLocaleString(
+                                        undefined,
+                                        {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }
+                                    );
+                            }
                         }
                     }
-                }
-            },
-
-            cutout: '65%'
-        }
-    });
+                },
+                cutout: '65%'
+            }
+        });
+    }
 </script>
 {% endblock %}

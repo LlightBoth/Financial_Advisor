@@ -35,6 +35,15 @@ class AuthService:
     def logout_user(user: User):
         print("offline_email", user)
         UserServices.update_user_offline(user)
+
+    @staticmethod
+    def find_user_email(email):
+        user_email = User.query.filter_by(email=email).first()
+        if user_email:
+            print("forgot_user_email_found")
+            
+            return user_email
+        return None
     
     @staticmethod
     def auth_role(user_role):

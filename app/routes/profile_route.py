@@ -109,8 +109,12 @@ def userIndex():
     total_expense = ExpenseServices.get_expense_total(current_user)
 
     sum_saving = total_income - total_expense
-    sum_saving_rate = (sum_saving*100)/total_income
 
+    if sum_saving > 0:
+        sum_saving_rate = (sum_saving*100)/total_income
+    else:
+        sum_saving_rate = 0
+        
     return render_template(
         "profiles/userIndex.html",
         form=form,

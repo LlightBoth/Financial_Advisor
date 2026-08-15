@@ -88,6 +88,16 @@
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
     transform: translateY(-2px);
 }
+
+.form-control::placeholder {
+    color: var(--bs-secondary-color) !important;
+    opacity: 0.8 !important;
+}
+
+.profile-input::placeholder {
+    color: var(--bs-secondary-color) !important;
+    opacity: 0.8 !important;
+}
 </style>
 
 <div class="container py-5">
@@ -176,9 +186,9 @@
                             <label class="form-label  small">Professional Bio</label>
                             <textarea 
                                 name="bio"
-                                class="form-control profile-input" 
+                                class="form-control profile-input text-body-secondary" 
                                 placeholder="Describe yourself..."
-                                rows="5">{{ current_user.bio or '' }}
+                                rows="5">
                             </textarea>
                         </div>
                         <div class="col-md-12 text-end mt-4">
