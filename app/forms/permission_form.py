@@ -1,70 +1,76 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SubmitField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import StringField, SubmitField, TextAreaField, SelectField
+from wtforms.validators import DataRequired
 
 
-from app.models import Permission
-from extension import db
+MODULE_CHOICES = [
+    ("General", "General"),
+    ("Dashboard", "Dashboard"),
+    ("Users", "Users"),
+    ("Roles", "Roles"),
+    ("Permission", "Permission"),
+    ("Rules", "Rules"),
+    ("Facts", "Facts"),
+    ("Plans", "Plans"),
+    ("Incomes", "Incomes"),
+    ("Expenses", "Expenses"),
+    ("Histories", "Histories"),
+    ("Advisors", "Advisors"),
+    ("Loans", "Loans"),
+]
+
 
 class PermissionCreateForm(FlaskForm):
     code = StringField(
-        "Code",
+        "Permission Code",
         validators=[DataRequired()],
-        render_kw={"placeholder": "e.g user.view"}
+        render_kw={"placeholder": "e.g. user.view, plan.create"}
     )
     name = StringField(
-        "Name",
+        "Display Name",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Human-readable name"}
+        render_kw={"placeholder": "e.g. View Users, Create Savings Plan"}
     )
     module = SelectField(
         "Module",
         validators=[DataRequired()],
         default="General",
-        choices=[
-            ("General","General"),
-            ("Permission","Permission"),
-            ("Roles","Roles"),
-            ("Users","Users"),
-            ]
+        choices=MODULE_CHOICES
     )
     descriptions = TextAreaField(
-        "Descriptions",
+        "Description",
         validators=[DataRequired()],
-        render_kw={"placeholder": "What does this permission allow?"}
+        render_kw={"placeholder": "Describe what capabilities this permission grants..."}
     )
-    submit = SubmitField("Apply")
+    submit = SubmitField("Create Permission")
 
 
 class PermissionEditForm(FlaskForm):
-    def __init__(self, original_permission, *arg, **kwargs):
-        super().__init__(*arg, **kwargs)
+    def __init__(self, original_permission, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.original_permission = original_permission
 
     code = StringField(
-        "Code",
+        "Permission Code",
         validators=[DataRequired()],
+        render_kw={"placeholder": "e.g. user.view"}
     )
     name = StringField(
-        "Name",
+        "Display Name",
         validators=[DataRequired()],
+        render_kw={"placeholder": "e.g. View Users"}
     )
     module = SelectField(
         "Module",
         default="General",
-        choices=[
-            ("General","General"),
-            ("Permission","Permission"),
-            ("Roles","Roles"),
-            ("Users","Users"),
-            ]
+        choices=MODULE_CHOICES
     )
     descriptions = TextAreaField(
-        "Descriptions",
+        "Description",
         validators=[DataRequired()],
+        render_kw={"placeholder": "Describe what capabilities this permission grants..."}
     )
-    
-    submit = SubmitField("Apply")
+    submit = SubmitField("Update Permission")
 
 
 class PermissionDeleteForm(FlaskForm):

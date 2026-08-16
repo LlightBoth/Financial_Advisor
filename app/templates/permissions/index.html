@@ -1,99 +1,159 @@
 {% extends "layouts/base.html" %}
-{% block title %} Permissions - Permission Management {% endblock %}
+{% block title %}Permissions Management{% endblock %}
 
 {% block content %}
-<style>
-    /* Clamp long descriptions to maximum 2 lines */
-    .text-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-break: break-word;
-    }
-
-    .perm-icon-box {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-</style>
-
-<div class="container-fluid px-3 px-sm-4 py-3 py-md-4 pb-5">
+<div class="container-fluid px-3 px-sm-4 py-3">
 
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h1 class="h3 fw-bold mb-1 text-body">Permissions</h1>
-            <p class="text-body-secondary small mb-0">Manage system permissions, module access, and assigned roles</p>
+            <p class="text-body-secondary small mb-0">Manage system-level authorization codes and role access controls</p>
         </div>
-        <a href="{{ url_for('permissions.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm">
-            <i class="bi bi-plus-lg"></i>
-            <span>New Permission</span>
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('permissions.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm px-3 py-2">
+                <i class="bi bi-plus-lg"></i>
+                <span class="fw-semibold">New Permission</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card bg-body border-0 shadow-sm rounded-4 p-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-3 bg-primary-subtle text-primary p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="bi bi-key-fill fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-body-secondary small fw-medium">Total Permissions</div>
+                    <div class="h4 fw-bold mb-0 text-body">{{ permissions|length }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card bg-body border-0 shadow-sm rounded-4 p-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-3 bg-info-subtle text-info p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="bi bi-layers-fill fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-body-secondary small fw-medium">Distinct Modules</div>
+                    <div class="h4 fw-bold mb-0 text-body">
+                        {{ permissions|map(attribute='module')|unique|list|length }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card bg-body border-0 shadow-sm rounded-4 p-3 d-flex flex-row align-items-center gap-3">
+                <div class="rounded-3 bg-success-subtle text-success p-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    <i class="bi bi-shield-lock-fill fs-4"></i>
+                </div>
+                <div>
+                    <div class="text-body-secondary small fw-medium">Active System Access</div>
+                    <div class="h4 fw-bold mb-0 text-success">Secured (RBAC)</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {% if permissions %}
-        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 overflow-hidden">
+        <!-- Search and Filter Bar -->
+        <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="p-3 border-bottom border-subtle bg-body-tertiary">
+                <div class="row g-2 align-items-center justify-content-between">
+                    <div class="col-12 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-body border-end-0 text-body-secondary rounded-start-3">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="permissionSearchInput" class="form-control bg-body border-start-0 rounded-end-3" placeholder="Search by permission code, name, or module...">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-auto text-body-secondary small text-end">
+                        Showing <span id="visibleCount" class="fw-bold text-body">{{ permissions|length }}</span> of {{ permissions|length }} permissions
+                    </div>
+                </div>
+            </div>
 
-            <!-- Desktop / Tablet Table View (hidden on mobile) -->
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr class="text-uppercase small fw-bold text-body-secondary border-bottom border-subtle" style="font-size: 0.725rem; letter-spacing: 0.05em;">
-                            <th class="border-0 px-4 py-3 bg-transparent">Code / Name</th>
-                            <th class="border-0 py-3 bg-transparent">Module</th>
-                            <th class="border-0 py-3 bg-transparent">Description</th>
-                            <th class="border-0 py-3 bg-transparent text-center">Roles</th>
-                            <th class="border-0 px-4 py-3 bg-transparent text-end" style="width: 130px;">Action</th>
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="permissionsTable">
+                    <thead class="bg-body-tertiary text-uppercase small text-body-secondary border-bottom border-subtle">
+                        <tr>
+                            <th class="py-3 px-4" style="letter-spacing: 0.05em; width: 30%;">Code & Name</th>
+                            <th class="py-3 px-3" style="letter-spacing: 0.05em; width: 18%;">Module</th>
+                            <th class="py-3 px-3 d-none d-lg-table-cell" style="letter-spacing: 0.05em; width: 28%;">Description</th>
+                            <th class="py-3 px-3 text-center" style="letter-spacing: 0.05em; width: 12%;">Assigned Roles</th>
+                            <th class="py-3 px-4 text-end" style="letter-spacing: 0.05em; width: 12%;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for permission in permissions %}
-                            <tr class="border-bottom border-subtle">
-                                <td class="px-4 py-3">
+                            <tr class="permission-row border-bottom border-subtle">
+                                <!-- Code & Name -->
+                                <td class="py-3 px-4">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="perm-icon-box bg-info-subtle text-info flex-shrink-0">
-                                            <i class="bi bi-key"></i>
+                                        <div class="rounded-3 bg-info-subtle text-info d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-key-fill fs-5"></i>
                                         </div>
                                         <div class="min-w-0">
-                                            <a href="{{ url_for('permissions.detail', permission_id=permission.id) }}" class="text-decoration-none fw-bold text-body d-block">
-                                                {{ permission.code }}
+                                            <a href="{{ url_for('permissions.detail', permission_id=permission.id) }}" class="text-decoration-none fw-bold text-body d-inline-block text-truncate">
+                                                <code class="px-2 py-1 bg-body-tertiary border border-subtle rounded-2 text-primary fw-semibold">{{ permission.code }}</code>
                                             </a>
-                                            {% if permission.name %}
-                                                <div class="small text-body-secondary fw-medium">{{ permission.name }}</div>
-                                            {% endif %}
+                                            <div class="small text-body-secondary fw-medium mt-1">{{ permission.name or '—' }}</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="py-3">
+
+                                <!-- Module -->
+                                <td class="py-3 px-3">
                                     {% if permission.module %}
-                                        <span class="badge bg-body-secondary text-body border border-subtle fw-semibold rounded-2 px-2 py-1">
-                                            <i class="bi bi-layers me-1 text-body-tertiary"></i>{{ permission.module }}
+                                        <span class="badge bg-body-secondary text-body border border-subtle fw-semibold rounded-pill px-3 py-1.5 font-monospace">
+                                            <i class="bi bi-folder2-open me-1 text-primary"></i>{{ permission.module }}
                                         </span>
                                     {% else %}
-                                        <span class="text-body-tertiary small">Global</span>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-1.5">General</span>
                                     {% endif %}
                                 </td>
-                                <td class="py-3">
-                                    <div class="text-body-secondary small text-clamp-2" title="{{ permission.descriptions }}">
+
+                                <!-- Description -->
+                                <td class="py-3 px-3 d-none d-lg-table-cell">
+                                    <div class="text-body-secondary small text-truncate" style="max-width: 320px;" title="{{ permission.descriptions }}">
                                         {{ permission.descriptions or 'No description provided.' }}
                                     </div>
                                 </td>
-                                <td class="py-3 text-center">
-                                    <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill px-2.5 py-1">
-                                        <i class="bi bi-shield-check me-1"></i>{{ permission.roles | length }}
-                                    </span>
+
+                                <!-- Assigned Roles -->
+                                <td class="py-3 px-3 text-center">
+                                    {% if permission.roles and permission.roles|length > 0 %}
+                                        <div class="d-flex justify-content-center flex-wrap gap-1">
+                                            {% for role in permission.roles[:3] %}
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 small">
+                                                    {{ role.name }}
+                                                </span>
+                                            {% endfor %}
+                                            {% if permission.roles|length > 3 %}
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-1.5 py-1 small" title="{{ permission.roles[3:]|map(attribute='name')|join(', ') }}">
+                                                    +{{ permission.roles|length - 3 }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-body-secondary text-body-tertiary border border-subtle rounded-pill px-2 py-1 small">Unassigned</span>
+                                    {% endif %}
                                 </td>
-                                <td class="px-4 py-3 text-end">
+
+                                <!-- Actions -->
+                                <td class="py-3 px-4 text-end">
                                     <div class="btn-group gap-1">
-                                        <a href="{{ url_for('permissions.edit', permission_id=permission.id) }}" 
+                                        <a href="{{ url_for('permissions.detail', permission_id=permission.id) }}" 
                                            class="btn btn-sm btn-outline-secondary rounded-2"
+                                           title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('permissions.edit', permission_id=permission.id) }}" 
+                                           class="btn btn-sm btn-outline-primary rounded-2"
                                            title="Edit Permission">
                                             <i class="bi bi-pencil"></i>
                                         </a>
@@ -109,83 +169,41 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Mobile View (Cards list on small screens) -->
-            <div class="d-md-none p-3 vstack gap-3">
-                {% for permission in permissions %}
-                    <div class="p-3 bg-body rounded-3 border border-subtle shadow-sm">
-                        
-                        <!-- Top Row: Code + Actions -->
-                        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                            <div class="d-flex align-items-center gap-2 min-w-0">
-                                <div class="perm-icon-box bg-info-subtle text-info flex-shrink-0" style="width:32px; height:32px; font-size:0.875rem;">
-                                    <i class="bi bi-key"></i>
-                                </div>
-                                <a href="{{ url_for('permissions.detail', permission_id=permission.id) }}" class="text-decoration-none fw-bold text-body text-truncate">
-                                    <code>{{ permission.code }}</code>
-                                </a>
-                            </div>
-                            <div class="btn-group gap-1 flex-shrink-0">
-                                <a href="{{ url_for('permissions.edit', permission_id=permission.id) }}" 
-                                   class="btn btn-sm btn-outline-secondary rounded-2 px-2 py-1"
-                                   title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{{ url_for('permissions.delete_confirm', permission_id=permission.id) }}" 
-                                   class="btn btn-sm btn-outline-danger rounded-2 px-2 py-1"
-                                   title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Name & Description -->
-                        {% if permission.name %}
-                            <div class="fw-medium text-body small mb-1">{{ permission.name }}</div>
-                        {% endif %}
-
-                        {% if permission.descriptions %}
-                            <p class="text-body-secondary small mb-3 text-clamp-2" title="{{ permission.descriptions }}">
-                                {{ permission.descriptions }}
-                            </p>
-                        {% endif %}
-
-                        <!-- Footer Badges: Module & Roles -->
-                        <div class="d-flex align-items-center justify-content-between pt-2 border-top border-subtle flex-wrap gap-2">
-                            {% if permission.module %}
-                                <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                    <i class="bi bi-layers me-1 text-body-tertiary"></i>{{ permission.module }}
-                                </span>
-                            {% else %}
-                                <span class="badge bg-body-secondary text-body-tertiary border border-subtle rounded-2">Global</span>
-                            {% endif %}
-
-                            <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill">
-                                <i class="bi bi-shield-check me-1"></i>{{ permission.roles | length }} roles
-                            </span>
-                        </div>
-
-                    </div>
-                {% endfor %}
-            </div>
-
         </div>
+
+        <script>
+            // Fast in-page live search for permissions table
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('permissionSearchInput');
+                const tableRows = document.querySelectorAll('.permission-row');
+                const visibleCount = document.getElementById('visibleCount');
+
+                if (searchInput) {
+                    searchInput.addEventListener('input', function() {
+                        const term = this.value.toLowerCase().trim();
+                        let count = 0;
+
+                        tableRows.forEach(row => {
+                            const text = row.textContent.toLowerCase();
+                            if (text.includes(term)) {
+                                row.style.display = '';
+                                count++;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+
+                        if (visibleCount) {
+                            visibleCount.textContent = count;
+                        }
+                    });
+                }
+            });
+        </script>
     {% else %}
-        <!-- Empty State -->
-        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 p-5 text-center">
-            <div class="mb-3 text-body-tertiary fs-1">
-                <i class="bi bi-key-fill"></i>
-            </div>
-            <h5 class="fw-bold text-body mb-2">No Permissions Found</h5>
-            <p class="text-body-secondary mb-4 small" style="max-width: 380px; margin: 0 auto;">
-                No system permissions have been registered yet. Start by defining your first permission rule.
-            </p>
-            <div>
-                <a href="{{ url_for('permissions.create') }}" class="btn btn-primary rounded-3 px-4 shadow-sm">
-                    <i class="bi bi-plus-lg me-1"></i> Create First Permission
-                </a>
-            </div>
-        </div>
+        {% with icon="bi-key-fill", title="No Permissions Found", message="No system permissions have been registered yet. Start by defining your first permission code.", action_url=url_for('permissions.create'), action_text="Create First Permission" %}
+            {% include "partials/_empty_state.html" %}
+        {% endwith %}
     {% endif %}
 
 </div>

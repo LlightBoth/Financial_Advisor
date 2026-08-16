@@ -67,12 +67,11 @@
                 </a>
             </li>
 
-            {% if not current_user.has_role('user') %}
-                <li><hr></li>
+            {% if is_management_user(current_user) %}
+                <li><hr class="border-secondary my-2"></li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'dashboards.empIndex' %}active{% endif %}"
-                    href="{{ url_for('dashboards.empIndex') }}">
-                        <i class="bi bi-speedometer2 me-2"></i> Employee
+                    <a class="nav-link" href="{{ get_management_url(current_user) }}">
+                        <i class="bi bi-shield-lock me-2"></i> Management
                     </a>
                 </li>
             {% endif %}
@@ -159,11 +158,7 @@
     </header>
 
     <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}{% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show">{{ message }}<button class="btn-close" data-bs-dismiss="alert"></button></div>
-            {% endfor %}{% endif %}
-        {% endwith %}
+        {% include "partials/_flash_messages.html" %}
 
         {% block content %}{% endblock %}
     </main>

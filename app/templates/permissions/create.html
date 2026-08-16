@@ -1,10 +1,31 @@
 {% extends "layouts/base.html" %}
-{% block title %} Create Permission {% endblock %}
+{% block title %}Create Permission{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-3"> Create Permission </h1>
-<form method="post">
-    {% include "permissions/_form.html" %}
-</form>
+<div class="container-fluid px-3 px-sm-4 py-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-7">
+            
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <a href="{{ url_for('permissions.index') }}" class="btn btn-outline-secondary btn-sm rounded-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </a>
+                <h1 class="h4 fw-bold mb-0 text-body">Create New Permission</h1>
+            </div>
 
+            <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-body-tertiary border-bottom border-subtle py-3 px-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle-fill text-primary"></i>
+                    <span class="fw-bold text-body">Permission Definition</span>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% include "permissions/_form.html" %}
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 {% endblock %}

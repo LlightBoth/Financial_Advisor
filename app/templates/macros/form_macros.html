@@ -1,0 +1,87 @@
+{# Reusable Form Field Macros for Flask-WTF / WTForms #}
+
+{# 1. Standard Input (Text, Number, Email, Password, Date, etc.) #}
+{% macro render_field(field, placeholder="", icon="", type=None, extra_class="") %}
+<div class="mb-3">
+    {% if field.type != 'HiddenField' and field.type != 'CSRFTokenField' %}
+        {{ field.label(class="form-label fw-semibold small text-body-secondary") }}
+    {% endif %}
+    
+    <div class="{% if icon %}input-group{% endif %}">
+        {% if icon %}
+            <span class="input-group-text bg-body-tertiary border-end-0 text-secondary">
+                <i class="{{ icon }}"></i>
+            </span>
+        {% endif %}
+        
+        {{ field(
+            class="form-control " ~ extra_class ~ (" is-invalid" if field.errors else ""), 
+            placeholder=placeholder or field.label.text,
+            type=type if type else None
+        ) }}
+        
+        {% for error in field.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+{# 2. Textarea Field #}
+{% macro render_textarea(field, rows=3, placeholder="", extra_class="") %}
+<div class="mb-3">
+    {{ field.label(class="form-label fw-semibold small text-body-secondary") }}
+    {{ field(
+        class="form-control " ~ extra_class ~ (" is-invalid" if field.errors else ""), 
+        rows=rows, 
+        placeholder=placeholder or field.label.text
+    ) }}
+    {% for error in field.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{# 3. Select Dropdown Field #}
+{% macro render_select(field, icon="", extra_class="") %}
+<div class="mb-3">
+    {{ field.label(class="form-label fw-semibold small text-body-secondary") }}
+    <div class="{% if icon %}input-group{% endif %}">
+        {% if icon %}
+            <span class="input-group-text bg-body-tertiary border-end-0 text-secondary">
+                <i class="{{ icon }}"></i>
+            </span>
+        {% endif %}
+        {{ field(class="form-select " ~ extra_class ~ (" is-invalid" if field.errors else "")) }}
+        {% for error in field.errors %}
+            <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+{# 4. Checkbox / Switch Field #}
+{% macro render_switch(field) %}
+<div class="form-check form-switch mb-3">
+    {{ field(class="form-check-input" ~ (" is-invalid" if field.errors else "")) }}
+    {{ field.label(class="form-check-label fw-semibold small text-body-secondary") }}
+    {% for error in field.errors %}
+        <div class="invalid-feedback d-block">{{ error }}</div>
+    {% endfor %}
+</div>
+{% endmacro %}
+
+{# 5. Form Action Buttons #}
+{% macro render_form_buttons(submit_label="Save Changes", cancel_url="#", submit_class="btn-primary", submit_icon="bi bi-check-lg") %}
+<div class="d-flex align-items-center gap-2 mt-4 pt-2 border-top border-subtle">
+    <button type="submit" class="btn {{ submit_class }} px-4 d-inline-flex align-items-center gap-2 shadow-sm rounded-3">
+        {% if submit_icon %}<i class="{{ submit_icon }}"></i>{% endif %}
+        <span>{{ submit_label }}</span>
+    </button>
+    {% if cancel_url and cancel_url != '#' %}
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary px-3 rounded-3">
+            Cancel
+        </a>
+    {% endif %}
+</div>
+{% endmacro %}

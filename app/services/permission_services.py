@@ -1,7 +1,6 @@
-from typing import Optional, List
-
 from app.models.permission import Permission
 from extension import db
+
 
 class PermissionServices:
     @staticmethod
@@ -14,29 +13,39 @@ class PermissionServices:
 
     @staticmethod
     def create(data: dict):
-        permission = Permission(
-            code = data["code"].lower(),
-            name = data["name"].lower(),
-            module = data["module"].capitalize(),
-            descriptions = data["descriptions"].lower(),
-        )
-
-        db.session.add(permission)
-        db.session.commit()
-        return permission
+        try:
+            permission = Permission(
+                code=data["code"].lower(),
+                name=data["name"].lower(),
+                module=data["module"].capitalize(),
+                descriptions=data.get("descriptions", "").lower() if data.get("descriptions") else None,
+            )
+            db.session.add(permission)
+            db.session.commit()
+            return permission
+        except Exception:
+            db.session.rollback()
+            raise
     
     @staticmethod
-    def update(permission: Permission,data: dict):
-        permission.code = data["code"].lower()
-        permission.name = data["name"].lower()
-        permission.module = data["module"].capitalize()
-        permission.descriptions = data["descriptions"].lower()
-        
-        db.session.commit()
-        return permission
+    def update(permission: Permission, data: dict):
+        try:
+            permission.code = data["code"].lower()
+            permission.name = data["name"].lower()
+            permission.module = data["module"].capitalize()
+            permission.descriptions = data.get("descriptions", "").lower() if data.get("descriptions") else None
+            db.session.commit()
+            return permission
+        except Exception:
+            db.session.rollback()
+            raise
     
     @staticmethod
     def delete(permission: Permission):
-        db.session.delete(permission)
-        db.session.commit()
-        
+        try:
+            db.session.delete(permission)
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            raise

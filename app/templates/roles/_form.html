@@ -1,50 +1,276 @@
+{% import "macros/form_macros.html" as f %}
+
 {{ form.hidden_tag() }}
 
-<div class="mb-3">
-    {{ form.name.label(class="form-label") }}
-    {{ form.name(class="form-control") }}
-
-    {% if form.name.errors %}
-        <div class="text-danger small">
-            {% for error in form.name.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
+<!-- Role Basic Info -->
+<div class="card border border-subtle shadow-sm mb-4">
+    <div class="card-header bg-body-tertiary py-3 px-4">
+        <h6 class="mb-0 fw-bold text-body">
+            <i class="bi bi-shield-lock me-2 text-primary"></i> Role Information
+        </h6>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-12 col-md-5">
+                {{ f.render_field(form.name, placeholder="e.g. Finance Auditor", icon="bi bi-person-badge") }}
+            </div>
+            <div class="col-12 col-md-7">
+                {{ f.render_textarea(form.descriptions, rows=2, placeholder="Describe the purpose and access level of this role...") }}
+            </div>
         </div>
-    {% endif %}
+    </div>
 </div>
 
-<div class="mb-3">
-    {{ form.descriptions.label(class="form-label") }}
-    {{ form.descriptions(class="form-control") }}
-
-    {% if form.descriptions.errors %}
-        <div class="text-danger small">
-            {% for error in form.descriptions.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
+<!-- 2D Permissions Matrix (Tick & No-Tick Checkboxes) -->
+<div class="card border border-subtle shadow-sm mb-4">
+    <div class="card-header bg-body-tertiary py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h6 class="mb-0 fw-bold text-body">
+                <i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i> Permissions Access Matrix
+            </h6>
+            <small class="text-body-secondary">Tick (✔) the checkboxes to grant specific permissions to this role</small>
         </div>
-    {% endif %}
-</div>
-
-{% if permissions %}
-<label class="mb-3">Permissions</label>
-<div style="padding: 8px 12px; border: 1px solid rgba(128, 128, 128, 0.796); border-radius: 8px;">
-    {% for permission in permissions | sort(attribute='module') %}
-        <div class="form-check ms-3 mb-2">
-            <input type="checkbox"
-                class="form-check-input"
-                name="permission_ids"
-                value="{{ permission.id }}"
-                {% if permission.id in current_permission_ids %} checked {% endif %}
-                >
-            <label class="form-check-label">
-                <strong style="color: palevioletred;">{{ permission.code }}</strong> - {{ permission.name }}
-            </label>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-primary shadow-sm" id="btnSelectAll">
+                <i class="bi bi-check-square me-1"></i> Tick All
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary shadow-sm" id="btnDeselectAll">
+                <i class="bi bi-square me-1"></i> Untick All
+            </button>
         </div>
-    {% endfor %}
-</div>
-{% endif %}
+    </div>
+    
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="matrixTable">
+                <thead class="table-light border-bottom border-subtle">
+                    <tr class="text-secondary small text-uppercase">
+                        <th class="ps-4 py-3" style="min-width: 220px;">Module / Resource</th>
+                        <th class="text-center py-3" style="width: 140px;">
+                            <div class="d-flex align-items-center justify-content-center gap-1 cursor-pointer col-header" data-col="view" title="Toggle entire View column">
+                                <i class="bi bi-eye text-primary"></i>
+                                <span>View</span>
+                            </div>
+                        </th>
+                        <th class="text-center py-3" style="width: 140px;">
+                            <div class="d-flex align-items-center justify-content-center gap-1 cursor-pointer col-header" data-col="create" title="Toggle entire Create column">
+                                <i class="bi bi-plus-circle text-success"></i>
+                                <span>Create</span>
+                            </div>
+                        </th>
+                        <th class="text-center py-3" style="width: 140px;">
+                            <div class="d-flex align-items-center justify-content-center gap-1 cursor-pointer col-header" data-col="edit" title="Toggle entire Edit column">
+                                <i class="bi bi-pencil text-warning"></i>
+                                <span>Edit</span>
+                            </div>
+                        </th>
+                        <th class="text-center py-3" style="width: 130px;">
+                            <i class="bi bi-trash text-danger me-1"></i> Delete
+                        </th>
+                        <th class="text-center pe-4 py-3" style="width: 120px;">Row Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y border-top-0">
+                    {% set icon_map = {
+                        'Users': 'bi-people',
+                        'Roles': 'bi-shield-check',
+                        'Permissions': 'bi-key',
+                        'Rules': 'bi-list-check',
+                        'Facts': 'bi-info-circle',
+                        'Plans': 'bi-piggy-bank',
+                        'Incomes': 'bi-wallet2',
+                        'Expenses': 'bi-credit-card',
+                        'Histories': 'bi-clock-history',
+                        'Loans': 'bi-cash-stack',
+                        'Advisors': 'bi-robot',
+                        'Settings': 'bi-gear',
+                        'General': 'bi-folder'
+                    } %}
 
-<div class="mt-4">
-    {{ form.submit(class="btn btn-primary") }}
+                    {% for module, module_perms in permissions | groupby('module') %}
+                        {% set mod_name = module or 'General' %}
+                        {% set mod_icon = icon_map.get(mod_name, 'bi-folder') %}
+                        
+                        {# Match permissions in this module by action keyword #}
+                        {% set view_p = namespace(val=none) %}
+                        {% set create_p = namespace(val=none) %}
+                        {% set edit_p = namespace(val=none) %}
+                        {% set delete_p = namespace(val=none) %}
+                        {% set custom_perms = [] %}
+
+                        {% for p in module_perms %}
+                            {% set c = p.code.lower() %}
+                            {% if '.view' in c or ':view' in c or 'view' in c %}
+                                {% set view_p.val = p %}
+                            {% elif '.create' in c or ':create' in c or 'create' in c %}
+                                {% set create_p.val = p %}
+                            {% elif '.edit' in c or ':edit' in c or 'edit' in c or '.update' in c %}
+                                {% set edit_p.val = p %}
+                            {% elif '.delete' in c or ':delete' in c or 'delete' in c or '.remove' in c %}
+                                {% set delete_p.val = p %}
+                            {% else %}
+                                {% set _ = custom_perms.append(p) %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <tr class="module-row" data-module="{{ mod_name }}">
+                            <!-- Module Info -->
+                            <td class="ps-4 py-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="p-2 rounded-2 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                        <i class="bi {{ mod_icon }} fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <span class="fw-semibold text-body d-block">{{ mod_name }}</span>
+                                        <span class="text-body-secondary font-monospace" style="font-size: 0.75rem;">{{ module_perms | length }} capabilities</span>
+                                    </div>
+                                </div>
+                                {% if custom_perms %}
+                                    <div class="mt-2 d-flex flex-wrap gap-1">
+                                        {% for cp in custom_perms %}
+                                            <label class="badge bg-body-secondary text-body border border-subtle d-inline-flex align-items-center gap-1 p-1 px-2 cursor-pointer">
+                                                <input type="checkbox"
+                                                       class="form-check-input m-0 perm-checkbox"
+                                                       name="permission_ids"
+                                                       value="{{ cp.id }}"
+                                                       {% if current_permission_ids and cp.id in current_permission_ids %} checked {% endif %}>
+                                                <span class="font-monospace" style="font-size: 0.7rem;">{{ cp.code }}</span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- View Checkbox (Tick / No-Tick) -->
+                            <td class="text-center py-3">
+                                {% if view_p.val %}
+                                    <div class="d-flex justify-content-center">
+                                        <input type="checkbox"
+                                               class="form-check-input perm-checkbox col-view"
+                                               id="perm_{{ view_p.val.id }}"
+                                               name="permission_ids"
+                                               value="{{ view_p.val.id }}"
+                                               title="{{ view_p.val.code }}"
+                                               style="width: 1.35rem; height: 1.35rem; cursor: pointer;"
+                                               {% if current_permission_ids and view_p.val.id in current_permission_ids %} checked {% endif %}>
+                                    </div>
+                                {% else %}
+                                    <span class="text-body-tertiary fw-light">—</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Create Checkbox (Tick / No-Tick) -->
+                            <td class="text-center py-3">
+                                {% if create_p.val %}
+                                    <div class="d-flex justify-content-center">
+                                        <input type="checkbox"
+                                               class="form-check-input perm-checkbox col-create"
+                                               id="perm_{{ create_p.val.id }}"
+                                               name="permission_ids"
+                                               value="{{ create_p.val.id }}"
+                                               title="{{ create_p.val.code }}"
+                                               style="width: 1.35rem; height: 1.35rem; cursor: pointer;"
+                                               {% if current_permission_ids and create_p.val.id in current_permission_ids %} checked {% endif %}>
+                                    </div>
+                                {% else %}
+                                    <span class="text-body-tertiary fw-light">—</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Edit Checkbox (Tick / No-Tick) -->
+                            <td class="text-center py-3">
+                                {% if edit_p.val %}
+                                    <div class="d-flex justify-content-center">
+                                        <input type="checkbox"
+                                               class="form-check-input perm-checkbox col-edit"
+                                               id="perm_{{ edit_p.val.id }}"
+                                               name="permission_ids"
+                                               value="{{ edit_p.val.id }}"
+                                               title="{{ edit_p.val.code }}"
+                                               style="width: 1.35rem; height: 1.35rem; cursor: pointer;"
+                                               {% if current_permission_ids and edit_p.val.id in current_permission_ids %} checked {% endif %}>
+                                    </div>
+                                {% else %}
+                                    <span class="text-body-tertiary fw-light">—</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Delete Checkbox (Tick / No-Tick) -->
+                            <td class="text-center py-3">
+                                {% if delete_p.val %}
+                                    <div class="d-flex justify-content-center">
+                                        <input type="checkbox"
+                                               class="form-check-input perm-checkbox col-delete"
+                                               id="perm_{{ delete_p.val.id }}"
+                                               name="permission_ids"
+                                               value="{{ delete_p.val.id }}"
+                                               title="{{ delete_p.val.code }}"
+                                               style="width: 1.35rem; height: 1.35rem; cursor: pointer;"
+                                               {% if current_permission_ids and delete_p.val.id in current_permission_ids %} checked {% endif %}>
+                                    </div>
+                                {% else %}
+                                    <span class="text-body-tertiary fw-light">—</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Row Toggle All -->
+                            <td class="text-center pe-4 py-3">
+                                <button type="button" class="btn btn-sm btn-outline-secondary border border-subtle btn-row-toggle shadow-sm px-2 py-1" style="font-size: 0.75rem;" title="Toggle entire row">
+                                    <i class="bi bi-check-square me-1"></i> Row
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+{{ f.render_form_buttons(
+    submit_label="Save Role Matrix", 
+    cancel_url=url_for('roles.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}
+
+<!-- JavaScript for Tick & No-Tick Matrix Controls -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tick All
+    const btnSelectAll = document.getElementById('btnSelectAll');
+    if (btnSelectAll) {
+        btnSelectAll.addEventListener('click', function() {
+            document.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = true);
+        });
+    }
+
+    // Untick All
+    const btnDeselectAll = document.getElementById('btnDeselectAll');
+    if (btnDeselectAll) {
+        btnDeselectAll.addEventListener('click', function() {
+            document.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = false);
+        });
+    }
+
+    // Row Toggle
+    document.querySelectorAll('.btn-row-toggle').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const checkboxes = row.querySelectorAll('.perm-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+        });
+    });
+
+    // Column Toggle (Click Column Header)
+    document.querySelectorAll('.col-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const colName = this.dataset.col;
+            const checkboxes = document.querySelectorAll('.col-' + colName);
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+        });
+    });
+});
+</script>

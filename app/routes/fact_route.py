@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from app.forms.fact_forms import FactForm, EditFactForm, ConfirmDeleteForm
 
 from app.services.fact_service import FactServices
-from app.security.role_check import check_user_role
+from app.security.role_check import check_route_permission
 from app.security.cookie import check_cookie_token
 
 
@@ -12,8 +12,8 @@ fact_bp = Blueprint("facts", __name__, url_prefix="/facts")
 # Middleware route
 @fact_bp.before_request
 def check_token():
-    check_cookie_token(current_user)
-    check_user_role()
+    # check_cookie_token(current_user)
+    check_route_permission()
 
 
 @fact_bp.route("/")

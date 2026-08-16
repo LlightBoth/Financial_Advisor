@@ -1,97 +1,61 @@
 {% extends "layouts/base.html" %}
-{% block title %} Facts - Fact Management {% endblock %}
+{% block title %}Facts Management{% endblock %}
 
 {% block content %}
-<style>
-    /* Clamp long fact descriptions to maximum 3 lines with ellipsis */
-    .text-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        word-break: break-word;
-    }
-
-    .fact-icon-box {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-</style>
-
-<div class="container-fluid px-3 px-sm-4 py-3 py-md-4 pb-5">
+<div class="container-fluid px-3 px-sm-4 py-3">
 
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h1 class="h3 fw-bold mb-1 text-body">Facts</h1>
-            <p class="text-body-secondary small mb-0">Manage knowledge base facts, tags, and status</p>
+            <p class="text-body-secondary small mb-0">Manage knowledge base facts, tags, and condition flags</p>
         </div>
-        <a href="{{ url_for('facts.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm">
+        <a href="{{ url_for('facts.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm px-3">
             <i class="bi bi-plus-lg"></i>
             <span>New Fact</span>
         </a>
     </div>
 
     {% if facts %}
-        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 overflow-hidden">
-
-            <!-- Desktop / Tablet Table View (hidden on mobile) -->
-            <div class="table-responsive d-none d-md-block">
+        <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr class="text-uppercase small fw-bold text-body-secondary border-bottom border-subtle" style="font-size: 0.725rem; letter-spacing: 0.05em;">
-                            <th class="border-0 px-4 py-3 bg-transparent" style="width: 50px;">#</th>
-                            <th class="border-0 py-3 bg-transparent">Description</th>
-                            <th class="border-0 py-3 bg-transparent" style="width: 220px;">Tags</th>
-                            <th class="border-0 py-3 bg-transparent text-center" style="width: 120px;">Status</th>
-                            <th class="border-0 px-4 py-3 bg-transparent text-end" style="width: 130px;">Action</th>
+                    <thead class="bg-body-tertiary text-uppercase small text-body-secondary border-bottom border-subtle">
+                        <tr>
+                            <th class="py-3 px-4" style="letter-spacing: 0.05em;">Description</th>
+                            <th class="py-3 d-none d-sm-table-cell" style="letter-spacing: 0.05em;">Tags</th>
+                            <th class="py-3 text-center" style="letter-spacing: 0.05em;">Status</th>
+                            <th class="py-3 px-4 text-end" style="width: 140px; letter-spacing: 0.05em;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for fact in facts %}
                             <tr class="border-bottom border-subtle">
-                                <td class="px-4 py-3 text-body-tertiary small fw-medium">
-                                    {{ loop.index }}
-                                </td>
-                                <td class="py-3">
-                                    <div class="d-flex align-items-start gap-3">
-                                        <div class="fact-icon-box bg-warning-subtle text-warning flex-shrink-0 mt-1">
-                                            <i class="bi bi-lightbulb"></i>
+                                <!-- Description -->
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 bg-warning-subtle text-warning d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                                            <i class="bi bi-lightbulb fs-5"></i>
                                         </div>
-                                        <div class="min-w-0">
-                                            <a href="{{ url_for('facts.detail', fact_id=fact.id) }}" 
-                                               class="text-decoration-none fw-semibold text-body text-clamp-3" 
-                                               title="{{ fact.description }}">
+                                        <div>
+                                            <a href="{{ url_for('facts.detail', fact_id=fact.id) }}" class="text-decoration-none fw-bold text-body">
                                                 {{ fact.description }}
                                             </a>
+                                            <div class="d-sm-none text-body-secondary small mt-1">
+                                                <span class="badge bg-body-secondary text-body border border-subtle">{{ fact.tags }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="py-3">
-                                    {% if fact.tags %}
-                                        <div class="d-flex flex-wrap gap-1">
-                                            {% if fact.tags is string %}
-                                                <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                                    <i class="bi bi-tag me-1 text-body-tertiary"></i>{{ fact.tags }}
-                                                </span>
-                                            {% else %}
-                                                {% for tag in fact.tags %}
-                                                    <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                                        <i class="bi bi-tag me-1 text-body-tertiary"></i>{{ tag }}
-                                                    </span>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </div>
-                                    {% else %}
-                                        <span class="text-body-tertiary small">—</span>
-                                    {% endif %}
+
+                                <!-- Tags -->
+                                <td class="py-3 d-none d-sm-table-cell">
+                                    <span class="badge bg-body-secondary text-body border border-subtle px-2.5 py-1">
+                                        <i class="bi bi-tag me-1 text-secondary"></i>{{ fact.tags }}
+                                    </span>
                                 </td>
+
+                                <!-- Status -->
                                 <td class="py-3 text-center">
                                     {% if fact.value %}
                                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
@@ -103,16 +67,17 @@
                                         </span>
                                     {% endif %}
                                 </td>
-                                <td class="px-4 py-3 text-end">
+
+                                <!-- Actions -->
+                                <td class="py-3 px-4 text-end">
                                     <div class="btn-group gap-1">
-                                        <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" 
-                                           class="btn btn-sm btn-outline-secondary rounded-2"
-                                           title="Edit Fact">
+                                        <a href="{{ url_for('facts.detail', fact_id=fact.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="View Fact">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="Edit Fact">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="{{ url_for('facts.delete_confirm', fact_id=fact.id) }}" 
-                                           class="btn btn-sm btn-outline-danger rounded-2"
-                                           title="Delete Fact">
+                                        <a href="{{ url_for('facts.delete_confirm', fact_id=fact.id) }}" class="btn btn-sm btn-outline-danger rounded-2" title="Delete Fact">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
@@ -122,95 +87,11 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Mobile View (Cards list on screens < md) -->
-            <div class="d-md-none p-3 vstack gap-3">
-                {% for fact in facts %}
-                    <div class="p-3 bg-body rounded-3 border border-subtle shadow-sm">
-                        
-                        <!-- Top Row: Icon + Actions -->
-                        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="fact-icon-box bg-warning-subtle text-warning flex-shrink-0" style="width:32px; height:32px; font-size:0.875rem;">
-                                    <i class="bi bi-lightbulb"></i>
-                                </div>
-                                <span class="text-body-tertiary small fw-medium">Fact #{{ loop.index }}</span>
-                            </div>
-                            <div class="btn-group gap-1 flex-shrink-0">
-                                <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" 
-                                   class="btn btn-sm btn-outline-secondary rounded-2 px-2 py-1"
-                                   title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{{ url_for('facts.delete_confirm', fact_id=fact.id) }}" 
-                                   class="btn btn-sm btn-outline-danger rounded-2 px-2 py-1"
-                                   title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Fact Description -->
-                        <div class="mb-3">
-                            <a href="{{ url_for('facts.detail', fact_id=fact.id) }}" 
-                               class="text-decoration-none fw-semibold text-body text-clamp-3 d-block" 
-                               title="{{ fact.description }}">
-                                {{ fact.description }}
-                            </a>
-                        </div>
-
-                        <!-- Footer Badges: Tags & Status -->
-                        <div class="d-flex align-items-center justify-content-between pt-2 border-top border-subtle flex-wrap gap-2">
-                            <div class="d-flex flex-wrap gap-1">
-                                {% if fact.tags %}
-                                    {% if fact.tags is string %}
-                                        <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                            <i class="bi bi-tag me-1 text-body-tertiary"></i>{{ fact.tags }}
-                                        </span>
-                                    {% else %}
-                                        {% for tag in fact.tags %}
-                                            <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                                <i class="bi bi-tag me-1 text-body-tertiary"></i>{{ tag }}
-                                            </span>
-                                        {% endfor %}
-                                    {% endif %}
-                                {% else %}
-                                    <span class="badge bg-body-secondary text-body-tertiary border border-subtle rounded-2">No Tags</span>
-                                {% endif %}
-                            </div>
-
-                            {% if fact.value %}
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
-                                    <i class="bi bi-check-circle me-1"></i>Active
-                                </span>
-                            {% else %}
-                                <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill">
-                                    <i class="bi bi-dash-circle me-1"></i>Inactive
-                                </span>
-                            {% endif %}
-                        </div>
-
-                    </div>
-                {% endfor %}
-            </div>
-
         </div>
     {% else %}
-        <!-- Empty State -->
-        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 p-5 text-center">
-            <div class="mb-3 text-body-tertiary fs-1">
-                <i class="bi bi-journal-x"></i>
-            </div>
-            <h5 class="fw-bold text-body mb-2">No Facts Found</h5>
-            <p class="text-body-secondary mb-4 small" style="max-width: 380px; margin: 0 auto;">
-                No facts have been created yet. Get started by defining your first knowledge item.
-            </p>
-            <div>
-                <a href="{{ url_for('facts.create') }}" class="btn btn-primary rounded-3 px-4 shadow-sm">
-                    <i class="bi bi-plus-lg me-1"></i> Create First Fact
-                </a>
-            </div>
-        </div>
+        {% with icon="bi-lightbulb", title="No Facts Found", message="No knowledge base facts defined yet.", action_url=url_for('facts.create'), action_text="Create First Fact" %}
+            {% include "partials/_empty_state.html" %}
+        {% endwith %}
     {% endif %}
 
 </div>

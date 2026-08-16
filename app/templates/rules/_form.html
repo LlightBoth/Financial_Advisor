@@ -1,64 +1,43 @@
+{% import "macros/form_macros.html" as f %}
+
 {{ form.hidden_tag() }}
 
-<div class="mb-3">
-    {{ form.conclusion.label(class="form-label") }}
-    {{ form.conclusion(class="form-control") }}
+{{ f.render_field(form.conclusion, placeholder="e.g. Budget is stable and healthy", icon="bi bi-lightbulb") }}
+{{ f.render_field(form.certainty, placeholder="e.g. 0.85 (0.0 to 1.0)", icon="bi bi-percent") }}
+{{ f.render_textarea(form.advice, rows=3, placeholder="Financial advice given when conditions match...") }}
 
-    {% if form.conclusion.errors %}
-        <div class="text-danger small">
-            {% for error in form.conclusion.errors %}
-                <div>{{ error }}</div>
+{% if facts %}
+<div class="mb-4">
+    <label class="form-label fw-semibold small text-body-secondary mb-2 d-block">
+        <i class="bi bi-info-circle me-1"></i> Trigger Conditions (Facts)
+    </label>
+    
+    <div class="card bg-body-tertiary border border-subtle rounded-3 p-3">
+        <div class="row g-2">
+            {% for fact in facts %}
+                <div class="col-12 col-md-6">
+                    <div class="form-check form-switch p-2 bg-body rounded-2 border border-subtle d-flex align-items-center justify-content-between px-3">
+                        <label class="form-check-label small mb-0 cursor-pointer" for="fact_{{ fact.id }}">
+                            <span class="fw-semibold text-body d-block">{{ fact.description }}</span>
+                            <code class="text-secondary small">{{ fact.tags }}</code>
+                        </label>
+                        <input type="checkbox"
+                               class="form-check-input ms-2"
+                               id="fact_{{ fact.id }}"
+                               name="fact_ids"
+                               value="{{ fact.id }}"
+                               {% if current_fact_ids and fact.id in current_fact_ids %} checked {% endif %}>
+                    </div>
+                </div>
             {% endfor %}
         </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.certainty.label(class="form-label") }}
-    {{ form.certainty(class="form-control") }}
-
-    {% if form.certainty.errors %}
-        <div class="text-danger small">
-            {% for error in form.certainty.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.advice.label(class="form-label") }}
-    {{ form.advice(class="form-control") }}
-
-    {% if form.advice.errors %}
-        <div class="text-danger small">
-            {% for error in form.advice.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    <label style="padding-bottom: 12px;">Conditions</label>
-    <div style="padding: 8px 12px; border: 1px solid rgba(128, 128, 128, 0.796); border-radius: 8px;">
-        {% for fact in facts | sort(attribute='module') %}
-            <div class="form-check ms-3 mb-2">
-                <input type="checkbox"
-                    class="form-check-input"
-                    name="fact_ids"
-                    value="{{ fact.id }}"
-                    {% if fact.id in current_fact_ids %} checked {% endif %}
-                >
-                <label class="form-check-label">
-                    <strong style="color: palevioletred;">{{ fact.description }}</strong> - {{ fact.tags }}
-                </label>
-            </div>
-        {% endfor %}
     </div>
 </div>
+{% endif %}
 
-
-<div class="mt-4">
-    {{ form.submit(class="btn btn-primary") }}
-</div>
+{{ f.render_form_buttons(
+    submit_label="Save Rule", 
+    cancel_url=url_for('rules.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}

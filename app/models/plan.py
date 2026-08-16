@@ -1,10 +1,9 @@
 from datetime import datetime
-from flask_login import UserMixin
-
-from .associations import user_plans
 from extension import db
+from app.models.associations import user_plans
 
-class Plan(UserMixin, db.Model):
+
+class Plan(db.Model):
     __tablename__ = "plans"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -14,14 +13,14 @@ class Plan(UserMixin, db.Model):
     description = db.Column(db.String(120), nullable=False)
     value = db.Column(db.Boolean, default=True, nullable=False)
 
-    saving = db.Column(db.Float, default=0)
-    last_completed = db.Column(db.DateTime)
+    saving = db.Column(db.Float, default=0.0)
+    last_completed = db.Column(db.DateTime, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # Relationship
+    # Relationships
     users = db.relationship("User", secondary=user_plans, back_populates="plans")
 
     def __repr__(self):
-        return f"<Plan {self.description}>"
+        return f"<Plan {self.goal}>"

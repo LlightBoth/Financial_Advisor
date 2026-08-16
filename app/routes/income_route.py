@@ -19,7 +19,8 @@ income_bp = Blueprint("incomes", __name__, url_prefix="/incomes")
 # Middleware
 @income_bp.before_request
 def check_token():
-    check_cookie_token(current_user)
+    # check_cookie_token(current_user)
+    pass
 
 
 # --------------------------------------------------
@@ -29,7 +30,6 @@ def check_token():
 @login_required
 def index():
     incomes = IncomeServices.get_all_income(current_user)
-
     return render_template("incomes/index.html", incomes=incomes, today=date.today())
 
 
@@ -39,18 +39,15 @@ def index():
 @income_bp.route("/<int:income_id>")
 @login_required
 def detail(income_id):
-    income = IncomeServices.get_income_id(income_id)
-
+    income = IncomeServices.get_income_id(income_id, current_user.id)
     if income is None:
         abort(404)
-
     return render_template("incomes/detail.html", income=income)
 
 
 # --------------------------------------------------
 # Create Income
 # --------------------------------------------------
-
 @income_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
@@ -66,8 +63,7 @@ def create():
         }
 
         income = IncomeServices.create_income(data, current_user)
-
-        flash(f"Income '{income.amount}' created successfully!", "success")
+        flash(f"Income '${income.amount:.2f}' created successfully!", "success")
         return redirect(url_for("incomes.index"))
 
     return render_template("incomes/create.html", form=form)
@@ -76,11 +72,10 @@ def create():
 # --------------------------------------------------
 # Edit Income
 # --------------------------------------------------
-@income_bp.route( "/<int:income_id>/edit", methods=["GET", "POST"])
+@income_bp.route("/<int:income_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(income_id):
-    income = IncomeServices.get_income_id(income_id)
-
+    income = IncomeServices.get_income_id(income_id, current_user.id)
     if income is None:
         abort(404)
     form = EditIncomeForm(original_income=income, obj=income)
@@ -95,8 +90,7 @@ def edit(income_id):
         }
 
         IncomeServices.update_income(income, data)
-
-        flash(f"Income '{income.amount}' updated successfully!", "success")
+        flash(f"Income '${income.amount:.2f}' updated successfully!", "success")
         return redirect(url_for("incomes.index"))
 
     return render_template(
@@ -112,8 +106,7 @@ def edit(income_id):
 @income_bp.route("/<int:income_id>/delete", methods=["GET"])
 @login_required
 def delete_confirm(income_id):
-    income = IncomeServices.get_income_id(income_id)
-
+    income = IncomeServices.get_income_id(income_id, current_user.id)
     if income is None:
         abort(404)
     form = IncomeDeleteForm()
@@ -131,12 +124,12 @@ def delete_confirm(income_id):
 @income_bp.route("/<int:income_id>/delete", methods=["POST"])
 @login_required
 def delete(income_id):
-    income = IncomeServices.get_income_id(income_id)
-    print(f"Income ID delete: {income}")
-    
+    income = IncomeServices.get_income_id(income_id, current_user.id)
     if income is None:
         abort(404)
-    IncomeServices.delete_income(income)
-    flash("Income deleted successfully!", "success")
-
+    
+    form = IncomeDeleteForm()
+    if form.validate_on_submit():
+        IncomeServices.delete_income(income)
+        flash("Income deleted successfully!", "success")
     return redirect(url_for("incomes.index"))

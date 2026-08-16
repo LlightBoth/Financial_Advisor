@@ -1,20 +1,8 @@
 {% extends "layouts/base.html" %}
-{% block title %} Users - User Management {% endblock %}
+{% block title %}Users Management{% endblock %}
 
 {% block content %}
-<style>
-    .user-avatar-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-</style>
-
-<div class="container-fluid px-3 px-sm-4 py-3 py-md-4 pb-5">
+<div class="container-fluid px-3 px-sm-4 py-3">
 
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -22,87 +10,105 @@
             <h1 class="h3 fw-bold mb-1 text-body">Users</h1>
             <p class="text-body-secondary small mb-0">Manage system user accounts, roles, and status</p>
         </div>
-        <a href="{{ url_for('users.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm">
+        {% if user_has_permission(current_user, 'user.create') %}
+        <a href="{{ url_for('users.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm px-3">
             <i class="bi bi-plus-lg"></i>
             <span>New User</span>
         </a>
+        {% endif %}
     </div>
 
     {% if users %}
-        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 overflow-hidden">
-
-            <!-- Desktop / Tablet Table View (hidden on mobile) -->
-            <div class="table-responsive d-none d-md-block">
+        <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr class="text-uppercase small fw-bold text-body-secondary border-bottom border-subtle" style="font-size: 0.725rem; letter-spacing: 0.05em;">
-                            <th class="border-0 px-4 py-3 bg-transparent" style="width: 50px;">#</th>
-                            <th class="border-0 py-3 bg-transparent">Username</th>
-                            <th class="border-0 py-3 bg-transparent">Full Name</th>
-                            <th class="border-0 py-3 bg-transparent">Email</th>
-                            <th class="border-0 py-3 bg-transparent text-center">Status</th>
-                            <th class="border-0 py-3 bg-transparent">Role</th>
-                            <th class="border-0 py-3 bg-transparent">Created</th>
-                            <th class="border-0 px-4 py-3 bg-transparent text-end" style="width: 130px;">Action</th>
+                    <thead class="bg-body-tertiary text-uppercase small text-body-secondary border-bottom border-subtle">
+                        <tr>
+                            <th class="py-3 px-4" style="letter-spacing: 0.05em;">User</th>
+                            <th class="py-3 d-none d-md-table-cell" style="letter-spacing: 0.05em;">Email</th>
+                            <th class="py-3 text-center" style="letter-spacing: 0.05em;">Status</th>
+                            <th class="py-3" style="letter-spacing: 0.05em;">Role</th>
+                            <th class="py-3 d-none d-lg-table-cell" style="letter-spacing: 0.05em;">Created</th>
+                            <th class="py-3 px-4 text-end" style="width: 140px; letter-spacing: 0.05em;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
                             <tr class="border-bottom border-subtle">
-                                <td class="px-4 py-3 text-body-tertiary small fw-medium">
-                                    {{ loop.index }}
-                                </td>
-                                <td class="py-3">
+                                <!-- User & Full Name -->
+                                <td class="py-3 px-4">
                                     <div class="d-flex align-items-center gap-3">
-                                        <div class="user-avatar-icon bg-primary-subtle text-primary flex-shrink-0">
-                                            <i class="bi bi-person"></i>
+                                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                                            <i class="bi bi-person fs-5"></i>
                                         </div>
-                                        <a href="{{ url_for('users.detail', user_id=user.id) }}" class="text-decoration-none fw-bold text-body text-truncate">
-                                            {{ user.username }}
-                                        </a>
+                                        <div>
+                                            <a href="{{ url_for('users.detail', user_id=user.id) }}" class="text-decoration-none fw-bold text-body">
+                                                {{ user.username }}
+                                            </a>
+                                            <div class="text-body-secondary small">
+                                                {{ user.full_name or '—' }}
+                                                <span class="d-md-none text-muted"> • {{ user.email }}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="py-3 text-body">
-                                    {{ user.full_name or '—' }}
+
+                                <!-- Email -->
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="text-body-secondary small">{{ user.email }}</span>
                                 </td>
-                                <td class="py-3 text-body-secondary">
-                                    {{ user.email }}
-                                </td>
+
+                                <!-- Status -->
                                 <td class="py-3 text-center">
                                     {% if user.is_active %}
                                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
                                             <i class="bi bi-check-circle me-1"></i>Active
                                         </span>
                                     {% else %}
-                                        <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill px-2.5 py-1">
-                                            <i class="bi bi-dash-circle me-1"></i>Inactive
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">
+                                            <i class="bi bi-x-circle me-1"></i>Inactive
                                         </span>
                                     {% endif %}
                                 </td>
+
+                                <!-- Role Badge -->
                                 <td class="py-3">
                                     {% if user.roles %}
-                                        <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                            <i class="bi bi-shield-check me-1 text-body-tertiary"></i>{{ user.roles[0].name }}
-                                        </span>
+                                        {% for role in user.roles %}
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1">
+                                                <i class="bi bi-shield-lock me-1"></i>{{ role.name }}
+                                            </span>
+                                        {% endfor %}
                                     {% else %}
-                                        <span class="text-body-tertiary small">—</span>
+                                        <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill px-2.5 py-1">
+                                            No Role
+                                        </span>
                                     {% endif %}
                                 </td>
-                                <td class="py-3 text-body-secondary small">
-                                    {{ user.created_at.strftime('%Y-%m-%d') }}
+
+                                <!-- Created Date -->
+                                <td class="py-3 d-none d-lg-table-cell">
+                                    <span class="text-body-secondary small">
+                                        {{ user.created_at.strftime('%b %d, %Y') if user.created_at else '—' }}
+                                    </span>
                                 </td>
-                                <td class="px-4 py-3 text-end">
+
+                                <!-- Actions -->
+                                <td class="py-3 px-4 text-end">
                                     <div class="btn-group gap-1">
-                                        <a href="{{ url_for('users.edit', user_id=user.id) }}" 
-                                           class="btn btn-sm btn-outline-secondary rounded-2"
-                                           title="Edit User">
+                                        <a href="{{ url_for('users.detail', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="View Profile">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if user_has_permission(current_user, 'user.edit') %}
+                                        <a href="{{ url_for('users.edit', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="Edit User">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="{{ url_for('users.delete_confirm', user_id=user.id) }}" 
-                                           class="btn btn-sm btn-outline-danger rounded-2"
-                                           title="Delete User">
+                                        {% endif %}
+                                        {% if user_has_permission(current_user, 'user.delete') %}
+                                        <a href="{{ url_for('users.delete_confirm', user_id=user.id) }}" class="btn btn-sm btn-outline-danger rounded-2" title="Delete User">
                                             <i class="bi bi-trash"></i>
                                         </a>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
@@ -110,93 +116,11 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Mobile View (Cards list on screens < md) -->
-            <div class="d-md-none p-3 vstack gap-3">
-                {% for user in users %}
-                    <div class="p-3 bg-body rounded-3 border border-subtle shadow-sm">
-                        
-                        <!-- Top Row: User + Actions -->
-                        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                            <div class="d-flex align-items-center gap-2 min-w-0">
-                                <div class="user-avatar-icon bg-primary-subtle text-primary flex-shrink-0" style="width:32px; height:32px; font-size:0.875rem;">
-                                    <i class="bi bi-person"></i>
-                                </div>
-                                <a href="{{ url_for('users.detail', user_id=user.id) }}" class="text-decoration-none fw-bold text-body text-truncate">
-                                    {{ user.username }}
-                                </a>
-                            </div>
-                            <div class="btn-group gap-1 flex-shrink-0">
-                                <a href="{{ url_for('users.edit', user_id=user.id) }}" 
-                                   class="btn btn-sm btn-outline-secondary rounded-2 px-2 py-1"
-                                   title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{{ url_for('users.delete_confirm', user_id=user.id) }}" 
-                                   class="btn btn-sm btn-outline-danger rounded-2 px-2 py-1"
-                                   title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- User Info Body -->
-                        <div class="small vstack gap-1 text-body-secondary mb-3">
-                            {% if user.full_name %}
-                                <div class="fw-medium text-body">{{ user.full_name }}</div>
-                            {% endif %}
-                            <div class="d-flex align-items-center gap-2 text-truncate">
-                                <i class="bi bi-envelope text-body-tertiary"></i>
-                                <span>{{ user.email }}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2 text-body-tertiary" style="font-size: 0.8rem;">
-                                <i class="bi bi-calendar3"></i>
-                                <span>Joined {{ user.created_at.strftime('%Y-%m-%d') }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Footer Badges: Status & Role -->
-                        <div class="d-flex align-items-center justify-content-between pt-2 border-top border-subtle flex-wrap gap-2">
-                            {% if user.is_active %}
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
-                                    <i class="bi bi-check-circle me-1"></i>Active
-                                </span>
-                            {% else %}
-                                <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill">
-                                    <i class="bi bi-dash-circle me-1"></i>Inactive
-                                </span>
-                            {% endif %}
-
-                            {% if user.roles %}
-                                <span class="badge bg-body-secondary text-body border border-subtle rounded-2">
-                                    <i class="bi bi-shield-check me-1 text-body-tertiary"></i>{{ user.roles[0].name }}
-                                </span>
-                            {% else %}
-                                <span class="badge bg-body-secondary text-body-tertiary border border-subtle rounded-2">No Role</span>
-                            {% endif %}
-                        </div>
-
-                    </div>
-                {% endfor %}
-            </div>
-
         </div>
     {% else %}
-        <!-- Empty State -->
-        <div class="card bg-body-tertiary border-0 shadow-sm rounded-4 p-5 text-center">
-            <div class="mb-3 text-body-tertiary fs-1">
-                <i class="bi bi-people-fill"></i>
-            </div>
-            <h5 class="fw-bold text-body mb-2">No Users Found</h5>
-            <p class="text-body-secondary mb-4 small" style="max-width: 380px; margin: 0 auto;">
-                No user accounts have been created yet. Get started by adding your first team member.
-            </p>
-            <div>
-                <a href="{{ url_for('users.create') }}" class="btn btn-primary rounded-3 px-4 shadow-sm">
-                    <i class="bi bi-plus-lg me-1"></i> Create First User
-                </a>
-            </div>
-        </div>
+        {% with icon="bi-people", title="No Users Found", message="No registered users found in the system.", action_url=url_for('users.create'), action_text="Add New User" %}
+            {% include "partials/_empty_state.html" %}
+        {% endwith %}
     {% endif %}
 
 </div>

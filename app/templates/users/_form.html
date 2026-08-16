@@ -1,89 +1,44 @@
+{% import "macros/form_macros.html" as f %}
+
 {{ form.hidden_tag() }}
 
-<div class="mb-3">
-    {{ form.username.label(class="form-label") }}
-    {{ form.username(class="form-control") }}
-
-    {% if form.username.errors %}
-        <div class="text-danger small">
-            {% for error in form.username.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.username, placeholder="e.g. john_doe", icon="bi bi-person") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.email, placeholder="e.g. john@example.com", icon="bi bi-envelope") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.full_name, placeholder="e.g. John Doe", icon="bi bi-card-text") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_select(form.role_module, icon="bi bi-shield-lock") }}
+    </div>
 </div>
 
-<div class="mb-3">
-    {{ form.email.label(class="form-label") }}
-    {{ form.email(class="form-control") }}
-
-    {% if form.email.errors %}
-        <div class="text-danger small">
-            {% for error in form.email.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+<div class="my-2">
+    {{ f.render_switch(form.is_active) }}
 </div>
 
-<div class="mb-3">
-    {{ form.full_name.label(class="form-label") }}
-    {{ form.full_name(class="form-control") }}
+<hr class="my-4 border-subtle">
 
-    {% if form.full_name.errors %}
-        <div class="text-danger small">
-            {% for error in form.full_name.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+<h6 class="fw-bold mb-3 text-body">
+    <i class="bi bi-lock me-1"></i> Security Credentials
+</h6>
+
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.password, placeholder="Enter secure password", icon="bi bi-key") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.confirm_password, placeholder="Confirm password", icon="bi bi-key-fill") }}
+    </div>
 </div>
 
-<div class="form-check mb-3">
-    {{ form.is_active(class="form-check-input") }}
-    {{ form.is_active.label(class="form-check-label") }}
-</div>
-
-<div class="mb-3">
-    {{ form.role_module.label(class="form-label") }}
-    {{ form.role_module(class="form-control") }}
-
-    {% if form.role_module.errors %}
-        <div class="text-danger small">
-            {% for error in form.role_module.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.password.label(class="form-label") }}
-    {{ form.password(class="form-control") }}
-
-    {% if form.password.errors %}
-        <div class="text-danger small">
-            {% for error in form.password.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.confirm_password.label(class="form-label") }}
-    {{ form.confirm_password(class="form-control") }}
-
-    {% if form.confirm_password.errors %}
-        <div class="text-danger small">
-            {% for error in form.confirm_password.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mt-4">
-    {{ form.submit(class="btn btn-primary") }}
-    <a href="{{ url_for('users.index') }}" class="btn btn-outline-secondary">Cancel</a>
-</div>
+{{ f.render_form_buttons(
+    submit_label="Save User", 
+    cancel_url=url_for('users.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}

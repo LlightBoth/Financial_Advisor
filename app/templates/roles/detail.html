@@ -1,13 +1,13 @@
 {% extends "layouts/base.html" %}
-
-{% block title %} Role: {{ role.name }} {% endblock %}
+{% block title %}Role: {{ role.name }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
     <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
         <div>
-            <h1 class="h3 mb-0 fw-bold">Role Profile</h1>
+            <h1 class="h3 mb-0 fw-bold text-body">Role Details</h1>
+            <p class="text-body-secondary small mb-0">Overview of role configuration, permissions, and members</p>
         </div>
         <div class="btn-group shadow-sm">
             <a href="{{ url_for('roles.edit', role_id=role.id) }}" class="btn btn-outline-primary btn-sm px-3">
@@ -20,71 +20,91 @@
     </div>
 
     <!-- Main Detail Card -->
-    <div class="card border shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Record ID: #{{ role.id }}</span>
-            <span class="badge text-bg-dark px-3 py-2 fs-6"> {{ role.name }}</span>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-body">
+        <div class="card-header bg-body-secondary py-3 px-4 border-bottom border-subtle d-flex justify-content-between align-items-center">
+            <span class="text-secondary small font-monospace">Record ID: #{{ role.id }}</span>
+            <span class="badge text-bg-primary px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-shield-lock me-1"></i>{{ role.name }}
+            </span>
         </div>
 
-        <div class="card-body p-4 bg-body">
+        <div class="card-body p-4">
             <div class="row g-4">
                 
                 <!-- Description Section -->
                 <div class="col-12">
-                    <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description : </span>
-                        <h5 class="mb-0 {% if not role.descriptions %}text-muted fst-italic{% else %}text-body{% endif %}">
-                            {{ role.descriptions if role.descriptions else "No description provided." }}
-                        </h5>
-                    </div>
+                    <span class="d-block text-body-secondary small text-uppercase fw-semibold mb-1">Description</span>
+                    <p class="mb-0 fs-6 {% if not role.descriptions %}text-body-tertiary fst-italic{% else %}text-body{% endif %}">
+                        {{ role.descriptions if role.descriptions else "No description provided." }}
+                    </p>
                 </div>
 
                 <!-- Permissions Section -->
                 <div class="col-12">
-                    <hr class="text-muted opacity-25">
-                    <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-2">Assigned Permissions : </span>
-                        {% if current_permission %}
-                            <div class="d-flex flex-wrap gap-2">
-                                {% for p in current_permission %}
-                                    <span class="badge bg-body-secondary text-body border px-3 py-2">
-                                        <strong class="text-primary">{{ p.code }}</strong>: {{ p.name }}
-                                    </span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <p class="text-muted fst-italic mb-0">No permissions assigned to this role.</p>
-                        {% endif %}
+                    <hr class="text-body-secondary opacity-25">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-body-secondary small text-uppercase fw-semibold">
+                            <i class="bi bi-key me-1"></i> Assigned Permissions ({{ current_permission | length if current_permission else 0 }})
+                        </span>
                     </div>
+                    {% if current_permission %}
+                        <div class="row g-2">
+                            {% for module, mod_perms in current_permission | groupby('module') %}
+                                <div class="col-12 col-md-6">
+                                    <div class="p-2 bg-body-tertiary rounded-3 border border-subtle">
+                                        <div class="small fw-semibold text-primary mb-2 px-1">
+                                            <i class="bi bi-folder2-open me-1"></i> {{ module or 'General' }}
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for p in mod_perms %}
+                                                <span class="badge bg-body text-body border border-subtle px-2 py-1 rounded-2">
+                                                    <code class="text-primary fw-bold">{{ p.code }}</code>
+                                                    <span class="text-secondary ms-1" style="font-size: 0.7rem;">{{ p.name }}</span>
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-body-tertiary fst-italic mb-0 small">No permissions assigned to this role.</p>
+                    {% endif %}
                 </div>
 
                 <!-- Users with this Role Section -->
                 <div class="col-12">
-                    <hr class="text-muted opacity-25">
-                    <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-2">Users with this Role</span>
-                        {% if users %}
-                            <ul class="list-group list-group-flush border rounded-3 overflow-hidden bg-body">
-                                {% for u in users %}
-                                    <li class="list-group-item bg-body d-flex justify-content-between align-items-center px-3 py-2">
-                                        <span class="text-body fw-medium">{{ u.username }}</span>
-                                        <a href="{{ url_for('users.detail', user_id=u.id) }}" class="btn btn-sm btn-outline-secondary px-3">
-                                            View User
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p class="text-muted fst-italic mb-0">No users currently assigned to this role.</p>
-                        {% endif %}
-                    </div>
+                    <hr class="text-body-secondary opacity-25">
+                    <span class="d-block text-body-secondary small text-uppercase fw-semibold mb-3">
+                        <i class="bi bi-people me-1"></i> Users Assigned to this Role ({{ role.users | length }})
+                    </span>
+                    {% if role.users %}
+                        <div class="list-group list-group-flush border border-subtle rounded-3 overflow-hidden">
+                            {% for u in role.users %}
+                                <div class="list-group-item bg-body d-flex justify-content-between align-items-center px-3 py-2 border-bottom border-subtle">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-person-circle text-secondary fs-5"></i>
+                                        <div>
+                                            <span class="text-body fw-semibold">{{ u.full_name or u.username }}</span>
+                                            <span class="text-secondary small ms-2">(@{{ u.username }})</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('users.detail', user_id=u.id) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-2">
+                                        View Profile
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-body-tertiary fst-italic mb-0 small">No users are currently assigned to this role.</p>
+                    {% endif %}
                 </div>
 
                 <!-- Timestamps -->
                 {% if role.created_at or role.updated_at %}
                 <div class="col-12">
-                    <hr class="text-muted opacity-25">
-                    <div class="d-flex justify-content-between text-muted small">
+                    <hr class="text-body-secondary opacity-25">
+                    <div class="d-flex justify-content-between text-body-secondary small flex-wrap gap-2">
                         <span>Created: <strong class="text-body">{{ role.created_at.strftime("%b %d, %Y, %I:%M %p") if role.created_at else "N/A" }}</strong></span>
                         <span>Last updated: <strong class="text-body">{{ role.updated_at.strftime("%b %d, %Y, %I:%M %p") if role.updated_at else "N/A" }}</strong></span>
                     </div>

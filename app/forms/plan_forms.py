@@ -1,21 +1,20 @@
-import re
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, StringField, SubmitField, FloatField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, NumberRange
 
 from app.models import Plan
-from extension import db
+
 
 class PlanForm(FlaskForm):
     goal = StringField(
         "Goal", 
         validators=[DataRequired()],
         render_kw={"placeholder": "e.g. Annual Marketing Strategy"}
-        )
+    )
     in_between = DateField(
         "In-Between", 
         validators=[DataRequired()],
-        )
+    )
     description = TextAreaField(
         "Description",
         validators=[Optional()],
@@ -23,12 +22,13 @@ class PlanForm(FlaskForm):
     )
     goal_cost = FloatField(
         "Goal-Cost",
-        validators=[DataRequired()],
+        validators=[
+            DataRequired(),
+            NumberRange(min=0.01, message="Estimated budget must be greater than 0.")
+        ],
         render_kw={"placeholder": "How much around does it cost?"}
     )
-    value = BooleanField(
-        "Value"
-    )
+    value = BooleanField("Value", default=True)
     
     submit = SubmitField('Launch Strategy')
 
@@ -39,19 +39,22 @@ class EditPlanForm(FlaskForm):
         "Goal", 
         validators=[DataRequired()],
         render_kw={"placeholder": "e.g. Annual Marketing Strategy"}
-        )
+    )
     in_between = DateField(
         "In-Between", 
         validators=[DataRequired()],
-        )
+    )
     description = TextAreaField(
         "Description",
-        validators=[DataRequired()],
-        render_kw={"placeholder": "Short description describe your plan"}
+        validators=[Optional()],
+        render_kw={"placeholder": "Short description of your financial plan"}
     )
     goal_cost = FloatField(
         "Goal-Cost",
-        validators=[DataRequired()],
+        validators=[
+            DataRequired(),
+            NumberRange(min=0.01, message="Estimated budget must be greater than 0.")
+        ],
         render_kw={"placeholder": "How much around does it cost?"}
     )
     value = BooleanField(
@@ -63,7 +66,6 @@ class EditPlanForm(FlaskForm):
     def __init__(self, original_plan: Plan, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.original_plan = original_plan
-
 
 
 # ----- ConfirmDeleteForm -----

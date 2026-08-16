@@ -1,8 +1,5 @@
-from typing import Optional
-
 from app.models.history import History
 from app.models.user import User
-
 from extension import db
 
 
@@ -12,65 +9,67 @@ class HistoryServices:
         return History.query.all()
     
     @staticmethod
-    def get_all_history(current_user_id):
-        return History.query.filter(History.users.any(id=current_user_id.id)).all()
+    def get_all_history(current_user):
+        return History.query.filter(History.users.any(id=current_user.id)).order_by(History.created_at.desc()).all()
 
     @staticmethod
-    def get_user_history_id(history_id, user):
+    def get_user_history_id(history_id: int, user):
         return History.query.filter(
             History.id == history_id,
             History.users.any(id=user.id)
-            ).first()
+        ).first()
     
     @staticmethod 
     def create(data: dict, current_user: User):
-        advice_obj = data["get_advice"]
+        try:
+            advice_obj = data.get("get_advice")
+            advice_text = getattr(advice_obj, "advice", str(advice_obj)) if advice_obj else ""
+            conclusion_text = getattr(advice_obj, "conclusion", "") if advice_obj else ""
+            certainty_val = getattr(advice_obj, "certainty", 0.0) if advice_obj else 0.0
 
-        # If it’s your EmptyAdvice object, make sure fields exist
-        advice_text = getattr(advice_obj, "advice", str(advice_obj))
-        conclusion_text = getattr(advice_obj, "conclusion", "")
-        certainty_val = getattr(advice_obj, "certainty", 0.0)
+            history = History(
+                goal_cost=data.get("goal_cost", 0.0),
+                income=data["income"],
+                expense=data["expense"],
+                martial_status=data.get("martial_status") or data.get("marital_status", "Single"),
+                is_employed=True if data.get("is_employed") in (True, "employed") else False,
+                is_debt=True if data.get("is_debt") in (True, "debt") else False,
+                is_spending=True if data.get("is_spending") in (True, "big spend") else False,
+                remain_percentage=data.get("remain_percentage", 0.0),
+                expense_percentage=data.get("expense_percentage", 0.0),
+                get_advice=advice_text,
+                get_conclusion=conclusion_text,
+                get_certainty=certainty_val,
+            )
 
-        history = History(
-            goal_cost = data.get("goal_cost", 0.0),
-            income = data["income"],
-            expense = data["expense"],
-            martial_status = data["martial_status"],
-            is_employed = True if data.get("is_employed") == "employed" else False,
-            is_debt = True if data.get("is_debt") == "debt" else False,
-            is_spending = True if data.get("is_spending") == "big spend" else False,
-            remain_percentage = data["remain_percentage"],
-            expense_percentage = data["expense_percentage"],
-            get_advice = advice_text,
-            get_conclusion = conclusion_text,
-            get_certainty = certainty_val,
-        )
-
-        # Add to user in history
-        history.users.append(current_user)
-
-        # Add to session and commit
-        db.session.add(history)
-        db.session.commit()
-        return history
+            history.users.append(current_user)
+            db.session.add(history)
+            db.session.commit()
+            return history
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def delete_history(history: History):
-        """Delete a history object that already belongs to a user."""
-        if history:
-            db.session.delete(history)
-            db.session.commit()
-            return True
-        return False
+        try:
+            if history:
+                db.session.delete(history)
+                db.session.commit()
+                return True
+            return False
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def delete_all_history(user):
-        # 1. Grab all history objects linked to this user
-        user_histories_list = list(user.histories)
-        
-        # 2. Delete each History object (SQLAlchemy handles clearing user_histories automatically)
-        for history_item in user_histories_list:
-            db.session.delete(history_item)
-            
-        # 3. Save changes
-        db.session.commit()
+        try:
+            user_histories_list = list(user.histories)
+            for history_item in user_histories_list:
+                db.session.delete(history_item)
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            raise

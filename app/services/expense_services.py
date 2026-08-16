@@ -15,7 +15,7 @@ class ExpenseServices:
     @staticmethod
     def get_expense_count(current_user):
         return Expense.query.filter(Expense.users.any(id=current_user.id)).count()
-
+    
     @staticmethod
     def get_expense_total(current_user):
         return (
@@ -24,37 +24,50 @@ class ExpenseServices:
         )
 
     @staticmethod
-    def get_expense_id(expense_id):
-        return Expense.query.get(expense_id)
+    def get_expense_id(expense_id: int, user_id: int = None):
+        query = Expense.query.filter(Expense.id == expense_id)
+        if user_id is not None:
+            query = query.filter(Expense.users.any(id=user_id))
+        return query.first()
 
     @staticmethod
-    def create_expense(data: dict, user:int):
-        expense = Expense(
-            amount=data["amount"],
-            description=data.get("description"),
-            category=data["category"],
-            expense_date=data["expense_date"],
-            recurring_period=data.get("recurring_period") or None,
-        )
-        expense.users.append(user)
-        db.session.add(expense)
-        db.session.commit()
-
-        return expense
+    def create_expense(data: dict, user):
+        try:
+            expense = Expense(
+                amount=data["amount"],
+                description=data.get("description"),
+                category=data["category"],
+                expense_date=data["expense_date"],
+                recurring_period=data.get("recurring_period") or None,
+            )
+            expense.users.append(user)
+            db.session.add(expense)
+            db.session.commit()
+            return expense
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def update_expense(expense: Expense, data: dict):
-        expense.amount = data["amount"]
-        expense.description = data.get("description")
-        expense.category = data["category"]
-        expense.expense_date = data["expense_date"]
-        expense.recurring_period = data.get("recurring_period") or None
-
-        db.session.commit()
-
-        return expense
+        try:
+            expense.amount = data["amount"]
+            expense.description = data.get("description")
+            expense.category = data["category"]
+            expense.expense_date = data["expense_date"]
+            expense.recurring_period = data.get("recurring_period") or None
+            db.session.commit()
+            return expense
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def delete_expense(expense: Expense):
-        db.session.delete(expense)
-        db.session.commit()
+        try:
+            db.session.delete(expense)
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            raise

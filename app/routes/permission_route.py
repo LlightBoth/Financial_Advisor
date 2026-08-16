@@ -3,18 +3,16 @@ from flask_login import login_required, current_user
 
 from app.services.permission_services import PermissionServices
 from app.forms import PermissionCreateForm, PermissionEditForm, PermissionDeleteForm
-
-from app.security.role_check import role_admin_only
-from app.security.cookie import check_cookie_token
+from app.security.role_check import check_route_permission
 
 
 permission_bp = Blueprint("permissions", __name__, url_prefix="/permissions")
 
-# Middleware route
+
+# Middleware route: automatically enforces granular RBAC for all routes in blueprint
 @permission_bp.before_request
 def check_token():
-    check_cookie_token(current_user)
-    role_admin_only()
+    check_route_permission()
 
 
 @permission_bp.route("/")
@@ -23,6 +21,7 @@ def index():
     permissions = PermissionServices.get_all_permissions()
     return render_template("permissions/index.html", permissions=permissions)
 
+
 @permission_bp.route("/<int:permission_id>")
 @login_required
 def detail(permission_id):
@@ -30,6 +29,7 @@ def detail(permission_id):
     if permission is None:
         abort(404)
     return render_template("permissions/detail.html", permission=permission)
+
 
 @permission_bp.route("/create", methods=["GET", "POST"])
 @login_required
@@ -48,6 +48,7 @@ def create():
         return redirect(url_for("permissions.index"))
 
     return render_template("permissions/create.html", form=form)
+
 
 @permission_bp.route("/<int:permission_id>/edit", methods=["GET", "POST"])
 @login_required
@@ -69,7 +70,8 @@ def edit(permission_id):
         flash("Updated permission successfully", "success")
         return redirect(url_for("permissions.index"))
 
-    return render_template("permissions/edit.html", form=form)
+    return render_template("permissions/edit.html", form=form, permission=permission)
+
 
 @permission_bp.route("/<int:permission_id>/delete", methods=["GET"])
 @login_required
@@ -80,6 +82,7 @@ def delete_confirm(permission_id):
 
     form = PermissionDeleteForm()
     return render_template("permissions/delete_confirm.html", form=form, permission=permission)
+
 
 @permission_bp.route("/<int:permission_id>/delete", methods=["POST"])
 @login_required

@@ -1,30 +1,26 @@
 from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
-from flask_login import login_required, current_user
-from app.forms.user_forms import UserCreateForm, UserEditForm, ConfirmDeleteForm, EditProfileForm
-
+from flask_login import login_required, current_user, logout_user
+from app.forms.user_forms import UserCreateForm, UserEditForm, ConfirmDeleteForm
 from app.services.user_services import UserServices
 from app.services.role_services import RoleServices
 from app.services.user_role_services import UserRoleServices
-
-from app.security.role_check import role_admin_only
-from app.security.cookie import check_cookie_token
+from app.security.role_check import check_route_permission
 
 
 user_bp = Blueprint("users", __name__, url_prefix="/users")
 
 
-# Middleware route
+# Middleware route: automatically enforces granular RBAC for all routes in blueprint
 @user_bp.before_request
 def check_token():
-    check_cookie_token(current_user)
-    # role_admin_only()
+    check_route_permission()
+
 
 @user_bp.route("/")
 @login_required
 def index():
     users = UserServices.get_all()
     roles = RoleServices.get_all_roles()
-    
     return render_template("users/index.html", users=users, roles=roles)
 
 
@@ -40,7 +36,6 @@ def detail(user_id):
 @user_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
-    # Get all roles for the select field
     all_roles = RoleServices.get_all_roles()
     roles_choices = [(r.id, r.name) for r in all_roles]
     form = UserCreateForm(roles_choices)
@@ -56,7 +51,6 @@ def create():
         role_module_id = form.role_module.data
 
         user = UserServices.create(data, password)
-        print(role_module_id)
         UserRoleServices.create_user_role(user.id, role_module_id)
         flash(f"User '{user.username}' created successfully!", "success")
 
@@ -72,16 +66,12 @@ def edit(user_id):
     if user is None:
         abort(404)
 
-    # Get all roles for the select field
     all_roles = RoleServices.get_all_roles()
     roles_choices = [(r.id, r.name) for r in all_roles]
 
-    # Get current role ID (manually via your association table)
     current_role_id = None
     if user.roles:
-        current_role_id = user.roles[0].id  # if relationship works
-    # Or fetch manually via UserRoleServices if needed:
-    # current_role_id = UserRoleServices.get_user_role_id(user.id)
+        current_role_id = user.roles[0].id
 
     form = UserEditForm(
         original_user=user,
@@ -102,7 +92,6 @@ def edit(user_id):
 
         UserServices.update(user, data, password)
         success = UserRoleServices.update_role_user(user.id, role_module_id)
-        print(f" user ID ={user.id}, module change = {role_module_id}")
         if not success:
             flash("User role update failed!", "danger")
             return redirect(url_for("users.edit", user_id=user.id))
@@ -111,6 +100,7 @@ def edit(user_id):
         return redirect(url_for("users.index"))
 
     return render_template("users/edit.html", form=form, user=user)
+
 
 @user_bp.route("/<int:user_id>/delete", methods=["GET"])
 @login_required
@@ -130,11 +120,11 @@ def delete(user_id):
     if user is None:
         abort(404)
 
-    # Check if yourself is the one requesting delete
     is_self = current_user.id == user.id
     UserServices.delete(user)
 
     if is_self:
+        logout_user()
         return redirect(url_for("auth.login"))
 
     flash("User deleted successfully!", "success")

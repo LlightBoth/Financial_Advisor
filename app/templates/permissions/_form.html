@@ -1,58 +1,15 @@
+{% import "macros/form_macros.html" as f %}
+
 {{ form.hidden_tag() }}
 
-<div class="mb-3">
-    {{ form.code.label(class="form-label") }}
-    {{ form.code(class="form-control") }}
+{{ f.render_field(form.code, placeholder="e.g. users:create", icon="bi bi-key") }}
+{{ f.render_field(form.name, placeholder="e.g. Create Users", icon="bi bi-tag") }}
+{{ f.render_select(form.module, icon="bi bi-layers") }}
+{{ f.render_textarea(form.descriptions, rows=3, placeholder="Describe what this permission allows...") }}
 
-    {% if form.code.errors %}
-        <div class="text-danger small">
-            {% for error in form.code.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.name.label(class="form-label") }}
-    {{ form.name(class="form-control") }}
-
-    {% if form.name.errors %}
-        <div class="text-danger small">
-            {% for error in form.name.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.module.label(class="form-label") }}
-    {{ form.module(class="form-control") }}
-
-    {% if form.module.errors %}
-        <div class="text-danger small">
-            {% for error in form.module.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mb-3">
-    {{ form.descriptions.label(class="form-label") }}
-    {{ form.descriptions(class="form-control") }}
-
-    {% if form.descriptions.errors %}
-        <div class="text-danger small">
-            {% for error in form.descriptions.errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-</div>
-
-<div class="mt-4">
-    {{ form.submit(class="btn btn-primary") }}
-    <a href="{{ url_for('users.index') }}" class="btn btn-outline-secondary">Cancel</a>
-</div>
+{{ f.render_form_buttons(
+    submit_label="Apply Permission", 
+    cancel_url=url_for('permissions.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}

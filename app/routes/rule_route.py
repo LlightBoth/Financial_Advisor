@@ -5,7 +5,7 @@ from app.forms.rule_forms import RuleForm, EditRuleForm, ConfirmDeleteForm
 from app.services.rule_service import RuleServices
 from app.services.fact_service import FactServices
 
-from app.security.role_check import check_user_role
+from app.security.role_check import check_route_permission
 from app.security.cookie import check_cookie_token
 
 
@@ -15,8 +15,8 @@ rule_bp = Blueprint("rules", __name__, url_prefix="/rules")
 # Middleware route
 @rule_bp.before_request
 def check_token():
-    check_cookie_token(current_user)
-    check_user_role()
+    # check_cookie_token(current_user)
+    check_route_permission()
 
 
 @rule_bp.route("/")

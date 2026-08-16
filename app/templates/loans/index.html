@@ -1,0 +1,135 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %}Loan Advisor & Calculator{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-primary text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-bank fs-2 me-3"></i>
+                        <div>
+                            <h3 class="mb-1 fw-bold">Loan Evaluation & Advisory</h3>
+                            <p class="mb-0 text-white-50">Assess your borrowing capacity and receive expert loan recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    {% if advice %}
+                    <div class="alert alert-info border-0 rounded-3 p-4 mb-4 shadow-sm">
+                        <h5 class="fw-bold"><i class="bi bi-check-circle-fill text-success me-2"></i> Loan Recommendation</h5>
+                        <p class="lead mb-2">{{ advice.advice if advice is mapping or hasattr(advice, 'advice') else advice }}</p>
+                        {% if advice.conclusion %}
+                        <div class="badge bg-primary fs-6">{{ advice.conclusion }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('loans.index') }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                {{ form.loan_goal.label(class="form-label fw-semibold") }}
+                                {{ form.loan_goal(class="form-control form-control-lg", placeholder="$ 10,000") }}
+                                {% for err in form.loan_goal.errors %}
+                                    <div class="text-danger small mt-1">{{ err }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.total_debt_amount.label(class="form-label fw-semibold") }}
+                                {{ form.total_debt_amount(class="form-control form-control-lg", placeholder="$ 0.00") }}
+                                {% for err in form.total_debt_amount.errors %}
+                                    <div class="text-danger small mt-1">{{ err }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.loan_term.label(class="form-label fw-semibold") }}
+                                {{ form.loan_term(class="form-select form-select-lg") }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.repayment_frequency.label(class="form-label fw-semibold") }}
+                                {{ form.repayment_frequency(class="form-select form-select-lg") }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.income.label(class="form-label fw-semibold") }}
+                                {{ form.income(class="form-control form-control-lg", placeholder="$ 5,000") }}
+                                {% for err in form.income.errors %}
+                                    <div class="text-danger small mt-1">{{ err }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.expense.label(class="form-label fw-semibold") }}
+                                {{ form.expense(class="form-control form-control-lg", placeholder="$ 2,500") }}
+                                {% for err in form.expense.errors %}
+                                    <div class="text-danger small mt-1">{{ err }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-12">
+                                {{ form.martial_status.label(class="form-label fw-semibold") }}
+                                {{ form.martial_status(class="form-select form-select-lg") }}
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-4 mb-4">
+                            <h5 class="fw-bold mb-3">Financial Profile Questions</h5>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold d-block">{{ form.employment_status.label.text }}</label>
+                                {% for subfield in form.employment_status %}
+                                    <div class="form-check form-check-inline">
+                                        {{ subfield(class="form-check-input") }}
+                                        {{ subfield.label(class="form-check-label") }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold d-block">{{ form.debt_status.label.text }}</label>
+                                {% for subfield in form.debt_status %}
+                                    <div class="form-check form-check-inline">
+                                        {{ subfield(class="form-check-input") }}
+                                        {{ subfield.label(class="form-check-label") }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold d-block">{{ form.spending_habit.label.text }}</label>
+                                {% for subfield in form.spending_habit %}
+                                    <div class="form-check form-check-inline">
+                                        {{ subfield(class="form-check-input") }}
+                                        {{ subfield.label(class="form-check-label") }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold d-block">{{ form.loan_history.label.text }}</label>
+                                {% for subfield in form.loan_history %}
+                                    <div class="form-check form-check-inline">
+                                        {{ subfield(class="form-check-input") }}
+                                        {{ subfield.label(class="form-check-label") }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary btn-lg rounded-3 py-3 fw-bold") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

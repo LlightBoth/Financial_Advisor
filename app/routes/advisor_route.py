@@ -14,7 +14,8 @@ advisor_bp = Blueprint("advisors", __name__, url_prefix="/advisors")
 # Middleware route
 @advisor_bp.before_request
 def check_token():
-    check_cookie_token(current_user)
+    # check_cookie_token(current_user)
+    pass
 
 @advisor_bp.route("/", methods=["GET", "POST"])
 @login_required

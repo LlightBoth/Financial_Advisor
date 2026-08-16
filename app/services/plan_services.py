@@ -2,6 +2,7 @@ from app.models.plan import Plan
 from extension import db
 from sqlalchemy import func
 
+
 class PlanServices:
     @staticmethod
     def get_all_total_plan():
@@ -21,36 +22,50 @@ class PlanServices:
         return total or 0
     
     @staticmethod
-    def get_plan_id(plan_id):
-        return Plan.query.get(plan_id)
+    def get_plan_id(plan_id: int, user_id: int = None):
+        query = Plan.query.filter(Plan.id == plan_id)
+        if user_id is not None:
+            query = query.filter(Plan.users.any(id=user_id))
+        return query.first()
     
     @staticmethod
-    def create_plan(data: dict, user: int):
-        plan = Plan(
-            goal = data["goal"],
-            goal_cost = data["goal_cost"],
-            in_between = data["in_between"],
-            description = data["description"],
-            value = data.get("value", True),
-        )
-        plan.users.append(user)
-
-        db.session.add(plan)
-        db.session.commit()
-        return plan
+    def create_plan(data: dict, user):
+        try:
+            plan = Plan(
+                goal=data["goal"],
+                goal_cost=data["goal_cost"],
+                in_between=data["in_between"],
+                description=data.get("description", ""),
+                value=data.get("value", True),
+            )
+            plan.users.append(user)
+            db.session.add(plan)
+            db.session.commit()
+            return plan
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def update_plan(plan: Plan, data: dict):
-        plan.description = data["description"]
-        plan.value = data.get("value", True)
-        plan.goal = data["goal"]
-        plan.goal_cost = data["goal_cost"]
-        plan.in_between = data["in_between"]
-
-        db.session.commit()
-        return plan
+        try:
+            plan.description = data.get("description", plan.description)
+            plan.value = data.get("value", plan.value)
+            plan.goal = data["goal"]
+            plan.goal_cost = data["goal_cost"]
+            plan.in_between = data["in_between"]
+            db.session.commit()
+            return plan
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
-    def delete_plan(plan_id):
-        db.session.delete(plan_id)
-        db.session.commit()
+    def delete_plan(plan: Plan):
+        try:
+            db.session.delete(plan)
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            raise

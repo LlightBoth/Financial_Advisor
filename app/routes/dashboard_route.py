@@ -4,6 +4,8 @@ from flask_login import login_required, current_user
 from app.services.dashboard_services import DashboardServices
 from app.services.income_services import IncomeServices
 from app.services.expense_services import ExpenseServices
+from app.security.role_check import role_admin_only
+from app.security.cookie import check_cookie_token
 
 dashboard_bp = Blueprint("dashboards", __name__, url_prefix="/dashboards")
 
@@ -11,6 +13,9 @@ dashboard_bp = Blueprint("dashboards", __name__, url_prefix="/dashboards")
 @dashboard_bp.route("/", methods=["GET"])
 @login_required
 def userIndex():
+    # Accessible to admin, user role, or explicit dashboard.client.view permission
+    if not current_user.has_role("admin") and not current_user.has_role("user") and not current_user.has_permission("dashboard.client.view"):
+        abort(403)
     # Saving Math Formula
     total_income = IncomeServices.get_income_total(current_user)
     total_expense = ExpenseServices.get_expense_total(current_user)
@@ -60,10 +65,12 @@ def user_test_saving(plan_id, amount):
     
 
 
-# Employee Route
+# Employee / Admin Dashboard Route
 @dashboard_bp.route("/emp", methods=["GET"])
 @login_required
 def empIndex():
+    if not current_user.has_role("admin") and not current_user.has_permission("dashboard.admin.view") and not current_user.has_permission("dashboard.emp.view"):
+        abort(403)
     total_users = DashboardServices.emp_get_all_users()
     total_plans = DashboardServices.emp_get_all_plans()
     total_incomes = DashboardServices.emp_get_all_incomes()

@@ -24,6 +24,15 @@ def create_app(config_class: type[Config] = Config):
     mail.init_app(app)
     # prevent_dos.init_app(app)
 
+    # Register Jinja global helpers
+    from app.utils.template_helpers import user_has_role, user_has_permission, is_management_user, get_management_url
+    app.jinja_env.globals.update(
+        user_has_role=user_has_role,
+        user_has_permission=user_has_permission,
+        is_management_user=is_management_user,
+        get_management_url=get_management_url,
+    )
+
     # Optional setting
     login_manager.login_view = "auth.login" # Blueprint.rout name
     login_manager.login_message = "Please login to view this page"
@@ -127,5 +136,9 @@ def create_app(config_class: type[Config] = Config):
             db.session.add(user2_admin)
 
         db.session.commit()
+
+        # Seed full system permissions across all modules
+        from app.security.seed_permissions import seed_system_permissions
+        seed_system_permissions()
     
     return app

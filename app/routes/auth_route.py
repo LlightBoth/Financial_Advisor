@@ -33,17 +33,19 @@ def login():
             login_user(user, remember=form.is_remember.data)
             flash("Login successful", "success")
 
-            # Decide redirect based on role
-            current_user_role = get_current_user_role()
-
-            # print("ROLE:", current_user_role)
-
-            if current_user_role == "user":
-                redirect_url = url_for("dashboards.userIndex")
-            elif current_user_role == "editor":
-                redirect_url = url_for("rules.index")
-            else:
+            # Decide redirect dynamically based on user's highest permitted landing module
+            if user.has_role("admin"):
                 redirect_url = url_for("dashboards.empIndex")
+            elif user.has_permission("user.view"):
+                redirect_url = url_for("users.index")
+            elif user.has_permission("rule.view"):
+                redirect_url = url_for("rules.index")
+            elif user.has_permission("role.view"):
+                redirect_url = url_for("roles.index")
+            elif user.has_permission("fact.view"):
+                redirect_url = url_for("facts.index")
+            else:
+                redirect_url = url_for("dashboards.userIndex")
 
             # print("REDIRECT:", redirect_url)
 
