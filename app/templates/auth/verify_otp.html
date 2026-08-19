@@ -1,36 +1,44 @@
 {% extends "layouts/authBase.html" %}
-{% block title %}Verify OTP{% endblock %}
+{% block title %}Verify Code{% endblock %}
 
 {% block auth_content %}
 <style>
-    .otp-input-group input {
+    .otp-field-box {
         width: 100%;
-        height: 54px;
-        font-size: 1.5rem;
+        height: 56px;
+        font-size: 1.6rem;
         font-weight: 700;
+        text-align: center;
         border-radius: 12px;
+        background: rgba(6, 9, 19, 0.6);
+        border: 1px solid var(--auth-border);
+        color: #ffffff;
+        transition: all 0.25s ease;
     }
-    .otp-input-group input::-webkit-outer-spin-button,
-    .otp-input-group input::-webkit-inner-spin-button {
+    .otp-field-box:focus {
+        background: rgba(6, 9, 19, 0.85);
+        border-color: var(--auth-border-focus);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+        outline: none;
+    }
+    .otp-field-box::-webkit-outer-spin-button,
+    .otp-field-box::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
-    .otp-input-group input[type=number] {
+    .otp-field-box[type=number] {
         -moz-appearance: textfield;
     }
 </style>
 
-<!-- Header & Icon -->
-<div class="text-center mb-4">
+<div class="auth-header">
     <div class="mb-3">
-        <span class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle" style="width: 60px; height: 60px; font-size: 1.5rem;">
-            <i class="fa-solid fa-shield-halved"></i>
+        <span class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle" style="width: 54px; height: 54px; font-size: 1.35rem;">
+            <i class="bi bi-shield-lock-fill"></i>
         </span>
     </div>
-    <h3 class="fw-bold text-white mb-2">Security Verification</h3>
-    <p class="text-white-50 small mb-0">
-        We sent a 6-digit code to to your email address<br>
-    </p>
+    <h3>Security Verification</h3>
+    <p>Enter the 6-digit verification code sent to your email</p>
 </div>
 
 <!-- Main OTP Submission Form -->
@@ -45,34 +53,28 @@
     <input type="hidden" name="otp" id="fullOtp">
 
     <!-- 6 Digit Input Boxes -->
-    <div class="d-flex justify-content-between gap-2 mb-4 otp-input-group">
-        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" autofocus required>
-        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
-        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
-        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
-        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
-        <input type="text" maxlength="1" inputmode="numeric" class="form-control text-center bg-dark text-white border-secondary otp-field" required>
+    <div class="d-flex justify-content-between gap-2 mb-4">
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-field-box otp-field" autofocus required>
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-field-box otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-field-box otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-field-box otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-field-box otp-field" required>
+        <input type="text" maxlength="1" inputmode="numeric" class="otp-field-box otp-field" required>
     </div>
 
-    {% if form and form.otp.errors %}
-        <div class="text-danger small text-center mb-3">
-            {{ form.otp.errors[0] }}
-        </div>
-    {% endif %}
-
     <!-- Submit Button -->
-    <div class="d-grid gap-2 mb-4">
-        <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold fs-6 py-2 shadow-sm">
-            <i class="fa-solid fa-circle-check me-2"></i>Verify & Proceed
+    <div class="mb-3">
+        <button type="submit" class="btn-auth-submit">
+            <span>Verify & Continue</span>
+            <i class="bi bi-arrow-right"></i>
         </button>
     </div>
 </form>
 
-<!-- Navigation Links & Resend Section (Outside #otpForm to prevent nested form bugs) -->
-<div class="text-center">
-    <!-- Resend Code Container -->
+<!-- Resend & Back Navigation -->
+<div class="text-center pt-2">
     <div class="d-flex align-items-center justify-content-center gap-1 text-white-50 small mb-3">
-        <span>Didn't receive the code?</span>
+        <span>Didn't receive code?</span>
         
         <form id="resendForm" method="POST" action="{{ url_for('auth.resend_otp') }}" class="d-inline">
             {% if form and form.hidden_tag is defined %}
@@ -81,14 +83,14 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             {% endif %}
             
-            <button type="submit" id="resendBtn" class="btn btn-link text-primary text-decoration-none fw-medium p-0 border-0 opacity-50 pe-none" disabled>
-                Resend Code <span id="timer">(60s)</span>
+            <button type="submit" id="resendBtn" class="btn btn-link auth-link p-0 border-0 opacity-50 pe-none" disabled>
+                Resend <span id="timer">(60s)</span>
             </button>
         </form>
     </div>
     
-    <a href="{{ url_for('auth.login') }}" class="text-white-50 small text-decoration-none fw-medium">
-        <i class="fa-solid fa-arrow-left me-1"></i> Back to Login
+    <a href="{{ url_for('auth.login') }}" class="auth-link-muted small">
+        <i class="bi bi-arrow-left me-1"></i> Back to Sign In
     </a>
 </div>
 {% endblock %}

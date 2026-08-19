@@ -1,107 +1,104 @@
-/* --- 1. Global Dashboard Theme --- */
+/* ==========================================================
+   Financial Advisor — Dashboard Styles (Midnight Obsidian)
+   ========================================================== */
+
 :root {
-    --dash-spacing: 1.5rem;
-    --card-radius: 20px;
-    --transition-speed: 0.3s;
+    --card-radius: 16px;
+    --primary-blue: #3b82f6;
+    --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    --emerald-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
-/* --- 2. Header & Layout --- */
-.dash-header {
+.dash-header-banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.5rem 0;
-    margin-bottom: 1rem;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--bs-border-color);
 }
 
 .stat-card {
-    border: none;
+    border: 1px solid var(--bs-border-color);
     border-radius: var(--card-radius);
-    transition: all var(--transition-speed) cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     background-color: var(--bs-card-bg);
     color: var(--bs-body-color);
+    position: relative;
     overflow: hidden;
 }
+
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.12) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.35);
 }
 
-/* --- 3. Card Decorations --- */
-.icon-box {
-    width: 42px;
-    height: 42px;
+.icon-box-modern {
+    width: 46px;
+    height: 46px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
 }
 
-.status-icon {
-    font-size: 1.2rem;
-    opacity: 0.8;
-}
+.icon-box-modern.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.icon-box-modern.green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+.icon-box-modern.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.icon-box-modern.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
 
-.text-label-caps {
+.metric-label {
     font-size: 0.75rem;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.05em;
     font-weight: 700;
     color: var(--bs-secondary-color);
     text-transform: uppercase;
 }
 
-/* --- 4. Row 3: Side-Label Layout --- */
-.side-layout-card {
-    display: grid !important;
-    grid-template-columns: 140px 1fr !important; 
-    padding: 0 !important;
-    min-height: 150px;
-}
-.card-side-header {
-    background-color: rgba(var(--bs-primary-rgb), 0.05);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-right: 1px solid var(--bs-border-color);
-}
-.side-label {
-    font-size: 0.7rem;
-    letter-spacing: 1px;
+.metric-value {
+    font-size: 1.85rem;
     font-weight: 800;
-    text-transform: uppercase;
-    color: var(--bs-secondary-color);
-    margin-top: 0.5rem;
+    letter-spacing: -0.02em;
 }
 
-/* --- 5. Task & Interaction Logic --- */
-.transition-hover {
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.transition-hover:hover {
-    transform: scale(1.01);
-    border-color: var(--bs-primary-border-subtle) !important;
-}
-
-label.task-item:has(input:checked) {
-    background-color: rgba(25, 135, 84, 0.1) !important;
-    border-color: var(--bs-success) !important;
-    opacity: 0.9;
+/* --- Savings Plan Progress Bar --- */
+.plan-progress-pill {
+    background: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: transform 0.2s ease;
 }
 
-label:has(input:checked) h6 {
-    text-decoration: line-through;
-    color: var(--bs-secondary-color) !important;
+.plan-progress-pill:hover {
+    transform: translateX(4px);
 }
 
-[data-bs-theme="dark"] .text-dark {
-    color: var(--bs-body-color) !important;
+/* --- Daily Tasks Interactive Item --- */
+.task-item-card {
+    background: var(--bs-card-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.task-container-card {
-    background: var(--bs-card-bg) !important;
+.task-item-card:hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.task-checkbox-custom {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    cursor: pointer;
 }

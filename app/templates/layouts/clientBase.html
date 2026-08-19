@@ -2,197 +2,217 @@
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Intelli App{% endblock %}</title>
+    <title>{% block title %}Financial Advisor{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/layout/client.css') }}" rel="stylesheet" >
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='css/layout/client.css') }}" rel="stylesheet">
 </head>
 <body>
 
 <div class="app-wrapper">
     
-    <nav class="sidebar d-flex flex-column py-2 px-3">
-        <div class="d-flex align-items-center justify-content-between mb-4 text-white text-decoration-none">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-currency-dollar fs-4 me-2 text-info"></i>
-                <span class="fs-5 fw-bold">Financial Advisor</span>
-            </div>
+    <!-- Sidebar -->
+    <nav class="sidebar d-flex flex-column py-3 px-3">
+        <div class="sidebar-brand-wrapper d-flex align-items-center justify-content-between mb-4">
+            <a href="/" class="d-flex align-items-center text-white text-decoration-none gap-2">
+                <div class="sidebar-logo-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <span class="fs-5 fw-bold brand-text">Fin<span>Advisor</span></span>
+            </a>
 
             <div class="burger-menu">
-                <i class="bi bi-list fs-1 text-info"></i>
+                <i class="bi bi-list fs-2 text-white"></i>
             </div>
         </div>
         
         <ul class="sidebar-nav nav nav-pills flex-column mb-auto">
-            <li><hr></li>
-            <li>
+            <li class="nav-section-title">MAIN MENU</li>
+            
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('dashboards.userIndex') }}" class="nav-link {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}">
-                    <i class="bi bi-house me-2"></i> Dashboard
+                    <i class="bi bi-grid-1x2 me-2"></i> <span>Dashboard</span>
                 </a>
             </li>
-            <li>
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('incomes.index') }}" class="nav-link {% if request.endpoint == 'incomes.index' %}active{% endif %}">
-                    <i class="bi bi-wallet2 me-2"></i> Income
+                    <i class="bi bi-arrow-down-left-circle me-2"></i> <span>Income</span>
                 </a>
             </li>
-            <li>
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('expenses.index') }}" class="nav-link {% if request.endpoint == 'expenses.index' %}active{% endif %}">
-                    <i class="bi bi-cash-stack me-2"></i> Expense
+                    <i class="bi bi-arrow-up-right-circle me-2"></i> <span>Expense</span>
                 </a>
             </li>
-            <li>
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('plans.index') }}" class="nav-link {% if 'plans' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-map me-2"></i> My Plans
+                    <i class="bi bi-bullseye me-2"></i> <span>My Plans</span>
                 </a>
             </li>
-
-            <li>
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('advisors.index') }}" class="nav-link {% if 'advisors' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-person-badge me-2"></i> Analyse
+                    <i class="bi bi-cpu me-2"></i> <span>AI Advisor</span>
                 </a>
             </li>
-
-            <!-- <li>
-                <a href="{{ url_for('loans.index') }}" class="nav-link {% if 'loans' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-cash-stack me-2"></i> Loan
-                </a>
-            </li> -->
-
-            <li>
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('history.index') }}" class="nav-link {% if 'history' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-clock-history me-2"></i> History
+                    <i class="bi bi-clock-history me-2"></i> <span>History</span>
                 </a>
             </li>
 
             {% if is_management_user(current_user) %}
-                <li><hr class="border-secondary my-2"></li>
+                <li class="nav-section-title mt-3">ADMINISTRATION</li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ get_management_url(current_user) }}">
-                        <i class="bi bi-shield-lock me-2"></i> Management
+                        <i class="bi bi-shield-lock me-2"></i> <span>Management</span>
                     </a>
                 </li>
             {% endif %}
         </ul>
 
         <div class="sidebar-footer mt-auto">
-            <hr class="border-top border-secondary pt-2">
-            <div class="form-check form-switch d-flex justify-content-between align-items-center p-0">
-                <label class="small text-white-50" for="modeToggle">Dark Mode</label>
-                <input class="form-check-input m-0 p-2" type="checkbox" id="modeToggle" style="cursor:pointer">
+            <hr class="border-secondary opacity-25 pt-2">
+            <div class="d-flex justify-content-between align-items-center p-2 rounded-3" style="background: rgba(255,255,255,0.04);">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-moon-stars text-white-50" id="themeIcon"></i>
+                    <span class="small text-white-50">Dark Theme</span>
+                </div>
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" id="modeToggle" style="cursor:pointer">
+                </div>
             </div>
         </div>
     </nav>
 
-    <header class="px-4 py-2 d-flex justify-content-between align-items-center">
+    <!-- Top Header Navigation -->
+    <header class="px-4 py-3 d-flex justify-content-between align-items-center">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item">Home</li>
-                <li class="mobile-hide breadcrumb-item active">Current Page</li>
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Workspace</li>
             </ol>
         </nav>
 
         <div class="d-flex align-items-center gap-2">
+            <!-- Header Quick Theme Toggle -->
+            <button type="button" class="btn btn-sm btn-icon-round" id="headerThemeToggle" aria-label="Toggle Theme" title="Toggle Dark/Light Theme">
+                <i class="bi bi-moon-stars" id="headerThemeIcon"></i>
+            </button>
 
-            <!-- Notification Dropdown -->
+            <!-- Notifications -->
             <div class="dropdown">
-
-                <button class="btn btn-sm dropdown-toggle mx-2"
-                        data-bs-toggle="dropdown">
-                    <i class="bi bi-bell fs-6"></i>
+                <button class="btn btn-sm btn-icon-round" data-bs-toggle="dropdown" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
                 </button>
-
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li class="dropdown-item text-center">Complete Daily Tasks</li>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                    <li class="dropdown-header small fw-bold">Recent Alerts</li>
+                    <li><a class="dropdown-item small" href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-check2-circle text-success me-2"></i>Complete Daily Tasks</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li class="dropdown-item text-center">Analyse Plan</li>
+                    <li><a class="dropdown-item small" href="{{ url_for('advisors.index') }}"><i class="bi bi-lightning text-warning me-2"></i>Run Financial Analysis</a></li>
                 </ul>
-
             </div>
 
-            <!-- User Dropdown -->
+            <!-- User Menu -->
             <div class="dropdown">
-
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                        data-bs-toggle="dropdown">
-
-                    {{ current_user.email if current_user.is_authenticated else "Guest" }}
-
+                <button class="btn btn-sm user-dropdown-pill dropdown-toggle" data-bs-toggle="dropdown">
+                    <div class="user-avatar-initials">
+                        {{ (current_user.username or current_user.email or "User")[:1].upper() if current_user.is_authenticated else "G" }}
+                    </div>
+                    <span class="d-none d-md-inline-block fw-semibold small">
+                        {{ (current_user.username or current_user.email or "User") if current_user.is_authenticated else "Guest" }}
+                    </span>
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow">
-
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold small">{{ current_user.full_name or current_user.username }}</div>
+                        <div class="text-muted x-small">{{ current_user.email }}</div>
+                    </li>
                     <li>
-                        <a class="dropdown-item" href="/profiles">
-                            <i class="bi bi-person me-2"></i>
-                            My Profile
+                        <a class="dropdown-item small py-2" href="/profiles">
+                            <i class="bi bi-person me-2 text-primary"></i> My Profile
                         </a>
                     </li>
-
+                    <li>
+                        <a class="dropdown-item small py-2" href="/settings">
+                            <i class="bi bi-gear me-2 text-secondary"></i> Settings
+                        </a>
+                    </li>
                     <li><hr class="dropdown-divider"></li>
-
                     <li>
-                        <a class="dropdown-item" href="/settings">
-                            <i class="bi bi-gear me-2"></i>
-                            Settings
+                        <a class="dropdown-item small py-2 text-danger" href="/auth/logout">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
                         </a>
                     </li>
-
                 </ul>
-
             </div>
-
-            <!-- Logout -->
-            {% if current_user.is_authenticated %}
-            <a href="/auth/logout"
-            class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-box-arrow-right me-2"></i>
-                Logout
-            </a>
-            {% endif %}
-
         </div>
-
     </header>
 
+    <!-- Main Viewport -->
     <main>
         {% include "partials/_flash_messages.html" %}
-
         {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        <small class="text-muted">© 2026 Financial Advisor App | All Rights Reserved</small>
+    <!-- Footer -->
+    <footer class="app-footer px-4 py-3">
+        <small class="text-muted">© 2026 Financial Advisor App — Real-Time Financial Planning</small>
     </footer>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> -->
 <script>
     const modeToggle = document.getElementById('modeToggle');
+    const headerThemeToggle = document.getElementById('headerThemeToggle');
+    const headerThemeIcon = document.getElementById('headerThemeIcon');
     const html = document.documentElement;
     const burger_menu = document.querySelector(".burger-menu");
     const sidebarNav = document.querySelector(".sidebar-nav");
     const sidebarFooter = document.querySelector(".sidebar-footer");
+    const themeIcon = document.getElementById("themeIcon");
 
-    // Fetch from localstorage
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-bs-theme', savedTheme);
-    modeToggle.checked = (savedTheme === 'dark');
-
-    modeToggle.addEventListener('change', () => {
-        const theme = modeToggle.checked ? 'dark' : 'light';
+    function applyTheme(theme) {
         html.setAttribute('data-bs-theme', theme);
         localStorage.setItem('theme', theme);
-    });
 
-    burger_menu.addEventListener('click', ()=> {
-        sidebarNav.classList.toggle("active");
-        sidebarFooter.classList.toggle("active");
-    })
+        if (modeToggle) modeToggle.checked = (theme === 'dark');
+        if (themeIcon) {
+            themeIcon.className = theme === 'dark' ? 'bi bi-sun text-warning' : 'bi bi-moon-stars text-white-50';
+        }
+        if (headerThemeIcon) {
+            headerThemeIcon.className = theme === 'dark' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars';
+        }
+    }
 
+    // Initial load from localStorage (default to light or dark based on preference)
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // Sidebar switch toggle
+    if (modeToggle) {
+        modeToggle.addEventListener('change', () => {
+            applyTheme(modeToggle.checked ? 'dark' : 'light');
+        });
+    }
+
+    // Header round button toggle
+    if (headerThemeToggle) {
+        headerThemeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-bs-theme');
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+    }
+
+    if (burger_menu) {
+        burger_menu.addEventListener('click', ()=> {
+            sidebarNav.classList.toggle("active");
+            sidebarFooter.classList.toggle("active");
+        });
+    }
 </script>
 </body>
 </html>

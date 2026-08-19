@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Advisor — Smart Wealth Planning & AI Financial Advisory</title>
+    <meta name="description" content="Intelligent financial advisory platform. Track cashflow, set milestone savings goals, manage recurring expenses, and receive tailored financial recommendations.">
+    
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Landing Page CSS with Cache Buster -->
+    <link href="{{ url_for('static', filename='css/landing.css') }}?v=4.4" rel="stylesheet">
+
+    <!-- Early Theme Initialization to Prevent Flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
+</head>
+<body>
+
+    <!-- Animated Mesh Background -->
+    <div class="landing-bg-glow" aria-hidden="true">
+        <div class="glow-orb glow-orb-1"></div>
+        <div class="glow-orb glow-orb-2"></div>
+        <div class="glow-orb glow-orb-3"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="landing-navbar">
+        <a href="/" class="brand-container">
+            <div class="brand-icon">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div class="brand-title">Financial <span>Advisor</span></div>
+        </a>
+
+        <!-- Center Navigation Menu Links (Desktop) -->
+        <div class="nav-menu-links d-none d-lg-flex">
+            <a href="#overview" class="nav-menu-link">Overview</a>
+            <a href="#features" class="nav-menu-link">Features</a>
+            <a href="#advisory" class="nav-menu-link">Advisory</a>
+            <a href="#security" class="nav-menu-link">Security</a>
+        </div>
+
+        <div class="nav-actions">
+            <!-- Dark/Light Mode Toggle Button -->
+            <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="Toggle Dark/Light Mode" title="Toggle Dark/Light Mode">
+                <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
+            </button>
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboards.userIndex') }}" class="btn-nav-cta d-none d-sm-inline-flex">
+                    <i class="bi bi-grid-1x2-fill"></i> Workspace
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-nav-ghost d-none d-sm-inline-flex">Sign In</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">
+                    Get Started <i class="bi bi-arrow-right"></i>
+                </a>
+            {% endif %}
+
+            <!-- Mobile Menu Toggle Button (Hamburger) -->
+            <button type="button" class="mobile-menu-btn d-lg-none" id="mobileMenuToggle" aria-label="Open Navigation Menu">
+                <i class="bi bi-list" id="mobileMenuIcon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Off-Canvas / Drawer Menu -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
+        <div class="mobile-drawer-header">
+            <a href="/" class="brand-container">
+                <div class="brand-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <div class="brand-title">Financial <span>Advisor</span></div>
+            </a>
+            <button type="button" class="drawer-close-btn" id="mobileDrawerClose" aria-label="Close Menu">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="mobile-drawer-links">
+            <a href="#overview" class="mobile-drawer-link">
+                <i class="bi bi-speedometer2 text-primary"></i> Financial Overview
+            </a>
+            <a href="#features" class="mobile-drawer-link">
+                <i class="bi bi-grid-fill text-info"></i> Features & Tools
+            </a>
+            <a href="#advisory" class="mobile-drawer-link">
+                <i class="bi bi-lightbulb-fill text-warning"></i> Wealth Advisory
+            </a>
+            <a href="#security" class="mobile-drawer-link">
+                <i class="bi bi-shield-check text-success"></i> Security & Privacy
+            </a>
+        </div>
+
+        <div class="mobile-drawer-footer">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboards.userIndex') }}" class="btn-hero-primary w-100 justify-content-center">
+                    <i class="bi bi-grid-1x2-fill"></i> Open Dashboard
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary w-100 justify-content-center">
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn-hero-primary w-100 justify-content-center">
+                    Get Started Free <i class="bi bi-arrow-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
+
+    <!-- Hero Section / Overview -->
+    <header class="hero-section" id="overview">
+        <h1 class="hero-title">
+            Smart Financial Planning & <br>
+            <span class="highlight-gradient">Personal Wealth Advisory</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            Take complete control of your finances. Track cash flow, budget recurring expenses, build custom savings goals, and unlock intelligent financial advice tailored to your life.
+        </p>
+
+        <div class="hero-cta-group">
+            <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
+                <span>Start Free Planning</span>
+                <i class="bi bi-arrow-right-short fs-4"></i>
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Sign In to Account</span>
+            </a>
+        </div>
+
+        <!-- Interactive Telemetry Mockup Preview -->
+        <div class="hero-mockup-container">
+            <div class="hero-mockup-inner">
+                <div class="mockup-header">
+                    <div class="mockup-dots">
+                        <div class="mockup-dot red"></div>
+                        <div class="mockup-dot yellow"></div>
+                        <div class="mockup-dot green"></div>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--text-dim); font-weight: 600; font-family: monospace;">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i> FINANCIAL HEALTH: OPTIMAL // ADVISORY: ACTIVE
+                    </span>
+                </div>
+
+                <div class="mockup-stats-grid">
+                    <div class="mockup-card">
+                        <div class="mockup-card-title">
+                            <span>Total Net Savings</span>
+                            <i class="bi bi-wallet2 text-primary"></i>
+                        </div>
+                        <div class="mockup-card-value text-success">$28,450.00</div>
+                        <div class="mockup-trend positive">
+                            <i class="bi bi-arrow-up-right"></i> +18.4% This Month
+                        </div>
+                    </div>
+
+                    <div class="mockup-card">
+                        <div class="mockup-card-title">
+                            <span>Savings Goal Pacing</span>
+                            <i class="bi bi-bullseye text-info"></i>
+                        </div>
+                        <div class="mockup-card-value">94.2%</div>
+                        <div class="mockup-trend positive">
+                            <i class="bi bi-check-all"></i> On Track to Target
+                        </div>
+                    </div>
+
+                    <div class="mockup-card">
+                        <div class="mockup-card-title">
+                            <span>Debt-to-Income Ratio</span>
+                            <i class="bi bi-shield-check text-warning"></i>
+                        </div>
+                        <div class="mockup-card-value text-primary">12.5%</div>
+                        <div class="mockup-trend neutral">
+                            <i class="bi bi-activity"></i> Healthy Low Risk
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <div class="section-tag">Core Capabilities</div>
+            <h2 class="section-title">Everything You Need to Master Your Money</h2>
+            <p class="section-subtitle">Comprehensive tools designed to help you track spending, build emergency funds, and reach your goals faster.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="feature-icon-wrap blue">
+                    <i class="bi bi-lightbulb-fill"></i>
+                </div>
+                <h3 class="feature-title">Intelligent Advisory Engine</h3>
+                <p class="feature-desc">Automated recommendations that evaluate your income, expense ratios, and savings habits to suggest optimal next steps.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrap green">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+                <h3 class="feature-title">Goal & Milestone Tracking</h3>
+                <p class="feature-desc">Set custom savings targets for home purchases, emergency funds, or retirement with automated daily contribution targets.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrap purple">
+                    <i class="bi bi-pie-chart-fill"></i>
+                </div>
+                <h3 class="feature-title">Cashflow & Expense Analytics</h3>
+                <p class="feature-desc">Categorize income and expenses with detailed breakdown charts, recurring frequency tags, and monthly budget pacing.</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrap amber">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+                <h3 class="feature-title">Audit-Ready Transaction Ledger</h3>
+                <p class="feature-desc">Secure, double-entry financial record keeping for complete accuracy, transaction history, and total visibility.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advisory Showcase Section -->
+    <section class="container my-5 py-4 position-relative" style="z-index: 10;" id="advisory">
+        <div class="showcase-card">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="section-tag mb-2">STRATEGIC WEALTH MANAGEMENT</div>
+                    <h2 class="fw-bold mb-3" style="font-size: clamp(1.75rem, 3vw, 2.25rem); color: var(--text-main);">Built for Confident Financial Decision-Making</h2>
+                    <p class="mb-4 leading-relaxed" style="color: var(--text-muted);">
+                        True financial stability comes from consistency and clear advice. Our system continuously monitors your debt liabilities, emergency fund adequacy, and savings trajectories to deliver actionable guidance.
+                    </p>
+                    <div class="d-flex flex-column gap-3" id="security">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 rounded-3 bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-shield-lock-fill fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold small" style="color: var(--text-main);">Bank-Level Security & Privacy</div>
+                                <div class="x-small" style="color: var(--text-dim);">Cryptographic session protection and local data isolation for your financial privacy.</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 rounded-3 bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-graph-up-arrow fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold small" style="color: var(--text-main);">Personalized Advisory Insights</div>
+                                <div class="x-small" style="color: var(--text-dim);">Every recommendation is tailored specifically to your real income and expenditure profile.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="position-relative rounded-4 overflow-hidden shadow-lg border" style="border-color: var(--border-subtle) !important;">
+                        <img src="{{url_for('static', filename='images/test.jpg')}}" 
+                             alt="Financial Advisory Strategy Session" 
+                             class="img-fluid w-100 object-fit-cover" 
+                             style="height: 380px; filter: brightness(0.92);"
+                             loading="lazy">
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(180deg, transparent 0%, rgba(6,9,19,0.92) 100%);">
+                            <div class="d-flex justify-content-between align-items-center text-white small">
+                                <span class="fw-semibold"><i class="bi bi-person-check-fill text-success me-1"></i> Certified Advisory Rules</span>
+                                <span class="badge bg-primary rounded-pill">Active Financial Plan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom CTA Banner -->
+    <section class="cta-banner-section">
+        <div class="cta-banner-card">
+            <h2 class="cta-banner-title">Take Control of Your Financial Future</h2>
+            <p class="cta-banner-desc">Join thousands of users planning smarter budgets, tracking milestone goals, and reaching financial freedom faster.</p>
+            <div class="hero-cta-group" style="margin-bottom: 0;">
+                <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
+                    <span>Create Free Account</span>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ultra-Professional Multi-Column Fintech Footer -->
+    <footer class="landing-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- Col 1: Brand & Mission -->
+                <div class="footer-brand-col">
+                    <a href="/" class="brand-container">
+                        <div class="brand-icon">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <div class="brand-title">Financial <span>Advisor</span></div>
+                    </a>
+                    <p class="footer-desc">
+                        Intelligent personal wealth planning and deterministic financial advisory engine. Helping you budget smarter and reach your goals faster.
+                    </p>
+                    <div class="footer-status-pill">
+                        <div class="status-dot-pulse"></div>
+                        <span>System Status: Operational</span>
+                    </div>
+
+                    <!-- Social Media Links -->
+                    <div class="footer-social-group mt-2">
+                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Facebook" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Instagram" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="LinkedIn" title="LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        <a href="mailto:support@financialadvisor.ai" class="footer-social-btn" aria-label="Email Us" title="Email Contact">
+                            <i class="bi bi-envelope-fill"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Platform Links -->
+                <div>
+                    <div class="footer-col-title">Platform</div>
+                    <ul class="footer-links">
+                        <li><a href="#overview"><i class="bi bi-chevron-right text-primary"></i> Overview</a></li>
+                        <li><a href="#features"><i class="bi bi-chevron-right text-primary"></i> Core Features</a></li>
+                        <li><a href="#advisory"><i class="bi bi-chevron-right text-primary"></i> Wealth Advisory</a></li>
+                        <li><a href="#security"><i class="bi bi-chevron-right text-primary"></i> Security & Privacy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Company -->
+                <div>
+                    <div class="footer-col-title">Company</div>
+                    <ul class="footer-links">
+                        <li><a href="#overview">About</a></li>
+                        <li><a href="mailto:support@financialadvisor.ai">Contact</a></li>
+                        <li><a href="#advisory">Blog <i class="bi bi-arrow-up-right small ms-1" style="font-size: 0.75rem;"></i></a></li>
+                        <li><a href="#overview">Careers <span class="careers-pill">Hiring</span></a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Legal -->
+                <div>
+                    <div class="footer-col-title">Legal</div>
+                    <ul class="footer-links">
+                        <li><a href="#security">Privacy</a></li>
+                        <li><a href="#security">Terms of Service</a></li>
+                        <li><a href="#security">Cookies</a></li>
+                        <li><a href="#security">EULA</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 5: Access & Portals -->
+                <div>
+                    <div class="footer-col-title">Access</div>
+                    <ul class="footer-links">
+                        {% if current_user.is_authenticated %}
+                            <li><a href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-grid-1x2-fill text-primary"></i> Open Workspace</a></li>
+                            <li><a href="{{ url_for('settings.profile') }}"><i class="bi bi-person-gear text-primary"></i> Account Settings</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right text-primary"></i> Sign In to Terminal</a></li>
+                            <li><a href="{{ url_for('auth.register') }}"><i class="bi bi-stars text-primary"></i> Create Free Account</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Financial Disclaimer Banner -->
+            <!-- <div class="footer-disclaimer-box">
+                <p>
+                    <i class="bi bi-info-circle text-primary me-1"></i>
+                    <strong>Advisory Disclaimer:</strong> Financial Advisor is an intelligent financial planning workspace designed to provide deterministic advisory modeling, budgeting heuristics, and milestone goal calculus. All user financial telemetry is isolated with local cryptographic session security.
+                </p>
+            </div> -->
+
+            <!-- Footer Bottom Bar -->
+            <div class="footer-bottom-bar">
+                <div class="footer-copyright">
+                    <span>&copy; 2026 Financial Advisor Inc. All rights reserved.</span>
+                    <span class="footer-region-badge">
+                        <i class="bi bi-globe2"></i> Global (EN-US)
+                    </span>
+                </div>
+
+                <a href="#overview" class="footer-back-to-top">
+                    <i class="bi bi-arrow-up"></i> Back to Top
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme & Mobile Drawer Scripts -->
+    <script>
+        (function() {
+            const html = document.documentElement;
+            const toggleBtn = document.getElementById('landingThemeToggle');
+            const toggleIcon = document.getElementById('landingThemeIcon');
+
+            // Theme switching
+            function applyTheme(theme) {
+                html.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('theme', theme);
+                if (toggleIcon) {
+                    if (theme === 'dark') {
+                        toggleIcon.className = 'bi bi-sun-fill text-warning';
+                    } else {
+                        toggleIcon.className = 'bi bi-moon-stars-fill text-dark';
+                    }
+                }
+            }
+
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            applyTheme(savedTheme);
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const currentTheme = html.getAttribute('data-bs-theme') || 'dark';
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    applyTheme(newTheme);
+                });
+            }
+
+            // Mobile Drawer toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+            const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+            const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+            const drawerLinks = document.querySelectorAll('.mobile-drawer-link');
+
+            function openDrawer() {
+                if (mobileNavDrawer && mobileDrawerBackdrop) {
+                    mobileNavDrawer.classList.add('open');
+                    mobileDrawerBackdrop.classList.add('open');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeDrawer() {
+                if (mobileNavDrawer && mobileDrawerBackdrop) {
+                    mobileNavDrawer.classList.remove('open');
+                    mobileDrawerBackdrop.classList.remove('open');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (mobileMenuToggle) mobileMenuToggle.addEventListener('click', openDrawer);
+            if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeDrawer);
+            if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeDrawer);
+
+            // Smooth Precision Scrolling for Anchor Links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href === '#') return;
+                    
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        closeDrawer(); // Closes drawer if opened on mobile
+
+                        const navbar = document.querySelector('.landing-navbar');
+                        const navHeight = navbar ? navbar.offsetHeight : 80;
+                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+
+                        // Update URL hash without jump
+                        if (history.pushState) {
+                            history.pushState(null, null, href);
+                        }
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

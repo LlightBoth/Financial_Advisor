@@ -80,10 +80,10 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(income_bp)
     app.register_blueprint(expense_bp)
 
-    # Add "/" so it goes to Users list
+    # Root landing page for visitors
     @app.route("/")
     def home():
-        return flask.redirect(flask.url_for("auth.login"))
+        return flask.render_template("landing.html")
 
     # Create Table
     with app.app_context():

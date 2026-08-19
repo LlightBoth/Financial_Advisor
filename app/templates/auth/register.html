@@ -1,66 +1,215 @@
 {% extends "layouts/authBase.html" %}
-{% block title %} Register {% endblock %}
+{% block title %}Create Account{% endblock %}
 
 {% block auth_content %}
-<div class="text-center mb-4">
-    <h3 class="text-white fw-bold">Create New Account</h3>
-    <p class="text-white-50 small">Join our community and shape the future</p>
+<div class="auth-header">
+    <h3>Create Account</h3>
+    <p>Start your journey with intelligent financial advisory</p>
 </div>
 
-<form method="post">
+<form method="post" novalidate>
     {{ form.hidden_tag() }}
 
     <div class="row g-3">
-        <div class="col-12">
-            {{ form.email.label(class="form-label text-white-50 small") }}
-            {{ form.email(class="form-control form-control-auth", placeholder="someone@example.com") }}
-            {% for error in form.email.errors %}
-                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
-            {% endfor %}
-        </div>
-
+        <!-- Full Name Field -->
         <div class="col-md-6">
-            {{ form.username.label(class="form-label text-white-50 small") }}
-            {{ form.username(class="form-control form-control-auth", placeholder="darah") }}
-            {% for error in form.username.errors %}
-                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <div class="col-md-6">
-            {{ form.full_name.label(class="form-label text-white-50 small") }}
-            {{ form.full_name(class="form-control form-control-auth", placeholder="Darah Reach") }}
+            <label for="full_name" class="auth-form-label">
+                <i class="bi bi-person text-primary"></i> Full Name
+            </label>
+            {{ form.full_name(class="form-control-auth", placeholder="John Doe", id="full_name", autocomplete="name", autofocus=true) }}
             {% for error in form.full_name.errors %}
-                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
             {% endfor %}
         </div>
 
+        <!-- Username Field -->
         <div class="col-md-6">
-            {{ form.password.label(class="form-label text-white-50 small") }}
-            {{ form.password(class="form-control form-control-auth", placeholder="••••••••") }}
+            <label for="username" class="auth-form-label">
+                <i class="bi bi-at text-primary"></i> Username
+            </label>
+            {{ form.username(class="form-control-auth", placeholder="john_doe", id="username", autocomplete="username") }}
+            {% for error in form.username.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Email Field -->
+        <div class="col-12">
+            <label for="email" class="auth-form-label">
+                <i class="bi bi-envelope text-primary"></i> Email Address
+            </label>
+            {{ form.email(class="form-control-auth", placeholder="name@example.com", id="email", autocomplete="email") }}
+            {% for error in form.email.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Password Field (Full Width) -->
+        <div class="col-12">
+            <label for="regPassword" class="auth-form-label">
+                <i class="bi bi-key text-primary"></i> Password
+            </label>
+            <div class="auth-input-group">
+                {{ form.password(class="form-control-auth", placeholder="Create a strong password (min 8 characters)", id="regPassword", autocomplete="new-password") }}
+                <button type="button" class="auth-password-toggle" id="toggleRegPassword" aria-label="Toggle password visibility">
+                    <i class="bi bi-eye" id="toggleRegIcon"></i>
+                </button>
+            </div>
             {% for error in form.password.errors %}
-                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
             {% endfor %}
+
+            <!-- 4-Segment Password Strength Meter -->
+            <div class="password-strength-wrap mt-2">
+                <div class="strength-bars-container">
+                    <div class="strength-segment" id="seg1"></div>
+                    <div class="strength-segment" id="seg2"></div>
+                    <div class="strength-segment" id="seg3"></div>
+                    <div class="strength-segment" id="seg4"></div>
+                </div>
+                <div class="strength-text">
+                    <span>Password Security</span>
+                    <span id="strengthLabel" class="fw-semibold">Enter password</span>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-6">
-            {{ form.confirm_password.label(class="form-label text-white-50 small") }}
-            {{ form.confirm_password(class="form-control form-control-auth", placeholder="••••••••") }}
+        <!-- Confirm Password Field (Full Width) -->
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <label for="confirmPassword" class="auth-form-label mb-0">
+                    <i class="bi bi-shield-check text-primary"></i> Confirm Password
+                </label>
+                <span id="matchFeedback" class="small fw-semibold" style="font-size: 0.75rem;"></span>
+            </div>
+            <div class="auth-input-group mt-1">
+                {{ form.confirm_password(class="form-control-auth", placeholder="Re-enter your password", id="confirmPassword", autocomplete="new-password") }}
+                <button type="button" class="auth-password-toggle" id="toggleConfirmPassword" aria-label="Toggle confirm password visibility">
+                    <i class="bi bi-eye" id="toggleConfirmIcon"></i>
+                </button>
+            </div>
             {% for error in form.confirm_password.errors %}
-                <div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
             {% endfor %}
         </div>
     </div>
 
     {{ form.is_active(class="d-none") }}
 
-    <div class="d-grid mt-4">
-        {{ form.submit(class="btn btn-auth btn-auth-primary btn-lg rounded-pill shadow") }}
+    <!-- Submit Button -->
+    <div class="mt-4">
+        <button type="submit" class="btn-auth-submit">
+            <span>Create Account</span>
+            <i class="bi bi-arrow-right"></i>
+        </button>
     </div>
 
-    <div class="mt-4 text-center small text-white-50">
+    <!-- Switch to Login -->
+    <div class="auth-switch-prompt">
         Already have an account? 
-        <a href="{{ url_for('auth.login') }}" class="text-white fw-bold text-decoration-none ms-1">Login</a>
+        <a href="{{ url_for('auth.login') }}" class="auth-link ms-1">Sign In</a>
     </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Password toggles
+    function setupToggle(btnId, inputId, iconId) {
+        const btn = document.getElementById(btnId);
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (btn && input && icon) {
+            btn.addEventListener("click", function () {
+                const isPassword = input.getAttribute("type") === "password";
+                input.setAttribute("type", isPassword ? "text" : "password");
+                icon.classList.toggle("bi-eye", !isPassword);
+                icon.classList.toggle("bi-eye-slash", isPassword);
+            });
+        }
+    }
+
+    setupToggle("toggleRegPassword", "regPassword", "toggleRegIcon");
+    setupToggle("toggleConfirmPassword", "confirmPassword", "toggleConfirmIcon");
+
+    // Real-time 4-segment password strength meter & match validator
+    const passwordInput = document.getElementById("regPassword");
+    const confirmInput = document.getElementById("confirmPassword");
+    const seg1 = document.getElementById("seg1");
+    const seg2 = document.getElementById("seg2");
+    const seg3 = document.getElementById("seg3");
+    const seg4 = document.getElementById("seg4");
+    const strengthLabel = document.getElementById("strengthLabel");
+    const matchFeedback = document.getElementById("matchFeedback");
+
+    function checkStrength() {
+        if (!passwordInput || !seg1 || !strengthLabel) return;
+        const val = passwordInput.value;
+        let score = 0;
+
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        [seg1, seg2, seg3, seg4].forEach(seg => {
+            seg.className = "strength-segment";
+        });
+
+        if (val.length === 0) {
+            strengthLabel.textContent = "Enter password";
+            strengthLabel.style.color = "var(--text-dim)";
+        } else if (score === 1) {
+            seg1.classList.add("active-weak");
+            strengthLabel.textContent = "Weak";
+            strengthLabel.style.color = "#ef4444";
+        } else if (score === 2) {
+            seg1.classList.add("active-fair");
+            seg2.classList.add("active-fair");
+            strengthLabel.textContent = "Fair";
+            strengthLabel.style.color = "#f59e0b";
+        } else if (score === 3) {
+            seg1.classList.add("active-good");
+            seg2.classList.add("active-good");
+            seg3.classList.add("active-good");
+            strengthLabel.textContent = "Good";
+            strengthLabel.style.color = "#3b82f6";
+        } else if (score >= 4) {
+            seg1.classList.add("active-strong");
+            seg2.classList.add("active-strong");
+            seg3.classList.add("active-strong");
+            seg4.classList.add("active-strong");
+            strengthLabel.textContent = "Strong";
+            strengthLabel.style.color = "#10b981";
+        }
+        checkMatch();
+    }
+
+    function checkMatch() {
+        if (!confirmInput || !matchFeedback) return;
+        const pwd = passwordInput ? passwordInput.value : "";
+        const cpwd = confirmInput.value;
+
+        if (!cpwd) {
+            matchFeedback.textContent = "";
+            confirmInput.style.borderColor = "";
+            return;
+        }
+
+        if (pwd === cpwd) {
+            matchFeedback.textContent = "✓ Passwords match";
+            matchFeedback.style.color = "#10b981";
+            confirmInput.style.borderColor = "rgba(16, 185, 129, 0.6)";
+        } else {
+            matchFeedback.textContent = "✗ Passwords do not match";
+            matchFeedback.style.color = "#ef4444";
+            confirmInput.style.borderColor = "rgba(239, 68, 68, 0.6)";
+        }
+    }
+
+    if (passwordInput) passwordInput.addEventListener("input", checkStrength);
+    if (confirmInput) confirmInput.addEventListener("input", checkMatch);
+});
+</script>
 {% endblock %}

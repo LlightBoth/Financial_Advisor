@@ -1,127 +1,144 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}Financial Advisor{% endblock %}
-
+{% block title %}AI Expert System — Financial Advisory Engine{% endblock %}
 
 {% block content %}
-
 <link href="{{ url_for('static', filename='css/client/advisor.css') }}" rel="stylesheet">
 
+<div class="advisor-container py-4">
 
-<div class="advisor-container py-5">
+    <!-- Telemetry Status Bar -->
+    <div class="text-center">
+        <div class="expert-system-badge">
+            <span class="telemetry-dot"></span>
+            <span>INFERENCE ENGINE v3.2 // RULE MATRIX ACTIVE</span>
+        </div>
+    </div>
 
     {% if not advice %}
-    <div class="stepper-wrapper mb-5 animate__animated animate__fadeIn">
+    <!-- 2-Stage Diagnostics Wizard -->
+    <div class="stepper-wrapper">
         <div class="step-item active" id="step-1-indicator">
-            <div class="step-counter">1</div>
-            <div class="step-name">Financials</div>
+            <div class="step-counter">01</div>
+            <div class="step-name">Financial Baseline</div>
         </div>
         <div class="step-connector"></div>
         <div class="step-item" id="step-2-indicator">
-            <div class="step-counter">2</div>
-            <div class="step-name">Advice</div>
+            <div class="step-counter">02</div>
+            <div class="step-name">Behavioral Profile</div>
         </div>
     </div>
     {% endif %}
 
     {% if advice %}
-    <div class="results-report animate__animated animate__zoomIn">
-        <div class="report-header-banner p-4 bg-indigo text-white rounded-top-4 d-flex justify-content-between align-items-center">
+    <!-- Inference Results Report -->
+    <div class="results-report animate__animated animate__fadeIn">
+        <div class="report-header-banner">
             <div>
-                <h4 class="fw-bold mb-0">Analysis Complete</h4>
-                <p class="mb-0 opacity-75 small">AI-Financial Calculate</p>
+                <h4 class="fw-bold mb-1">Expert System Analysis</h4>
+                <p class="mb-0 small opacity-75">Inference Cycle Concluded // Rule Evaluation Complete</p>
             </div>
             <div class="status-badge-white">
-                <span class="pulse-dot-white"></span> Live Scan
+                <i class="bi bi-cpu-fill text-info"></i>
+                <span>FACTS VERIFIED</span>
             </div>
         </div>
 
         <div class="p-4 p-md-5">
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="metric-mini-card border-0 bg-light py-4 shadow-sm">
-                <span class="label text-muted fw-bold small text-uppercase">Savings Potential</span>
-                <span class="value text-success d-block h2 fw-bold mt-2">{{ advice.remain_percentage|round(1) }}%</span>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="metric-mini-card border-0 bg-light py-4 shadow-sm">
-                <span class="label text-muted fw-bold small text-uppercase">Expense Load</span>
-                <span class="value text-orange d-block h2 fw-bold mt-2">{{ advice.expense_percentage|round(1) }}%</span>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="metric-mini-card highlight border-0 py-4 shadow-sm" style="background-color: #f5f3ff;">
-                <span class="label text-indigo fw-bold small text-uppercase">Goal Timeline</span>
-                <span class="value d-block h2 fw-bold mt-2 text-indigo">
-                    {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal">Months</small>
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <hr class="my-5 opacity-25">
-
-    <div class="report-content px-lg-4">
-        <div class="mb-5">
-            <h6 class="text-center text-uppercase fw-bold tracking-widest text-indigo mb-3">Expert Conclusion</h6>
-            <h4 class="text-dark">{{ advice.get_advice.conclusion }}</h4>
-        </div>
-
-        <div class="advice-box p-4 bg-white border border-light shadow-sm rounded-4 mb-5 position-relative">
-            <div class="position-absolute top-0 start-0 h-100 bg-indigo rounded-start" style="width: 6px;"></div>
-            <h6 class="text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">Strategic Roadmap</h6>
-            <p class="advice-text mb-0 ps-2 text-secondary lh-lg">{{ advice.get_advice.advice }}</p>
-        </div>
-
-        <div class="confidence-section bg-light p-4 rounded-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-shield-check text-indigo me-2"></i>
-                    <span class="small fw-bold text-muted text-uppercase">AI Confidence Rating</span>
+            <!-- Metric Triad -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="metric-mini-card">
+                        <span class="label">Savings Potential</span>
+                        <span class="value text-success d-block">{{ advice.remain_percentage|round(1) }}%</span>
+                    </div>
                 </div>
-                <span class="badge bg-indigo rounded-pill px-3">{{ (advice.get_advice.certainty * 100)|round|int }}%</span>
+                <div class="col-md-4">
+                    <div class="metric-mini-card">
+                        <span class="label">Expense Load</span>
+                        <span class="value text-warning d-block">{{ advice.expense_percentage|round(1) }}%</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-mini-card">
+                        <span class="label">Projected Horizon</span>
+                        <span class="value text-primary d-block">
+                            {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal text-muted">Months</small>
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div class="progress bg-white" style="height: 10px; border-radius: 20px;">
-                <div class="progress-bar bg-indigo progress-bar-striped" 
-                     style="width: {{ advice.get_advice.certainty * 100 }}%"></div>
-            </div>
-            <p class="small text-muted mt-3 mb-0 text-center italic">
-                *Analysis based on your specific lifestyle context and current market rules.
-            </p>
-        </div>
-    </div>
 
-    <div class="text-center mt-5">
-        <button id="btn-close" class="btn-refresh-long mt-3">
-            <i class="fas fa-redo me-2"></i> Generate New Advise
-        </button>
-    </div>
-</div>
+            <!-- Conclusion & Strategic Roadmap -->
+            <div class="report-content">
+                <div class="mb-4 text-center">
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 font-monospace small">
+                        PRIMARY HEURISTIC CONCLUSION
+                    </span>
+                    <h4 class="fw-bold text-body-emphasis">{{ advice.get_advice.conclusion }}</h4>
+                </div>
+
+                <div class="advice-box mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-diagram-3-fill text-primary"></i>
+                        <span class="fw-bold small text-uppercase letter-spacing text-muted">Prescribed Action Protocol</span>
+                    </div>
+                    <p class="advice-text mb-0">{{ advice.get_advice.advice }}</p>
+                </div>
+
+                <!-- Certainty Factor Rating -->
+                <div class="confidence-section">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check text-primary fs-5"></i>
+                            <span class="small fw-bold text-uppercase text-muted">Certainty Factor (CF)</span>
+                        </div>
+                        <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold font-monospace">
+                            {{ (advice.get_advice.certainty * 100)|round|int }}% MATCH
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 8px; border-radius: 20px; background: rgba(0,0,0,0.08);">
+                        <div class="progress-bar confidence-progress-bar" 
+                             style="width: {{ advice.get_advice.certainty * 100 }}%"></div>
+                    </div>
+                    <small class="text-muted d-block text-center mt-2 italic">
+                        *Derived via forward-chaining rules against your financial facts and behavioral indicators.
+                    </small>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <button id="btn-close" class="btn-refresh-expert">
+                    <i class="bi bi-arrow-repeat me-2"></i> Recalibrate Inference Scan
+                </button>
+            </div>
+        </div>
     </div>
     {% endif %}
 
-    <form method="POST" id="advisor-form" class="advisor-form-box {% if advice %}d-none{% endif %} shadow-lg">
+    <!-- Input Form -->
+    <form method="POST" id="advisor-form" class="advisor-form-box {% if advice %}d-none{% endif %}">
         {{ form.hidden_tag() }}
 
-        <div id="advisor-step-1" class="form-step animate__animated animate__fadeIn">
+        <!-- Step 1: Financial Standing -->
+        <div id="advisor-step-1" class="form-step">
             <div class="mb-4">
-                <h4 class="fw-bold">Financial Standing</h4>
-                <p class="text-muted small">Enter your monthly figures to begin the scan.</p>
+                <h4 class="fw-bold mb-1">Financial Standing</h4>
+                <p class="text-muted small">Input your primary cashflow baseline values to start the inference cycle.</p>
             </div>
 
             <div class="mb-4">
-                <label class="custom-label">Target Goal Amount ($)</label>
-                {{ form.goal_cost(class="custom-input", type="number") }}
+                <label class="custom-label">Target Milestone Goal ($)</label>
+                {{ form.goal_cost(class="custom-input", type="number", placeholder="e.g. 10000", required=true) }}
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-6">
-                    <label class="custom-label">Monthly Income</label>
-                    {{ form.income(class="custom-input") }}
+                    <label class="custom-label">Monthly Income ($)</label>
+                    {{ form.income(class="custom-input", type="number", placeholder="e.g. 4000", required=true) }}
                 </div>
                 <div class="col-6">
-                    <label class="custom-label">Monthly Expense</label>
-                    {{ form.expense(class="custom-input") }}
+                    <label class="custom-label">Monthly Expense ($)</label>
+                    {{ form.expense(class="custom-input", type="number", placeholder="e.g. 2200", required=true) }}
                 </div>
             </div>
 
@@ -129,21 +146,25 @@
                 <label class="custom-label">Marital Status</label>
                 {{ form.martial_status(class="custom-select") }}
             </div>
-            <hr class="my-5">
-            <button id="btn-next" type="button" class="btn text-light fw-bold btn-primary-glow w-100 py-3">
-                Next <i class="fas fa-chevron-right ms-2"></i>
-            </button>
+
+            <div class="pt-3">
+                <button id="btn-next" type="button" class="btn-ai-primary w-100 py-3">
+                    <span>Continue to Behavioral Context</span>
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
         </div>
 
-        <div id="advisor-step-2" class="form-step d-none animate__animated animate__fadeIn">
+        <!-- Step 2: Behavioral Profile -->
+        <div id="advisor-step-2" class="form-step d-none">
             <div class="mb-4">
-                <h4 class="fw-bold">Lifestyle Details</h4>
-                <p class="text-muted small">Contextual factors improve advice accuracy.</p>
+                <h4 class="fw-bold mb-1">Behavioral Context & Heuristics</h4>
+                <p class="text-muted small">Select qualitative variables to optimize the rule-matching certainty.</p>
             </div>
 
             {% for field in [form.employment_status, form.debt_status, form.spending_habit] %}
             <div class="mb-4">
-                <label class="section-subtitle fw-bold text-uppercase small text-indigo">{{ field.label.text }}</label>
+                <label class="custom-label">{{ field.label.text }}</label>
                 <div class="options-grid mt-2">
                     {% for subfield in field %}
                     <label class="option-pill-modern">
@@ -155,32 +176,35 @@
             </div>
             {% endfor %}
             
-            <hr class="my-5">
-            <div class="d-flex gap-3 mt-5">
-                <button id="btn-back" type="button" class="btn btn-outline-secondary flex-fill rounded-2 p-3">Back</button>
-                {{ form.submit(class="btn btn-success-glow flex-fill rounded-2", value="Generate Advice") }}
+            <div class="d-flex gap-3 pt-3">
+                <button id="btn-back" type="button" class="btn btn-outline-secondary flex-fill rounded-3 py-3 fw-semibold">
+                    <i class="bi bi-arrow-left me-1"></i> Back
+                </button>
+                <button type="submit" class="btn-ai-primary flex-fill py-3">
+                    <i class="bi bi-lightning-charge-fill me-1"></i>
+                    <span>Execute Inference Analysis</span>
+                </button>
             </div>
         </div>
     </form>
-</div>
-<div class="col-12 mt-4 advisor-footer-wrap">
-    <div class="row g-4 justify-content-evenly">
-        <div class="col-md-5">
-            <div class="d-flex align-items-start p-2">
-                <i class="bi bi-shield-check text-indigo fs-4 me-3"></i>
+
+    <!-- Trust Badges -->
+    <div class="row g-4 mt-4 pt-2">
+        <div class="col-md-6">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
+                <i class="bi bi-shield-check text-primary fs-3"></i>
                 <div>
-                    <h6 class="fw-bold mb-1 small">Privacy-First Analysis</h6>
-                    <p class="text-muted x-small mb-0">Financial datasets are processed via encrypted protocols ensuring total data anonymity.</p>
+                    <div class="fw-bold small">Deterministic Knowledge Base</div>
+                    <div class="text-muted x-small">Scored against codified economic models.</div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-5">
-            <div class="d-flex align-items-start p-2">
-                <i class="bi bi-arrow-repeat text-warning fs-4 me-3"></i>
+        <div class="col-md-6">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
+                <i class="bi bi-sliders text-info fs-3"></i>
                 <div>
-                    <h6 class="fw-bold mb-1 small">Dynamic Goal Scaling</h6>
-                    <p class="text-muted x-small mb-0">Seamlessly recalibrate your strategic roadmap as your liquidity and income profiles evolve.</p>
+                    <div class="fw-bold small">Dynamic Factor Weighting</div>
+                    <div class="text-muted x-small">Recalibrates as income and debt ratios evolve.</div>
                 </div>
             </div>
         </div>
@@ -193,10 +217,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const s2 = document.getElementById("advisor-step-2");
     const l1 = document.getElementById("step-1-indicator");
     const l2 = document.getElementById("step-2-indicator");
-    const form = document.getElementById("advisor-form");
 
     document.getElementById("btn-next")?.addEventListener("click", () => {
-        // Trigger HTML5 validation check
         const inputs = s1.querySelectorAll('input, select');
         let valid = true;
         inputs.forEach(input => {
@@ -207,38 +229,23 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (valid) {
-            s1.classList.add("animate__fadeOutLeft");
-            setTimeout(() => {
-                s1.classList.add("d-none");
-                s1.classList.remove("animate__fadeOutLeft");
-                s2.classList.remove("d-none");
-                s2.classList.add("animate__fadeInRight");
-                l1.classList.remove("active");
-                l2.classList.add("active");
-            }, 300);
+            s1.classList.add("d-none");
+            s2.classList.remove("d-none");
+            l1.classList.remove("active");
+            l2.classList.add("active");
         }
     });
 
     document.getElementById("btn-back")?.addEventListener("click", () => {
-        // Transition Step 2 to 1
-        s2.classList.add("animate__fadeOutRight");
-        setTimeout(() => {
-            s2.classList.add("d-none");
-            s2.classList.remove("animate__fadeOutRight");
-            s1.classList.remove("d-none");
-            s1.classList.add("animate__fadeInLeft");
-            l2.classList.remove("active");
-            l1.classList.add("active");
-        }, 300);
+        s2.classList.add("d-none");
+        s1.classList.remove("d-none");
+        l2.classList.remove("active");
+        l1.classList.add("active");
     });
 
     document.getElementById("btn-close")?.addEventListener('click', () => {
         window.location.href = window.location.pathname;
     });
-
-    
-    // Back button and Refresh button logic remains the same...
 });
-
 </script>
 {% endblock %}

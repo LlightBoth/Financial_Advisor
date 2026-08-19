@@ -1,185 +1,219 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %} Dashboard {% endblock %}
+{% block title %}Dashboard — Financial Advisor{% endblock %}
 
 {% block content %}
-<link href="{{ url_for('static', filename='css/client/dashboard.css') }}" rel="stylesheet" >
-
+<link href="{{ url_for('static', filename='css/client/dashboard.css') }}" rel="stylesheet">
 
 <div class="container-fluid pb-5">
     
-    <header class="dash-header">
+    <!-- Header Banner -->
+    <div class="dash-header-banner">
         <div>
-            <h3 class="fw-bold mb-0">System Analytics</h3>
-            <span class="text-muted small">Real-time performance metrics</span>
+            <h3 class="fw-bold mb-1">Financial Intelligence</h3>
+            <span class="text-muted small">Real-time performance metrics & savings tracking</span>
         </div>
         <div class="d-flex gap-2">
-    <form action="{{ url_for('advisors.analyseIndex') }}" method="POST" class="d-inline">
-        {% if csrf_token is defined %}
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% endif %}
-        
-        <!-- Use total_income and total_expense here -->
-        <input type="hidden" name="income" value="{{ total_income | default(0) }}">
-        <input type="hidden" name="expense" value="{{ total_expense | default(0) }}">
-        <input type="hidden" name="goal_cost" value="{{ (total_income | default(0)) }}">
+            <form action="{{ url_for('advisors.analyseIndex') }}" method="POST" class="d-inline">
+                {% if csrf_token is defined %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% endif %}
+                
+                <input type="hidden" name="income" value="{{ total_income | default(0) }}">
+                <input type="hidden" name="expense" value="{{ total_expense | default(0) }}">
+                <input type="hidden" name="goal_cost" value="{{ (total_income | default(0)) }}">
 
-        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Analyse Now
-        </button>
-    </form>
-</div>
-    </header>
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
+                    <i class="bi bi-cpu-fill me-1"></i> AI Advisory Scan
+                </button>
+            </form>
+        </div>
+    </div>
 
+    <!-- Metric Cards Grid -->
     <div class="row g-4 mb-4">
+        <!-- Total Balance Saving -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4">
+            <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box bg-primary-subtle text-primary"><i class="bi bi-wallet2"></i></div>
-                    <i class="bi bi-arrow-up-right status-icon text-success"></i>
+                    <div class="icon-box-modern blue">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-arrow-up-right me-1"></i> Live
+                    </span>
                 </div>
-                <div class="text-label-caps">Total Balance Saving</div>
-                <div class="h2 fw-bold mb-0 {% if sum_saving >= 0 %} text-success
-                                            {% else %} text-danger
-                                            {% endif %}
-                "> ${{ "{:,.2f}".format(sum_saving or 0) }}
+                <div class="metric-label">Total Balance Saving</div>
+                <div class="metric-value {% if sum_saving >= 0 %} text-success {% else %} text-danger {% endif %}">
+                    ${{ "{:,.2f}".format(sum_saving or 0) }}
                 </div>
             </div>
         </div>
+
+        <!-- Income Growth Rate -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4">
+            <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
-                    <i class="bi bi-activity status-icon text-success"></i>
+                    <div class="icon-box-modern green">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Rate
+                    </span>
                 </div>
-                <div class="text-label-caps">Income Growth</div>
-                <div class="h2 fw-bold mb-0">{{ "{:,.2f}".format(sum_saving_rate or 0) }}%</div>
+                <div class="metric-label">Income Growth</div>
+                <div class="metric-value text-body-emphasis">
+                    {{ "{:,.2f}".format(sum_saving_rate or 0) }}%
+                </div>
             </div>
         </div>
+
+        <!-- Risk Status -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4">
+            <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box bg-warning-subtle text-warning"><i class="bi bi-shield-check"></i></div>
-                    <i class="bi bi-patch-check status-icon text-muted"></i>
+                    <div class="icon-box-modern amber">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1.5 small fw-bold">
+                        Score
+                    </span>
                 </div>
-                <div class="text-label-caps">Risk Status</div>
+                <div class="metric-label">Risk Profile Status</div>
                 {% if sum_saving_rate >= 75 %}
-                    <div class="h2 fw-bold mb-0 text-success">Excellent</div>
+                    <div class="metric-value text-success">Excellent</div>
                 {% elif sum_saving_rate >= 25 %}
-                    <div class="h2 fw-bold mb-0 text-warning">Moderate</div>
+                    <div class="metric-value text-warning">Moderate</div>
                 {% elif sum_saving_rate == 0 %}
-                    <div class="h2 fw-bold mb-0 text-muted">None</div>
+                    <div class="metric-value text-muted">Neutral</div>
                 {% else %}
-                    <div class="h2 fw-bold mb-0 text-danger">Risky</div>
+                    <div class="metric-value text-danger">Risky</div>
                 {% endif %}
             </div>
         </div>
     </div>
 
+    <!-- Charts Row -->
     <div class="row g-4 mb-4">
         <!-- Weekly Performance -->
         <div class="col-12 col-lg-8">
-            <div class="card stat-card shadow-sm p-3 p-md-4 h-100">
-                <h6 class="fw-bold mb-3 mb-md-4 text-uppercase text-muted"
-                    style="font-size: 0.8rem;">
-                    Weekly Performance
-                </h6>
-
-                <div id="chart_main"
-                    class="w-100"
-                    style="height: 280px;">
+            <div class="card stat-card shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">Weekly Cashflow Trend</h6>
+                    <span class="badge bg-primary-subtle text-primary small">7-Day Analysis</span>
                 </div>
+                <div id="chart_main" class="w-100" style="height: 280px;"></div>
             </div>
         </div>
 
-        <!-- Progress -->
+        <!-- Distribution Breakdown -->
         <div class="col-12 col-lg-4">
-            <div class="card stat-card shadow-sm p-3 p-md-4 h-100">
-                <h6 class="fw-bold mb-3 mb-md-4 text-uppercase text-muted"
-                    style="font-size: 0.8rem;">
-                    Progress Percentage
-                </h6>
-
-                <div id="chart_side"
-                    class="w-100"
-                    style="height: 280px;">
+            <div class="card stat-card shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">Income vs Expense</h6>
+                    <span class="badge bg-secondary-subtle text-secondary small">Ratio</span>
                 </div>
+                <div id="chart_side" class="w-100" style="height: 280px;"></div>
             </div>
         </div>
-
     </div>
 
+    <!-- Savings Plans & Tasks Row -->
     <div class="row g-4">
+        <!-- Active Goal Plans -->
         <div class="col-md-6">
-            <div class="card stat-card side-layout-card shadow-sm border-0">
-                <div class="card-side-header">
-                    <i class="bi bi-piggy-bank fs-1 text-success"></i>
-                    <span class="side-label">Savings</span>
+            <div class="card stat-card shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-box-modern green" style="width: 36px; height: 36px; font-size: 1rem;">
+                            <i class="bi bi-piggy-bank-fill"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Savings Milestones</h6>
+                            <small class="text-muted">Target Strategy Pacing</small>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('plans.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        View All
+                    </a>
                 </div>
                 
-                <div class="p-4 d-flex flex-column justify-content-center">
+                <div class="d-flex flex-column gap-3">
                     {% for plan in user_plans %}
-                    <div class="card p-3 shadow-sm mb-3 border-0 bg-body-tertiary">
-                        <div class="d-flex justify-content-between align-items-end mb-1">
-                            <span class="small fw-bold text-muted">{{ plan.name }}</span>
+                    <div class="plan-progress-pill">
+                        <div class="d-flex justify-content-between align-items-end mb-2">
+                            <span class="small fw-bold">{{ plan.name }}</span>
                             <span class="small fw-bold text-success">${{ "{:,.2f}".format(plan.saved) }} / ${{ "{:,.2f}".format(plan.goal) }}</span>
                         </div>
-                        <div class="progress" style="height: 6px; border-radius: 10px;">
-                            <div class="progress-bar {{ plan.color }}" style="width: {{ plan.percent }}%"></div>
+                        <div class="progress" style="height: 8px; border-radius: 10px; background: rgba(0,0,0,0.08);">
+                            <div class="progress-bar {{ plan.color }}" style="width: {{ plan.percent }}%; border-radius: 10px;"></div>
                         </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-bullseye fs-3 d-block mb-2 opacity-50"></i>
+                        No active plans yet. <a href="{{ url_for('plans.create') }}" class="text-primary text-decoration-none fw-bold">Create one</a>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
+        <!-- Daily Tasks -->
         <div class="col-md-6">
-            <div class="card stat-card shadow-sm p-4 task-container-card">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="icon-box bg-primary bg-opacity-10 text-primary p-3 me-3 rounded-3">
-                        <i class="bi bi-ui-checks-grid fs-4"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-0 fw-bold">Daily Tasks</h5>
-                        <small class="text-muted">Managed Upcoming Tasks</small>
+            <div class="card stat-card shadow-sm p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-box-modern purple" style="width: 36px; height: 36px; font-size: 1rem;">
+                            <i class="bi bi-check2-square"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Daily Milestones</h6>
+                            <small class="text-muted">Check off today's contributions</small>
+                        </div>
                     </div>
                 </div>
 
-                <div class="vstack gap-3">
+                <div class="vstack gap-2">
                     {% for plan in user_plans %}
                     <form method="POST" action="{{ url_for('dashboards.user_complete_task', plan_id=plan.id, amount=plan.daily) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        <label class="task-item d-flex align-items-center p-3 rounded-4 bg-body border border-2 border-primary border-opacity-10 shadow-sm transition-hover" 
+                        <label class="task-item d-flex align-items-center p-3 rounded-3 shadow-none transition-hover w-100" 
                                style="cursor: pointer;" 
                                onclick="this.closest('form').submit();">
                             
                             <div class="me-3">
                                 <div class="form-check m-0">
-                                    <input class="form-check-input rounded-circle border-2 p-2 shadow-none"
+                                    <input class="form-check-input rounded-circle p-2 shadow-none"
                                         type="checkbox"
                                         {% if plan.is_done or plan.percent >= 100 %}checked{% endif %}
-                                        style="cursor: pointer; width: 1.5rem; height: 1.5rem;">
+                                        style="cursor: pointer; width: 1.35rem; height: 1.35rem;">
                                 </div>
                             </div>
 
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold">{{ plan.name }}</h6>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill fw-bold" style="font-size: 0.7rem;">
+                                    <h6 class="mb-0 fw-bold small">{{ plan.name }}</h6>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill fw-bold" style="font-size: 0.75rem;">
                                         ${{ "{:,.2f}".format(plan.daily) }} / DAY
                                     </span>
                                 </div>
-                                <div class="text-muted" style="font-size: 0.8rem;">
-                                    <i class="bi bi-graph-up-arrow me-1 text-success"></i>
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-arrow-up-short text-success"></i>
                                     {{ plan.percent }}% reached
                                 </div>
                             </div>
 
-                            <div class="ms-3 text-muted opacity-25">
+                            <div class="ms-2 text-muted opacity-25">
                                 <i class="bi bi-chevron-right"></i>
                             </div>
                         </label>
                     </form>
+                    {% else %}
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-list-check fs-3 d-block mb-2 opacity-50"></i>
+                        All caught up! No pending daily milestones.
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -195,21 +229,24 @@
     const weeklySaving = {{ weekly_saving | tojson | safe }};
     const totalIncome = Number({{ total_income | default(0) | tojson }}) || 0;
     const totalExpense = Number({{ total_expense | default(0) | tojson }}) || 0;
-    // const userPlan = {{ user_plans | tojson | safe }};
 
     function drawCharts() {
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
-        const labelColor = isDark ? '#adb5bd' : '#888';
+        const labelColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
         
         var options = {
             backgroundColor: 'transparent',
-            chartArea: {width: '90%', height: '80%'},
+            chartArea: {width: '88%', height: '78%'},
             legend: 'none',
-            hAxis: { textStyle: { color: labelColor, fontSize: 10 } },
-            vAxis: { gridlines: { color: 'transparent' }, textStyle: { color: labelColor, fontSize: 10 } }
+            hAxis: { textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } },
+            vAxis: { 
+                gridlines: { color: gridColor }, 
+                textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } 
+            }
         };
 
-        // 1/ Line chart
+        // 1. Line / Area chart
         var dataMain = google.visualization.arrayToDataTable([
             ['Day', 'Val'],
             ['Mon', weeklySaving.Mon],
@@ -221,27 +258,35 @@
             ['Sun', weeklySaving.Sun],
         ]);
 
-        new google.visualization.AreaChart(document.getElementById('chart_main')).draw(dataMain, { ...options, colors: ['#0d6efd'] });
+        new google.visualization.AreaChart(document.getElementById('chart_main')).draw(dataMain, { 
+            ...options, 
+            colors: ['#3b82f6'],
+            areaOpacity: 0.15
+        });
 
-        // 2/ Bar chart
-        // No financial data yet
+        // 2. Pie chart
         if (totalIncome === 0 && totalExpense === 0) {
-            chart_side.innerHTML = `
-                <div class="d-flex flex-column justify-content-center 
-                            align-items-center h-100 text-body-secondary">
-                    <i class="bi bi-pie-chart fs-1 mb-3 opacity-50"></i>
-                    <div class="fw-semibold">No financial data yet</div>
-                    <small>Add income or expense records to see your progress.</small>
+            document.getElementById('chart_side').innerHTML = `
+                <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary">
+                    <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
+                    <div class="fw-semibold small">No Transaction Data</div>
+                    <small class="text-muted">Add income or expense to render ratio.</small>
                 </div>
             `;
             return;
         }
 
         var dataSide = google.visualization.arrayToDataTable([
-            ['Type', 'Amount'], ['Expense', Number(totalExpense)], ['Income', Number(totalIncome)]
+            ['Type', 'Amount'], 
+            ['Expense', Number(totalExpense)], 
+            ['Income', Number(totalIncome)]
         ]);
 
-        new google.visualization.PieChart(document.getElementById('chart_side')).draw(dataSide, { ...options, pieHole: 0.7, colors: ['#0d6efd', '#20c997'] });
+        new google.visualization.PieChart(document.getElementById('chart_side')).draw(dataSide, { 
+            ...options, 
+            pieHole: 0.65, 
+            colors: ['#ef4444', '#10b981'] 
+        });
     }
     window.addEventListener('resize', drawCharts);
 </script>
