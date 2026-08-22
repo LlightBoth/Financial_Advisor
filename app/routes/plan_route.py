@@ -4,6 +4,7 @@ from app.forms.plan_forms import PlanForm, EditPlanForm, ConfirmDeleteForm
 
 from app.services.plan_services import PlanServices
 from app.security.cookie import check_cookie_token
+from app.security.role_check import check_route_permission
 
 from datetime import date
 
@@ -13,8 +14,8 @@ plan_bp = Blueprint("plans", __name__, url_prefix="/plans")
 # Middleware 
 @plan_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 @plan_bp.route("/")
 @login_required

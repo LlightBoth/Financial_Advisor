@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from app.forms.history_forms import ConfirmDeleteForm
 from app.services.history_services import HistoryServices
 from app.security.cookie import check_cookie_token
+from app.security.role_check import check_route_permission
 
 
 history_bp = Blueprint("history", __name__, url_prefix="/histories")
@@ -11,8 +12,8 @@ history_bp = Blueprint("history", __name__, url_prefix="/histories")
 
 @history_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 
 @history_bp.route("/")
@@ -56,13 +57,13 @@ def delete(history_id):
     return redirect(url_for("history.index"))
 
 
-@history_bp.route("/delete_all", methods=["POST"])
+@history_bp.route("/delete_all", methods=["GET"])
 @login_required
 def delete_all():
     form = ConfirmDeleteForm()
-    if form.validate_on_submit():
-        HistoryServices.delete_all_history(current_user)
-        flash("All advisory history records have been cleared.", "success")
-    else:
-        flash("Invalid request to delete all history.", "danger")
+    # if form.validate_on_submit():
+    HistoryServices.delete_all_history(current_user)
+    flash("All advisory history records have been cleared.", "success")
+    # else:
+    #     flash("Invalid request to delete all history.", "danger")
     return redirect(url_for("history.index"))

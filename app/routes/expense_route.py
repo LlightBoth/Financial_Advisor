@@ -9,6 +9,7 @@ from app.forms.expense_forms import (
 
 from app.services.expense_services import ExpenseServices
 from app.security.cookie import check_cookie_token
+from app.security.role_check import check_route_permission
 
 from datetime import date
 
@@ -21,8 +22,8 @@ expense_bp = Blueprint("expenses", __name__, url_prefix="/expenses")
 # --------------------------------------------------
 @expense_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 
 # --------------------------------------------------

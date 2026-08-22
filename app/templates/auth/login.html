@@ -68,7 +68,9 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("togglePassword");
+    const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
+    const rememberCheckbox = document.getElementById("remember");
     const toggleIcon = document.getElementById("togglePasswordIcon");
 
     if (toggleBtn && passwordInput && toggleIcon) {
@@ -79,6 +81,30 @@ document.addEventListener("DOMContentLoaded", function () {
             toggleIcon.classList.toggle("bi-eye-slash", isPassword);
         });
     }
+
+    const saved = JSON.parse(
+        localStorage.getItem("user_detail") || "null"
+    );
+
+    if (saved) {
+        emailInput.value = saved.email || "";
+        passwordInput.value = saved.password || "";
+        rememberCheckbox.checked = true;
+    }
+
+    document.querySelector("form").addEventListener("submit", function () {
+        if (rememberCheckbox.checked) {
+            localStorage.setItem(
+                "user_detail",
+                JSON.stringify({
+                    email: emailInput.value,
+                    password: passwordInput.value
+                })
+            );
+        } else {
+            localStorage.removeItem("user_detail");
+        }
+    });
 });
 </script>
 {% endblock %}

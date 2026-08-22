@@ -10,7 +10,7 @@
         {{ f.render_field(form.goal_cost, placeholder="0.00", icon="bi bi-currency-dollar") }}
     </div>
     <div class="col-12 col-md-6">
-        {{ f.render_field(form.in_between, icon="bi bi-calendar-check") }}
+        {{ f.render_field(form.in_between, icon="bi bi-calendar-check", type="date") }}
     </div>
     <div class="col-12">
         {{ f.render_textarea(form.description, rows=4, placeholder="Describe this financial goal and timeline...") }}

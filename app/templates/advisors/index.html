@@ -6,14 +6,6 @@
 
 <div class="advisor-container py-4">
 
-    <!-- Telemetry Status Bar -->
-    <div class="text-center">
-        <div class="expert-system-badge">
-            <span class="telemetry-dot"></span>
-            <span>INFERENCE ENGINE v3.2 // RULE MATRIX ACTIVE</span>
-        </div>
-    </div>
-
     {% if not advice %}
     <!-- 2-Stage Diagnostics Wizard -->
     <div class="stepper-wrapper">
@@ -108,7 +100,7 @@
 
             <div class="text-center mt-5">
                 <button id="btn-close" class="btn-refresh-expert">
-                    <i class="bi bi-arrow-repeat me-2"></i> Recalibrate Inference Scan
+                    <i class="bi bi-arrow-repeat me-2"></i> End Scan
                 </button>
             </div>
         </div>
@@ -182,7 +174,7 @@
                 </button>
                 <button type="submit" class="btn-ai-primary flex-fill py-3">
                     <i class="bi bi-lightning-charge-fill me-1"></i>
-                    <span>Execute Inference Analysis</span>
+                    <span>Analyse Now</span>
                 </button>
             </div>
         </div>

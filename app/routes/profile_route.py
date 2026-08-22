@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from app.forms.user_forms import EditProfileForm, ChangePasswordProfileForm
 from app.models.user import User
 from app.security.cookie import check_cookie_token
-from app.security.role_check import check_user_role
+from app.security.role_check import check_route_permission
 from app.services.user_services import UserServices
 from app.services.plan_services import PlanServices
 from app.services.income_services import IncomeServices
@@ -16,8 +16,8 @@ profile_bp = Blueprint("profiles", __name__, url_prefix="/profiles")
 # Middleware route
 @profile_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 
 # ----- Employee Route -----

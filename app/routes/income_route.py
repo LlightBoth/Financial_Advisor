@@ -9,6 +9,7 @@ from app.forms.income_forms import (
 
 from app.services.income_services import IncomeServices
 from app.security.cookie import check_cookie_token
+from app.security.role_check import check_route_permission
 
 from datetime import date
 
@@ -19,8 +20,8 @@ income_bp = Blueprint("incomes", __name__, url_prefix="/incomes")
 # Middleware
 @income_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 
 # --------------------------------------------------

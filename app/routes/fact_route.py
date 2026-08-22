@@ -12,7 +12,7 @@ fact_bp = Blueprint("facts", __name__, url_prefix="/facts")
 # Middleware route
 @fact_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
+    check_cookie_token(current_user)
     check_route_permission()
 
 

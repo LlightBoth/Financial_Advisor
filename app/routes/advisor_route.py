@@ -6,7 +6,7 @@ from app.services.advisor_services import AdvisorServices
 from app.services.plan_services import PlanServices
 
 from app.security.cookie import check_cookie_token
-from app.security.role_check import role_user_only
+# from app.security.role_check import role_user_only
 
 advisor_bp = Blueprint("advisors", __name__, url_prefix="/advisors")
 
@@ -14,8 +14,8 @@ advisor_bp = Blueprint("advisors", __name__, url_prefix="/advisors")
 # Middleware route
 @advisor_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    
 
 @advisor_bp.route("/", methods=["GET", "POST"])
 @login_required

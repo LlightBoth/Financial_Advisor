@@ -21,7 +21,7 @@
                 <div class="sidebar-logo-icon">
                     <i class="bi bi-wallet2"></i>
                 </div>
-                <span class="fs-5 fw-bold brand-text">Fin<span>Advisor</span></span>
+                <span class="fs-5 fw-bold brand-text">Financial <span>Advisor</span></span>
             </a>
 
             <div class="burger-menu">
@@ -37,16 +37,21 @@
                     <i class="bi bi-grid-1x2 me-2"></i> <span>Dashboard</span>
                 </a>
             </li>
+            {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'income.view') %}
             <li class="nav-item mb-1">
                 <a href="{{ url_for('incomes.index') }}" class="nav-link {% if request.endpoint == 'incomes.index' %}active{% endif %}">
                     <i class="bi bi-arrow-down-left-circle me-2"></i> <span>Income</span>
                 </a>
             </li>
+            {% endif %}
+            {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'expense.view') %}
             <li class="nav-item mb-1">
                 <a href="{{ url_for('expenses.index') }}" class="nav-link {% if request.endpoint == 'expenses.index' %}active{% endif %}">
                     <i class="bi bi-arrow-up-right-circle me-2"></i> <span>Expense</span>
                 </a>
             </li>
+            {% endif %}
+            {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'plan.view') %}
             <li class="nav-item mb-1">
                 <a href="{{ url_for('plans.index') }}" class="nav-link {% if 'plans' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-bullseye me-2"></i> <span>My Plans</span>
@@ -54,15 +59,17 @@
             </li>
             <li class="nav-item mb-1">
                 <a href="{{ url_for('advisors.index') }}" class="nav-link {% if 'advisors' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-cpu me-2"></i> <span>AI Advisor</span>
+                    <i class="bi bi-upc-scan me-2"></i> <span>Analyse</span>
                 </a>
             </li>
+            {% endif %}
+            {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'history.view') %}
             <li class="nav-item mb-1">
                 <a href="{{ url_for('history.index') }}" class="nav-link {% if 'history' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-clock-history me-2"></i> <span>History</span>
                 </a>
             </li>
-
+            {% endif %}
             {% if is_management_user(current_user) %}
                 <li class="nav-section-title mt-3">ADMINISTRATION</li>
                 <li class="nav-item">
@@ -131,6 +138,7 @@
                         <div class="fw-bold small">{{ current_user.full_name or current_user.username }}</div>
                         <div class="text-muted x-small">{{ current_user.email }}</div>
                     </li>
+                    
                     <li>
                         <a class="dropdown-item small py-2" href="/profiles">
                             <i class="bi bi-person me-2 text-primary"></i> My Profile
