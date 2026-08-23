@@ -35,7 +35,7 @@ class AdvisorForm(FlaskForm):
         choices=[
             ("employed", "Yes, I am employed"),
             ("not employed", "No, I am not employed"),
-            ("not employed", "Prefer not to say"),
+            ("unspecified_employment", "Prefer not to say"),
         ],
         validators=[InputRequired()]
     )
@@ -45,7 +45,7 @@ class AdvisorForm(FlaskForm):
         choices=[
             ("debt", "Yes, I have debt"),
             ("no debt", "No, I do not have debt"),
-            ("no debt", "Prefer not to say"),
+            ("unspecified_debt", "Prefer not to say"),
         ],
         validators=[InputRequired()]
     )
@@ -55,7 +55,7 @@ class AdvisorForm(FlaskForm):
         choices=[
             ("big spend", "I tend to spend a lot"),
             ("average spend", "I spend moderately"),
-            ("average spend", "Prefer not to say"),
+            ("unspecified_spend", "Prefer not to say"),
         ],
         validators=[InputRequired()]
     )

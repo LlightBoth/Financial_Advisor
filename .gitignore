@@ -10,6 +10,7 @@ env/
 
 # Flask instance folder (contains database and secrets)
 instance/
+instance/financial.db.backup
 
 # Environment variables
 .env

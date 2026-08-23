@@ -19,12 +19,18 @@ def userIndex():
     # Saving Math Formula
     total_income = IncomeServices.get_income_total(current_user)
     total_expense = ExpenseServices.get_expense_total(current_user)
+    sum_saving = 0
 
-    sum_saving = total_income - total_expense
-    if sum_saving > 0:
-        sum_saving_rate = (sum_saving*100)/total_income
+    if total_income > 0:
+        sum_saving = total_income - total_expense
+        sum_saving_rate = (sum_saving * 100) / total_income
     else:
-        sum_saving_rate = 0
+        # Income is 0, but user has expenses (Negative flow)
+        sum_saving = -total_expense
+        if total_expense > 0:
+            sum_saving_rate = -100.0  # Represents a 100% loss / deficit relative to 0 income
+        else:
+            sum_saving_rate = 0.0
 
     weekly_saving = DashboardServices.user_weekly_saving(current_user.id)
 
@@ -34,7 +40,6 @@ def userIndex():
 
     user_plans = DashboardServices.user_all_saving_plan(current_user.id)
     
-
     return render_template(
         "dashboards/index.html", 
         sum_saving = sum_saving,
@@ -46,7 +51,7 @@ def userIndex():
         )
 
 
-@dashboard_bp.route("/complete_task/<int:plan_id>/<int:amount>", methods=["POST"])
+@dashboard_bp.route("/complete_task/<int:plan_id>/<float:amount>", methods=["POST"])
 @login_required
 def user_complete_task(plan_id, amount):
     try:

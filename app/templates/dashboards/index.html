@@ -13,17 +13,16 @@
             <span class="text-muted small">Real-time performance metrics & savings tracking</span>
         </div>
         <div class="d-flex gap-2">
-            <form action="{{ url_for('advisors.analyseIndex') }}" method="POST" class="d-inline">
+            <form action="{{ url_for('advisors.personalAnalyse') }}" method="POST" class="d-inline">
                 {% if csrf_token is defined %}
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 {% endif %}
                 
                 <input type="hidden" name="income" value="{{ total_income | default(0) }}">
                 <input type="hidden" name="expense" value="{{ total_expense | default(0) }}">
-                <input type="hidden" name="goal_cost" value="{{ (total_income | default(0)) }}">
 
                 <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
-                    <i class="bi bi-upc-scan me-1"></i> Analyse Scan Now
+                    <i class="bi bi-upc-scan me-1"></i> Analyse Now
                 </button>
             </form>
         </div>
@@ -99,7 +98,7 @@
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold mb-0 text-uppercase text-muted small">Weekly Cashflow Trend</h6>
-                    <span class="badge bg-primary-subtle text-primary small">7-Day Analysis</span>
+                    <span class="badge bg-primary-subtle text-primary small">Weekly Analysis</span>
                 </div>
                 <div id="chart_main" class="w-100" style="height: 280px;"></div>
             </div>
@@ -142,7 +141,7 @@
                     <div class="plan-progress-pill">
                         <div class="d-flex justify-content-between align-items-end mb-2">
                             <span class="small fw-bold">{{ plan.name }}</span>
-                            <span class="small fw-bold text-success">${{ "{:,.2f}".format(plan.saved) }} / ${{ "{:,.2f}".format(plan.goal) }}</span>
+                            <span class="small fw-bold text-success">${{ "{:,.2f}".format(plan.saved) }} / {{ plan.goal }}</span>
                         </div>
                         <div class="progress" style="height: 8px; border-radius: 10px; background: rgba(0,0,0,0.08);">
                             <div class="progress-bar {{ plan.color }}" style="width: {{ plan.percent }}%; border-radius: 10px;"></div>

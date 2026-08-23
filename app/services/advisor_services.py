@@ -1,7 +1,11 @@
 from app.models import Rule, Fact
 from app.services.history_services import HistoryServices
-
 from flask_login import current_user
+
+class EmptyAdvice:
+    certainty = 0.0
+    advice = "No advice available"
+    conclusion = "No conclusion"
 
 class AdvisorServices:
     @staticmethod
@@ -9,21 +13,22 @@ class AdvisorServices:
         goal_cost = data.get("goal_cost", 0)
         income = data.get("income", 0)
         expense = data.get("expense", 0)
-        martial_status = data["martial_status"]
-        is_employed = data.get("is_employed", "not employed")
-        is_debt = data.get("is_debt", "no debt")
-        is_spending = data.get("is_spending", "average spend")
+        marital_status = data.get("marital_status", "")
 
-        # Guard
+        def clean_value(val):
+            if not val or "unspecified" in str(val).lower() or val in ["Prefer not to say", ""]:
+                return ""
+            return val
+
+        is_employed = clean_value(data.get("is_employed", ""))
+        is_debt = clean_value(data.get("is_debt", ""))
+        is_spending = clean_value(data.get("is_spending", ""))
+
         if income <= 0:
-            class EmptyAdvice:
-                certainty = 0
-                advice = "No advice available"
-                conclusion = "No conclusion"
             return {
                 "income": income,
                 "expense": expense,
-                "martial_status": martial_status,
+                "marital_status": marital_status,
                 "is_employed": is_employed,
                 "is_debt": is_debt,
                 "is_spending": is_spending,
@@ -32,43 +37,62 @@ class AdvisorServices:
                 "get_advice": EmptyAdvice()
             }
 
-        # Percentages
-        remain_percentage = (income - expense) / income
+        # Calculate percentages
+        remain_percentage = (income - expense) / income  # This is SAVINGS POTENTIAL
         expense_percentage = expense / income
 
-        # Candidate rules
-        candidate_rules = Rule.query.filter(Rule.certainty <= expense_percentage).all()
-        if not candidate_rules:
-            # fallback
-            class EmptyAdvice:
-                certainty = 0
-                advice = "No advice available"
-                conclusion = "No conclusion"
-            best_rule = EmptyAdvice()
+        # -------------------------------------------------------------
+        # Map Certainty Directly from SAVINGS POTENTIAL (remain_percentage)
+        # -------------------------------------------------------------
+        # < 0.25 (25%)  --> 0.25 Certainty Tier
+        # 0.25 to 0.75 --> 0.50 Certainty Tier
+        # > 0.75 (75%)  --> 0.75 Certainty Tier
+        if remain_percentage < 0.25:
+            target_certainty = 0.25
+        elif remain_percentage <= 0.75:
+            target_certainty = 0.50
         else:
-            # Tags from user
-            user_tags = {is_employed, is_debt, is_spending}
+            target_certainty = 0.75
 
-            # Score rules by matching tags
-            def score_rule(rule):
-                rule_tags = {f.tags for f in rule.facts}
-                matches = user_tags.intersection(rule_tags)
-                return len(matches), rule.certainty  # prioritize more matches, then higher certainty
+        user_tags = {tag for tag in [is_employed, is_debt, is_spending] if tag != ""}
 
-            scored = [(score_rule(r), r) for r in candidate_rules]
-            scored.sort(key=lambda x: (x[0][0], x[0][1]), reverse=True)  # most matches first
+        def get_no_conditions_rule():
+            # Query 'No Condition' rule matching the calculated certainty tier
+            rule = Rule.query.filter(~Rule.facts.any(), Rule.certainty == target_certainty).first()
+            if not rule:
+                rule = Rule.query.filter(~Rule.facts.any()).first()
+            return rule if rule else EmptyAdvice()
 
-            best_rule = scored[0][1] if scored else None
+        # SCENARIO 27: No behavioral conditions selected
+        if len(user_tags) == 0:
+            best_rule = get_no_conditions_rule()
+        else:
+            # Query database rules matching target_certainty
+            candidate_rules = Rule.query.filter(Rule.certainty == target_certainty).all()
 
-            # Cap certainty at 1.0
-            if best_rule:
-                best_rule.certainty = min(best_rule.certainty, 1.0)
+            # Fallback to all rules if no exact certainty match exists
+            if not candidate_rules:
+                candidate_rules = Rule.query.all()
+
+            candidates = []
+            for r in candidate_rules:
+                rule_tags = {f.tags for f in r.facts}
+                matches = len(user_tags.intersection(rule_tags))
+                
+                if matches > 0:
+                    candidates.append((matches, r))
+
+            if candidates:
+                candidates.sort(key=lambda x: x[0], reverse=True)
+                best_rule = candidates[0][1]
+            else:
+                best_rule = get_no_conditions_rule()
 
         advice_data = {
             "goal_cost": goal_cost,
             "income": income,
             "expense": expense,
-            "martial_status": martial_status,
+            "marital_status": marital_status,
             "is_employed": is_employed,
             "is_debt": is_debt,
             "is_spending": is_spending,
@@ -76,12 +100,62 @@ class AdvisorServices:
             "expense_percentage": expense_percentage * 100,
             "get_advice": best_rule
         }
-        
-        # Save to history
+
         HistoryServices.create(advice_data, current_user)
-
-        # Debug
-        # for k, v in advice_data.items():
-        #     print(f"DEBUG: {k} -> {v}")
-
         return advice_data
+
+
+    @staticmethod
+    def persoal_analyse(data: dict):
+        goal_cost = data.get("goal_cost", 0.0)
+        income = data.get("income", 0.0)
+        expense = data.get("expense", 0.0)
+        marital_status = data.get("marital_status", "Single")
+
+        # Guard: Invalid or zero income
+        if income <= 0:
+            return {
+                "income": income,
+                "expense": expense,
+                "goal_cost": goal_cost,
+                "marital_status": marital_status,
+                "remain_percentage": 0.0,
+                "expense_percentage": 0.0,
+                "target_certainty": 0.25,
+                "get_advice": EmptyAdvice()
+            }
+
+        # Calculate cash flow percentages
+        remain_percentage = (income - expense) / income  # Savings Potential
+        expense_percentage = expense / income           # Expense Load
+
+        # Determine Certainty Tier strictly based on Savings Potential
+        if remain_percentage < 0.25:
+            target_certainty = 0.25
+        elif remain_percentage <= 0.75:
+            target_certainty = 0.50
+        else:
+            target_certainty = 0.75
+
+        # Query the "No Conditions" rule matching the target certainty tier
+        best_rule = Rule.query.filter(
+            ~Rule.facts.any(),
+            Rule.certainty == target_certainty
+        ).first()
+
+        # Fallback if specific certainty tier isn't found
+        if not best_rule:
+            best_rule = Rule.query.filter(~Rule.facts.any()).first() or EmptyAdvice()
+
+        advise_data = {
+            "goal_cost": goal_cost,
+            "income": income,
+            "expense": expense,
+            "marital_status": marital_status,
+            "remain_percentage": remain_percentage * 100,
+            "expense_percentage": expense_percentage * 100,
+            "target_certainty": target_certainty,
+            "get_advice": best_rule
+        }
+
+        return advise_data
