@@ -1,5 +1,5 @@
 import secrets
-from flask import abort
+from flask import abort, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from extension import db
 
@@ -21,10 +21,16 @@ class Token:
     def check_token(user: User, rf_token: str) -> bool:
         if not user or not user.refresh_token or not rf_token:
             return abort(403)
-        
-        check_user_token = check_password_hash(user.refresh_token, rf_token)
-        if not check_user_token:
+
+        # 1. Check if token is decrypt correctly
+        decrypt_user_token = check_password_hash(user.refresh_token, rf_token)
+        if not decrypt_user_token:
             return abort(403)
+
+        # 2. Check if session token is equal to token user provided
+        if session["refresh_token"] != rf_token:
+            return abort(403)
+
 
     @staticmethod
     def rotate_refresh_token(user: User, old_token: str):

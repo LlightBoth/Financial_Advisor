@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>AI Chat Interface</title>
+  
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Marked.js for parsing AI Markdown responses -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    :root {
+      --user-msg-bg: #0d6efd;
+      --user-msg-color: #ffffff;
+    }
+
+    body {
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .chat-wrapper {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    #chat-container {
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .message-bubble {
+      max-width: 85%;
+      border-radius: 1.25rem;
+      padding: 0.85rem 1.25rem;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .message-bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (min-width: 768px) {
+      .message-bubble {
+        max-width: 80%;
+      }
+    }
+    .max-width-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .btn-subtle-danger {
+      background-color: var(--bs-danger-bg-subtle, rgba(220, 53, 69, 0.1));
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-subtle-danger:hover {
+      background-color: var(--bs-danger);
+      color: #fff !important;
+    }
+    .max-w-75 {
+      max-width: 85%;
+    }
+    
+    .user-message {
+      background-color: var(--user-msg-bg);
+      color: var(--user-msg-color);
+      border-bottom-right-radius: 0.25rem;
+    }
+    
+    /* Dark/Light mode dynamic AI bubble styling */
+    [data-bs-theme="dark"] .ai-message {
+      background-color: #2b3035;
+      border: 1px solid #495057;
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    [data-bs-theme="light"] .ai-message {
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      border-bottom-left-radius: 0.25rem;
+    }
+    
+    .avatar {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body class="bg-body-tertiary">
+
+  <div class="d-flex flex-column vh-100 bg-body-tertiary">
+
+    <!-- Top Navbar -->
+    <header class="navbar navbar-expand bg-body border-bottom px-3 py-2 shadow-sm sticky-top">
+      <div class="container-fluid max-width-wrapper d-flex align-items-center justify-content-between">
+        
+        <!-- Brand & Status -->
+        <a class="navbar-brand d-flex align-items-center gap-2 m-0 text-decoration-none" href="#">
+          <div class="brand-icon-wrapper rounded-3 bg-primary bg-opacity-10 p-2 d-flex align-items-center justify-content-center">
+            <i class="bi bi-robot text-primary fs-5" aria-hidden="true"></i>
+          </div>
+          <div>
+            <span class="fw-semibold fs-5 text-body d-block leading-none">Financial AI</span>
+            <small class="text-success fw-medium d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+              <span class="p-1 bg-success rounded-circle d-inline-block"></span> Online
+            </small>
+          </div>
+        </a>
+
+        <!-- Action Group -->
+        <div class="d-flex align-items-center gap-2">
+          <a href="{{ url_for('dashboards.userIndex') }}" 
+            class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 border-subtle {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}"
+            aria-label="Back to Dashboard">
+            <i class="bi bi-grid-1x2" aria-hidden="true"></i>
+            <span class="d-none d-md-inline fw-medium">Dashboard</span>
+          </a>
+
+          <button class="btn btn-subtle-danger btn-sm d-flex align-items-center gap-1 border border-danger-subtle text-danger" 
+                  onclick="clearChat()" 
+                  title="Clear Chat History">
+            <i class="bi bi-trash3" aria-hidden="true"></i>
+            <span class="d-none d-sm-inline fw-medium">Clear</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Chat Container -->
+    <main id="chat-container" class="flex-grow-1 overflow-y-auto p-3 p-md-4">
+      <div class="container-fluid max-width-wrapper d-flex flex-column gap-3" id="message-list">
+        
+        <!-- Privacy Disclaimer Notice -->
+        <div class="text-center my-2">
+          <span class="badge bg-body-secondary text-secondary font-monospace fw-normal px-3 py-2 rounded-pill border border-subtle">
+            <i class="bi bi-shield-lock me-1" aria-hidden="true"></i> Note: All prompt history will be remove upon session logout.
+          </span>
+        </div>
+
+        <!-- AI Welcome Message -->
+        <div class="d-flex align-items-start gap-2 max-w-75">
+          <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 36px; height: 36px;">
+            <i class="bi bi-robot fs-6" aria-hidden="true"></i>
+          </div>
+          <div class="bg-body border border-subtle rounded-4 p-3 shadow-sm text-body">
+            <div class="fw-semibold small text-primary mb-1">Financial Assistant</div>
+            <p class="mb-0 leading-relaxed">Hello! How can I assist you with your personal finances, wealth targets, or expense budgeting today?</p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Fixed Bottom Input Bar -->
+    <footer class="bg-body border-top p-3 mt-auto">
+      <div class="container-fluid max-width-wrapper">
+        <form id="chat-form" class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
+          <input type="text" 
+                id="user-input" 
+                class="form-control border-0 bg-body px-3 fs-6" 
+                placeholder="Ask a financial question..." 
+                required 
+                autocomplete="off"
+                aria-label="Ask a financial question">
+          <button class="btn btn-primary px-4 d-flex align-items-center justify-content-center" type="submit" id="send-btn" aria-label="Send Message">
+            <i class="bi bi-send-fill fs-6" aria-hidden="true"></i>
+          </button>
+        </form>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Bootstrap 5.3 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const messageList = document.getElementById('message-list');
+    const chatContainer = document.getElementById('chat-container');
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+
+    const STORAGE_KEY = 'financial_chat_history';
+
+    // 1. Initialize Bootstrap Dark Mode Theme
+    const html = document.documentElement;
+    function applyTheme(theme) {
+      html.setAttribute('data-bs-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    // 2. Load stored messages on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const history = getLocalHistory();
+      if (history.length > 0) {
+        messageList.innerHTML = ''; // Replace initial welcome message with saved history
+        history.forEach(msg => appendMessageUI(msg.content, msg.role));
+      }
+    });
+
+    // 3. Chat Form Submission
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      // Add user message to UI & LocalStorage
+      appendMessageUI(message, 'user');
+      saveToLocal('user', message);
+      userInput.value = '';
+
+      const loadingId = appendLoadingIndicator();
+
+      try {
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const res = await fetch("{{ url_for('bots.chat') }}", {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken  // Add This Header for flask-csrf
+          },
+          body: JSON.stringify({ 
+            message: message,
+            history: getLocalHistory().slice(-10)
+          })
+        });
+
+        const data = await res.json();
+        removeMessage(loadingId);
+
+        if (res.ok) {
+          appendMessageUI(data.response, 'model');
+          saveToLocal('model', data.response);
+        } else {
+          appendMessageUI(`Error: ${data.error || 'Something went wrong.'}`, 'model');
+        }
+      } catch (err) {
+        removeMessage(loadingId);
+        appendMessageUI('Error: Unable to connect to server.', 'model');
+      }
+    });
+
+    // LocalStorage Helper Functions
+    function getLocalHistory() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    }
+
+    function saveToLocal(role, content) {
+      const history = getLocalHistory();
+      history.push({ role, content });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    }
+
+    function clearChat() {
+      localStorage.removeItem(STORAGE_KEY);
+      messageList.innerHTML = `
+        <div class="d-flex mb-4 align-items-start">
+          <div class="avatar bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm">
+            <i class="bi bi-robot text-light"></i>
+          </div>
+          <div class="message-bubble ai-message shadow-sm">
+            Hello! How can I help you today?
+          </div>
+        </div>
+      `;
+    }
+
+    // UI Helper Functions
+    function appendMessageUI(text, sender) {
+      const wrapper = document.createElement('div');
+      const isUser = sender === 'user';
+      wrapper.className = `d-flex mb-4 align-items-start ${isUser ? 'justify-content-end' : ''}`;
+
+      if (isUser) {
+        wrapper.innerHTML = `<div class="message-bubble user-message shadow-sm">${escapeHtml(text)}</div>`;
+      } else {
+        const parsedText = typeof marked !== 'undefined' ? marked.parse(text) : escapeHtml(text);
+        wrapper.innerHTML = `
+          <div class="avatar bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm">
+            <i class="bi bi-robot text-light"></i>
+          </div>
+          <div class="message-bubble ai-message shadow-sm">${parsedText}</div>
+        `;
+      }
+
+      messageList.appendChild(wrapper);
+      scrollToBottom();
+    }
+
+    function appendLoadingIndicator() {
+      const id = 'loading-' + Date.now();
+      const wrapper = document.createElement('div');
+      wrapper.id = id;
+      wrapper.className = 'd-flex mb-4 align-items-start';
+      wrapper.innerHTML = `
+        <div class="avatar bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm">
+          <i class="bi bi-robot text-light"></i>
+        </div>
+        <div class="message-bubble ai-message shadow-sm d-flex align-items-center gap-2">
+          <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+          <span class="text-body-secondary">Thinking...</span>
+        </div>
+      `;
+      messageList.appendChild(wrapper);
+      scrollToBottom();
+      return id;
+    }
+
+    function removeMessage(id) {
+      const elem = document.getElementById(id);
+      if (elem) elem.remove();
+    }
+
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+  </script>
+
+</body>
+</html>

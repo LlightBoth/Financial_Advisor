@@ -158,7 +158,8 @@
 
                         <!-- Logout -->
                         <a class="btn btn-sm {% if not current_user.is_authenticated %}btn-primary{% else %}btn-outline-danger{% endif %}"
-                            href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}">
+                            href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}"
+                            onclick="localStorage.removeItem('financial_chat_history')">
                             <i
                                 class="bi {% if not current_user.is_authenticated %}bi-box-arrow-in-right{% else %}bi-box-arrow-right{% endif %} me-1"></i>
                             {{"Sign-In" if not current_user.is_authenticated else "Logout"}}

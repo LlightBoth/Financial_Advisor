@@ -47,9 +47,10 @@ def login():
             else:
                 redirect_url = url_for("dashboards.userIndex")
 
-            # print("REDIRECT:", redirect_url)
+            # Give user new session token
+            session["refresh_token"] = refresh_token
 
-            # ✅ RETURN with cookies
+            # RETURN with cookies
             return get_cookie(redirect_url, access_token, refresh_token)
 
         flash("Invalid credentials", "danger")
@@ -308,5 +309,7 @@ def reset_password():
 @login_required
 def logout():
     # logout_user()
+    session.pop("refresh_token", None)
+    session.clear()
     AuthService.logout_user(current_user)
     return remove_cookie()

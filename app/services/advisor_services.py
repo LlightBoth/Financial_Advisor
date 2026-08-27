@@ -41,15 +41,18 @@ class AdvisorServices:
         remain_percentage = (income - expense) / income  # This is SAVINGS POTENTIAL
         expense_percentage = expense / income
 
+        # Cetatinty Factor Formula
+        certainty_factor = (income - expense) / goal_cost
+
         # -------------------------------------------------------------
         # Map Certainty Directly from SAVINGS POTENTIAL (remain_percentage)
         # -------------------------------------------------------------
         # < 0.25 (25%)  --> 0.25 Certainty Tier
         # 0.25 to 0.75 --> 0.50 Certainty Tier
         # > 0.75 (75%)  --> 0.75 Certainty Tier
-        if remain_percentage < 0.25:
+        if certainty_factor < 0.25:
             target_certainty = 0.25
-        elif remain_percentage <= 0.75:
+        elif certainty_factor <= 0.75:
             target_certainty = 0.50
         else:
             target_certainty = 0.75

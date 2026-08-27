@@ -178,6 +178,9 @@ class DashboardServices:
         # min() ensures we never exceed the goal_cost
         plan.saving = min((plan.saving or 0) + amount, plan.goal_cost)
         plan.last_completed = datetime.utcnow()
+
+        if plan.saving >= plan.goal_cost:
+            plan.value = True
         
         db.session.commit()
         

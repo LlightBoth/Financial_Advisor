@@ -54,16 +54,16 @@
                 <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
             </button>
 
-            {% if current_user.is_authenticated %}
+            <!-- {% if current_user.is_authenticated %}
                 <a href="{{ url_for('dashboards.userIndex') }}" class="btn-nav-cta d-none d-sm-inline-flex">
                     <i class="bi bi-grid-1x2-fill"></i> Workspace
                 </a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn-nav-ghost d-none d-sm-inline-flex">Sign In</a>
-                <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">
+            {% else %} -->
+                <a href="{{ url_for('auth.register') }}" class="btn-nav-ghost d-none d-sm-inline-flex">Sign Up</a>
+                <a href="{{ url_for('auth.login') }}" class="btn-nav-cta">
                     Get Started <i class="bi bi-arrow-right"></i>
                 </a>
-            {% endif %}
+            <!-- {% endif %} -->
 
             <!-- Mobile Menu Toggle Button (Hamburger) -->
             <button type="button" class="mobile-menu-btn d-lg-none" id="mobileMenuToggle" aria-label="Open Navigation Menu">
@@ -366,7 +366,7 @@
                     <ul class="footer-links">
                         {% if current_user.is_authenticated %}
                             <li><a href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-grid-1x2-fill text-primary"></i> Open Workspace</a></li>
-                            <li><a href="{{ url_for('settings.profile') }}"><i class="bi bi-person-gear text-primary"></i> Account Settings</a></li>
+                            <li><a href="{{ url_for('settings.empIndex') }}"><i class="bi bi-person-gear text-primary"></i> Account Settings</a></li>
                         {% else %}
                             <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right text-primary"></i> Sign In to Terminal</a></li>
                             <li><a href="{{ url_for('auth.register') }}"><i class="bi bi-stars text-primary"></i> Create Free Account</a></li>

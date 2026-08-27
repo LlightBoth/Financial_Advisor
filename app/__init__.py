@@ -63,6 +63,7 @@ def create_app(config_class: type[Config] = Config):
     from app.routes.profile_route import profile_bp
     from app.routes.income_route import income_bp
     from app.routes.expense_route import expense_bp
+    from app.routes.bot_route import bot_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(auth_bp)
@@ -79,6 +80,7 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(loan_bp)
     app.register_blueprint(income_bp)
     app.register_blueprint(expense_bp)
+    app.register_blueprint(bot_bp)
 
     # Root landing page for visitors
     @app.route("/")

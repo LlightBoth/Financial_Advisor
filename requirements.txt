@@ -9,4 +9,5 @@ flask-login
 flask-limiter
 Flask-Migrate
 Flask-Mail
+google-genai
 python-dotenv
