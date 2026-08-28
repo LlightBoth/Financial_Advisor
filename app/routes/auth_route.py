@@ -153,34 +153,29 @@ def generate_otp_email(otp_code):
 def get_session(user_email):
     """
     Helper function to generate OTP and set up session timer.
-    Accepts a string email address.
-    Returns True if successful, False if email sending failed.
+    Sends email via Google OAuth (AuthService.send_email).
+    Returns True if successful, False if email dispatch failed.
     """
-    otp_code = str(secrets.randbelow(900000) + 100000)  # 6-digit OTP
+    otp_code = str(secrets.randbelow(900000) + 100000)  # Cryptographically secure 6-digit OTP
+    text_body, html_body = generate_otp_email(otp_code)
+
+    # Dispatch email via Gmail API
+    email_sent = AuthService.send_email(
+        to=user_email, 
+        subject="Your Verification Code - Financial Consultant", 
+        body=text_body,
+        html=html_body
+    )
+
+    # Only set session keys if the Gmail API request succeeded
+    if email_sent:
+        session["pending_user_email"] = user_email
+        session["generated_otp"] = otp_code
+        session["otp_expiry"] = time.time() + 300  # 5 minutes expiry
+        session.pop("otp_verified", None)          # Ensure state is unverified until checked
+        return True
     
-    # Try sending the email First before writing to the session
-    try:
-        text_body, html_body = generate_otp_email(otp_code)
-
-        AuthService.send_email(
-            to=user_email, 
-            subject="Your Verification Code - Financial Consultant", 
-            body=text_body,
-            html=html_body
-        )
-    except Exception as e:
-        print(f"[ERROR] Failed to send OTP email to {user_email}: {e}")
-        return False
-
-    # Only set session variables if the email was sent successfully
-    session["pending_user_email"] = user_email
-    session["generated_otp"] = otp_code
-    session["otp_expiry"] = time.time() + 300  # 5 minutes expiry
-    session.pop("otp_verified", None)          # Ensure state is unverified until OTP is checked
-
-    # print(f"[DEBUG] Email: {user_email} | OTP: {otp_code}")
-    return True
-
+    return False
 ### -------------------- ###
 
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
@@ -190,22 +185,20 @@ def forgot_password():
         user_email = form.email.data
         user = AuthService.find_user_email(user_email)
 
-        # Flash standard message to prevent email enumeration attacks
-        flash('If an account exists with that email, a password reset code has been sent.', 'info')
-
         if user:
-            # Check if email successfully sent
+            # Check if Gmail API delivered the message successfully
             if get_session(user.email):
+                flash('If an account exists with that email, a password reset code has been sent.', 'info')
                 return redirect(url_for('auth.verify_otp'))
             else:
-                # Handle email server failure (flash an error or keep them on the page)
                 flash('An error occurred while sending the email. Please try again later.', 'danger')
                 return redirect(url_for('auth.forgot_password'))
         else:
+            # Flash standard security message to prevent user enumeration
+            flash('If an account exists with that email, a password reset code has been sent.', 'info')
             return redirect(url_for('auth.forgot_password'))
 
     return render_template('auth/forgot_password.html', form=form)
-
 
 @auth_bp.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():

@@ -1,14 +1,11 @@
 import flask
 from flask_migrate import Migrate
-from flask_mail import Mail
 from config import Config
 from extension import db, csrf, login_manager
 # from werkzeug.middleware.proxy_fix import ProxyFix
 # from app.security.anti_dos import prevent_dos
 from sqlalchemy import text
 
-# Create Mail To Send
-mail = Mail()
 
 # Initail App
 def create_app(config_class: type[Config] = Config):
@@ -21,7 +18,6 @@ def create_app(config_class: type[Config] = Config):
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
-    mail.init_app(app)
     # prevent_dos.init_app(app)
 
     # Register Jinja global helpers

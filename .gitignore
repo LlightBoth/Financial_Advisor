@@ -13,6 +13,8 @@ instance/
 instance/financial.db.backup
 
 # Environment variables
+credentials.json
+token.json
 .env
 
 # IDE files

@@ -39,19 +39,19 @@
             <!-- Metric Triad -->
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
-                    <div class="metric-mini-card">
+                    <div class="metric-mini-card bg-secondary-subtle">
                         <span class="label">Savings Potential</span>
                         <span class="value text-success d-block">{{ advice.remain_percentage|round(1) }}%</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="metric-mini-card">
+                    <div class="metric-mini-card bg-secondary-subtle">
                         <span class="label">Expense Load</span>
                         <span class="value text-warning d-block">{{ advice.expense_percentage|round(1) }}%</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="metric-mini-card">
+                    <div class="metric-mini-card bg-secondary-subtle">
                         <span class="label">Projected Horizon</span>
                         <span class="value text-primary d-block">
                             {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal text-muted">Months</small>
@@ -64,21 +64,20 @@
             <div class="report-content">
                 <div class="mb-4 text-center">
                     <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 font-monospace small">
-                        PRIMARY HEURISTIC CONCLUSION
+                        EXPERT CONCLUSION
                     </span>
                     <h4 class="fw-bold text-body-emphasis">{{ advice.get_advice.conclusion }}</h4>
                 </div>
 
-                <div class="advice-box mb-4">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="bi bi-diagram-3-fill text-primary"></i>
-                        <span class="fw-bold small text-uppercase letter-spacing text-muted">Prescribed Action Protocol</span>
-                    </div>
-                    <p class="advice-text mb-0">{{ advice.get_advice.advice }}</p>
+                <div class="advice-box p-4 border border-light bg-secondary-subtle shadow-sm rounded-4 mb-5 position-relative">
+                    <h6 class="text-center text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">Strategic Roadmap</h6>
+                    <p class="advice-text mb-0 ps-2 text-secondary lh-lg">
+                        {{ advice.get_advice.advice }}
+                    </p>
                 </div>
 
                 <!-- Certainty Factor Rating -->
-                <div class="confidence-section">
+                <div class="confidence-section bg-secondary-subtle">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-shield-check text-primary fs-5"></i>
