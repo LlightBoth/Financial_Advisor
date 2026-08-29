@@ -4,45 +4,73 @@
 {% block content %}
 <style>
     :root {
-    --glass-surface: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --danger-soft: rgba(220, 53, 69, 0.1);
-    --danger-border: rgba(220, 53, 69, 0.3);
-}
+        --glass-surface: rgba(255, 255, 255, 0.75);
+        --glass-border: rgba(0, 0, 0, 0.08);
+        --danger-soft: rgba(220, 53, 69, 0.1);
+        --danger-border: rgba(220, 53, 69, 0.3);
+        --text-color: #212529;
+        --text-muted-color: #6c757d;
+        --input-bg: rgba(255, 255, 255, 0.9);
+        --input-text: #212529;
+    }
 
-.settings-card {
-    background: var(--glass-surface);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 2rem;
-}
+    [data-bs-theme="dark"] {
+        --glass-surface: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --danger-soft: rgba(220, 53, 69, 0.1);
+        --danger-border: rgba(220, 53, 69, 0.3);
+        --text-color: #ffffff;
+        --text-muted-color: rgba(255, 255, 255, 0.5);
+        --input-bg: rgba(0, 0, 0, 0.2);
+        --input-text: #ffffff;
+    }
 
-.danger-zone {
-    background: var(--danger-soft);
-    border: 1px solid var(--danger-border);
-    border-radius: 12px;
-}
+    .settings-card {
+        background: var(--glass-surface);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 2rem;
+    }
 
-.nav-pills .nav-link {
-    color: #94a3b8;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    transition: 0.3s;
-}
+    .danger-zone {
+        background: var(--danger-soft);
+        border: 1px solid var(--danger-border);
+        border-radius: 12px;
+    }
 
-.nav-pills .nav-link.active {
-    background: rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
-    border-left: 4px solid #3b82f6;
-}
+    .nav-pills .nav-link {
+        color: var(--text-secondary);
+    }
 
-.form-control-glass {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--glass-border);
-    color: white;
-}
+    .form-control-glass {
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--input-text);
+    }
+
+    .form-control-glass:focus {
+        background: var(--input-bg);
+        color: var(--input-text);
+        border-color: #3b82f6;
+    }
+
+    .form-select.form-control-glass option {
+        background-color: var(--input-bg);
+        color: var(--input-text);
+    }
+
+    /* Preserve structural text adaptations */
+    .theme-text-heading {
+        color: var(--text-color) !important;
+    }
+
+    .theme-text-muted {
+        color: var(--text-muted-color) !important;
+    }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="container py-5">
     <div class="row g-4">
@@ -64,15 +92,14 @@
                 
                 <div class="tab-pane fade show active" id="tab-app">
                     <div class="settings-card">
-                        <h4 class="text-white mb-4">App Preferences</h4>
+                        <h4 class="theme-text-heading mb-4">App Preferences</h4>
                         <form action="{{ url_for('settings.empIndex') }}" method="POST">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small uppercase">Display Language</label>
+                                    <label class="form-label small uppercase theme-text-muted">Display Language</label>
                                     <select name="language" class="form-select form-control-glass">
                                         <option value="en" selected>English (US)</option>
-                                        <option value="kh">Khmer</option>
-                                        <option value="es">Español</option>
+                                        <option value="kh">Khmer (coming soon)</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -86,23 +113,23 @@
 
                 <div class="tab-pane fade" id="tab-security">
                     <div class="settings-card">
-                        <h4 class="text-white mb-4">Update Password</h4>
+                        <h4 class="theme-text-heading mb-4">Update Password</h4>
                         <form action="/profiles/emp/{{current_user.id}}/change_pw" method="POST">
                             {{ form.hidden_tag() }}
 
                             <div class="mb-3">
-                                <label class="form-label text-white-50 small">Current Password</label>
+                                <label class="form-label theme-text-muted small">Current Password</label>
                                 {{ form.current_password(class="form-control form-control-glass") }}
                             </div>
 
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">New Password</label>
+                                    <label class="form-label theme-text-muted small">New Password</label>
                                     {{ form.new_password(class="form-control form-control-glass") }}
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Confirm New Password</label>
+                                    <label class="form-label theme-text-muted small">Confirm New Password</label>
                                     {{ form.confirm_password(class="form-control form-control-glass") }}
                                 </div>
                             </div>

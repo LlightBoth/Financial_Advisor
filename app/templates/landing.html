@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
     <!-- Early Theme Initialization to Prevent Flash -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
         })();
     </script>
@@ -386,15 +386,8 @@
             <!-- Footer Bottom Bar -->
             <div class="footer-bottom-bar">
                 <div class="footer-copyright">
-                    <span>&copy; 2026 Financial Advisor Inc. All rights reserved.</span>
-                    <span class="footer-region-badge">
-                        <i class="bi bi-globe2"></i> Global (EN-US)
-                    </span>
+                    <span>&copy; 2026 Financial Advisor App. All rights reserved.</span>
                 </div>
-
-                <a href="#overview" class="footer-back-to-top">
-                    <i class="bi bi-arrow-up"></i> Back to Top
-                </a>
             </div>
         </div>
     </footer>

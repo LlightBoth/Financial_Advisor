@@ -9,14 +9,14 @@ from app.security.cookie import get_cookie, remove_cookie
 
 import secrets
 import time
-# from app.security.anti_dos import prevent_dos
+from app.security.limiter import limiter
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-# @prevent_dos.limit("10 per minute")
+@limiter.limit("5 per minute; 20 per hour")
 def login():
     form = LoginForm() 
 
@@ -60,7 +60,7 @@ def login():
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
-# @prevent_dos.limit("10 per minute")
+@limiter.limit("5 per minute; 10 per hour")
 def register():
     form = RegisterForm()
 
@@ -179,6 +179,7 @@ def get_session(user_email):
 ### -------------------- ###
 
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
+@limiter.limit("3 per minute; 5 per hour")
 def forgot_password():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
@@ -201,6 +202,7 @@ def forgot_password():
     return render_template('auth/forgot_password.html', form=form)
 
 @auth_bp.route('/verify-otp', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def verify_otp():
     email = session.get('pending_user_email')
 
@@ -234,6 +236,7 @@ def verify_otp():
 
 
 @auth_bp.route('/resend-otp', methods=['POST'])
+@limiter.limit("1 per minute; 3 per hour")
 def resend_otp():
     user_email = session.get('pending_user_email')
 
@@ -252,6 +255,7 @@ def resend_otp():
 
 
 @auth_bp.route('/reset-password', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def reset_password():
     user_email = session.get('pending_user_email')
     is_verified = session.get('otp_verified')

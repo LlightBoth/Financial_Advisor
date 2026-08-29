@@ -4,6 +4,8 @@ from app.security.cookie import check_cookie_token
 from google import genai
 from google.genai import types
 
+from app.security.limiter import limiter
+
 bot_bp = Blueprint("bots", __name__, url_prefix="/bots")
 client = genai.Client()
 
@@ -27,6 +29,7 @@ def index():
 
 @bot_bp.route('/chat', methods=['POST'])
 @login_required
+@limiter.limit("3 per minute; 10 per hour")
 def chat():
     try:
         data = request.get_json()

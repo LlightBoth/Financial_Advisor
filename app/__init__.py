@@ -2,8 +2,8 @@ import flask
 from flask_migrate import Migrate
 from config import Config
 from extension import db, csrf, login_manager
-# from werkzeug.middleware.proxy_fix import ProxyFix
-# from app.security.anti_dos import prevent_dos
+from werkzeug.middleware.proxy_fix import ProxyFix
+from app.security.limiter import limiter
 from sqlalchemy import text
 
 
@@ -11,14 +11,17 @@ from sqlalchemy import text
 def create_app(config_class: type[Config] = Config):
     app = flask.Flask(__name__)
     app.config.from_object(config_class)
-    migrate = Migrate(app, db)
 
+    # Fix Remote IP reading behind Render's reverse proxy
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
+    migrate = Migrate(app, db)
     
     # Initialize DB,CSRF For App
     db.init_app(app)
     csrf.init_app(app)
     login_manager.init_app(app)
-    # prevent_dos.init_app(app)
+    limiter.init_app(app)
 
     # Register Jinja global helpers
     from app.utils.template_helpers import user_has_role, user_has_permission, is_management_user, get_management_url
@@ -83,7 +86,26 @@ def create_app(config_class: type[Config] = Config):
     def home():
         return flask.render_template("landing.html")
 
-    # Create Table
+
+    # ---------------------- #
+    #  Prevent/Rate Limiter  #
+    # ---------------------- #
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        # Check if the request expects JSON (API calls, fetch, axios, postman)
+        if flask.request.is_json or flask.request.accept_mimetypes.best == 'application/json':
+            return flask.jsonify({
+                "error": "Rate limit exceeded",
+                "message": "You are making requests too quickly. Please wait a minute and try again."
+            }), 429
+
+        # Otherwise, assume it is a standard browser page/form submission
+        return flask.redirect(flask.url_for('auth.login'))
+
+
+    # --------------- #
+    #   Create Table  #
+    # --------------- #
     with app.app_context():
         from app.models.user import User
         from app.models.plan import Plan

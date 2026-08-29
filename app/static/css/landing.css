@@ -373,25 +373,99 @@ h1, h2, h3, h4, h5, h6, .brand-title {
 }
 
 /* --- Mobile Drawer (Off-Canvas) --- */
+/* Mobile Navigation Drawer & Backdrop Styles */
 .mobile-nav-drawer {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 300px;
-    max-width: 85vw;
+    width: 85%;
+    max-width: 380px;
     height: 100vh;
-    background: var(--drawer-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border-left: 1px solid var(--border-subtle);
+    background-color: var(--bs-body-bg, #ffffff);
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1050;
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
-    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
+    overflow-y: auto;
 }
 
+.mobile-nav-drawer.open {
+    right: 0;
+}
+
+.mobile-drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1040;
+}
+
+.mobile-drawer-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.drawer-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--bs-body-color, #333);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-drawer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-grow: 1;
+}
+
+.mobile-drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--bs-body-color, #333);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.mobile-drawer-link:hover {
+    background-color: var(--bs-tertiary-bg, rgba(0, 0, 0, 0.05));
+}
+
+.mobile-drawer-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+}
 .mobile-nav-drawer.open {
     right: 0;
 }
@@ -405,44 +479,10 @@ h1, h2, h3, h4, h5, h6, .brand-title {
     margin-bottom: 1.5rem;
 }
 
-.drawer-close-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--theme-btn-bg);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
 
 .drawer-close-btn:hover {
     color: #ef4444;
     border-color: #ef4444;
-}
-
-.mobile-drawer-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    flex-grow: 1;
-}
-
-.mobile-drawer-link {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 0.85rem 1rem;
-    border-radius: 12px;
-    color: var(--text-main);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
 }
 
 .mobile-drawer-link i {
@@ -455,24 +495,6 @@ h1, h2, h3, h4, h5, h6, .brand-title {
     transform: translateX(4px);
 }
 
-.mobile-drawer-footer {
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-subtle);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.mobile-drawer-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    z-index: 1040;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
 
 .mobile-drawer-backdrop.open {
     opacity: 1;
@@ -1093,17 +1115,17 @@ h1, h2, h3, h4, h5, h6, .brand-title {
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     .landing-navbar {
         padding: 0.75rem 1rem;
     }
     .brand-title {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     .brand-icon {
         width: 34px;
         height: 34px;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     .btn-nav-ghost {
         display: none; /* Keeps top bar clean on mobile */

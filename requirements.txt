@@ -8,9 +8,9 @@ Flask-SQLAlchemy == 3.1.1
 flask-login
 flask-limiter
 Flask-Migrate
-Flask-Mail
 google-genai
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+redis
 python-dotenv

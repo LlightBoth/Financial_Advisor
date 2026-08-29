@@ -10,7 +10,7 @@
             <h1 class="h3 fw-bold mb-1 text-body">Rules</h1>
             <p class="text-body-secondary small mb-0">Manage decision rules, certainty factors, and financial advice</p>
         </div>
-        <a href="{{ url_for('rules.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm px-3">
+        <a href="{{ url_for('rules.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm px-3 flex-shrink-0">
             <i class="bi bi-plus-lg"></i>
             <span>New Rule</span>
         </a>
@@ -22,56 +22,64 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-body-tertiary text-uppercase small text-body-secondary border-bottom border-subtle">
                         <tr>
-                            <th class="py-3 px-4" style="letter-spacing: 0.05em;">Conclusion</th>
-                            <th class="py-3 text-center" style="letter-spacing: 0.05em;">Certainty</th>
-                            <th class="py-3 d-none d-md-table-cell" style="letter-spacing: 0.05em;">Advice</th>
-                            <th class="py-3 px-4 text-end" style="width: 140px; letter-spacing: 0.05em;">Actions</th>
+                            <th class="py-3 px-3 px-md-4" style="letter-spacing: 0.05em;">Conclusion</th>
+                            <th class="py-3 text-center d-none d-md-table-cell" style="letter-spacing: 0.05em;">Certainty</th>
+                            <th class="py-3 d-none d-lg-table-cell" style="letter-spacing: 0.05em;">Advice</th>
+                            <th class="py-3 px-3 px-md-4 text-end" style="letter-spacing: 0.05em;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for rule in rules %}
                             <tr class="border-bottom border-subtle">
-                                <!-- Conclusion -->
-                                <td class="py-3 px-4">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="rounded-3 bg-info-subtle text-info-emphasis d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                                <!-- Conclusion & Mobile Certainty Integration -->
+                                <td class="py-3 px-3 px-md-4">
+                                    <div class="d-flex align-items-start align-items-md-center gap-3">
+                                        <div class="rounded-3 bg-info-subtle text-info-emphasis d-flex align-items-center justify-content-center flex-shrink-0 mt-1 mt-md-0" style="width: 38px; height: 38px;">
                                             <i class="bi bi-gear-wide-connected fs-5"></i>
                                         </div>
-                                        <div>
-                                            <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" class="text-decoration-none fw-bold text-body">
+                                        <div class="min-w-0">
+                                            <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" class="text-decoration-none fw-bold text-body text-break">
                                                 {{ rule.conclusion }}
                                             </a>
-                                            <div class="d-md-none text-body-secondary small text-truncate" style="max-width: 200px;">
-                                                {{ rule.advice }}
+                                            <!-- Visible only on mobile/tablet viewports under 768px -->
+                                            <div class="d-md-none mt-1">
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5 small me-2">
+                                                    {{ "%.0f"|format(rule.certainty * 100) }}% Certainty
+                                                </span>
                                             </div>
+                                            {% if rule.advice %}
+                                                <div class="text-body-secondary small text-truncate d-lg-none mt-1" style="max-width: 260px;">
+                                                    {{ rule.advice }}
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </td>
 
-                                <!-- Certainty -->
-                                <td class="py-3 text-center">
+                                <!-- Certainty (Tablet & Desktop) -->
+                                <td class="py-3 text-center d-none d-md-table-cell">
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1">
                                         {{ "%.0f"|format(rule.certainty * 100) }}%
                                     </span>
                                 </td>
 
-                                <!-- Advice -->
-                                <td class="py-3 d-none d-md-table-cell">
-                                    <div class="text-body-secondary small text-truncate" style="max-width: 350px;" title="{{ rule.advice }}">
+                                <!-- Advice (Large screens only) -->
+                                <td class="py-3 d-none d-lg-table-cell">
+                                    <div class="text-body-secondary small text-truncate" style="max-width: 320px;" title="{{ rule.advice }}">
                                         {{ rule.advice }}
                                     </div>
                                 </td>
 
                                 <!-- Actions -->
-                                <td class="py-3 px-4 text-end">
-                                    <div class="btn-group gap-1">
-                                        <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="View Rule">
+                                <td class="py-3 px-3 px-md-4 text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <a href="{{ url_for('rules.detail', rule_id=rule.id) }}" class="btn btn-sm btn-outline-secondary rounded-2 px-2" title="View Rule">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ url_for('rules.edit', rule_id=rule.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="Edit Rule">
+                                        <a href="{{ url_for('rules.edit', rule_id=rule.id) }}" class="btn btn-sm btn-outline-secondary rounded-2 px-2" title="Edit Rule">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <a href="{{ url_for('rules.delete_confirm', rule_id=rule.id) }}" class="btn btn-sm btn-outline-danger rounded-2" title="Delete Rule">
+                                        <a href="{{ url_for('rules.delete_confirm', rule_id=rule.id) }}" class="btn btn-sm btn-outline-danger rounded-2 px-2" title="Delete Rule">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
