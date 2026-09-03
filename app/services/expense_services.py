@@ -13,6 +13,23 @@ class ExpenseServices:
         return Expense.query.filter(Expense.users.any(id=current_user.id)).all()
 
     @staticmethod
+    def get_filter_expense(current_user, sort_value=None):
+        query = Expense.query.filter(Expense.users.any(id=current_user.id))
+    
+        # Filter by date/amount if provided
+        if sort_value == "general":
+            query = query.order_by(Expense.created_at.asc())
+        elif sort_value == "amount":
+            query = query.order_by(Expense.amount.desc())
+        elif sort_value == "date":
+            query = query.order_by(Expense.created_at.desc())
+        else:
+            # Default sort by date ascending ('day')
+            query = query.order_by(Expense.created_at.asc())
+            
+        return query.all()
+
+    @staticmethod
     def get_expense_count(current_user):
         return Expense.query.filter(Expense.users.any(id=current_user.id)).count()
     

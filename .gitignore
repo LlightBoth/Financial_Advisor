@@ -20,10 +20,3 @@ token.json
 # IDE files
 .vscode/
 .idea/
-
-# Database files
-*.db
-*.sqlite3
-
-# Logs
-*.log

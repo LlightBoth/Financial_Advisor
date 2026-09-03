@@ -9,6 +9,54 @@ class UserServices:
     def get_all():
         return User.query.all()
 
+    @staticmethod
+    def get_filter_user(sort_info=None, role_by=None, sort_by=None, search_fullname=None):
+        query = User.query
+
+        # Filter by status
+        if sort_info == "online":
+            query = query.filter(User.is_active.is_(True))
+
+        elif sort_info == "offline":
+            query = query.filter(User.is_active.is_(False))
+
+        # Filter by role
+        if role_by == "user":
+            query = query.filter(User.roles.any(name="user"))
+
+        elif role_by == "editor":
+            query = query.filter(User.roles.any(name="editor"))
+
+        elif role_by == "manager":
+            query = query.filter(User.roles.any(name="manager"))
+
+        elif role_by == "admin":
+            query = query.filter(User.roles.any(name="admin"))
+
+        # Search fullname
+        if search_fullname:
+            query = query.filter(User.full_name.ilike(f"%{search_fullname}%"))
+
+        # Sort
+        if sort_info == "username":
+            column = User.username
+        elif sort_info == "fullname":
+            column = User.full_name
+        elif sort_info == "date":
+            column = User.created_at
+        else:
+            column = User.created_at
+
+        if sort_by == "asc":
+            query = query.order_by(column.asc())
+        else:
+            query = query.order_by(column.desc())
+
+        return query.all()
+
+
+
+
     @staticmethod 
     def get_by_id(user_id):
         return User.query.get(user_id)

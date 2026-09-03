@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, abort, flash
+from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 from app.forms.plan_forms import PlanForm, EditPlanForm, ConfirmDeleteForm
 
@@ -20,7 +20,11 @@ def check_token():
 @plan_bp.route("/")
 @login_required
 def index():
-    plans = PlanServices.get_all_plan(current_user)
+    # Reads ?status= value from URL; defaults to 'general' if not provided
+    status_value = request.args.get("status", "general")
+    sort_value = request.args.get("sort", "day")
+
+    plans = PlanServices.get_filter_plan(current_user, status_value=status_value, sort_value=sort_value)
     return render_template("plans/index.html", plans=plans, today=date.today())
 
 @plan_bp.route("/<int:plan_id>")

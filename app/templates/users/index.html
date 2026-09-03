@@ -18,6 +18,55 @@
         {% endif %}
     </div>
 
+    <!-- Filter/Sort -->
+    <form action="{{ url_for('users.index') }}" method="GET" class="row g-2 align-items-center mb-4">
+    <!-- Search Input -->
+        <div class="col-12 col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text text-body-secondary bg-body-tertiary">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search fullname..." value="{{ request.args.get('search', '') }}">
+            </div>
+        </div>
+
+        <!-- Sort By Field -->
+        <div class="col-6 col-md-2">
+            <select name="info" id="info" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort by...</option>
+                <option value="fullname" {{ 'selected' if request.args.get('info') == 'fullname' }}>Full Name</option>
+                <option value="username" {{ 'selected' if request.args.get('info') == 'username' }}>Username</option>
+                <option value="date" {{ 'selected' if request.args.get('info') == 'date' }}>Join Date</option>
+                <option value="online" {{ 'selected' if request.args.get('info') == 'online' }}>Online</option>
+                <option value="offline" {{ 'selected' if request.args.get('info') == 'offline' }}>Offline</option>
+            </select>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <select name="role_by" id="role_by" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort role...</option>
+                <option value="all" {{ 'selected' if request.args.get('role_by') == 'all' }}>All-Role</option>
+                <option value="user" {{ 'selected' if request.args.get('role_by') == 'user' }}>User</option>
+                <option value="editor" {{ 'selected' if request.args.get('role_by') == 'editor' }}>Editor</option>
+                <option value="manager" {{ 'selected' if request.args.get('role_by') == 'manager' }}>Manager</option>
+                <option value="admin" {{ 'selected' if request.args.get('role_by') == 'admin' }}>Admin</option>
+            </select>
+        </div>
+
+        <!-- Sort Direction -->
+        <div class="col-6 col-md-2">
+            <select name="sort_by" id="sort_by" class="form-select form-select-sm">
+                <option value="asc" {{ 'selected' if request.args.get('sort_by') == 'asc' }}>Ascending</option>
+                <option value="desc" {{ 'selected' if request.args.get('sort_by') == 'desc' }}>Descending</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
+        </div>
+    </form>
+
     {% if users %}
         <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="table-responsive">

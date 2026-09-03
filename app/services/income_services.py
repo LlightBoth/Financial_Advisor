@@ -13,6 +13,23 @@ class IncomeServices:
         return Income.query.filter(Income.users.any(id=current_user.id)).all()
 
     @staticmethod
+    def get_filter_income(current_user, sort_value=None):
+        query = Income.query.filter(Income.users.any(id=current_user.id))
+    
+        # Filter by date/amount if provided
+        if sort_value == "general":
+            query = query.order_by(Income.created_at.asc())
+        elif sort_value == "amount":
+            query = query.order_by(Income.amount.desc())
+        elif sort_value == "date":
+            query = query.order_by(Income.created_at.desc())
+        else:
+            # Default sort by date ascending ('day')
+            query = query.order_by(Income.created_at.asc())
+            
+        return query.all()
+
+    @staticmethod
     def get_income_count(current_user):
         return Income.query.filter(Income.users.any(id=current_user.id)).count()
     

@@ -11,7 +11,24 @@ class RuleServices:
     @staticmethod
     def get_rule_id(rule_id: int):
         return Rule.query.get(rule_id)
-    
+
+    @staticmethod
+    def get_filter_rule(status_value=None, sort_by=None):
+        query = Rule.query
+
+        if status_value == "certainty":
+            column = Rule.certainty
+        else:
+            # "all", "id", or anything else
+            column = Rule.id
+
+        if sort_by == "asc":
+            query = query.order_by(column.asc())
+        else:
+            query = query.order_by(column.desc())
+
+        return query.all()
+
     @staticmethod
     def create_rule(data: dict):
         try:

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, abort, flash
+from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 
 from app.forms.expense_forms import (
@@ -32,7 +32,9 @@ def check_token():
 @expense_bp.route("/")
 @login_required
 def index():
-    expenses = ExpenseServices.get_all_expense(current_user)
+    # Reads ?sort_by value from URL; defaults to 'date'
+    sort_value = request.args.get("sort", "general")
+    expenses = ExpenseServices.get_filter_expense(current_user, sort_value)
     return render_template("expenses/index.html", expenses=expenses, today=date.today())
 
 

@@ -22,7 +22,10 @@ def check_token():
 @rule_bp.route("/")
 @login_required
 def index():
-    rules = RuleServices.get_all_rule()
+    status_value = request.args.get("status", "all")
+    sort_by = request.args.get("sort_by", "asc")
+
+    rules = RuleServices.get_filter_rule(status_value, sort_by)
     return render_template("rules/index.html", rules=rules)
 
 @rule_bp.route("/<int:rule_id>")

@@ -92,10 +92,12 @@ class DashboardServices:
     @staticmethod
     def user_weekly_saving(user_id):
         query = """
-            SELECT strftime('%w', p.created_at) as weekday, SUM(p.saving) as total
+            SELECT strftime('%w', p.last_completed) as weekday, SUM(p.saving) as total
             FROM plans as p
             INNER JOIN user_plans as up ON up.plan_id = p.id
             WHERE up.user_id = ?
+            AND p.last_completed IS NOT NULL
+            AND strftime('%Y-%W', p.last_completed) = strftime('%Y-%W', 'now')
             GROUP BY weekday;
         """
         conn = Config().get_sqlite3_connection()

@@ -53,7 +53,7 @@
 
     <!-- Top Summary Stat Cards (Fixed Dark Mode Contrast with 'border border-subtle') -->
     <div class="row g-3 mb-3 mb-md-4">
-        <div class="col-12 col-sm-6 col-xl-4">
+        <div class="col-12 col-sm-6 col-xl-4" onclick="window.location.href='{{ url_for('users.index') }}';" style="cursor: pointer;">
             <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3">
                     <div class="icon-box bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
@@ -90,7 +90,7 @@
     <!-- Charts Row -->
     <div class="row g-3 mb-3 mb-md-4">
         <div class="col-12 col-lg-8">
-            <div class="card admin-card-accent-primary bg-body-tertiary border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
+            <div class="card admin-card-accent-primary bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
                 <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">User Monthly Registrations</h6>
                 <div class="chart-container">
                     <canvas id="barChart"></canvas>
@@ -99,7 +99,7 @@
         </div>
 
         <div class="col-12 col-lg-4">
-            <div class="card admin-card-accent-warning bg-body-tertiary border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
+            <div class="card admin-card-accent-warning bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
                 <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">Distribution</h6>
                 <div class="chart-container">
                     <canvas id="radarChart"></canvas>
@@ -182,7 +182,7 @@
 
         <!-- Activity Stream -->
         <div class="col-12 col-lg-4">
-            <div class="card bg-body-tertiary border border-subtle shadow-sm rounded-4 p-3 p-md-4 h-100">
+            <div class="card bg-body border border-subtle shadow-sm rounded-4 p-3 p-md-4 h-100">
                 <h6 class="fw-bold mb-3 mb-md-4 text-body">System Activity</h6>
                 <div class="vstack gap-3 gap-md-4">
                     <div class="d-flex gap-3 align-items-start">

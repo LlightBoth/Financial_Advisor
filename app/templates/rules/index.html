@@ -16,6 +16,26 @@
         </a>
     </div>
 
+    <!-- Body -->
+    <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
+        <span class="badge text-body-secondary bg-body-tertiary border fw-normal px-2 py-1 me-2">
+            <i class="bi bi-funnel me-1"></i>Sort By
+        </span>
+        <form action="{{ url_for('rules.index') }}" method="GET" class="d-flex gap-2">
+            <select name="status" id="status" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort by...</option>
+                <option value="all" {{ 'selected' if request.args.get('status') == 'all' }}>All</option>
+                <option value="id" {{ 'selected' if request.args.get('status') == 'id' }}>ID</option>
+                <option value="certainty"  {{ 'selected' if request.args.get('status') == 'certainty' }}>Certainty</option>
+            </select>
+            <select name="sort_by" id="sort_by" class="form-select form-select-sm">
+                <option value="asc" {{ 'selected' if request.args.get('sort_by') == 'asc' }}>Ascending</option>
+                <option value="desc" {{ 'selected' if request.args.get('sort_by') == 'desc' }}>Descending</option>
+            </select>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Filter</button>
+        </form>
+    </div>
+
     {% if rules %}
         <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="table-responsive">

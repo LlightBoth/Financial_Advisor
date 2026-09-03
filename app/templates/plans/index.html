@@ -18,6 +18,27 @@
         </a>
     </div>
 
+    <!-- Body -->
+    <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
+        <span class="badge text-body-secondary bg-body-tertiary border fw-normal px-2 py-1 me-2">
+            <i class="bi bi-funnel me-1"></i>Sort By
+        </span>
+        <form action="{{ url_for('plans.index') }}" method="GET" class="d-flex gap-2">
+            <select name="status" id="status" class="form-select form-select-sm">
+                <option value="" disabled selected>Status</option>
+                <option value="general" {{ 'selected' if request.args.get('status') == 'general' }}>All</option>
+                <option value="complete" {{ 'selected' if request.args.get('status') == 'complete' }}>Complete</option>
+                <option value="incomplete" {{ 'selected' if request.args.get('status') == 'incomplete' }}>Incomplete</option>
+            </select>
+            <select name="sort" id="sort" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort by...</option>
+                <option value="day" {{ 'selected' if request.args.get('sort') == 'day' }}>Day</option>
+                <option value="price" {{ 'selected' if request.args.get('sort') == 'price' }}>Price</option>
+            </select>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Filter</button>
+        </form>
+    </div>
+
     <!-- Plans Grid -->
     <div class="row g-4 pb-5">
         {% for plan in plans %}
@@ -45,7 +66,13 @@
                         </div>
                     </div>
 
-                    <h5 class="fw-bold mb-2 text-body-emphasis">{{ plan.goal | title }}</h5>
+                    <!-- Title and Info -->
+                   <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="fw-bold mb-2 text-body-emphasis text-decoration-underline" style="text-underline-offset: 4px;">{{ plan.goal | title }}</h5>
+                        <div class="timeline-pill {{ 'text-success' if plan.value else 'text-secondary' }}">
+                            {{ 'Completed' if plan.value else 'Incomplete' }}
+                        </div>
+                    </div>
                     
                     <div class="d-flex align-items-center mb-3">
                         <i class="bi bi-calendar-event text-muted me-2"></i>
@@ -95,4 +122,5 @@
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}

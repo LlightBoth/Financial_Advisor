@@ -13,6 +13,27 @@ class PlanServices:
         return Plan.query.filter(Plan.users.any(id=current_user.id)).all()
     
     @staticmethod
+    def get_filter_plan(current_user, status_value=None, sort_value=None):
+        query = Plan.query.filter(Plan.users.any(id=current_user.id))
+        
+        # Filter by status if provided (and ignore 'general' if it means "all")
+        if status_value and status_value != "general":
+            # Convert string parameter to boolean if plan.value is a Boolean field
+            is_complete = True if status_value == "complete" else False
+            query = query.filter(Plan.value == is_complete)
+
+        # Filter by day/price if provided
+        if sort_value == "price":
+            query = query.order_by(Plan.goal_cost.desc())
+        elif sort_value == "day":
+            query = query.order_by(Plan.created_at.desc())
+        else:
+            # Default sort by date ascending ('day')
+            query = query.order_by(Plan.created_at.asc())
+            
+        return query.all()
+    
+    @staticmethod
     def get_user_all_plan_count(current_user):
         return Plan.query.filter(Plan.users.any(id=current_user.id)).count()
     

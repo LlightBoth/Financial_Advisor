@@ -31,7 +31,7 @@ def userIndex():
             sum_saving_rate = -100.0  # Represents a 100% loss / deficit relative to 0 income
         else:
             sum_saving_rate = 0.0
-
+    
     weekly_saving = DashboardServices.user_weekly_saving(current_user.id)
 
     # ensure a saving dict is always working and return value back

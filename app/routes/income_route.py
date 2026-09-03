@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, abort, flash
+from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 
 from app.forms.income_forms import (
@@ -30,7 +30,9 @@ def check_token():
 @income_bp.route("/")
 @login_required
 def index():
-    incomes = IncomeServices.get_all_income(current_user)
+    # Reads ?sort_by value from URL; defaults to 'date'
+    sort_value = request.args.get("sort", "general")
+    incomes = IncomeServices.get_filter_income(current_user, sort_value)
     return render_template("incomes/index.html", incomes=incomes, today=date.today())
 
 

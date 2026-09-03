@@ -19,7 +19,13 @@ def check_token():
 @user_bp.route("/")
 @login_required
 def index():
-    users = UserServices.get_all()
+    # Filter/Sort field
+    sort_info = request.args.get("info", "fullname")
+    role_by = request.args.get("role_by", "all")
+    sort_by = request.args.get("sort_by", "desc")
+    search_fullname = request.args.get("search", "")
+
+    users = UserServices.get_filter_user(sort_info, role_by, sort_by, search_fullname)
     roles = RoleServices.get_all_roles()
     return render_template("users/index.html", users=users, roles=roles)
 
