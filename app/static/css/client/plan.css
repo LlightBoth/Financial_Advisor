@@ -74,3 +74,131 @@
     overflow: hidden;
     height: 2.8rem;
 }
+
+/* =========================================
+   Mobile Plans
+   ========================================= */
+@media (max-width: 575.98px) {
+
+    /* Page container */
+    .container-fluid {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    /* Header */
+    .container-fluid > .d-flex {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .container-fluid > .d-flex h3 {
+        font-size: 1.25rem;
+    }
+
+    .container-fluid > .d-flex p {
+        font-size: 0.7rem !important;
+    }
+
+    /* Create button */
+    .container-fluid > .d-flex > .btn {
+        padding: 8px 14px !important;
+        font-size: 0.8rem;
+    }
+
+    /* Sort/filter section */
+    .container-fluid > .d-flex.justify-content-end {
+        width: 100%;
+        gap: 6px !important;
+    }
+
+    .container-fluid > .d-flex.justify-content-end form {
+        display: flex;
+        flex: 1;
+        gap: 4px !important;
+    }
+
+    .container-fluid > .d-flex.justify-content-end .badge {
+        font-size: 0.65rem;
+        margin-right: 0 !important;
+    }
+
+    .container-fluid > .d-flex.justify-content-end .form-select,
+    .container-fluid > .d-flex.justify-content-end .btn {
+        font-size: 0.7rem;
+        padding: 5px 7px;
+    }
+
+    /* Plan grid */
+    .row.g-4 {
+        --bs-gutter-x: 0.75rem;
+        --bs-gutter-y: 0.75rem;
+    }
+
+    /* Plan card */
+    .plan-card .card-body {
+        padding: 14px !important;
+    }
+
+    /* Days remaining + menu */
+    .plan-card .timeline-pill {
+        font-size: 0.65rem;
+        line-height: 1.2;
+    }
+
+    .plan-card .btn-link {
+        font-size: 0.8rem;
+    }
+
+    .plan-card .btn-link i {
+        font-size: 1rem !important;
+    }
+
+    /* Plan title + status */
+    .plan-card h5 {
+        font-size: 0.95rem;
+        line-height: 1.2;
+        max-width: 65%;
+        margin-bottom: 0.25rem !important;
+    }
+
+    /* Target date row */
+    .plan-card .text-label {
+        font-size: 0.65rem;
+    }
+
+    .plan-card .small.fw-bold {
+        font-size: 0.7rem !important;
+    }
+
+    .plan-card .bi-calendar-event {
+        font-size: 0.8rem;
+    }
+
+    /* Description */
+    .plan-card .description-text {
+        font-size: 0.7rem;
+        line-height: 1.4;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Bottom section */
+    .plan-card .cost-badge {
+        font-size: 0.8rem;
+    }
+
+    .plan-card .btn-outline-primary {
+        font-size: 0.7rem;
+        padding: 5px 10px !important;
+    }
+
+    /* Empty state */
+    .container-fluid .card.p-5 {
+        padding: 2rem 1rem !important;
+    }
+
+    .container-fluid .card.p-5 h5 {
+        font-size: 1rem;
+    }
+}

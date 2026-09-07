@@ -466,9 +466,6 @@ h1, h2, h3, h4, h5, h6, .brand-title {
     padding-top: 1.5rem;
     border-top: 1px solid var(--bs-border-color, #dee2e6);
 }
-.mobile-nav-drawer.open {
-    right: 0;
-}
 
 .mobile-drawer-header {
     display: flex;

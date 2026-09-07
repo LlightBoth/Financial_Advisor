@@ -13,7 +13,7 @@ class AdvisorServices:
         goal_cost = data.get("goal_cost", 0)
         income = data.get("income", 0)
         expense = data.get("expense", 0)
-        marital_status = data.get("marital_status", "")
+        marital_status = data.get("marital_status", "Single")
 
         def clean_value(val):
             if not val or "unspecified" in str(val).lower() or val in ["Prefer not to say", ""]:

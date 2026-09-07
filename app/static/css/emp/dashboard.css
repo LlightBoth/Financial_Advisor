@@ -1,0 +1,73 @@
+/* Admin Custom Utility Styles */
+.admin-card-accent-primary {
+    border: 2px solid var(--bs-primary) !important;
+}
+
+.admin-card-accent-warning {
+    border: 2px solid var(--bs-warning) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--bs-tertiary-bg);
+    cursor: pointer;
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+/* Chart */
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 220px;
+}
+
+@media (min-width: 768px) {
+    .chart-container {
+        height: 280px;
+    }
+}
+
+/* ONLY phones */
+@media (max-width: 575.98px) {
+
+    /* Card */
+    .col-4 .card {
+        padding: 10px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Icon */
+    .col-4 .icon-box {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+    }
+
+    /* Top-right icon */
+    .col-4 .card .fs-5 {
+        font-size: 0.8rem !important;
+    }
+
+    /* Label */
+    .col-4 .text-uppercase {
+        font-size: 0.55rem !important;
+        letter-spacing: 0.02em !important;
+        line-height: 1.2;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    /* Number */
+    .col-4 .h3 {
+        font-size: 1.1rem !important;
+        line-height: 1.2;
+    }
+}

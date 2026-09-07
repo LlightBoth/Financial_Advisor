@@ -76,7 +76,6 @@
       border-bottom-right-radius: 0.25rem;
     }
     
-    /* Dark/Light mode dynamic AI bubble styling */
     [data-bs-theme="dark"] .ai-message {
       background-color: #2b3035;
       border: 1px solid #495057;
@@ -102,7 +101,7 @@
   <div class="d-flex flex-column vh-100 bg-body-tertiary">
 
     <!-- Top Navbar -->
-    <header class="navbar navbar-expand bg-body border-bottom px-3 py-2 shadow-sm sticky-top">
+    <header class="navbar navbar-expand bg-body border-bottom px-3 py-2 shadow-sm">
       <div class="container-fluid max-width-wrapper d-flex align-items-center justify-content-between">
         
         <!-- Brand & Status -->
@@ -121,7 +120,7 @@
         <!-- Action Group -->
         <div class="d-flex align-items-center gap-2">
           <a href="{{ url_for('dashboards.userIndex') }}" 
-            class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 border-subtle {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}"
+            class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 border-subtle"
             aria-label="Back to Dashboard">
             <i class="bi bi-grid-1x2" aria-hidden="true"></i>
             <span class="d-none d-md-inline fw-medium">Dashboard</span>
@@ -139,7 +138,7 @@
 
     <!-- Main Chat Container -->
     <main id="chat-container" class="flex-grow-1 overflow-y-auto p-3 p-md-4">
-      <div class="container-fluid max-width-wrapper d-flex flex-column gap-3" id="message-list">
+      <div class="container-fluid max-width-wrapper d-flex flex-column gap-3 pb-5" id="message-list">
         
         <!-- Privacy Disclaimer Notice -->
         <div class="text-center my-2">
@@ -147,8 +146,7 @@
                 <i class="bi bi-shield-lock me-1" aria-hidden="true"></i> Note: All conversations will be removed upon session logout.
             </span>
         </div>
-        <!-- <hr class="text-body-secondary"> -->
-         
+          
         <!-- AI Welcome Message -->
         <div class="d-flex align-items-start gap-2 max-w-75">
           <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 36px; height: 36px;">
@@ -163,21 +161,21 @@
       </div>
     </main>
 
-    <!-- Fixed Bottom Input Bar -->
-    <footer class="bg-body border-top p-3 mt-auto">
+    <!-- Bottom Input Bar (Removed fixed-bottom to prevent overlap) -->
+    <footer class="bg-body border-top p-2 p-md-3 shadow-sm">
       <div class="container-fluid max-width-wrapper">
-        <form id="chat-form" class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
-          <input type="text" 
-                id="user-input" 
-                class="form-control border-0 bg-body px-3 fs-6" 
-                placeholder="Ask a financial question..." 
-                required 
-                autocomplete="off"
-                aria-label="Ask a financial question">
-          <button class="btn btn-primary px-4 d-flex align-items-center justify-content-center" type="submit" id="send-btn" aria-label="Send Message">
-            <i class="bi bi-send-fill fs-6" aria-hidden="true"></i>
-          </button>
-        </form>
+          <form id="chat-form" class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border bg-body">
+              <input type="text" 
+                    id="user-input" 
+                    class="form-control border-0 bg-body px-3 fs-6" 
+                    placeholder="Ask a financial question..." 
+                    required 
+                    autocomplete="off"
+                    aria-label="Ask a financial question">
+              <button class="btn btn-primary px-4 d-flex align-items-center justify-content-center" type="submit" id="send-btn" aria-label="Send Message">
+                  <i class="bi bi-send-fill fs-6" aria-hidden="true"></i>
+              </button>
+          </form>
       </div>
     </footer>
 
@@ -191,6 +189,7 @@
     const chatContainer = document.getElementById('chat-container');
     const chatForm = document.getElementById('chat-form');
     const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
     const STORAGE_KEY = 'financial_chat_history';
 
@@ -207,7 +206,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const history = getLocalHistory();
       if (history.length > 0) {
-        messageList.innerHTML = ''; // Replace initial welcome message with saved history
+        messageList.innerHTML = '';
         history.forEach(msg => appendMessageUI(msg.content, msg.role));
       }
     });
@@ -215,10 +214,14 @@
     // 3. Chat Form Submission
     chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const message = userInput.value.trim();
-      if (!message) return;
+      sendBtn.disabled = true;
 
-      // Add user message to UI & LocalStorage
+      const message = userInput.value.trim();
+      if (!message) {
+        sendBtn.disabled = false;
+        return;
+      }
+
       appendMessageUI(message, 'user');
       saveToLocal('user', message);
       userInput.value = '';
@@ -226,14 +229,13 @@
       const loadingId = appendLoadingIndicator();
 
       try {
-        // Get CSRF token from meta tag
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         const res = await fetch("{{ url_for('bots.chat') }}", {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken  // Add This Header for flask-csrf
+            'X-CSRFToken': csrfToken 
           },
           body: JSON.stringify({ 
             message: message,
@@ -253,10 +255,11 @@
       } catch (err) {
         removeMessage(loadingId);
         appendMessageUI('Error: Unable to connect to server.', 'model');
+      } finally {
+        sendBtn.disabled = false;
       }
     });
 
-    // LocalStorage Helper Functions
     function getLocalHistory() {
       return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
     }
@@ -270,32 +273,32 @@
     function clearChat() {
       localStorage.removeItem(STORAGE_KEY);
       messageList.innerHTML = `
-        <div class="d-flex mb-4 align-items-start">
-          <div class="avatar bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm">
-            <i class="bi bi-robot text-light"></i>
+        <div class="d-flex align-items-start gap-2 max-w-75">
+          <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 36px; height: 36px;">
+            <i class="bi bi-robot fs-6" aria-hidden="true"></i>
           </div>
-          <div class="message-bubble ai-message shadow-sm">
-            Hello! How can I help you today?
+          <div class="bg-body border border-subtle rounded-4 p-3 shadow-sm text-body">
+            <div class="fw-semibold small text-primary mb-1">Financial Assistant</div>
+            <p class="mb-0 leading-relaxed">Hello! How can I assist you with your personal finances, wealth targets, or expense budgeting today?</p>
           </div>
         </div>
       `;
     }
 
-    // UI Helper Functions
     function appendMessageUI(text, sender) {
       const wrapper = document.createElement('div');
       const isUser = sender === 'user';
-      wrapper.className = `d-flex mb-4 align-items-start ${isUser ? 'justify-content-end' : ''}`;
+      wrapper.className = `d-flex mb-3 align-items-start ${isUser ? 'justify-content-end' : ''}`;
 
       if (isUser) {
         wrapper.innerHTML = `<div class="message-bubble user-message shadow-sm">${escapeHtml(text)}</div>`;
       } else {
         const parsedText = typeof marked !== 'undefined' ? marked.parse(text) : escapeHtml(text);
         wrapper.innerHTML = `
-          <div class="avatar bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm">
-            <i class="bi bi-robot text-light"></i>
+          <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm me-2" style="width: 36px; height: 36px;">
+            <i class="bi bi-robot fs-6" aria-hidden="true"></i>
           </div>
-          <div class="message-bubble ai-message shadow-sm">${parsedText}</div>
+          <div class="bg-body border border-subtle rounded-4 p-3 shadow-sm text-body message-bubble ai-message">${parsedText}</div>
         `;
       }
 
@@ -307,12 +310,12 @@
       const id = 'loading-' + Date.now();
       const wrapper = document.createElement('div');
       wrapper.id = id;
-      wrapper.className = 'd-flex mb-4 align-items-start';
+      wrapper.className = 'd-flex mb-3 align-items-start';
       wrapper.innerHTML = `
-        <div class="avatar bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center shadow-sm">
-          <i class="bi bi-robot text-light"></i>
+        <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm me-2" style="width: 36px; height: 36px;">
+          <i class="bi bi-robot fs-6" aria-hidden="true"></i>
         </div>
-        <div class="message-bubble ai-message shadow-sm d-flex align-items-center gap-2">
+        <div class="bg-body border border-subtle rounded-4 p-3 shadow-sm text-body message-bubble ai-message d-flex align-items-center gap-2">
           <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
           <span class="text-body-secondary">Thinking...</span>
         </div>

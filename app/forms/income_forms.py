@@ -1,3 +1,4 @@
+from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField,
@@ -46,7 +47,9 @@ class IncomeForm(FlaskForm):
 
     income_date = DateField(
         "Income Date",
-        validators=[DataRequired()]
+        validators=[DataRequired()],
+        default=date.today, 
+        format='%Y-%m-%d'
     )
 
     recurring_period = SelectField(

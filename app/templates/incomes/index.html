@@ -3,34 +3,12 @@
 {% block title %}Income Ledger — Financial Advisor{% endblock %}
 
 {% block content %}
-<style>
-    .stat-card-clean {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border: 1px solid var(--bs-border-color);
-        background-color: var(--bs-card-bg);
-        border-radius: 14px;
-    }
-    .stat-card-clean:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 24px -10px rgba(0,0,0,0.1) !important;
-        border-color: rgba(59, 130, 246, 0.3);
-    }
-    .icon-shape-sm {
-        width: 42px;
-        height: 42px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-    }
-</style>
-
 <div class="container-fluid py-2 px-2 px-md-3">
     
     <!-- Header -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="header-title d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Income Streams</h3>
+            <h3 class="fw-bold mb-1">Income Tracking</h3>
             <p class="text-muted small mb-0">Record and monitor all recurring and one-time earnings.</p>
         </div>
 
@@ -46,8 +24,8 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Total Earned</span>
-                    <div class="icon-shape-sm bg-success-subtle text-success">
-                        <i class="bi bi-cash-stack fs-5"></i>
+                    <div class="icon-shape-sm bg-success-subtle rounded-circle text-success">
+                        <i class="bi bi-cash-stack ps-2 fs-5"></i>
                     </div>
                 </div>
                 <h3 class="fw-bold mb-0 text-success">
@@ -62,8 +40,8 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Transaction Logs</span>
-                    <div class="icon-shape-sm bg-primary-subtle text-primary">
-                        <i class="bi bi-receipt fs-5"></i>
+                    <div class="icon-shape-sm bg-primary-subtle rounded-circle text-primary">
+                        <i class="bi bi-receipt ps-2 fs-5"></i>
                     </div>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
@@ -78,8 +56,8 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Recurring Streams</span>
-                    <div class="icon-shape-sm bg-warning-subtle text-warning">
-                        <i class="bi bi-arrow-repeat fs-5"></i>
+                    <div class="icon-shape-sm bg-warning-subtle rounded-circle text-warning">
+                        <i class="bi bi-arrow-repeat ps-2 fs-5"></i>
                     </div>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">

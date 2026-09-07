@@ -1,3 +1,4 @@
+from datetime import date
 from flask_wtf import FlaskForm
 from flask_wtf.form import _Auto
 from wtforms import ( StringField, SubmitField, FloatField, DateField, SelectField )
@@ -45,7 +46,9 @@ class ExpenseForm(FlaskForm):
 
     expense_date = DateField(
         "Expense Date",
-        validators=[DataRequired()]
+        validators=[DataRequired()],
+        default=date.today, 
+        format='%Y-%m-%d'
     )
 
     recurring_period = SelectField(

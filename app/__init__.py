@@ -83,6 +83,7 @@ def create_app(config_class: type[Config] = Config):
 
     # Root landing page for visitors
     @app.route("/")
+    @limiter.limit("5 per minute")
     def home():
         return flask.render_template("landing.html")
 

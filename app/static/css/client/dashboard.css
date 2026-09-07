@@ -113,4 +113,23 @@
         padding: 12px;
         font-size: 0.8rem;
     }
+    .stat-card {
+        padding: 12px !important;
+    }
+
+    .metric-value {
+        font-size: 1.1rem;
+    }
+
+    .metric-label {
+        font-size: 0.7rem;
+    }
+
+    .icon-box-modern {
+        width: 32px;
+        height: 32px;
+    }
+    .hidePhone {
+        display: none;
+    }
 }
