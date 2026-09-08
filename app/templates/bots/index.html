@@ -49,9 +49,19 @@
       margin-bottom: 0;
     }
 
-    @media (min-width: 768px) {
+    @media (max-width: 768px) {
       .message-bubble {
         max-width: 80%;
+      }
+      .bot-footer {
+        height: 180px;
+        /* margin-bottom: 54px; */
+      }
+      .bot-div {
+        padding: 1.25rem 1rem;
+      }
+      #chat-form input[type="text"] {
+        padding: 1rem;
       }
     }
     .max-width-wrapper {
@@ -162,8 +172,8 @@
     </main>
 
     <!-- Bottom Input Bar (Removed fixed-bottom to prevent overlap) -->
-    <footer class="bg-body border-top p-2 p-md-3 shadow-sm">
-      <div class="container-fluid max-width-wrapper">
+    <footer class="bot-footer bg-body border-top p-2 p-md-3 shadow-sm">
+      <div class="bot-div container-fluid max-width-wrapper">
           <form id="chat-form" class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border bg-body">
               <input type="text" 
                     id="user-input" 

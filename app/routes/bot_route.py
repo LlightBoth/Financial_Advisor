@@ -64,3 +64,42 @@ def chat():
     except Exception as e:
         print(f"[Gemini API Error]: {type(e).__name__} - {e}")
         return jsonify({'error': f'Backend Error: {str(e)}'}), 500
+
+    
+@bot_bp.route('/analyse', methods=['POST'])
+@login_required
+@limiter.limit("3 per minute; 10 per hour")
+def analyse():
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '').strip()
+        history = data.get('history', [])
+
+        if not user_message:
+            return jsonify({'error': 'Message cannot be empty'}), 400
+
+        # Convert frontend history to Gemini SDK format (exclude the latest prompt)
+        sdk_history = [
+            types.Content(
+                role=item['role'], 
+                parts=[types.Part.from_text(text=item['content'])]
+            )
+            for item in history[:-1]  # Exclude current message
+        ]
+
+        # Initialize multi-turn chat with history
+        chat_instance = client.chats.create(
+            model='gemini-3.6-flash',
+            history=sdk_history,
+            config=types.GenerateContentConfig(
+                system_instruction=FINANCIAL_SYSTEM_INSTRUCTION,
+                temperature=0.2
+            )
+        )
+
+        response = chat_instance.send_message(user_message)
+        return jsonify({'response': response.text})
+
+    except Exception as e:
+        print(f"[Gemini API Error]: {type(e).__name__} - {e}")
+        return jsonify({'error': f'Backend Error: {str(e)}'}), 500

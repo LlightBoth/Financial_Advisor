@@ -22,92 +22,205 @@
     {% endif %}
 
     {% if advice %}
-    <!-- Inference Results Report -->
-    <div class="results-report animate__animated animate__fadeIn">
-        <div class="report-header-banner">
-            <div>
-                <h4 class="fw-bold mb-1">Expert System Analysis</h4>
-                <p class="mb-0 small opacity-75">Inference Cycle Concluded // Rule Evaluation Complete</p>
-            </div>
-            <div class="status-badge-white">
-                <i class="bi bi-cpu-fill text-info"></i>
-                <span>FACTS VERIFIED</span>
-            </div>
-        </div>
-
-        <div class="p-4 p-md-5">
-            <!-- Metric Triad -->
-            <div class="row g-4 mb-5">
-                <div class="col-md-4">
-                    <div class="metric-mini-card bg-secondary-subtle">
-                        <span class="label">Savings Potential</span>
-                        <span class="value text-success d-block">{{ advice.remain_percentage|round(1) }}%</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="metric-mini-card bg-secondary-subtle">
-                        <span class="label">Expense Load</span>
-                        <span class="value text-warning d-block">{{ advice.expense_percentage|round(1) }}%</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="metric-mini-card bg-secondary-subtle">
-                        <span class="label">Projected Horizon</span>
-                        <span class="value text-primary d-block">
-                            {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal text-muted">Months</small>
+        <div class="results-report border-0 shadow-lg rounded-5 overflow-hidden bg-body animate__animated animate__fadeIn">
+            <!-- Header Banner -->
+            <div class="report-header-banner p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-white bg-opacity-25 text-white rounded-pill px-3 py-1 fw-semibold tracking-wide small">
+                            AI FINANCIAL ENGINE
+                        </span>
+                        <span class="badge bg-success bg-opacity-25 text-white border border-white border-opacity-25 rounded-pill px-3 py-1 small fw-semibold">
+                            ANALYSIS COMPLETE
                         </span>
                     </div>
-                </div>
-            </div>
-
-            <!-- Conclusion & Strategic Roadmap -->
-            <div class="report-content">
-                <div class="mb-4 text-center">
-                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 font-monospace small">
-                        EXPERT CONCLUSION
-                    </span>
-                    <h4 class="fw-bold text-body-emphasis">{{ advice.get_advice.conclusion }}</h4>
-                </div>
-
-                <div class="advice-box p-4 border border-light bg-secondary-subtle shadow-sm rounded-4 mb-5 position-relative">
-                    <h6 class="text-center text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">Strategic Roadmap</h6>
-                    <p class="advice-text mb-0 ps-2 text-secondary lh-lg">
-                        {{ advice.get_advice.advice }}
+                    <h3 class="fw-bold mb-1 text-white">AI Financial Analysis</h3>
+                    <p class="mb-0 text-white-50 small">
+                        Automated diagnostic and tailored wealth optimization breakdown
                     </p>
                 </div>
 
-                <!-- Certainty Factor Rating -->
-                <div class="confidence-section bg-secondary-subtle">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-shield-check text-primary fs-5"></i>
-                            <span class="small fw-bold text-uppercase text-muted">Certainty Factor (CF)</span>
-                        </div>
-                        <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold font-monospace">
-                            {{ (advice.get_advice.certainty * 100)|round|int }}% MATCH
-                        </span>
-                    </div>
-                    <div class="progress" style="height: 8px; border-radius: 20px; background: rgba(0,0,0,0.08);">
-                        <div class="progress-bar confidence-progress-bar" 
-                             style="width: {{ advice.get_advice.certainty * 100 }}%"></div>
-                    </div>
-                    <small class="text-muted d-block text-center mt-2 italic">
-                        *Derived via forward-chaining rules against your financial facts and behavioral indicators.
-                    </small>
+                <div class="d-flex align-items-center gap-2 bg-black bg-opacity-25 backdrop-blur px-3 py-2 rounded-pill align-self-start align-self-md-center border border-white border-opacity-10">
+                    <i class="bi bi-robot text-info fs-5"></i>
+                    <span class="small fw-bold tracking-wide text-white">READY</span>
                 </div>
             </div>
 
-            <div class="text-center mt-5">
-                <button id="btn-close" class="btn-refresh-expert">
-                    <i class="bi bi-arrow-repeat me-2"></i> End Scan
-                </button>
+            <div class="p-4 p-md-5">
+
+                <!-- Top Section: Core Conclusion & Doughnut Chart Breakdown -->
+                <div class="row g-4 align-items-center mb-5">
+                    
+                    <!-- AI Conclusion Card -->
+                    <div class="col-lg-7">
+                        <div class="p-4 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-25 h-100 d-flex flex-column justify-content-center">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold tracking-wider font-monospace small">
+                                    AI CONCLUSION
+                                </span>
+                                <span class="text-body-secondary small ms-auto fw-medium">
+                                    Certainty: <strong class="text-primary">{{ ((advice["certainty"] | default(0)) * 100) | round | int }}%</strong>
+                                </span>
+                            </div>
+
+                            <h4 class="fw-bold text-body mt-2 mb-3 lh-sm">
+                                "{{ advice["conclusion"] | default('Analysis processing completed.') }}"
+                            </h4>
+
+                            <!-- Progress Bar for AI Certainty -->
+                            <div class="mt-2">
+                                <div class="progress confidence-progress-bg" style="height: 6px; border-radius: 10px;">
+                                    <div class="progress-bar bg-primary rounded-pill" 
+                                        style="width: {{ ((advice['certainty'] | default(0)) * 100) }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart.js Doughnut Display -->
+                    <div class="col-lg-5">
+                        <div class="p-4 rounded-4 bg-body-tertiary border border-border-subtle text-center">
+                            <h6 class="text-uppercase text-body-secondary fw-bold small mb-3">Financial Allocation</h6>
+                            <div class="chart-wrapper d-flex justify-content-center align-items-center">
+                                <canvas id="financialChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="row g-4 mb-5">
+
+                    <!-- Savings Potential -->
+                    <div class="col-md-4">
+                        <div class="metric-mini-card p-4 rounded-4 bg-body-tertiary border border-border-subtle h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="text-body-secondary small text-uppercase fw-bold">Savings Potential</span>
+                                <div class="bg-success bg-opacity-10 p-2 rounded-circle">
+                                    <i class="bi bi-graph-up-arrow text-success fs-5"></i>
+                                </div>
+                            </div>
+                            <span class="fs-1 fw-extrabold text-success d-block mb-1">
+                                {{ (advice["remain_percentage"] | default(0)) | round(1) }}%
+                            </span>
+                            <small class="text-body-secondary">Net income retained monthly</small>
+                        </div>
+                    </div>
+
+                    <!-- Expense Load -->
+                    <div class="col-md-4">
+                        <div class="metric-mini-card p-4 rounded-4 bg-body-tertiary border border-border-subtle h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="text-body-secondary small text-uppercase fw-bold">Expense Load</span>
+                                <div class="bg-warning bg-opacity-10 p-2 rounded-circle">
+                                    <i class="bi bi-wallet2 text-warning fs-5"></i>
+                                </div>
+                            </div>
+                            <span class="fs-1 fw-extrabold text-warning d-block mb-1">
+                                {{ (advice["expense_percentage"] | default(0)) | round(1) }}%
+                            </span>
+                            <small class="text-body-secondary">Total outflow utilization</small>
+                        </div>
+                    </div>
+
+                    <!-- Projected Horizon -->
+                    <div class="col-md-4">
+                        <div class="metric-mini-card p-4 rounded-4 bg-body-tertiary border border-border-subtle h-100">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="text-body-secondary small text-uppercase fw-bold">Projected Horizon</span>
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
+                                    <i class="bi bi-calendar-check text-primary fs-5"></i>
+                                </div>
+                            </div>
+                            <span class="fs-1 fw-extrabold text-primary d-block mb-1">
+                                {% if advice["months_to_goal"] is defined and advice["months_to_goal"] is not none %}
+                                    {{ advice["months_to_goal"] }} <small class="fs-6 fw-normal text-body-secondary">Months</small>
+                                {% else %}
+                                    <span class="text-body-secondary fs-3">N/A</span>
+                                {% endif %}
+                            </span>
+                            <small class="text-body-secondary">Estimated timeline to goal</small>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Strategic Roadmap -->
+                <div class="report-content mb-5">
+                    <div class="advice-box p-4 border border-border-subtle bg-body-tertiary rounded-4 shadow-sm">
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <i class="bi bi-signpost-split-fill text-primary fs-4"></i>
+                            <h5 class="fw-bold text-body mb-0">Strategic Roadmap</h5>
+                        </div>
+
+                        <div class="d-flex flex-column gap-3">
+                            {% for item in advice["advice"] | default([]) %}
+                                <div class="d-flex align-items-start gap-3 p-3 rounded-3 bg-body border border-border-subtle">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 mt-1" 
+                                        style="width: 28px; height: 28px; font-size: 0.85rem;">
+                                        {{ loop.index }}
+                                    </div>
+                                    <div class="text-body-secondary lh-base pt-1 fw-medium">
+                                        {{ item }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p class="text-body-secondary mb-0">No specific advice items provided.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Certainty Detail Section -->
+                <div class="confidence-section p-4 rounded-4 bg-body-tertiary border border-border-subtle mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check text-primary fs-5"></i>
+                            <span class="small fw-bold text-uppercase text-body-secondary">AI Certainty Score</span>
+                        </div>
+                        <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold font-monospace">
+                            {{ ((advice["certainty"] | default(0)) * 100) | round | int }}% MATCH
+                        </span>
+                    </div>
+
+                    <div class="progress confidence-progress-bg mb-2" style="height: 8px; border-radius: 20px;">
+                        <div class="progress-bar bg-primary rounded-pill transition-all" 
+                            style="width: {{ ((advice['certainty'] | default(0)) * 100) }}%;"></div>
+                    </div>
+
+                    <small class="text-body-secondary d-block text-center fst-italic style-08rem">
+                        *AI certainty reflects the completeness and consistency of the supplied financial information.
+                    </small>
+                </div>
+
+                <!-- Action Trigger Button -->
+                <div class="text-center">
+                    <button id="btn-close" type="button" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-arrow-repeat fs-5"></i>
+                        New Analysis
+                    </button>
+                </div>
+
             </div>
         </div>
-    </div>
+
+    {% endif %}
+
+
+    {% if ai_error %}
+        <div class="alert alert-warning rounded-4">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ ai_error }}
+        </div>
     {% endif %}
 
     <!-- Input Form -->
-    <form method="POST" id="advisor-form" class="advisor-form-box {% if advice %}d-none{% endif %}">
+    <form
+        method="POST"
+        id="advisor-form"
+        class="advisor-form-box {% if advice %}d-none{% endif %}"
+    >
         {{ form.hidden_tag() }}
 
         <!-- Step 1: Financial Standing -->
@@ -202,6 +315,37 @@
     </div>
 </div>
 
+<!-- AI Loading Overlay -->
+<div id="ai-loading" class="ai-loading-overlay d-none">
+    <div class="ai-loading-card">
+
+        <div class="ai-loading-icon">
+            <i class="bi bi-robot"></i>
+        </div>
+
+        <h5 class="fw-bold mt-3 mb-2">
+            Analyzing Your Finances
+        </h5>
+
+        <p class="text-muted small mb-3">
+            Our AI is reviewing your income, expenses, goal,
+            and financial profile.
+        </p>
+
+        <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+
+        <div class="small text-muted">
+            Please wait...
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const s1 = document.getElementById("advisor-step-1");
@@ -209,7 +353,83 @@ document.addEventListener("DOMContentLoaded", function () {
     const l1 = document.getElementById("step-1-indicator");
     const l2 = document.getElementById("step-2-indicator");
 
+    const advisorForm = document.getElementById("advisor-form");
+    const loading = document.getElementById("ai-loading");
+
+    // Initialize Chart ONLY if canvas exists in the DOM
+    const canvas = document.getElementById('financialChart');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        
+        // Safe extractions with fallback values
+        const savings = parseFloat("{{ (advice['remain_percentage'] | default(0)) | round(1) }}") || 0;
+        const expenses = parseFloat("{{ (advice['expense_percentage'] | default(0)) | round(1) }}") || 0;
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Savings Potential', 'Expense Load'],
+                datasets: [{
+                    data: [savings, expenses],
+                    backgroundColor: [
+                        '#198754', // Bootstrap Success Green
+                        '#ffc107'  // Bootstrap Warning Yellow
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                },
+                cutout: '72%'
+            }
+        });
+    }
+
+    // Form Submission & Loading Overlay
+    advisorForm?.addEventListener("submit", function () {
+        loading?.classList.remove("d-none");
+
+        const submitButton = advisorForm.querySelector('button[type="submit"]');
+        const reportCard = document.querySelector(".results-report");
+
+        if (reportCard) {
+            // Remove one class:
+            reportCard.classList.remove("animate__fadeIn");
+        }
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Analyzing...
+            `;
+        }
+    });
+
+    // Step 1 -> Step 2 Navigation
     document.getElementById("btn-next")?.addEventListener("click", () => {
+        if (!s1) return;
         const inputs = s1.querySelectorAll('input, select');
         let valid = true;
         inputs.forEach(input => {
@@ -221,19 +441,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (valid) {
             s1.classList.add("d-none");
-            s2.classList.remove("d-none");
-            l1.classList.remove("active");
-            l2.classList.add("active");
+            s2?.classList.remove("d-none");
+            l1?.classList.remove("active");
+            l2?.classList.add("active");
         }
     });
 
+    // Step 2 -> Step 1 Navigation
     document.getElementById("btn-back")?.addEventListener("click", () => {
-        s2.classList.add("d-none");
-        s1.classList.remove("d-none");
-        l2.classList.remove("active");
-        l1.classList.add("active");
+        s2?.classList.add("d-none");
+        s1?.classList.remove("d-none");
+        l2?.classList.remove("active");
+        l1?.classList.add("active");
     });
 
+    // Reset Page / New Analysis Button
     document.getElementById("btn-close")?.addEventListener('click', () => {
         window.location.href = window.location.pathname;
     });

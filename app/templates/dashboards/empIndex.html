@@ -14,7 +14,7 @@
         </div>
     </header>
 
-    <!-- Top Summary Stat Cards (Fixed Dark Mode Contrast with 'border border-subtle') -->
+    <!-- Top Summary Stat Cards -->
     <div class="row g-3 mb-3 mb-md-4">
         <div class="col-4 col-sm-6 col-xl-4" onclick="window.location.href='{{ url_for('users.index') }}';" style="cursor: pointer;">
             <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
@@ -54,7 +54,7 @@
     <div class="row g-3 mb-3 mb-md-4">
         <div class="col-12 col-lg-8">
             <div class="card admin-card-accent-primary bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
-                <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">User Monthly Registrations</h6>
+                <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">User Monthly Registrations & Trend</h6>
                 <div class="chart-container">
                     <canvas id="barChart"></canvas>
                 </div>
@@ -73,7 +73,7 @@
 
     <!-- Recent Users & System Activity -->
     <div class="row g-3">
-        <!-- Recent Users View (Card list on Mobile, Table on Tablet/Desktop) -->
+        <!-- Recent Users View -->
         <div class="col-12 col-lg-8">
             <div class="card bg-body-tertiary border border-subtle shadow-sm rounded-4 overflow-hidden h-100">
                 <div class="card-header bg-body py-3 px-3 px-md-4 border-bottom border-subtle d-flex justify-content-between align-items-center">
@@ -200,7 +200,7 @@
 
         let colors = getChartColors();
 
-        // 1. Bar Chart Setup
+        // 1. Combo Chart Setup (Bar + Line Overlay)
         const labels = monthlyUsers.map(item => {
             if (!item.month) return '';
             const [year, month] = item.month.split('-');
@@ -216,22 +216,44 @@
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'New Users',
-                        data: userCounts,
-                        backgroundColor: '#0d6efd',
-                        borderRadius: 4
-                    }]
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Growth Trend',
+                            data: userCounts,
+                            borderColor: '#0dcaf0',
+                            backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.35,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0dcaf0',
+                            fill: false,
+                            order: 1
+                        },
+                        {
+                            type: 'bar',
+                            label: 'New Users',
+                            data: userCounts,
+                            backgroundColor: 'rgba(13, 110, 253, 0.85)',
+                            hoverBackgroundColor: '#0d6efd',
+                            borderRadius: 6,
+                            order: 2
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { 
-                        legend: { labels: { color: colors.textColor, font: { size: 11 } } } 
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            labels: { color: colors.textColor, font: { size: 11, weight: '500' }, usePointStyle: true } 
+                        } 
                     },
                     scales: {
                         x: { ticks: { color: colors.textColor, font: { size: 10 } }, grid: { color: colors.gridColor } },
-                        y: { ticks: { color: colors.textColor, font: { size: 10 } }, grid: { color: colors.gridColor } }
+                        y: { ticks: { color: colors.textColor, font: { size: 10 }, precision: 0 }, grid: { color: colors.gridColor }, beginAtZero: true }
                     }
                 }
             });
