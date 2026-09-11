@@ -16,6 +16,7 @@ instance/financial.db.backup
 credentials.json
 token.json
 .env
+integrate.txt
 
 # IDE files
 .vscode/

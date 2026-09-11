@@ -4,51 +4,59 @@ from flask_login import login_required, current_user
 from app.services.dashboard_services import DashboardServices
 from app.services.income_services import IncomeServices
 from app.services.expense_services import ExpenseServices
+from app.services.audit_log_services import AuditLogService
 from app.security.role_check import role_admin_only
 from app.security.cookie import check_cookie_token
 
 dashboard_bp = Blueprint("dashboards", __name__, url_prefix="/dashboards")
 
 
+from flask import render_template, abort
+from flask_login import current_user, login_required
+from app.services.dashboard_services import DashboardServices
+from app.services.income_services import IncomeServices
+from app.services.expense_services import ExpenseServices
+
 @dashboard_bp.route("/", methods=["GET"])
 @login_required
 def userIndex():
-    # Accessible to admin, user role, or explicit dashboard.client.view permission
-    if not current_user.has_role("admin") and not current_user.has_role("user") and not current_user.has_permission("dashboard.client.view"):
+    # Role / Permission Guard
+    if not (
+        current_user.has_role("admin") 
+        or current_user.has_role("user")
+        or current_user.is_authenticated
+    ):
         abort(403)
-    # Saving Math Formula
-    total_income = IncomeServices.get_income_total(current_user)
-    total_expense = ExpenseServices.get_expense_total(current_user)
-    sum_saving = 0
+
+    # Financial Summaries
+    total_income = IncomeServices.get_income_total(current_user) or 0
+    total_expense = ExpenseServices.get_expense_total(current_user) or 0
 
     if total_income > 0:
         sum_saving = total_income - total_expense
         sum_saving_rate = (sum_saving * 100) / total_income
     else:
-        # Income is 0, but user has expenses (Negative flow)
         sum_saving = -total_expense
-        if total_expense > 0:
-            sum_saving_rate = -100.0  # Represents a 100% loss / deficit relative to 0 income
-        else:
-            sum_saving_rate = 0.0
+        sum_saving_rate = -100.0 if total_expense > 0 else 0.0
+
+    # Chart Data & Active User Plans
+    # weekly_saving = DashboardServices.user_weekly_saving(current_user.id) or {
+    #     "Mon": 0, "Tue": 0, "Wed": 0, "Thu": 0, "Fri": 0, "Sat": 0, "Sun": 0
+    # }
     
-    weekly_saving = DashboardServices.user_weekly_saving(current_user.id)
-
-    # ensure a saving dict is always working and return value back
-    if not weekly_saving:
-        weekly_saving = {"Mon": 0, "Tue": 0, "Wed": 0, "Thu": 0, "Fri": 0, "Sat": 0, "Sun": 0}
-
+    monthly_cashflow = DashboardServices.user_monthly_cashflow(current_user.id)
     user_plans = DashboardServices.user_all_saving_plan(current_user.id)
-    
+
     return render_template(
-        "dashboards/index.html", 
-        sum_saving = sum_saving,
-        sum_saving_rate = sum_saving_rate,
-        total_income = total_income,
-        total_expense = total_expense,
-        weekly_saving = weekly_saving,
-        user_plans = user_plans
-        )
+        "dashboards/index.html",
+        sum_saving=sum_saving,
+        sum_saving_rate=round(sum_saving_rate, 2),
+        total_income=total_income,
+        total_expense=total_expense,
+        # weekly_saving=weekly_saving,
+        monthly_cashflow=monthly_cashflow,
+        user_plans=user_plans
+    )
 
 
 @dashboard_bp.route("/complete_task/<int:plan_id>/<float:amount>", methods=["POST"])
@@ -84,6 +92,9 @@ def empIndex():
     total_active_users = DashboardServices.emp_get_all_active_users()
     monthly_users_registered = DashboardServices.emp_get_all_users_registered()
 
+    # Fetch top 3 recent audit logs
+    recent_logs = AuditLogService.get_top_3_audit_logs()
+
     return render_template(
         "dashboards/empIndex.html",
         total_users = total_users,
@@ -92,5 +103,6 @@ def empIndex():
         total_expenses = total_expenses,
         total_anayses = total_anayses,
         total_active_users=total_active_users,
-        monthly_users_registered = monthly_users_registered
+        monthly_users_registered = monthly_users_registered,
+        audit_logs= recent_logs,
         )

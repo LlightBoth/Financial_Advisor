@@ -17,3 +17,4 @@ from .profile_route import profile_bp
 from .income_route import income_bp
 from .expense_route import expense_bp
 from .bot_route import bot_bp
+from .audit_log_route import audit_log_bp

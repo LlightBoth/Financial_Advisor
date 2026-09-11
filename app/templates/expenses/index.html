@@ -24,10 +24,10 @@
         <div class="col-12 col-md-4">
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase text-muted fw-bold small">Total Outlay</span>
-                    <div class="icon-shape-sm bg-danger-subtle rounded-circle text-danger">
-                        <i class="bi bi-arrow-up-right-circle p-2 fs-5"></i>
-                    </div>
+                    <span class="text-uppercase text-muted fw-bold small">Total Expense</span>
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Live
+                    </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-danger">
                     ${{ "%.2f"|format(expenses|sum(attribute="amount")|float) }}
@@ -41,9 +41,9 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Expense Records</span>
-                    <div class="icon-shape-sm bg-primary-subtle rounded-circle text-primary">
-                        <i class="bi bi-receipt-cutoff p-2 fs-5"></i>
-                    </div>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Logs
+                    </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
                     {{ expenses|length }}
@@ -57,14 +57,14 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Recurring Fixed Costs</span>
-                    <div class="icon-shape-sm bg-warning-subtle rounded-circle text-warning">
-                        <i class="bi bi-arrow-repeat p-2 fs-5"></i>
-                    </div>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Rate
+                    </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
                     {{ expenses|selectattr("recurring_period")|list|length }}
                 </h3>
-                <div class="text-muted small mt-1">Active subscription/recurring items</div>
+                <div class="text-muted small mt-1">Automated recurring flows</div>
             </div>
         </div>
     </div>

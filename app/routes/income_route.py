@@ -1,11 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 
-from app.forms.income_forms import (
-    IncomeForm,
-    EditIncomeForm,
-    IncomeDeleteForm
-)
+from app.forms.income_forms import (IncomeForm, EditIncomeForm, IncomeDeleteForm)
 
 from app.services.income_services import IncomeServices
 from app.security.cookie import check_cookie_token

@@ -1,0 +1,288 @@
+{% extends "layouts/base.html" %}
+{% block title %}Audit Log #{{ audit_log.id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <a href="{{ url_for('audit_logs.index') }}"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Back
+                </a>
+            </div>
+
+            <h2 class="fw-bold mb-1">
+                Audit Log #{{ audit_log.id }}
+            </h2>
+
+            <p class="text-body-secondary mb-0">
+                Detailed information about this audit event.
+            </p>
+        </div>
+
+        <!-- Status -->
+        {% if audit_log.status == "SUCCESS" %}
+            <span class="badge text-bg-success fs-6 px-3 py-2">
+                <i class="bi bi-check-circle me-1"></i>
+                {{ audit_log.status }}
+            </span>
+        {% elif audit_log.status == "FAILED" %}
+            <span class="badge text-bg-danger fs-6 px-3 py-2">
+                <i class="bi bi-x-circle me-1"></i>
+                {{ audit_log.status }}
+            </span>
+        {% else %}
+            <span class="badge text-bg-secondary fs-6 px-3 py-2">
+                {{ audit_log.status }}
+            </span>
+        {% endif %}
+    </div>
+
+
+    <!-- Main Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-shield-check fs-5"></i>
+                <h5 class="mb-0 fw-semibold">Audit Information</h5>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Action -->
+            <div class="row py-3 border-bottom">
+                <div class="col-md-4 col-lg-3">
+                    <span class="text-body-secondary">
+                        Action
+                    </span>
+                </div>
+
+                <div class="col-md-8 col-lg-9">
+                    <span class="badge text-bg-primary">
+                        {{ audit_log.action }}
+                    </span>
+                </div>
+            </div>
+
+
+            <!-- Status -->
+            <div class="row py-3 border-bottom">
+                <div class="col-md-4 col-lg-3">
+                    <span class="text-body-secondary">
+                        Status
+                    </span>
+                </div>
+
+                <div class="col-md-8 col-lg-9">
+                    {% if audit_log.status == "SUCCESS" %}
+                        <span class="text-success fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i>
+                            {{ audit_log.status }}
+                        </span>
+                    {% elif audit_log.status == "FAILED" %}
+                        <span class="text-danger fw-semibold">
+                            <i class="bi bi-x-circle me-1"></i>
+                            {{ audit_log.status }}
+                        </span>
+                    {% else %}
+                        <span class="text-body-secondary fw-semibold">
+                            {{ audit_log.status }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- User -->
+            <div class="row py-3 border-bottom">
+                <div class="col-md-4 col-lg-3">
+                    <span class="text-body-secondary">
+                        User
+                    </span>
+                </div>
+
+                <div class="col-md-8 col-lg-9">
+                    {% if audit_log.user %}
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-primary text-white
+                                        d-flex align-items-center justify-content-center"
+                                 style="width: 36px; height: 36px;">
+                                {{ audit_log.user.username[:1]|upper }}
+                            </div>
+
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ audit_log.user.username }}
+                                </div>
+
+                                <small class="text-body-secondary">
+                                    {{ audit_log.user.email }}
+                                </small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="text-body-secondary">
+                            <i class="bi bi-person-slash me-1"></i>
+                            Anonymous / Unknown User
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- IP Address -->
+            <div class="row py-3 border-bottom">
+                <div class="col-md-4 col-lg-3">
+                    <span class="text-body-secondary">
+                        IP Address
+                    </span>
+                </div>
+
+                <div class="col-md-8 col-lg-9">
+                    {% if audit_log.ip_address %}
+                        <code class="px-2 py-1 rounded bg-body-tertiary">
+                            {{ audit_log.ip_address }}
+                        </code>
+                    {% else %}
+                        <span class="text-body-secondary">
+                            Not available
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- User Agent -->
+            <div class="row py-3 border-bottom">
+                <div class="col-md-4 col-lg-3">
+                    <span class="text-body-secondary">
+                        User Agent
+                    </span>
+                </div>
+
+                <div class="col-md-8 col-lg-9">
+                    {% if audit_log.user_agent %}
+                        <div class="p-3 rounded bg-body-tertiary">
+                            <code class="text-break">
+                                {{ audit_log.user_agent }}
+                            </code>
+                        </div>
+                    {% else %}
+                        <span class="text-body-secondary">
+                            Not available
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- Created At -->
+            <div class="row py-3">
+                <div class="col-md-4 col-lg-3">
+                    <span class="text-body-secondary">
+                        Created At
+                    </span>
+                </div>
+
+                <div class="col-md-8 col-lg-9">
+                    <div class="fw-semibold">
+                        {{ audit_log.created_at.strftime("%Y-%m-%d %H:%M:%S") }}
+                    </div>
+
+                    <small class="text-body-secondary">
+                        UTC
+                    </small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Technical Information -->
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-header bg-transparent py-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-terminal fs-5"></i>
+                <h5 class="mb-0 fw-semibold">
+                    Technical Information
+                </h5>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- Log ID -->
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-body-tertiary">
+                        <small class="text-body-secondary d-block mb-1">
+                            Log ID
+                        </small>
+
+                        <span class="fw-semibold">
+                            #{{ audit_log.id }}
+                        </span>
+                    </div>
+                </div>
+
+
+                <!-- User ID -->
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-body-tertiary">
+                        <small class="text-body-secondary d-block mb-1">
+                            User ID
+                        </small>
+
+                        <span class="fw-semibold">
+                            {% if audit_log.user_id %}
+                                {{ audit_log.user_id }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+
+                <!-- Action -->
+                <div class="col-md-4">
+                    <div class="p-3 rounded bg-body-tertiary">
+                        <small class="text-body-secondary d-block mb-1">
+                            Action
+                        </small>
+
+                        <span class="fw-semibold">
+                            {{ audit_log.action }}
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Theme Support -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const theme = localStorage.getItem("theme");
+
+    if (theme === "dark") {
+        document.documentElement.setAttribute("data-bs-theme", "dark");
+    } else {
+        document.documentElement.setAttribute("data-bs-theme", "light");
+    }
+});
+</script>
+
+{% endblock %}

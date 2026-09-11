@@ -30,75 +30,69 @@
 
     <!-- Metric Cards Grid -->
     <div class="row g-4 mb-4">
-        <!-- Total Balance Saving -->
+        <!-- Total Balance Savings -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box-modern blue">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
+            <div class="card stat-card shadow-sm p-4 h-100 border-0">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Account Reserve</span>
                     <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">
                         <i class="bi bi-arrow-up-right me-1"></i> Live
                     </span>
                 </div>
-                <div class="metric-label"><div class="hidePhone">Total </div>Balance Saving</div>
-                <div class="metric-value {% if sum_saving >= 0 %} text-success {% else %} text-danger {% endif %}">
+                <div class="metric-value fs-2 fw-bold mb-2 {% if sum_saving >= 0 %} text-success {% else %} text-danger {% endif %}">
                     ${{ "{:,.2f}".format(sum_saving or 0) }}
                 </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Total Savings Balance</div>
             </div>
         </div>
 
         <!-- Income Growth Rate -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box-modern green">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
+            <div class="card stat-card shadow-sm p-4 h-100 border-0">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Performance</span>
                     <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
                         <i class="bi bi-activity me-1"></i> Rate
                     </span>
                 </div>
-                <div class="metric-label">Income Growth</div>
-                <div class="metric-value text-body-emphasis">
-                    {{ "{:,.2f}".format(sum_saving_rate or 0) }}%
+                <div class="metric-value fs-2 fw-bold text-body-emphasis mb-2">
+                    {% if sum_saving_rate > 0 %}+{% endif %}{{ "{:,.2f}".format(sum_saving_rate or 0) }}%
                 </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Income Growth Rate</div>
             </div>
         </div>
 
         <!-- Risk Status -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box-modern amber">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
+            <div class="card stat-card shadow-sm p-4 h-100 border-0">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Risk Metrics</span>
                     <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1.5 small fw-bold">
                         Score
                     </span>
                 </div>
-                <div class="metric-label">Risk Profile Status</div>
                 {% if sum_saving_rate >= 75 %}
-                    <div class="metric-value text-success">Excellent</div>
+                <div class="metric-value fs-2 fw-bold text-success mb-2">Low Risk</div>
                 {% elif sum_saving_rate >= 25 %}
-                    <div class="metric-value text-warning">Moderate</div>
+                <div class="metric-value fs-2 fw-bold text-warning mb-2">Moderate Risk</div>
                 {% elif sum_saving_rate == 0 %}
-                    <div class="metric-value text-muted">Neutral</div>
+                <div class="metric-value fs-2 fw-bold text-muted mb-2">Neutral</div>
                 {% else %}
-                    <div class="metric-value text-danger">Risky</div>
+                <div class="metric-value fs-2 fw-bold text-danger mb-2">High Risk</div>
                 {% endif %}
+                <div class="metric-label text-body-secondary fw-medium mb-1">Risk Profile Status</div>
             </div>
         </div>
     </div>
 
     <!-- Charts Row -->
     <div class="row g-4 mb-4">
-        <!-- Weekly Performance -->
+        <!-- Monthly Performance -->
         <div class="col-12 col-lg-8">
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">Weekly Cashflow Trend</h6>
-                    <span class="badge bg-primary-subtle text-primary small">Weekly Analysis</span>
+                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">Monthly Cashflow Trend</h6>
+                    <span class="badge bg-primary-subtle text-primary small">Monthly Analysis</span>
                 </div>
                 <div id="chart_main" class="w-100" style="height: 280px;"></div>
             </div>
@@ -225,68 +219,106 @@
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);
 
-    const weeklySaving = {{ weekly_saving | tojson | safe }};
+    // Dynamic Flask/Jinja2 variables
+    const monthlyData = {{ monthly_cashflow | tojson | safe }};
     const totalIncome = Number({{ total_income | default(0) | tojson }}) || 0;
     const totalExpense = Number({{ total_expense | default(0) | tojson }}) || 0;
 
     function drawCharts() {
-        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const currentTheme = localStorage.getItem('theme') || document.documentElement.getAttribute('data-bs-theme') || 'light';
+        const isDark = currentTheme === 'dark';
+        
         const labelColor = isDark ? '#94a3b8' : '#64748b';
         const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
         
-        var options = {
+        const sharedOptions = {
             backgroundColor: 'transparent',
-            chartArea: {width: '88%', height: '78%'},
-            legend: 'none',
+            chartArea: { width: '85%', height: '75%' },
+            legend: { 
+                position: 'top', 
+                alignment: 'end',
+                textStyle: { color: labelColor, fontSize: 12, fontName: 'Inter' }
+            },
             hAxis: { textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } },
             vAxis: { 
                 gridlines: { color: gridColor }, 
-                textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } 
+                textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' },
+                format: '$#,##0'
             }
         };
 
-        // 1. Line / Area chart
-        var dataMain = google.visualization.arrayToDataTable([
-            ['Day', 'Val'],
-            ['Mon', weeklySaving.Mon],
-            ['Tue', weeklySaving.Tue],
-            ['Wed', weeklySaving.Wed],
-            ['Thu', weeklySaving.Thu],
-            ['Fri', weeklySaving.Fri],
-            ['Sat', weeklySaving.Sat],
-            ['Sun', weeklySaving.Sun],
-        ]);
+        // 1. ComboChart (Main Dashboard Chart)
+        const mainChartEl = document.getElementById('chart_main');
+        if (monthlyData && monthlyData.length > 0 && mainChartEl) {
+            var dataMain = new google.visualization.DataTable();
+            dataMain.addColumn('string', 'Month');
+            dataMain.addColumn('number', 'Income');
+            dataMain.addColumn('number', 'Expenses');
+            dataMain.addColumn('number', 'Net Cash Flow');
 
-        new google.visualization.AreaChart(document.getElementById('chart_main')).draw(dataMain, { 
-            ...options, 
-            colors: ['#3b82f6'],
-            areaOpacity: 0.15
-        });
+            const formattedData = monthlyData.map(row => [
+                String(row[0]),
+                Number(row[1]) || 0,
+                Number(row[2]) || 0,
+                Number(row[3]) || 0
+            ]);
 
-        // 2. Pie chart
-        if (totalIncome === 0 && totalExpense === 0) {
-            document.getElementById('chart_side').innerHTML = `
-                <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary">
-                    <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
-                    <div class="fw-semibold small">No Transaction Data</div>
-                    <small class="text-muted">Add income or expense to render ratio.</small>
+            dataMain.addRows(formattedData);
+
+            var comboOptions = {
+                ...sharedOptions,
+                seriesType: 'bars',
+                series: {
+                    0: { color: '#10b981' }, // Income (Green Bar)
+                    1: { color: '#ef4444' }, // Expenses (Red Bar)
+                    2: { 
+                        type: 'line', 
+                        color: '#3b82f6', 
+                        lineWidth: 3, 
+                        pointSize: 6,
+                        curveType: 'function' // Creates smooth, wavy curves between data points
+                    }
+                }
+            };
+
+            new google.visualization.ComboChart(mainChartEl).draw(dataMain, comboOptions);
+        } else if (mainChartEl) {
+            mainChartEl.innerHTML = `
+                <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
+                    <i class="bi bi-bar-chart-line fs-1 mb-2 opacity-50 text-primary"></i>
+                    <div class="fw-semibold small">No Monthly Data Available</div>
                 </div>
             `;
-            return;
         }
 
-        var dataSide = google.visualization.arrayToDataTable([
-            ['Type', 'Amount'], 
-            ['Expense', Number(totalExpense)], 
-            ['Income', Number(totalIncome)]
-        ]);
+        // 2. Donut Pie Chart (Side Dashboard Chart)
+        const sideChartEl = document.getElementById('chart_side');
+        if (sideChartEl) {
+            if (totalIncome === 0 && totalExpense === 0) {
+                sideChartEl.innerHTML = `
+                    <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
+                        <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
+                        <div class="fw-semibold small">No Transaction Data</div>
+                        <small class="text-muted">Add income or expense to render ratio.</small>
+                    </div>
+                `;
+                return;
+            }
 
-        new google.visualization.PieChart(document.getElementById('chart_side')).draw(dataSide, { 
-            ...options, 
-            pieHole: 0.65, 
-            colors: ['#ef4444', '#10b981'] 
-        });
+            var dataSide = google.visualization.arrayToDataTable([
+                ['Type', 'Amount'], 
+                ['Expense', totalExpense], 
+                ['Income', totalIncome]
+            ]);
+
+            new google.visualization.PieChart(sideChartEl).draw(dataSide, { 
+                ...sharedOptions, 
+                pieHole: 0.65, 
+                colors: ['#ef4444', '#10b981'] 
+            });
+        }
     }
+
     window.addEventListener('resize', drawCharts);
 </script>
 {% endblock %}

@@ -24,9 +24,9 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Total Earned</span>
-                    <div class="icon-shape-sm bg-success-subtle rounded-circle text-success">
-                        <i class="bi bi-cash-stack ps-2 fs-5"></i>
-                    </div>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Live
+                    </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-success">
                     ${{ "%.2f"|format(incomes|sum(attribute="amount")|float) }}
@@ -40,9 +40,9 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Transaction Logs</span>
-                    <div class="icon-shape-sm bg-primary-subtle rounded-circle text-primary">
-                        <i class="bi bi-receipt ps-2 fs-5"></i>
-                    </div>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Logs
+                    </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
                     {{ incomes|length }}
@@ -56,9 +56,9 @@
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="text-uppercase text-muted fw-bold small">Recurring Streams</span>
-                    <div class="icon-shape-sm bg-warning-subtle rounded-circle text-warning">
-                        <i class="bi bi-arrow-repeat ps-2 fs-5"></i>
-                    </div>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1.5 small fw-bold">
+                        <i class="bi bi-activity me-1"></i> Rate
+                    </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
                     {{ incomes|selectattr("recurring_period")|list|length }}

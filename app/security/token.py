@@ -1,8 +1,7 @@
 import secrets
-from flask import abort, session
+from flask import session
 from werkzeug.security import generate_password_hash, check_password_hash
 from extension import db
-
 from app.models.user import User
 
 class Token:
@@ -12,33 +11,45 @@ class Token:
 
     @staticmethod
     def generate_refresh_token(user: User):
+        # Ensure user exists and is a real model instance
+        if not user or not hasattr(user, "id"):
+            return None
+
         new_refresh_token = Token.get_new_token()
         user.refresh_token = generate_password_hash(new_refresh_token)
         db.session.commit()
         return new_refresh_token
 
     @staticmethod
-    def check_token(user: User, rf_token: str) -> bool:
-        if not user or not user.refresh_token or not rf_token:
-            return abort(403)
+    def check_token(user, rf_token: str) -> bool:
+        # 1. Guard against None, AnonymousUserMixin, or unauthenticated state
+        if not user or not getattr(user, "is_authenticated", False):
+            return False
 
-        # 1. Check if token is decrypt correctly
-        decrypt_user_token = check_password_hash(user.refresh_token, rf_token)
-        if not decrypt_user_token:
-            return abort(403)
+        # 2. Check if user model actually has a refresh token set
+        hashed_rf_token = getattr(user, "refresh_token", None)
+        if not hashed_rf_token or not rf_token:
+            return False
 
-        # 2. Check if session token is equal to token user provided
-        if session["refresh_token"] != rf_token:
-            return abort(403)
+        # 3. Verify hashed token against provided token
+        if not check_password_hash(hashed_rf_token, rf_token):
+            return False
 
+        # 4. Check if session token matches (safely get session key without KeyError)
+        session_rf_token = session.get("refresh_token")
+        if not session_rf_token or session_rf_token != rf_token:
+            return False
+
+        return True
 
     @staticmethod
-    def rotate_refresh_token(user: User, old_token: str):
+    def rotate_refresh_token(user, old_token: str):
         if not Token.check_token(user, old_token):
             return None
         return Token.generate_refresh_token(user)
 
     @staticmethod
-    def delete_token(user: User):
-        user.refresh_token = None
-        db.session.commit()
+    def delete_token(user):
+        if user and hasattr(user, "refresh_token"):
+            user.refresh_token = None
+            db.session.commit()

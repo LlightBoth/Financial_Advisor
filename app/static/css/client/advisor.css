@@ -281,14 +281,14 @@ input:checked + .pill-design {
 
 /* --- Primary AI Buttons --- */
 .btn-ai-primary {
-    background: var(--ai-gradient);
-    color: #ffffff;
+    background-color: var(--bs-secondary-color);
+    color: var(--bs-body-bg);
     border: none;
     padding: 0.9rem 1.75rem;
     border-radius: 12px;
     font-weight: 700;
     font-size: 0.95rem;
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 6px 20px var(--bs-tertiary-bg-rgb, rgba(0, 0, 0, 0.2));
     transition: all 0.25s ease;
     display: inline-flex;
     align-items: center;
@@ -297,9 +297,10 @@ input:checked + .pill-design {
 }
 
 .btn-ai-primary:hover {
+    color: var(--bs-body-bg);
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.5);
-    color: #ffffff;
+    opacity: 0.9;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
 }
 
 .btn-refresh-expert {
