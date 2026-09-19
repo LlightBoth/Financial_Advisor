@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}AI Expert System — Financial Advisory Engine{% endblock %}
+{% block title %}{{ _("advisor.page_title") }}{% endblock %}
 
 {% block content %}
 <link href="{{ url_for('static', filename='css/client/advisor.css') }}" rel="stylesheet">
@@ -10,7 +10,7 @@
     <div class="text-center">
         <div class="expert-system-badge">
             <span class="telemetry-dot"></span>
-            <span>INFERENCE ENGINE v3.2 // RULE MATRIX ACTIVE</span>
+            <span>{{ _("advisor.telemetry_status") }}</span>
         </div>
     </div>
 
@@ -19,12 +19,12 @@
     <div class="stepper-wrapper">
         <div class="step-item active" id="step-1-indicator">
             <div class="step-counter">01</div>
-            <div class="step-name">Financial Baseline</div>
+            <div class="step-name">{{ _("advisor.step_1_title") }}</div>
         </div>
         <div class="step-connector"></div>
         <div class="step-item" id="step-2-indicator">
             <div class="step-counter">02</div>
-            <div class="step-name">Behavioral Profile</div>
+            <div class="step-name">{{ _("advisor.step_2_title") }}</div>
         </div>
     </div>
     {% endif %}
@@ -34,12 +34,12 @@
     <div class="results-report animate__animated animate__fadeIn">
         <div class="report-header-banner">
             <div>
-                <h4 class="fw-bold mb-1">Expert System Analysis</h4>
-                <p class="mb-0 small opacity-75">Inference Cycle Concluded // Rule Evaluation Complete</p>
+                <h4 class="fw-bold mb-1">{{ _("advisor.analysis_report_title") }}</h4>
+                <p class="mb-0 small opacity-75">{{ _("advisor.analysis_report_subtitle") }}</p>
             </div>
             <div class="status-badge-white">
                 <i class="bi bi-cpu-fill text-info"></i>
-                <span>FACTS VERIFIED</span>
+                <span>{{ _("advisor.facts_verified") }}</span>
             </div>
         </div>
 
@@ -48,21 +48,21 @@
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
                     <div class="metric-mini-card">
-                        <span class="label">Savings Potential</span>
+                        <span class="label">{{ _("advisor.savings_potential") }}</span>
                         <span class="value text-success d-block">{{ advice.remain_percentage|round(1) }}%</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="metric-mini-card">
-                        <span class="label">Expense Load</span>
+                        <span class="label">{{ _("advisor.expense_load") }}</span>
                         <span class="value text-warning d-block">{{ advice.expense_percentage|round(1) }}%</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="metric-mini-card">
-                        <span class="label">Projected Horizon</span>
+                        <span class="label">{{ _("advisor.projected_horizon") }}</span>
                         <span class="value text-primary d-block">
-                            {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal text-muted">Months</small>
+                            {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal text-muted">{{ _("advisor.months") }}</small>
                         </span>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
             <div class="report-content">
                 <div class="mb-4 text-center">
                     <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 font-monospace small">
-                        PRIMARY HEURISTIC CONCLUSION
+                        {{ _("advisor.primary_conclusion_badge") }}
                     </span>
                     <h4 class="fw-bold text-body-emphasis">{{ advice.get_advice.conclusion }}</h4>
                 </div>
@@ -80,7 +80,7 @@
                 <div class="advice-box mb-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <i class="bi bi-diagram-3-fill text-primary"></i>
-                        <span class="fw-bold small text-uppercase letter-spacing text-muted">Prescribed Action Protocol</span>
+                        <span class="fw-bold small text-uppercase letter-spacing text-muted">{{ _("advisor.prescribed_protocol") }}</span>
                     </div>
                     <p class="advice-text mb-0">{{ advice.get_advice.advice }}</p>
                 </div>
@@ -90,10 +90,10 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-shield-check text-primary fs-5"></i>
-                            <span class="small fw-bold text-uppercase text-muted">Certainty Factor (CF)</span>
+                            <span class="small fw-bold text-uppercase text-muted">{{ _("advisor.certainty_factor") }}</span>
                         </div>
                         <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold font-monospace">
-                            {{ (advice.get_advice.certainty * 100)|round|int }}% MATCH
+                            {{ _("advisor.cf_match", percent=(advice.get_advice.certainty * 100)|round|int) }}
                         </span>
                     </div>
                     <div class="progress" style="height: 8px; border-radius: 20px; background: rgba(0,0,0,0.08);">
@@ -101,14 +101,14 @@
                              style="width: {{ advice.get_advice.certainty * 100 }}%"></div>
                     </div>
                     <small class="text-muted d-block text-center mt-2 italic">
-                        *Derived via forward-chaining rules against your financial facts and behavioral indicators.
+                        {{ _("advisor.cf_explanation") }}
                     </small>
                 </div>
             </div>
 
             <div class="text-center mt-5">
                 <button id="btn-close" class="btn-refresh-expert">
-                    <i class="bi bi-arrow-repeat me-2"></i> Recalibrate Inference Scan
+                    <i class="bi bi-arrow-repeat me-2"></i> {{ _("advisor.recalibrate_scan") }}
                 </button>
             </div>
         </div>
@@ -122,34 +122,34 @@
         <!-- Step 1: Financial Standing -->
         <div id="advisor-step-1" class="form-step">
             <div class="mb-4">
-                <h4 class="fw-bold mb-1">Financial Standing</h4>
-                <p class="text-muted small">Input your primary cashflow baseline values to start the inference cycle.</p>
+                <h4 class="fw-bold mb-1">{{ _("advisor.financial_standing_title") }}</h4>
+                <p class="text-muted small">{{ _("advisor.financial_standing_subtitle") }}</p>
             </div>
 
             <div class="mb-4">
-                <label class="custom-label">Target Milestone Goal ($)</label>
-                {{ form.goal_cost(class="custom-input", type="number", placeholder="e.g. 10000", required=true) }}
+                <label class="custom-label">{{ _("advisor.goal_cost_label") }}</label>
+                {{ form.goal_cost(class="custom-input", type="number", placeholder=_("advisor.goal_placeholder"), required=true) }}
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-6">
-                    <label class="custom-label">Monthly Income ($)</label>
-                    {{ form.income(class="custom-input", type="number", placeholder="e.g. 4000", required=true) }}
+                    <label class="custom-label">{{ _("advisor.income_label") }}</label>
+                    {{ form.income(class="custom-input", type="number", placeholder=_("advisor.income_placeholder"), required=true) }}
                 </div>
                 <div class="col-6">
-                    <label class="custom-label">Monthly Expense ($)</label>
-                    {{ form.expense(class="custom-input", type="number", placeholder="e.g. 2200", required=true) }}
+                    <label class="custom-label">{{ _("advisor.expense_label") }}</label>
+                    {{ form.expense(class="custom-input", type="number", placeholder=_("advisor.expense_placeholder"), required=true) }}
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="custom-label">Marital Status</label>
+                <label class="custom-label">{{ _("advisor.marital_status_label") }}</label>
                 {{ form.martial_status(class="custom-select") }}
             </div>
 
             <div class="pt-3">
                 <button id="btn-next" type="button" class="btn-ai-primary w-100 py-3">
-                    <span>Continue to Behavioral Context</span>
+                    <span>{{ _("advisor.continue_btn") }}</span>
                     <i class="bi bi-arrow-right"></i>
                 </button>
             </div>
@@ -158,8 +158,8 @@
         <!-- Step 2: Behavioral Profile -->
         <div id="advisor-step-2" class="form-step d-none">
             <div class="mb-4">
-                <h4 class="fw-bold mb-1">Behavioral Context & Heuristics</h4>
-                <p class="text-muted small">Select qualitative variables to optimize the rule-matching certainty.</p>
+                <h4 class="fw-bold mb-1">{{ _("advisor.behavioral_title") }}</h4>
+                <p class="text-muted small">{{ _("advisor.behavioral_subtitle") }}</p>
             </div>
 
             {% for field in [form.employment_status, form.debt_status, form.spending_habit] %}
@@ -178,11 +178,11 @@
             
             <div class="d-flex gap-3 pt-3">
                 <button id="btn-back" type="button" class="btn btn-outline-secondary flex-fill rounded-3 py-3 fw-semibold">
-                    <i class="bi bi-arrow-left me-1"></i> Back
+                    <i class="bi bi-arrow-left me-1"></i> {{ _("common.back") }}
                 </button>
                 <button type="submit" class="btn-ai-primary flex-fill py-3">
                     <i class="bi bi-lightning-charge-fill me-1"></i>
-                    <span>Execute Inference Analysis</span>
+                    <span>{{ _("advisor.execute_analysis_btn") }}</span>
                 </button>
             </div>
         </div>
@@ -191,20 +191,20 @@
     <!-- Trust Badges -->
     <div class="row g-4 mt-4 pt-2">
         <div class="col-md-6">
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
-                <i class="bi bi-shield-check text-primary fs-3"></i>
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
+                <i class="bi bi-shield-check text-primary fs-3 flex-shrink-0"></i>
                 <div>
-                    <div class="fw-bold small">Deterministic Knowledge Base</div>
-                    <div class="text-muted x-small">Scored against codified economic models.</div>
+                    <div class="fw-bold small">{{ _("advisor.trust_deterministic_title") }}</div>
+                    <div class="text-muted x-small">{{ _("advisor.trust_deterministic_desc") }}</div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
-                <i class="bi bi-sliders text-info fs-3"></i>
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
+                <i class="bi bi-sliders text-info fs-3 flex-shrink-0"></i>
                 <div>
-                    <div class="fw-bold small">Dynamic Factor Weighting</div>
-                    <div class="text-muted x-small">Recalibrates as income and debt ratios evolve.</div>
+                    <div class="fw-bold small">{{ _("advisor.trust_dynamic_title") }}</div>
+                    <div class="text-muted x-small">{{ _("advisor.trust_dynamic_desc") }}</div>
                 </div>
             </div>
         </div>

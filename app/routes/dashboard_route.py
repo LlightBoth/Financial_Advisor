@@ -6,6 +6,7 @@ from app.services.income_services import IncomeServices
 from app.services.expense_services import ExpenseServices
 from app.security.role_check import role_admin_only
 from app.security.cookie import check_cookie_token
+from app.utils.i18n import _
 
 dashboard_bp = Blueprint("dashboards", __name__, url_prefix="/dashboards")
 
@@ -51,7 +52,7 @@ def userIndex():
 def user_complete_task(plan_id, amount):
     try:
         DashboardServices.complete_daily_task(current_user.id, plan_id, amount)
-        flash(f"Task completed!", "success")
+        flash(_("dashboard.task_completed"), "success")
     except ValueError as e:
         flash(str(e), "warning")
     

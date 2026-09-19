@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}Analysis Report | Intelli App{% endblock %}
+{% block title %}{{ _("history.detail_page_title") }}{% endblock %}
 
 {% block content %}
 <div class="advisor-container py-5">
@@ -7,8 +7,8 @@
         
         <div class="report-header-banner p-4 bg-indigo rounded-top-4 d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="fw-bold mb-0 text-light">Analysis Record</h4>
-                <p class="mb-0 opacity-75 small text-light">Reference ID: #{{ history.id }}</p>
+                <h4 class="fw-bold mb-0 text-light">{{ _("history.detail_title") }}</h4>
+                <p class="mb-0 opacity-75 small text-light">{{ _("history.reference_id", id=history.id) }}</p>
             </div>
             <div class="status-badge-white text-light">
                 <i class="fas fa-calendar-alt me-2"></i> {{ history.created_at.strftime("%d %b %Y") }}
@@ -19,7 +19,7 @@
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
                     <div class="metric-mini-card py-4 shadow-sm border border-light">
-                        <span class="label text-muted fw-bold small text-uppercase">Savings Potential</span>
+                        <span class="label text-muted fw-bold small text-uppercase">{{ _("advisor.savings_potential") }}</span>
                         <span class="value text-success d-block h2 fw-bold mt-2">
                             {{ "%.1f"|format(history.remain_percentage) }}%
                         </span>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="metric-mini-card py-4 shadow-sm border border-light">
-                        <span class="label text-muted fw-bold small text-uppercase">Expense Load</span>
+                        <span class="label text-muted fw-bold small text-uppercase">{{ _("advisor.expense_load") }}</span>
                         <span class="value text-orange d-block h2 fw-bold mt-2">
                             {{ "%.1f"|format(history.expense_percentage) }}%
                         </span>
@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="metric-mini-card py-4 shadow-sm border border-light">
-                        <span class="label text-indigo fw-bold small text-uppercase">Monthly Income</span>
+                        <span class="label text-indigo fw-bold small text-uppercase">{{ _("advisor.monthly_income") }}</span>
                         <span class="value d-block h2 fw-bold mt-2 text-indigo">
                             <small class="fs-6 fw-normal">$</small>{{ "{:,}".format(history.income|int) }}
                         </span>
@@ -45,19 +45,27 @@
 
             <div class="row g-3 mb-5 px-2">
                 <div class="col-md-4">
-                    <p class="text-label mb-1">Status</p>
-                    <span class="fw-bold">{{ history.martial_status }}</span>
-                </div>
-                <div class="col-md-4">
-                    <p class="text-label mb-1">Employment</p>
-                    <span class="badge {{ 'bg-success' if history.is_employed else 'bg-danger' }} bg-opacity-10 {{ 'text-success' if history.is_employed else 'text-danger' }}">
-                        {{ 'Active' if history.is_employed else 'Unemployed' }}
+                    <p class="text-label mb-1">{{ _("advisor.status") }}</p>
+                    <span class="fw-bold">
+                        {% if history.martial_status == 'single' %}
+                            {{ _("advisor.single") }}
+                        {% elif history.martial_status == 'married' %}
+                            {{ _("advisor.married") }}
+                        {% else %}
+                            {{ history.martial_status }}
+                        {% endif %}
                     </span>
                 </div>
                 <div class="col-md-4">
-                    <p class="text-label mb-1">Debt</p>
+                    <p class="text-label mb-1">{{ _("history.employment") }}</p>
+                    <span class="badge {{ 'bg-success' if history.is_employed else 'bg-danger' }} bg-opacity-10 {{ 'text-success' if history.is_employed else 'text-danger' }}">
+                        {{ _('history.employed_active') if history.is_employed else _('history.unemployed') }}
+                    </span>
+                </div>
+                <div class="col-md-4">
+                    <p class="text-label mb-1">{{ _("history.debt") }}</p>
                     <span class="badge {{ 'bg-danger' if history.is_debt else 'bg-success' }} bg-opacity-10 {{ 'text-danger' if history.is_debt else 'text-success' }}">
-                        {{ 'Yes' if history.is_debt else 'No Debt' }}
+                        {{ _('history.debt_yes') if history.is_debt else _('history.no_debt') }}
                     </span>
                 </div>
             </div>
@@ -66,13 +74,13 @@
 
             <div class="report-content px-lg-4">
                 <div class="mb-5">
-                    <h6 class="text-center text-uppercase fw-bold tracking-widest text-indigo mb-3">Expert Conclusion</h6>
+                    <h6 class="text-center text-uppercase fw-bold tracking-widest text-indigo mb-3">{{ _("history.expert_conclusion") }}</h6>
                     <h6 class="fw-bold tracking-widest text-muted mb-4">{{ history.get_conclusion }}</h6>
                 </div>
 
                 <div class="advice-box p-4 border border-light shadow-sm rounded-4 mb-5 position-relative">
                     <div class="position-absolute top-0 start-0 h-100 bg-indigo rounded-start" style="width: 6px;"></div>
-                    <h6 class="text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">Strategic Roadmap</h6>
+                    <h6 class="text-uppercase fw-bold tracking-widest text-muted mb-3 ps-2">{{ _("history.strategic_roadmap") }}</h6>
                     <p class="advice-text mb-0 ps-2 text-secondary lh-lg">
                         {{ history.get_advice }}
                     </p>
@@ -81,7 +89,7 @@
 
             <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
                 <a href="{{ url_for('history.index') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                    <i class="fas fa-arrow-left me-2"></i> Back
+                    <i class="fas fa-arrow-left me-2"></i> {{ _("common.back") }}
                 </a>
                 <div class="d-flex gap-2">
                     <button onclick="window.print()" class="btn btn-light border rounded-pill px-3">
@@ -89,7 +97,7 @@
                     </button>
                     <a href="{{ url_for('history.delete_confirm', history_id=history.id) }}" 
                        class="btn btn-danger rounded-pill px-4">
-                        Delete Record
+                        {{ _("history.delete_record") }}
                     </a>
                 </div>
             </div>

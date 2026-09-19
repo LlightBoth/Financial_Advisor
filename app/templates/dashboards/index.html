@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}Dashboard — Financial Advisor{% endblock %}
+{% block title %}{{ _('dashboard.title') }} — {{ _('app.name') }}{% endblock %}
 
 {% block content %}
 <link href="{{ url_for('static', filename='css/client/dashboard.css') }}" rel="stylesheet">
@@ -9,8 +9,8 @@
     <!-- Header Banner -->
     <div class="dash-header-banner">
         <div>
-            <h3 class="fw-bold mb-1">Financial Intelligence</h3>
-            <span class="text-muted small">Real-time performance metrics & savings tracking</span>
+            <h3 class="fw-bold mb-1">{{ _('dashboard.financial_intelligence') }}</h3>
+            <span class="text-muted small">{{ _('dashboard.header_subtitle') }}</span>
         </div>
         <div class="d-flex gap-2">
             <form action="{{ url_for('advisors.analyseIndex') }}" method="POST" class="d-inline">
@@ -23,7 +23,7 @@
                 <input type="hidden" name="goal_cost" value="{{ (total_income | default(0)) }}">
 
                 <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
-                    <i class="bi bi-cpu-fill me-1"></i> AI Advisory Scan
+                    <i class="bi bi-cpu-fill me-1"></i> {{ _('dashboard.ai_advisory_scan') }}
                 </button>
             </form>
         </div>
@@ -39,10 +39,10 @@
                         <i class="bi bi-wallet2"></i>
                     </div>
                     <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">
-                        <i class="bi bi-arrow-up-right me-1"></i> Live
+                        <i class="bi bi-arrow-up-right me-1"></i> {{ _('dashboard.live') }}
                     </span>
                 </div>
-                <div class="metric-label">Total Balance Saving</div>
+                <div class="metric-label">{{ _('dashboard.total_balance_saving') }}</div>
                 <div class="metric-value {% if sum_saving >= 0 %} text-success {% else %} text-danger {% endif %}">
                     ${{ "{:,.2f}".format(sum_saving or 0) }}
                 </div>
@@ -57,10 +57,10 @@
                         <i class="bi bi-graph-up-arrow"></i>
                     </div>
                     <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
-                        <i class="bi bi-activity me-1"></i> Rate
+                        <i class="bi bi-activity me-1"></i> {{ _('dashboard.rate') }}
                     </span>
                 </div>
-                <div class="metric-label">Income Growth</div>
+                <div class="metric-label">{{ _('dashboard.income_growth') }}</div>
                 <div class="metric-value text-body-emphasis">
                     {{ "{:,.2f}".format(sum_saving_rate or 0) }}%
                 </div>
@@ -75,18 +75,18 @@
                         <i class="bi bi-shield-check"></i>
                     </div>
                     <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1.5 small fw-bold">
-                        Score
+                        {{ _('dashboard.score') }}
                     </span>
                 </div>
-                <div class="metric-label">Risk Profile Status</div>
+                <div class="metric-label">{{ _('dashboard.risk_profile_status') }}</div>
                 {% if sum_saving_rate >= 75 %}
-                    <div class="metric-value text-success">Excellent</div>
+                    <div class="metric-value text-success">{{ _('dashboard.risk_excellent') }}</div>
                 {% elif sum_saving_rate >= 25 %}
-                    <div class="metric-value text-warning">Moderate</div>
+                    <div class="metric-value text-warning">{{ _('dashboard.risk_moderate') }}</div>
                 {% elif sum_saving_rate == 0 %}
-                    <div class="metric-value text-muted">Neutral</div>
+                    <div class="metric-value text-muted">{{ _('dashboard.risk_neutral') }}</div>
                 {% else %}
-                    <div class="metric-value text-danger">Risky</div>
+                    <div class="metric-value text-danger">{{ _('dashboard.risk_risky') }}</div>
                 {% endif %}
             </div>
         </div>
@@ -98,8 +98,8 @@
         <div class="col-12 col-lg-8">
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">Weekly Cashflow Trend</h6>
-                    <span class="badge bg-primary-subtle text-primary small">7-Day Analysis</span>
+                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">{{ _('dashboard.weekly_cashflow_trend') }}</h6>
+                    <span class="badge bg-primary-subtle text-primary small">{{ _('dashboard.analysis_7day') }}</span>
                 </div>
                 <div id="chart_main" class="w-100" style="height: 280px;"></div>
             </div>
@@ -109,8 +109,8 @@
         <div class="col-12 col-lg-4">
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">Income vs Expense</h6>
-                    <span class="badge bg-secondary-subtle text-secondary small">Ratio</span>
+                    <h6 class="fw-bold mb-0 text-uppercase text-muted small">{{ _('dashboard.income_vs_expense') }}</h6>
+                    <span class="badge bg-secondary-subtle text-secondary small">{{ _('dashboard.ratio') }}</span>
                 </div>
                 <div id="chart_side" class="w-100" style="height: 280px;"></div>
             </div>
@@ -128,12 +128,12 @@
                             <i class="bi bi-piggy-bank-fill"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0">Savings Milestones</h6>
-                            <small class="text-muted">Target Strategy Pacing</small>
+                            <h6 class="fw-bold mb-0">{{ _('dashboard.savings_milestones') }}</h6>
+                            <small class="text-muted">{{ _('dashboard.target_strategy_pacing') }}</small>
                         </div>
                     </div>
                     <a href="{{ url_for('plans.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                        View All
+                        {{ _('dashboard.view_all') }}
                     </a>
                 </div>
                 
@@ -151,7 +151,7 @@
                     {% else %}
                     <div class="text-center py-4 text-muted small">
                         <i class="bi bi-bullseye fs-3 d-block mb-2 opacity-50"></i>
-                        No active plans yet. <a href="{{ url_for('plans.create') }}" class="text-primary text-decoration-none fw-bold">Create one</a>
+                        {{ _('dashboard.no_active_plans') }} <a href="{{ url_for('plans.create') }}" class="text-primary text-decoration-none fw-bold">{{ _('dashboard.create_one') }}</a>
                     </div>
                     {% endfor %}
                 </div>
@@ -167,8 +167,8 @@
                             <i class="bi bi-check2-square"></i>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-0">Daily Milestones</h6>
-                            <small class="text-muted">Check off today's contributions</small>
+                            <h6 class="fw-bold mb-0">{{ _('dashboard.daily_milestones') }}</h6>
+                            <small class="text-muted">{{ _('dashboard.check_off_today') }}</small>
                         </div>
                     </div>
                 </div>
@@ -195,12 +195,12 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0 fw-bold small">{{ plan.name }}</h6>
                                     <span class="badge bg-primary-subtle text-primary rounded-pill fw-bold" style="font-size: 0.75rem;">
-                                        ${{ "{:,.2f}".format(plan.daily) }} / DAY
+                                        ${{ "{:,.2f}".format(plan.daily) }} {{ _('dashboard.per_day') }}
                                     </span>
                                 </div>
                                 <div class="text-muted small mt-1">
                                     <i class="bi bi-arrow-up-short text-success"></i>
-                                    {{ plan.percent }}% reached
+                                    {{ plan.percent }}{{ _('dashboard.percent_reached') }}
                                 </div>
                             </div>
 
@@ -212,7 +212,7 @@
                     {% else %}
                     <div class="text-center py-4 text-muted small">
                         <i class="bi bi-list-check fs-3 d-block mb-2 opacity-50"></i>
-                        All caught up! No pending daily milestones.
+                        {{ _('dashboard.no_pending_tasks') }}
                     </div>
                     {% endfor %}
                 </div>
@@ -223,6 +223,26 @@
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+    const I18N = {{ {
+        "day": _("dashboard.chart_day"),
+        "val": _("dashboard.chart_val"),
+        "type": _("dashboard.chart_type"),
+        "amount": _("dashboard.chart_amount"),
+        "income": _("dashboard.income"),
+        "expense": _("dashboard.expenses"),
+        "noTransactionData": _("dashboard.no_transaction_data"),
+        "addTransactionHint": _("dashboard.add_transaction_hint"),
+        "days": {
+            "Mon": _("dashboard.day_mon"),
+            "Tue": _("dashboard.day_tue"),
+            "Wed": _("dashboard.day_wed"),
+            "Thu": _("dashboard.day_thu"),
+            "Fri": _("dashboard.day_fri"),
+            "Sat": _("dashboard.day_sat"),
+            "Sun": _("dashboard.day_sun")
+        }
+    } | tojson }};
+
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);
 
@@ -232,30 +252,32 @@
 
     function drawCharts() {
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const isKhmer = document.documentElement.getAttribute('lang') === 'km';
         const labelColor = isDark ? '#94a3b8' : '#64748b';
         const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+        const chartFont = isKhmer ? 'Khmer OS Battambang' : 'Inter';
         
         var options = {
             backgroundColor: 'transparent',
             chartArea: {width: '88%', height: '78%'},
             legend: 'none',
-            hAxis: { textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } },
+            hAxis: { textStyle: { color: labelColor, fontSize: 11, fontName: chartFont } },
             vAxis: { 
                 gridlines: { color: gridColor }, 
-                textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } 
+                textStyle: { color: labelColor, fontSize: 11, fontName: chartFont } 
             }
         };
 
         // 1. Line / Area chart
         var dataMain = google.visualization.arrayToDataTable([
-            ['Day', 'Val'],
-            ['Mon', weeklySaving.Mon],
-            ['Tue', weeklySaving.Tue],
-            ['Wed', weeklySaving.Wed],
-            ['Thu', weeklySaving.Thu],
-            ['Fri', weeklySaving.Fri],
-            ['Sat', weeklySaving.Sat],
-            ['Sun', weeklySaving.Sun],
+            [I18N.day, I18N.val],
+            [I18N.days.Mon, weeklySaving.Mon],
+            [I18N.days.Tue, weeklySaving.Tue],
+            [I18N.days.Wed, weeklySaving.Wed],
+            [I18N.days.Thu, weeklySaving.Thu],
+            [I18N.days.Fri, weeklySaving.Fri],
+            [I18N.days.Sat, weeklySaving.Sat],
+            [I18N.days.Sun, weeklySaving.Sun],
         ]);
 
         new google.visualization.AreaChart(document.getElementById('chart_main')).draw(dataMain, { 
@@ -269,17 +291,17 @@
             document.getElementById('chart_side').innerHTML = `
                 <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary">
                     <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
-                    <div class="fw-semibold small">No Transaction Data</div>
-                    <small class="text-muted">Add income or expense to render ratio.</small>
+                    <div class="fw-semibold small">${I18N.noTransactionData}</div>
+                    <small class="text-muted">${I18N.addTransactionHint}</small>
                 </div>
             `;
             return;
         }
 
         var dataSide = google.visualization.arrayToDataTable([
-            ['Type', 'Amount'], 
-            ['Expense', Number(totalExpense)], 
-            ['Income', Number(totalIncome)]
+            [I18N.type, I18N.amount], 
+            [I18N.expense, Number(totalExpense)], 
+            [I18N.income, Number(totalIncome)]
         ]);
 
         new google.visualization.PieChart(document.getElementById('chart_side')).draw(dataSide, { 

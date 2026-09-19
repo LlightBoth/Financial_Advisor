@@ -1,10 +1,10 @@
 {% extends "layouts/authBase.html" %}
-{% block title %}Sign In{% endblock %}
+{% block title %}{{ _('auth.sign_in') }}{% endblock %}
 
 {% block auth_content %}
 <div class="auth-header">
-    <h3>Welcome Back</h3>
-    <p>Sign in to access your financial dashboard</p>
+    <h3>{{ _('auth.welcome_back') }}</h3>
+    <p>{{ _('auth.sign_in_subtitle') }}</p>
 </div>
 
 <form method="post" novalidate>
@@ -13,7 +13,7 @@
     <!-- Email Field -->
     <div class="mb-3">
         <label for="email" class="auth-form-label">
-            <i class="bi bi-envelope text-primary"></i> Email Address
+            <i class="bi bi-envelope text-primary"></i> {{ _('auth.email_address') }}
         </label>
         {{ form.email(class="form-control-auth", placeholder="name@example.com", id="email", autocomplete="email", autofocus=true) }}
         {% for error in form.email.errors %}
@@ -24,10 +24,10 @@
     <!-- Password Field with Toggle -->
     <div class="mb-3">
         <label for="password" class="auth-form-label">
-            <i class="bi bi-key text-primary"></i> Password
+            <i class="bi bi-key text-primary"></i> {{ _('auth.password') }}
         </label>
         <div class="auth-input-group">
-            {{ form.password(class="form-control-auth", placeholder="Enter your password", id="password", autocomplete="current-password") }}
+            {{ form.password(class="form-control-auth", placeholder=_('auth.enter_password'), id="password", autocomplete="current-password") }}
             <button type="button" class="auth-password-toggle" id="togglePassword" aria-label="Toggle password visibility">
                 <i class="bi bi-eye" id="togglePasswordIcon"></i>
             </button>
@@ -41,25 +41,25 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="form-check-auth">
             {{ form.is_remember(class="form-check-input", id="remember") }}
-            <label class="form-check-label" for="remember">Remember me</label>
+            <label class="form-check-label" for="remember">{{ _('auth.remember_me') }}</label>
         </div>
         <div>
-            <a href="{{ url_for('auth.forgot_password') }}" class="auth-link-muted">Forgot password?</a>
+            <a href="{{ url_for('auth.forgot_password') }}" class="auth-link-muted">{{ _('auth.forgot_password') }}</a>
         </div>
     </div>
 
     <!-- Submit Button -->
     <div>
         <button type="submit" class="btn-auth-submit">
-            <span>Sign In</span>
+            <span>{{ _('auth.sign_in') }}</span>
             <i class="bi bi-arrow-right"></i>
         </button>
     </div>
 
     <!-- Switch to Register -->
     <div class="auth-switch-prompt">
-        Don't have an account? 
-        <a href="{{ url_for('auth.register') }}" class="auth-link ms-1">Create Account</a>
+        {{ _('auth.dont_have_account') }} 
+        <a href="{{ url_for('auth.register') }}" class="auth-link ms-1">{{ _('auth.create_account') }}</a>
     </div>
 </form>
 {% endblock %}

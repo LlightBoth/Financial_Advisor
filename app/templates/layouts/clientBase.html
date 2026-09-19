@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="{{ current_lang }}" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Financial Advisor{% endblock %}</title>
+    <title>{% block title %}{{ _('app.name') }}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/layout/client.css') }}" rel="stylesheet">
 </head>
 <body>
@@ -30,44 +31,44 @@
         </div>
         
         <ul class="sidebar-nav nav nav-pills flex-column mb-auto">
-            <li class="nav-section-title">MAIN MENU</li>
+            <li class="nav-section-title">{{ _('nav.main_menu') }}</li>
             
             <li class="nav-item mb-1">
                 <a href="{{ url_for('dashboards.userIndex') }}" class="nav-link {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}">
-                    <i class="bi bi-grid-1x2 me-2"></i> <span>Dashboard</span>
+                    <i class="bi bi-grid-1x2 me-2"></i> <span>{{ _('nav.dashboard') }}</span>
                 </a>
             </li>
             <li class="nav-item mb-1">
                 <a href="{{ url_for('incomes.index') }}" class="nav-link {% if request.endpoint == 'incomes.index' %}active{% endif %}">
-                    <i class="bi bi-arrow-down-left-circle me-2"></i> <span>Income</span>
+                    <i class="bi bi-arrow-down-left-circle me-2"></i> <span>{{ _('nav.income') }}</span>
                 </a>
             </li>
             <li class="nav-item mb-1">
                 <a href="{{ url_for('expenses.index') }}" class="nav-link {% if request.endpoint == 'expenses.index' %}active{% endif %}">
-                    <i class="bi bi-arrow-up-right-circle me-2"></i> <span>Expense</span>
+                    <i class="bi bi-arrow-up-right-circle me-2"></i> <span>{{ _('nav.expense') }}</span>
                 </a>
             </li>
             <li class="nav-item mb-1">
                 <a href="{{ url_for('plans.index') }}" class="nav-link {% if 'plans' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-bullseye me-2"></i> <span>My Plans</span>
+                    <i class="bi bi-bullseye me-2"></i> <span>{{ _('nav.my_plans') }}</span>
                 </a>
             </li>
             <li class="nav-item mb-1">
                 <a href="{{ url_for('advisors.index') }}" class="nav-link {% if 'advisors' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-cpu me-2"></i> <span>AI Advisor</span>
+                    <i class="bi bi-cpu me-2"></i> <span>{{ _('nav.advisor') }}</span>
                 </a>
             </li>
             <li class="nav-item mb-1">
                 <a href="{{ url_for('history.index') }}" class="nav-link {% if 'history' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-clock-history me-2"></i> <span>History</span>
+                    <i class="bi bi-clock-history me-2"></i> <span>{{ _('nav.history') }}</span>
                 </a>
             </li>
 
             {% if is_management_user(current_user) %}
-                <li class="nav-section-title mt-3">ADMINISTRATION</li>
+                <li class="nav-section-title mt-3">{{ _('nav.administration') }}</li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ get_management_url(current_user) }}">
-                        <i class="bi bi-shield-lock me-2"></i> <span>Management</span>
+                        <i class="bi bi-shield-lock me-2"></i> <span>{{ _('nav.management') }}</span>
                     </a>
                 </li>
             {% endif %}
@@ -78,7 +79,7 @@
             <div class="d-flex justify-content-between align-items-center p-2 rounded-3" style="background: rgba(255,255,255,0.04);">
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-moon-stars text-white-50" id="themeIcon"></i>
-                    <span class="small text-white-50">Dark Theme</span>
+                    <span class="small text-white-50">{{ _('common.dark_theme') }}</span>
                 </div>
                 <div class="form-check form-switch m-0">
                     <input class="form-check-input" type="checkbox" id="modeToggle" style="cursor:pointer">
@@ -91,12 +92,25 @@
     <header class="px-4 py-3 d-flex justify-content-between align-items-center">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Workspace</li>
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">{{ _('common.home') }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ _('common.workspace') }}</li>
             </ol>
         </nav>
 
         <div class="d-flex align-items-center gap-2">
+            <!-- Language Switcher -->
+            <div class="d-flex align-items-center me-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Language Selector">
+                    <a href="{{ url_for('lang.set_language', language='en') }}" 
+                       class="btn btn-sm {% if current_lang == 'en' %}btn-primary{% else %}btn-outline-secondary{% endif %}" 
+                       title="English">English</a>
+                    <span class="d-flex align-items-center text-muted px-1">|</span>
+                    <a href="{{ url_for('lang.set_language', language='km') }}" 
+                       class="btn btn-sm {% if current_lang == 'km' %}btn-primary{% else %}btn-outline-secondary{% endif %}" 
+                       title="ខ្មែរ">ខ្មែរ</a>
+                </div>
+            </div>
+
             <!-- Header Quick Theme Toggle -->
             <button type="button" class="btn btn-sm btn-icon-round" id="headerThemeToggle" aria-label="Toggle Theme" title="Toggle Dark/Light Theme">
                 <i class="bi bi-moon-stars" id="headerThemeIcon"></i>
@@ -108,10 +122,10 @@
                     <i class="bi bi-bell"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                    <li class="dropdown-header small fw-bold">Recent Alerts</li>
-                    <li><a class="dropdown-item small" href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-check2-circle text-success me-2"></i>Complete Daily Tasks</a></li>
+                    <li class="dropdown-header small fw-bold">{{ _('nav.recent_alerts') }}</li>
+                    <li><a class="dropdown-item small" href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-check2-circle text-success me-2"></i>{{ _('dashboard.complete_daily_tasks') }}</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item small" href="{{ url_for('advisors.index') }}"><i class="bi bi-lightning text-warning me-2"></i>Run Financial Analysis</a></li>
+                    <li><a class="dropdown-item small" href="{{ url_for('advisors.index') }}"><i class="bi bi-lightning text-warning me-2"></i>{{ _('dashboard.run_financial_analysis') }}</a></li>
                 </ul>
             </div>
 
@@ -133,18 +147,18 @@
                     </li>
                     <li>
                         <a class="dropdown-item small py-2" href="/profiles">
-                            <i class="bi bi-person me-2 text-primary"></i> My Profile
+                            <i class="bi bi-person me-2 text-primary"></i> {{ _('nav.my_profile') }}
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item small py-2" href="/settings">
-                            <i class="bi bi-gear me-2 text-secondary"></i> Settings
+                            <i class="bi bi-gear me-2 text-secondary"></i> {{ _('nav.settings') }}
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <a class="dropdown-item small py-2 text-danger" href="/auth/logout">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            <i class="bi bi-box-arrow-right me-2"></i> {{ _('nav.logout') }}
                         </a>
                     </li>
                 </ul>
@@ -160,7 +174,7 @@
 
     <!-- Footer -->
     <footer class="app-footer px-4 py-3">
-        <small class="text-muted">© 2026 Financial Advisor App — Real-Time Financial Planning</small>
+        <small class="text-muted">© 2026 {{ _('app.name') }} | {{ _('common.all_rights_reserved') }}</small>
     </footer>
 </div>
 

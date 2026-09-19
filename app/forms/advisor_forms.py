@@ -2,62 +2,72 @@ from flask_wtf import FlaskForm
 from wtforms import FloatField, RadioField, SubmitField, SelectField
 from wtforms.validators import InputRequired
 
-class AdvisorForm(FlaskForm):
+from app.utils.i18n import _l, I18NTranslations
+
+
+class BaseLocalizedForm(FlaskForm):
+    class Meta:
+        def get_translations(self, form):
+            return I18NTranslations()
+
+
+class AdvisorForm(BaseLocalizedForm):
     goal_cost = FloatField(
-        "Financial Goal Amount",
-        validators=[InputRequired()],
-        render_kw={"placeholder": "e.g. 10,000"}
+        _l("advisor.goal_amount"),
+        validators=[InputRequired(message=_l("validation.required"))],
+        render_kw={"placeholder": _l("advisor.goal_placeholder")}
     )
 
     income = FloatField(
-        "Monthly Income",
-        validators=[InputRequired()],
-        render_kw={"placeholder": "e.g. 5,000"}
+        _l("advisor.monthly_income"),
+        validators=[InputRequired(message=_l("validation.required"))],
+        render_kw={"placeholder": _l("advisor.income_placeholder")}
     )
 
     expense = FloatField(
-        "Monthly Expenses",
-        validators=[InputRequired()],
-        render_kw={"placeholder": "e.g. 2,500"}
+        _l("advisor.monthly_expense"),
+        validators=[InputRequired(message=_l("validation.required"))],
+        render_kw={"placeholder": _l("advisor.expense_placeholder")}
     )
 
     martial_status = SelectField(
-        "Martial Status",
-        choices= [
-            ('Single','Single'),
-            ('Married', 'Married')
+        _l("advisor.marital_status"),
+        choices=[
+            ('Single', _l('advisor.single')),
+            ('Married', _l('advisor.married'))
         ],
         coerce=str
     )
 
     employment_status = RadioField(
-        "1/ Are you currently employed?",
+        _l("advisor.q_employment"),
         choices=[
-            ("employed", "Yes, I am employed"),
-            ("not employed", "No, I am not employed"),
-            ("not employed", "Prefer not to say"),
+            ("employed", _l("advisor.employed_yes")),
+            ("not employed", _l("advisor.employed_no")),
+            ("not employed", _l("advisor.prefer_not_say")),
         ],
-        validators=[InputRequired()]
+        validators=[InputRequired(message=_l("validation.required"))]
     )
 
     debt_status = RadioField(
-        "2/ Do you have any outstanding debt?",
+        _l("advisor.q_debt"),
         choices=[
-            ("debt", "Yes, I have debt"),
-            ("no debt", "No, I do not have debt"),
-            ("no debt", "Prefer not to say"),
+            ("debt", _l("advisor.debt_yes")),
+            ("no debt", _l("advisor.debt_no")),
+            ("no debt", _l("advisor.prefer_not_say")),
         ],
-        validators=[InputRequired()]
+        validators=[InputRequired(message=_l("validation.required"))]
     )
 
     spending_habit = RadioField(
-        "3/ How would you describe your spending habits?",
+        _l("advisor.q_spending"),
         choices=[
-            ("big spend", "I tend to spend a lot"),
-            ("average spend", "I spend moderately"),
-            ("average spend", "Prefer not to say"),
+            ("big spend", _l("advisor.spending_high")),
+            ("average spend", _l("advisor.spending_moderate")),
+            ("average spend", _l("advisor.prefer_not_say")),
         ],
-        validators=[InputRequired()]
+        validators=[InputRequired(message=_l("validation.required"))]
     )
 
-    submit = SubmitField("Get Financial Advice")
+    submit = SubmitField(_l("advisor.get_advice_btn"))
+

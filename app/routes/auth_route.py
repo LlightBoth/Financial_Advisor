@@ -6,6 +6,7 @@ from app.services.auth_services import AuthService
 from app.services.user_services import UserServices
 from app.security.role_check import get_current_user_role
 from app.security.cookie import get_cookie, remove_cookie
+from app.utils.i18n import _
 
 import secrets
 import time
@@ -31,7 +32,7 @@ def login():
             # print("USER:", user.username)
 
             login_user(user, remember=form.is_remember.data)
-            flash("Login successful", "success")
+            flash(_("message.login_success"), "success")
 
             # Decide redirect dynamically based on user's highest permitted landing module
             if user.has_role("admin"):
@@ -52,7 +53,7 @@ def login():
             # ✅ RETURN with cookies
             return get_cookie(redirect_url, access_token, refresh_token)
 
-        flash("Invalid credentials", "danger")
+        flash(_("message.login_failed"), "danger")
 
     return render_template("auth/login.html", form=form)
 
@@ -76,10 +77,10 @@ def register():
         # Register user
         user = AuthService.register_user(data, password)
         if user:
-            flash("Registration successful. Please login.", "success")
+            flash(_("message.registration_success"), "success")
             return redirect(url_for("auth.login"))
 
-        flash("Registration failed. Try again.", "danger")
+        flash(_("message.registration_failed"), "danger")
 
     return render_template("auth/register.html", form=form)
 
@@ -190,7 +191,7 @@ def forgot_password():
         user = AuthService.find_user_email(user_email)
 
         # Flash standard message to prevent email enumeration attacks
-        flash('If an account exists with that email, a password reset code has been sent.', 'info')
+        flash(_('message.password_reset_sent'), 'info')
 
         if user:
             # Check if email successfully sent
@@ -198,7 +199,7 @@ def forgot_password():
                 return redirect(url_for('auth.verify_otp'))
             else:
                 # Handle email server failure (flash an error or keep them on the page)
-                flash('An error occurred while sending the email. Please try again later.', 'danger')
+                flash(_('message.email_send_failed'), 'danger')
                 return redirect(url_for('auth.forgot_password'))
         else:
             return redirect(url_for('auth.forgot_password'))
@@ -211,7 +212,7 @@ def verify_otp():
     email = session.get('pending_user_email')
 
     if not email:
-        flash('Session expired. Please request a new password reset.', 'error')
+        flash(_('message.session_expired'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     if request.method == 'POST':
@@ -221,7 +222,7 @@ def verify_otp():
 
         # 1. Check expiration
         if time.time() > otp_expiry:
-            flash('The OTP code has expired. Please request a new one.', 'error')
+            flash(_('message.otp_expired'), 'error')
             return redirect(url_for('auth.forgot_password'))
 
         # 2. Verify OTP code
@@ -231,10 +232,10 @@ def verify_otp():
             session.pop('otp_expiry', None)
             session['otp_verified'] = True  # ✅ Set authorization flag
 
-            flash('Email verified successfully!', 'success')
+            flash(_('message.otp_verified'), 'success')
             return redirect(url_for('auth.reset_password'))
         else:
-            flash('Invalid OTP code. Please try again.', 'error')
+            flash(_('message.invalid_otp'), 'error')
 
     return render_template('auth/verify_otp.html')
 
@@ -244,7 +245,7 @@ def resend_otp():
     user_email = session.get('pending_user_email')
 
     if not user_email:
-        flash('Session expired. Please enter your email again.', 'error')
+        flash(_('message.session_expired_reenter'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     # Regenerate OTP with string email
@@ -253,7 +254,7 @@ def resend_otp():
     # TODO: Resend email here
     # send_otp_email(user_email, session['generated_otp'])
 
-    flash('A new OTP code has been sent to your email address.', 'info')
+    flash(_('message.new_otp_sent'), 'info')
     return redirect(url_for('auth.verify_otp'))
 
 
@@ -264,12 +265,12 @@ def reset_password():
 
     # Security check: User MUST have verified their OTP first
     if not user_email or not is_verified:
-        flash('Unauthorized access or session expired. Please verify your email.', 'error')
+        flash(_('message.unauthorized_reset'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     user = AuthService.find_user_email(user_email)
     if not user:
-        flash('User account not found.', 'error')
+        flash(_('message.user_not_found'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     if request.method == 'POST':
@@ -277,11 +278,11 @@ def reset_password():
         confirm_password = request.form.get('confirm_password')
 
         if not password or len(password) < 8:
-            flash('Password must be at least 8 characters long.', 'error')
+            flash(_('validation.password_min8'), 'error')
             return render_template('auth/new_password.html')
 
         if password != confirm_password:
-            flash('Passwords do not match.', 'error')
+            flash(_('validation.password_mismatch'), 'error')
             return render_template('auth/new_password.html')
 
         data = {
@@ -298,7 +299,7 @@ def reset_password():
         session.pop('pending_user_email', None)
         session.pop('otp_verified', None)
 
-        flash('Password reset successful! Please log in with your new password.', 'success')
+        flash(_('message.password_reset_success'), 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/new_password.html')

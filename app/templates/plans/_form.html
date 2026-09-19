@@ -4,21 +4,21 @@
 
 <div class="row g-3 mb-3">
     <div class="col-12">
-        {{ f.render_field(form.goal, placeholder="e.g. Emergency Fund or Vacation Savings", icon="bi bi-bullseye") }}
+        {{ f.render_field(form.goal, placeholder=_('plan.goal_placeholder'), icon="bi bi-bullseye") }}
     </div>
     <div class="col-12 col-md-6">
-        {{ f.render_field(form.goal_cost, placeholder="0.00", icon="bi bi-currency-dollar") }}
+        {{ f.render_field(form.goal_cost, placeholder=_('plan.cost_placeholder'), icon="bi bi-currency-dollar") }}
     </div>
     <div class="col-12 col-md-6">
         {{ f.render_field(form.in_between, icon="bi bi-calendar-check") }}
     </div>
     <div class="col-12">
-        {{ f.render_textarea(form.description, rows=4, placeholder="Describe this financial goal and timeline...") }}
+        {{ f.render_textarea(form.description, rows=4, placeholder=_('plan.description_placeholder')) }}
     </div>
 </div>
 
 {{ f.render_form_buttons(
-    submit_label="Save Plan", 
+    submit_label=_('plan.save_plan'), 
     cancel_url=url_for('plans.index'), 
     submit_class="btn-primary", 
     submit_icon="bi bi-check-circle"

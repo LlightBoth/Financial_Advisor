@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from app.forms.history_forms import ConfirmDeleteForm
 from app.services.history_services import HistoryServices
 from app.security.cookie import check_cookie_token
+from app.utils.i18n import _
 
 
 history_bp = Blueprint("history", __name__, url_prefix="/histories")
@@ -52,7 +53,7 @@ def delete(history_id):
     form = ConfirmDeleteForm()
     if form.validate_on_submit():
         HistoryServices.delete_history(history)
-        flash("History record deleted successfully.", "success")
+        flash(_("message.history_deleted_success"), "success")
     return redirect(url_for("history.index"))
 
 
@@ -62,7 +63,7 @@ def delete_all():
     form = ConfirmDeleteForm()
     if form.validate_on_submit():
         HistoryServices.delete_all_history(current_user)
-        flash("All advisory history records have been cleared.", "success")
+        flash(_("message.history_all_cleared_success"), "success")
     else:
-        flash("Invalid request to delete all history.", "danger")
+        flash(_("message.history_delete_invalid"), "danger")
     return redirect(url_for("history.index"))

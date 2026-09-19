@@ -8,6 +8,8 @@ venv/
 env/
 .venv/
 
+docs/
+
 # Flask instance folder (contains database and secrets)
 instance/
 

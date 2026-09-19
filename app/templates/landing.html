@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="{{ current_lang }}" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Landing Page CSS with Cache Buster -->
-    <link href="{{ url_for('static', filename='css/landing.css') }}?v=4.4" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/landing.css') }}?v=4.5" rel="stylesheet">
 
     <!-- Early Theme Initialization to Prevent Flash -->
     <script>
@@ -49,6 +50,21 @@
         </div>
 
         <div class="nav-actions">
+            <!-- Language Switcher -->
+            <div class="d-flex align-items-center me-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Language Selector">
+                    <a href="{{ url_for('lang.set_language', language='en') }}" 
+                       class="btn btn-sm {% if current_lang == 'en' %}btn-primary text-white{% else %}btn-outline-secondary text-secondary{% endif %} py-1 px-2" 
+                       style="font-size: 0.8rem; border-radius: 6px;"
+                       title="English">English</a>
+                    <span class="d-flex align-items-center text-muted px-1">|</span>
+                    <a href="{{ url_for('lang.set_language', language='km') }}" 
+                       class="btn btn-sm {% if current_lang == 'km' %}btn-primary text-white{% else %}btn-outline-secondary text-secondary{% endif %} py-1 px-2" 
+                       style="font-size: 0.8rem; border-radius: 6px;"
+                       title="ខ្មែរ">ខ្មែរ</a>
+                </div>
+            </div>
+
             <!-- Dark/Light Mode Toggle Button -->
             <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="Toggle Dark/Light Mode" title="Toggle Dark/Light Mode">
                 <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>

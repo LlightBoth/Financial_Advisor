@@ -4,6 +4,7 @@ from app.forms.plan_forms import PlanForm, EditPlanForm, ConfirmDeleteForm
 
 from app.services.plan_services import PlanServices
 from app.security.cookie import check_cookie_token
+from app.utils.i18n import _
 
 from datetime import date
 
@@ -45,7 +46,7 @@ def create():
         }
 
         plan = PlanServices.create_plan(data, current_user)
-        flash(f"Plan '{plan.goal}' created successfully!", "success")
+        flash(_("message.plan_created_success", goal=plan.goal), "success")
         return redirect(url_for("plans.index"))
 
     return render_template("plans/create.html", form=form)
@@ -70,7 +71,7 @@ def edit(plan_id):
         }
 
         PlanServices.update_plan(plan, data)
-        flash(f"Plan '{plan.goal}' updated successfully!", "success")
+        flash(_("message.plan_updated_success", goal=plan.goal), "success")
         return redirect(url_for("plans.index"))
 
     return render_template("plans/edit.html", form=form, plan=plan)
@@ -97,5 +98,5 @@ def delete(plan_id):
     form = ConfirmDeleteForm()
     if form.validate_on_submit():
         PlanServices.delete_plan(plan)
-        flash("Plan deleted successfully!", "success")
+        flash(_("message.plan_deleted_success"), "success")
     return redirect(url_for("plans.index"))

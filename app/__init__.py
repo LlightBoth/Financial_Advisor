@@ -35,8 +35,10 @@ def create_app(config_class: type[Config] = Config):
 
     # Optional setting
     login_manager.login_view = "auth.login" # Blueprint.rout name
-    login_manager.login_message = "Please login to view this page"
+    login_manager.login_message = "message.please_login"
     login_manager.login_message_category = "warning"
+    from app.utils.i18n import translate
+    login_manager.localize_callback = translate
 
     # This function tells Flask-login how to load a user from a session
     @login_manager.user_loader
@@ -52,6 +54,7 @@ def create_app(config_class: type[Config] = Config):
     from app.routes.permission_route import permission_bp
     from app.routes.fact_route import fact_bp
     from app.routes.rule_route import rule_bp
+    from app.routes.lang_route import lang_bp
 
     # Register blueprints Client-Side
     from app.routes.plan_route import plan_bp
@@ -70,6 +73,7 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(permission_bp)
     app.register_blueprint(fact_bp)
     app.register_blueprint(rule_bp)
+    app.register_blueprint(lang_bp)
     app.register_blueprint(plan_bp)
     app.register_blueprint(advisor_bp)
     app.register_blueprint(dashboard_bp)
@@ -79,6 +83,21 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(loan_bp)
     app.register_blueprint(income_bp)
     app.register_blueprint(expense_bp)
+
+    # Register translation helpers for Jinja
+    from app.utils.i18n import _, translate, get_locale, SUPPORTED_LANGUAGES
+
+    app.jinja_env.globals["_"] = _
+    app.jinja_env.globals["translate"] = translate
+    app.jinja_env.globals["get_locale"] = get_locale
+    app.jinja_env.globals["SUPPORTED_LANGUAGES"] = SUPPORTED_LANGUAGES
+
+    @app.context_processor
+    def inject_i18n():
+        return {
+            "current_lang": get_locale(),
+            "supported_languages": SUPPORTED_LANGUAGES,
+        }
 
     # Root landing page for visitors
     @app.route("/")

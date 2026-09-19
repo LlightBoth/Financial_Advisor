@@ -1,6 +1,6 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %} Edit Income | Intelli App {% endblock %}
+{% block title %} {{ _('income.edit_title') }} {% endblock %}
 
 {% block content %}
 
@@ -11,13 +11,13 @@
         <a href="{{ url_for('incomes.index') }}"
            class="text-decoration-none text-muted small">
             <i class="bi bi-arrow-left me-1"></i>
-            Back to Income
+            {{ _('income.back_to_income') }}
         </a>
 
-        <h2 class="fw-bold mt-3 mb-1">Add Income</h2>
+        <h2 class="fw-bold mt-3 mb-1">{{ _('income.edit_income') }}</h2>
 
         <p class="text-muted mb-0">
-            Update a source of income and keep your financial records up to date.
+            {{ _('income.edit_subtitle') }}
         </p>
     </div>
 
@@ -44,17 +44,18 @@
 
                         <div>
                             <h5 class="fw-bold mb-1">
-                                Income Information
+                                {{ _('income.card_header') }}
                             </h5>
 
                             <p class="text-muted small mb-0">
-                                Enter the details of your income.
+                                {{ _('income.card_subtitle') }}
                             </p>
                         </div>
 
                     </div>
                     
                     <form method="post" novalidate class="row g-4">
+                        {% set submit_label = _('income.update_income') %}
                         {% include "incomes/_form.html" %}
                     </form>
 

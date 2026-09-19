@@ -3,65 +3,72 @@ from wtforms import BooleanField, StringField, SubmitField, FloatField, DateFiel
 from wtforms.validators import DataRequired, Optional, NumberRange
 
 from app.models import Plan
+from app.utils.i18n import _l, I18NTranslations
 
 
-class PlanForm(FlaskForm):
+class BaseLocalizedForm(FlaskForm):
+    class Meta:
+        def get_translations(self, form):
+            return I18NTranslations()
+
+
+class PlanForm(BaseLocalizedForm):
     goal = StringField(
-        "Goal", 
-        validators=[DataRequired()],
-        render_kw={"placeholder": "e.g. Annual Marketing Strategy"}
+        _l("plan.goal"), 
+        validators=[DataRequired(message=_l("validation.required"))],
+        render_kw={"placeholder": _l("plan.goal_placeholder")}
     )
     in_between = DateField(
-        "In-Between", 
-        validators=[DataRequired()],
+        _l("plan.target_date"), 
+        validators=[DataRequired(message=_l("validation.required"))],
     )
     description = TextAreaField(
-        "Description",
+        _l("common.description"),
         validators=[Optional()],
-        render_kw={"placeholder": "Short description describe your plan"}
+        render_kw={"placeholder": _l("plan.description_placeholder")}
     )
     goal_cost = FloatField(
-        "Goal-Cost",
+        _l("plan.goal_cost"),
         validators=[
-            DataRequired(),
-            NumberRange(min=0.01, message="Estimated budget must be greater than 0.")
+            DataRequired(message=_l("validation.required")),
+            NumberRange(min=0.01, message=_l("validation.budget_positive"))
         ],
-        render_kw={"placeholder": "How much around does it cost?"}
+        render_kw={"placeholder": _l("plan.cost_placeholder")}
     )
-    value = BooleanField("Value", default=True)
+    value = BooleanField(_l("plan.status"), default=True)
     
-    submit = SubmitField('Launch Strategy')
+    submit = SubmitField(_l("plan.launch_strategy"))
 
 
 # ----- EditPlanForm -----
-class EditPlanForm(FlaskForm):
+class EditPlanForm(BaseLocalizedForm):
     goal = StringField(
-        "Goal", 
-        validators=[DataRequired()],
-        render_kw={"placeholder": "e.g. Annual Marketing Strategy"}
+        _l("plan.goal"), 
+        validators=[DataRequired(message=_l("validation.required"))],
+        render_kw={"placeholder": _l("plan.goal_placeholder")}
     )
     in_between = DateField(
-        "In-Between", 
-        validators=[DataRequired()],
+        _l("plan.target_date"), 
+        validators=[DataRequired(message=_l("validation.required"))],
     )
     description = TextAreaField(
-        "Description",
+        _l("common.description"),
         validators=[Optional()],
-        render_kw={"placeholder": "Short description of your financial plan"}
+        render_kw={"placeholder": _l("plan.description_placeholder")}
     )
     goal_cost = FloatField(
-        "Goal-Cost",
+        _l("plan.goal_cost"),
         validators=[
-            DataRequired(),
-            NumberRange(min=0.01, message="Estimated budget must be greater than 0.")
+            DataRequired(message=_l("validation.required")),
+            NumberRange(min=0.01, message=_l("validation.budget_positive"))
         ],
-        render_kw={"placeholder": "How much around does it cost?"}
+        render_kw={"placeholder": _l("plan.cost_placeholder")}
     )
     value = BooleanField(
-        "Value"
+        _l("plan.status")
     )
     
-    submit = SubmitField('Update')
+    submit = SubmitField(_l("plan.update_strategy"))
 
     def __init__(self, original_plan: Plan, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,5 +76,6 @@ class EditPlanForm(FlaskForm):
 
 
 # ----- ConfirmDeleteForm -----
-class ConfirmDeleteForm(FlaskForm):
-    submit = SubmitField("Confirm Delete")
+class ConfirmDeleteForm(BaseLocalizedForm):
+    submit = SubmitField(_l("common.confirm_delete"))
+

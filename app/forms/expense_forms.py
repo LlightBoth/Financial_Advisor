@@ -1,17 +1,24 @@
 from flask_wtf import FlaskForm
-from flask_wtf.form import _Auto
 from wtforms import ( StringField, SubmitField, FloatField, DateField, SelectField )
 from wtforms.validators import DataRequired, Optional, NumberRange
 
 from app.models import Expense
+from app.utils.i18n import _l, I18NTranslations
+
+
+class BaseLocalizedForm(FlaskForm):
+    class Meta:
+        def get_translations(self, form):
+            return I18NTranslations()
+
 
 # ----- ExpenseForm -----
-class ExpenseForm(FlaskForm):
+class ExpenseForm(BaseLocalizedForm):
     amount = FloatField(
-        "Amount",
+        _l("finance.amount"),
         validators=[
-            DataRequired(),
-            NumberRange(min=0.01)
+            DataRequired(message=_l("validation.required")),
+            NumberRange(min=0.01, message=_l("validation.amount_positive"))
         ],
         render_kw={
             "placeholder": "e.g. 250.00"
@@ -19,7 +26,7 @@ class ExpenseForm(FlaskForm):
     )
 
     description = StringField(
-        "Description",
+        _l("common.description"),
         validators=[Optional()],
         render_kw={
             "placeholder": "e.g. Monthly food expenses"
@@ -27,48 +34,48 @@ class ExpenseForm(FlaskForm):
     )
 
     category = SelectField(
-        "Category",
+        _l("finance.category"),
         choices=[
-            ("Food", "Food"),
-            ("Transportation", "Transportation"),
-            ("Housing", "Housing"),
-            ("Utilities", "Utilities"),
-            ("Education", "Education"),
-            ("Healthcare", "Healthcare"),
-            ("Shopping", "Shopping"),
-            ("Entertainment", "Entertainment"),
-            ("Debt", "Debt"),
-            ("Other", "Other"),
+            ("Food", _l("category.food")),
+            ("Transportation", _l("category.transportation")),
+            ("Housing", _l("category.housing")),
+            ("Utilities", _l("category.utilities")),
+            ("Education", _l("category.education")),
+            ("Healthcare", _l("category.healthcare")),
+            ("Shopping", _l("category.shopping")),
+            ("Entertainment", _l("category.entertainment")),
+            ("Debt", _l("category.debt")),
+            ("Other", _l("category.other")),
         ],
-        validators=[DataRequired()]
+        validators=[DataRequired(message=_l("validation.required"))]
     )
 
     expense_date = DateField(
-        "Expense Date",
-        validators=[DataRequired()]
+        _l("expense.expense_date"),
+        validators=[DataRequired(message=_l("validation.required"))]
     )
 
     recurring_period = SelectField(
-        "Recurring Period",
+        _l("expense.recurring_period"),
         choices=[
-            ("", "Not Recurring"),
-            ("Weekly", "Weekly"),
-            ("Monthly", "Monthly"),
-            ("Yearly", "Yearly"),
+            ("", _l("period.not_recurring")),
+            ("Weekly", _l("period.weekly")),
+            ("Monthly", _l("period.monthly")),
+            ("Yearly", _l("period.yearly")),
         ],
         validators=[Optional()]
     )
 
-    submit = SubmitField("Add Expense")
+    submit = SubmitField(_l("expense.add_expense"))
 
 
 # ----- EditExpenseForm -----
-class EditExpenseForm(FlaskForm):
+class EditExpenseForm(BaseLocalizedForm):
     amount = FloatField(
-        "Amount",
+        _l("finance.amount"),
         validators=[
-            DataRequired(),
-            NumberRange(min=0.01)
+            DataRequired(message=_l("validation.required")),
+            NumberRange(min=0.01, message=_l("validation.amount_positive"))
         ],
         render_kw={
             "placeholder": "e.g. 250.00"
@@ -76,7 +83,7 @@ class EditExpenseForm(FlaskForm):
     )
 
     description = StringField(
-        "Description",
+        _l("common.description"),
         validators=[Optional()],
         render_kw={
             "placeholder": "e.g. Monthly food expenses"
@@ -84,39 +91,39 @@ class EditExpenseForm(FlaskForm):
     )
 
     category = SelectField(
-        "Category",
+        _l("finance.category"),
         choices=[
-            ("Food", "Food"),
-            ("Transportation", "Transportation"),
-            ("Housing", "Housing"),
-            ("Utilities", "Utilities"),
-            ("Education", "Education"),
-            ("Healthcare", "Healthcare"),
-            ("Shopping", "Shopping"),
-            ("Entertainment", "Entertainment"),
-            ("Debt", "Debt"),
-            ("Other", "Other"),
+            ("Food", _l("category.food")),
+            ("Transportation", _l("category.transportation")),
+            ("Housing", _l("category.housing")),
+            ("Utilities", _l("category.utilities")),
+            ("Education", _l("category.education")),
+            ("Healthcare", _l("category.healthcare")),
+            ("Shopping", _l("category.shopping")),
+            ("Entertainment", _l("category.entertainment")),
+            ("Debt", _l("category.debt")),
+            ("Other", _l("category.other")),
         ],
-        validators=[DataRequired()]
+        validators=[DataRequired(message=_l("validation.required"))]
     )
 
     expense_date = DateField(
-        "Expense Date",
-        validators=[DataRequired()]
+        _l("expense.expense_date"),
+        validators=[DataRequired(message=_l("validation.required"))]
     )
 
     recurring_period = SelectField(
-        "Recurring Period",
+        _l("expense.recurring_period"),
         choices=[
-            ("", "Not Recurring"),
-            ("Weekly", "Weekly"),
-            ("Monthly", "Monthly"),
-            ("Yearly", "Yearly"),
+            ("", _l("period.not_recurring")),
+            ("Weekly", _l("period.weekly")),
+            ("Monthly", _l("period.monthly")),
+            ("Yearly", _l("period.yearly")),
         ],
         validators=[Optional()]
     )
 
-    submit = SubmitField("Update")
+    submit = SubmitField(_l("common.update"))
 
     def __init__(self, original_expense: Expense, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -124,5 +131,5 @@ class EditExpenseForm(FlaskForm):
 
 
 # ----- ConfirmDeleteForm -----
-class ExpenseDeleteForm(FlaskForm):
-    submit = SubmitField("Confirm Delete")
+class ExpenseDeleteForm(BaseLocalizedForm):
+    submit = SubmitField(_l("common.confirm_delete"))

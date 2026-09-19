@@ -1,20 +1,20 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %} Plan Detail {% endblock %}
+{% block title %}{{ _("plan.detail_title") }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 fw-bold">Plan Overview</h1>
+            <h1 class="h3 mb-0 fw-bold">{{ _("plan.overview") }}</h1>
         </div>
         <div class="btn-group shadow-sm">
             <a href="{{ url_for('plans.edit', plan_id=plan.id) }}" class="btn btn-outline-primary btn-sm px-3">
-                <i class="bi bi-pencil me-1"></i> Edit
+                <i class="bi bi-pencil me-1"></i> {{ _("common.edit") }}
             </a>
             <a href="{{ url_for('plans.index') }}" class="btn btn-outline-secondary btn-sm px-3">
-                <i class="bi bi-arrow-left me-1"></i> Back to list
+                <i class="bi bi-arrow-left me-1"></i> {{ _("common.back_to_list") }}
             </a>
         </div>
     </div>
@@ -22,13 +22,13 @@
     <!-- Main Detail Card -->
     <div class="card border shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Record ID: #{{ plan.id }}</span>
+            <span class="text-muted small">{{ _("common.record_id") }}: #{{ plan.id }}</span>
             
             <!-- Completion Status Badge -->
             {% if plan.value %} 
-                <span class="badge text-bg-success px-3 py-2 fs-6">Completed</span>
+                <span class="badge text-bg-success px-3 py-2 fs-6">{{ _("plan.status_completed") }}</span>
             {% else %}
-                <span class="badge text-bg-secondary px-3 py-2 fs-6">Incompleted</span>
+                <span class="badge text-bg-secondary px-3 py-2 fs-6">{{ _("plan.status_incompleted") }}</span>
             {% endif %}
         </div>
 
@@ -38,7 +38,7 @@
                 <!-- Goal Cost Highlight Box -->
                 <div class="col-md-12">
                     <div class="p-3 bg-body-tertiary border rounded-3 d-flex align-items-center justify-content-between">
-                        <span class="text-muted fw-medium text-uppercase fs-7">Goal Cost</span>
+                        <span class="text-muted fw-medium text-uppercase fs-7">{{ _("plan.goal_cost_label") }}</span>
                         <h2 class="text-success fw-bold mb-0">${{ "%.2f"|format(plan.goal_cost|float) }}</h2>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                 <!-- Goal & In-Between Detail Grid -->
                 <div class="col-12">
                     <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Goal : </span>
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">{{ _("plan.goal_label") }} : </span>
                         <h4 class="text-body fw-semibold mb-0">{{ plan.goal }}</h4>
                     </div>
                 </div>
@@ -54,9 +54,9 @@
                 <div class="col-12">
                     <hr class="text-muted opacity-25">
                     <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">In-Between Steps / Details</span>
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">{{ _("plan.in_between_label") }}</span>
                         <p class="mb-0 {% if not plan.in_between %}text-muted fst-italic{% else %}text-body{% endif %}">
-                            {{ plan.in_between if plan.in_between else "No intermediate steps provided." }}
+                            {{ plan.in_between if plan.in_between else _("plan.no_steps_provided") }}
                         </p>
                     </div>
                 </div>
@@ -65,8 +65,8 @@
                 <div class="col-12">
                     <hr class="text-muted opacity-25">
                     <div class="d-flex justify-content-between text-muted small">
-                        <span>Created: <strong class="text-body">{{ plan.created_at.strftime("%b %d, %Y, %I:%M %p") if plan.created_at else "N/A" }}</strong></span>
-                        <span>Last updated: <strong class="text-body">{{ plan.updated_at.strftime("%b %d, %Y, %I:%M %p") if plan.updated_at else "N/A" }}</strong></span>
+                        <span>{{ _("common.created_at") }}: <strong class="text-body">{{ plan.created_at.strftime("%b %d, %Y, %I:%M %p") if plan.created_at else "N/A" }}</strong></span>
+                        <span>{{ _("common.updated_at") }}: <strong class="text-body">{{ plan.updated_at.strftime("%b %d, %Y, %I:%M %p") if plan.updated_at else "N/A" }}</strong></span>
                     </div>
                 </div>
 

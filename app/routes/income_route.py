@@ -9,6 +9,7 @@ from app.forms.income_forms import (
 
 from app.services.income_services import IncomeServices
 from app.security.cookie import check_cookie_token
+from app.utils.i18n import _
 
 from datetime import date
 
@@ -63,7 +64,7 @@ def create():
         }
 
         income = IncomeServices.create_income(data, current_user)
-        flash(f"Income '${income.amount:.2f}' created successfully!", "success")
+        flash(_("message.income_created_success", amount=f"${income.amount:.2f}"), "success")
         return redirect(url_for("incomes.index"))
 
     return render_template("incomes/create.html", form=form)
@@ -90,7 +91,7 @@ def edit(income_id):
         }
 
         IncomeServices.update_income(income, data)
-        flash(f"Income '${income.amount:.2f}' updated successfully!", "success")
+        flash(_("message.income_updated_success", amount=f"${income.amount:.2f}"), "success")
         return redirect(url_for("incomes.index"))
 
     return render_template(
@@ -131,5 +132,5 @@ def delete(income_id):
     form = IncomeDeleteForm()
     if form.validate_on_submit():
         IncomeServices.delete_income(income)
-        flash("Income deleted successfully!", "success")
+        flash(_("message.income_deleted_success"), "success")
     return redirect(url_for("incomes.index"))

@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}Inference History — Financial Advisor{% endblock %}
+{% block title %}{{ _("history.page_title") }}{% endblock %}
 
 {% block content %}
 <style>
@@ -19,11 +19,11 @@
 <div class="container-fluid py-2 px-2 px-md-3">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Inference History Archive</h3>
-            <p class="text-muted small mb-0">Audit logs of all historical expert system scans and heuristic evaluations.</p>
+            <h3 class="fw-bold mb-1">{{ _("history.index_title") }}</h3>
+            <p class="text-muted small mb-0">{{ _("history.index_subtitle") }}</p>
         </div>
         <a href="{{ url_for('advisors.index') }}" class="btn btn-primary px-4 py-2 mt-3 mt-md-0 rounded-pill shadow-sm fw-semibold">
-            <i class="bi bi-cpu-fill me-1"></i> New Inference Scan
+            <i class="bi bi-cpu-fill me-1"></i> {{ _("history.new_scan") }}
         </a>
     </div>
 
@@ -35,12 +35,12 @@
                     <div class="row align-items-center g-3">
                         
                         <div class="col-md-1 border-end d-none d-md-block text-center">
-                            <span class="text-uppercase small fw-bold text-muted d-block" style="font-size: 0.7rem;">Scan Ref</span>
+                            <span class="text-uppercase small fw-bold text-muted d-block" style="font-size: 0.7rem;">{{ _("history.scan_ref") }}</span>
                             <span class="h6 mb-0 text-primary font-monospace">#{{ h.id }}</span>
                         </div>
 
                         <div class="col-md-2 ps-md-3">
-                            <label class="small text-muted d-block">Timestamp</label>
+                            <label class="small text-muted d-block">{{ _("history.timestamp") }}</label>
                             <span class="fw-medium small">
                                 <i class="bi bi-calendar3 me-1 text-secondary"></i>
                                 {{ h.created_at.strftime('%b %d, %Y') }}
@@ -50,13 +50,13 @@
                         <div class="col-md-3">
                             <div class="row">
                                 <div class="col-6">
-                                    <label class="small text-muted d-block">Target Goal</label>
+                                    <label class="small text-muted d-block">{{ _("history.target_goal") }}</label>
                                     <span class="fw-bold text-body-emphasis small font-monospace">
                                         {{ "${:,.2f}".format(h.goal_cost) if h.goal_cost else "—" }}
                                     </span>
                                 </div>
                                 <div class="col-6">
-                                    <label class="small text-muted d-block">Income Baseline</label>
+                                    <label class="small text-muted d-block">{{ _("history.income_baseline") }}</label>
                                     <span class="fw-bold text-success small font-monospace">
                                         ${{ "{:,.2f}".format(h.income) }}
                                     </span>
@@ -65,23 +65,23 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="small text-muted d-block">Prescribed Heuristic Conclusion</label>
+                            <label class="small text-muted d-block">{{ _("history.heuristic_conclusion") }}</label>
                             <p class="mb-0 text-body-secondary small text-truncate">
                                 <i class="bi bi-chat-left-quote me-1 text-primary"></i>
                                 {% if h.get_advice %}
                                     "{{ h.get_advice[:75] }}{% if h.get_advice|length > 75 %}...{% endif %}"
                                 {% else %}
-                                    <span class="text-muted fst-italic">No conclusion logged</span>
+                                    <span class="text-muted fst-italic">{{ _("history.no_conclusion_logged") }}</span>
                                 {% endif %}
                             </p>
                         </div>
 
                         <div class="col-md-2 text-md-end">
                             <div class="btn-group btn-group-sm shadow-none rounded-3 border">
-                                <a href="{{ url_for('history.detail', history_id=h.id) }}" class="btn btn-light" title="Inspect Full Report">
+                                <a href="{{ url_for('history.detail', history_id=h.id) }}" class="btn btn-light" title="{{ _('history.inspect_report') }}">
                                     <i class="bi bi-eye text-primary"></i>
                                 </a>
-                                <a href="{{ url_for('history.delete_confirm', history_id=h.id) }}" class="btn btn-light text-danger" title="Delete Archive">
+                                <a href="{{ url_for('history.delete_confirm', history_id=h.id) }}" class="btn btn-light text-danger" title="{{ _('history.delete_archive') }}">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </div>
@@ -95,13 +95,13 @@
     {% else %}
         <div class="card border shadow-sm text-center py-5 rounded-4" style="background-color: var(--bs-card-bg);">
             <i class="bi bi-clock-history display-5 text-muted opacity-50 mb-3 d-block"></i>
-            <h5 class="fw-bold">No Inference Archive Found</h5>
+            <h5 class="fw-bold">{{ _("history.no_archive_found") }}</h5>
             <p class="text-muted small mx-auto mb-3" style="max-width: 400px;">
-                Execute your first AI advisory evaluation to record deterministic reports.
+                {{ _("history.no_archive_hint") }}
             </p>
             <div>
                 <a href="{{ url_for('advisors.index') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-                    <i class="bi bi-cpu-fill me-1"></i> Start Inference Check
+                    <i class="bi bi-cpu-fill me-1"></i> {{ _("history.start_check") }}
                 </a>
             </div>
         </div>

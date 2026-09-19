@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ current_lang }}">
 
 <head>
     <meta charset="utf-8">
@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/layout/emp.css') }}" rel="stylesheet">
 
 </head>
@@ -20,7 +21,7 @@
             <div class="d-flex align-items-center justify-content-between mb-4 text-white text-decoration-none px-3">
                 <div class="d-flex align-items-center">
                     <i class="bi bi-currency-dollar fs-4 me-2 text-info"></i>
-                    <span class="fs-5 fw-bold">Financial Advisor</span>
+                    <span class="fs-5 fw-bold">{{ _('app.name') }}</span>
                 </div>
 
                 <div class="burger-menu">
@@ -32,7 +33,7 @@
                 <li class="nav-item">
                     <a class="nav-link {% if request.endpoint == 'dashboards.empIndex' %}active{% endif %}"
                         href="{{ url_for('dashboards.empIndex') }}">
-                        <i class="bi bi-speedometer2"></i> Dashboard
+                        <i class="bi bi-speedometer2"></i> {{ _('nav.dashboard') }}
                     </a>
                 </li>
                 {% endif %}
@@ -42,7 +43,7 @@
                 <li>
                     <a class="nav-link {% if request.endpoint == 'rules.index' %}active{% endif %}"
                         href="{{ url_for('rules.index') }}">
-                        <i class="bi bi-list-check"></i> Rules
+                        <i class="bi bi-list-check"></i> {{ _('nav.rules') }}
                     </a>
                 </li>
                 {% endif %}
@@ -52,7 +53,7 @@
                 <li>
                     <a class="nav-link {% if request.endpoint == 'facts.index' %}active{% endif %}"
                         href="{{ url_for('facts.index') }}">
-                        <i class="bi bi-info-circle"></i> Facts
+                        <i class="bi bi-info-circle"></i> {{ _('nav.facts') }}
                     </a>
                 </li>
                 {% endif %}
@@ -61,7 +62,7 @@
                 <li>
                     <a class="nav-link {% if request.endpoint == 'roles.index' %}active{% endif %}"
                         href="{{ url_for('roles.index') }}">
-                        <i class="bi bi-people"></i> Roles
+                        <i class="bi bi-people"></i> {{ _('nav.roles') }}
                     </a>
                 </li>
                 {% endif %}
@@ -70,7 +71,7 @@
                 <li>
                     <a class="nav-link {% if request.endpoint == 'users.index' %}active{% endif %}"
                         href="{{ url_for('users.index') }}">
-                        <i class="bi bi-person-gear"></i> Users
+                        <i class="bi bi-person-gear"></i> {{ _('nav.users') }}
                     </a>
                 </li>
                 {% endif %}
@@ -79,7 +80,7 @@
                 <li>
                     <a class="nav-link {% if request.endpoint == 'dashboards.userIndex' %}active{% endif %}"
                         href="{{ url_for('dashboards.userIndex') }}">
-                        <i class="bi bi-cash-coin"></i> Financial App
+                        <i class="bi bi-cash-coin"></i> {{ _('nav.financial_app') }}
                     </a>
                 </li>
                 {% endif %}
@@ -89,7 +90,7 @@
                 <li>
                     <a class="nav-link {% if request.endpoint == 'settings.empIndex' %}active{% endif %}"
                         href="{{ url_for('settings.empIndex') }}">
-                        <i class="bi bi-gear"></i> Setting
+                        <i class="bi bi-gear"></i> {{ _('nav.setting') }}
                     </a>
                 </li>
             </ul>
@@ -97,7 +98,7 @@
             <div class="sidebar-footer mt-auto px-3">
                 <hr class="border-top border-secondary pt-2">
                 <div class="form-check form-switch d-flex justify-content-between align-items-center p-0">
-                    <label class="small text-white-50" for="modeToggle">Dark Mode</label>
+                    <label class="small text-white-50" for="modeToggle">{{ _('common.dark_mode') }}</label>
                     <input class="form-check-input m-0 p-2" type="checkbox" id="modeToggle" style="cursor:pointer">
                 </div>
             </div>
@@ -110,7 +111,7 @@
                     <!-- Role display (LEFT SIDE) -->
                     <button class="btn btn-sm btn-light border shadow-sm d-flex align-items-center rounded-pill px-3">
                         <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
-                        <span class="fw-semibold text-secondary mx-1">Role:</span>
+                        <span class="fw-semibold text-secondary mx-1">{{ _('common.role') }}:</span>
                         <span class="ms-1 fw-bold text-dark">
                             {{ current_user.roles[0].name if current_user.roles else "None" }}
                         </span>
@@ -118,6 +119,19 @@
 
                     <!-- RIGHT SIDE CONTENT -->
                     <div class="ms-auto d-flex align-items-center">
+
+                        <!-- Language Switcher -->
+                        <div class="d-flex align-items-center me-3">
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Language Selector">
+                                <a href="{{ url_for('lang.set_language', language='en') }}" 
+                                   class="btn btn-sm {% if current_lang == 'en' %}btn-primary{% else %}btn-outline-secondary{% endif %}" 
+                                   title="English">English</a>
+                                <span class="d-flex align-items-center text-muted px-1">|</span>
+                                <a href="{{ url_for('lang.set_language', language='km') }}" 
+                                   class="btn btn-sm {% if current_lang == 'km' %}btn-primary{% else %}btn-outline-secondary{% endif %}" 
+                                   title="ខ្មែរ">ខ្មែរ</a>
+                            </div>
+                        </div>
 
                         <!-- Notification dropdown -->
                         <div class="mobile-hide dropdown">
@@ -150,7 +164,7 @@
                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                 <li>
                                     <a class="dropdown-item" href="/profiles/emp">
-                                        <i class="bi bi-person me-2"></i> My Profile
+                                        <i class="bi bi-person me-2"></i> {{ _('nav.my_profile') }}
                                     </a>
                                 </li>
                             </ul>
@@ -161,7 +175,7 @@
                             href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}">
                             <i
                                 class="bi {% if not current_user.is_authenticated %}bi-box-arrow-in-right{% else %}bi-box-arrow-right{% endif %} me-1"></i>
-                            {{"Sign-In" if not current_user.is_authenticated else "Logout"}}
+                            {{ _('nav.login') if not current_user.is_authenticated else _('nav.logout') }}
                         </a>
 
                     </div>
