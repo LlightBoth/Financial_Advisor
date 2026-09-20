@@ -211,7 +211,6 @@
         const totalIncome = Number({{ total_incomes | default(0) | tojson }}) || 0;
         const totalExpense = Number({{ total_expenses | default(0) | tojson }}) || 0;
         const totalPlan = Number({{ total_plans | default(0) | tojson }}) || 0;
-        const totalAnalyse = Number({{ total_anayses | default(0) | tojson }}) || 0;
         const monthlyUsers = {{ monthly_users_registered | default([]) | tojson }} || [];
 
         // Helper to dynamically match Chart colors with Bootstrap's theme state
@@ -292,10 +291,10 @@
             radarChartInstance = new Chart(radarCtx, {
                 type: 'radar',
                 data: {
-                    labels: ['Plan', 'Analyse', 'Income', 'Expense'],
+                    labels: ['Plan', 'Income', 'Expense'],
                     datasets: [{
                         label: 'Client Distribution',
-                        data: [totalPlan, totalAnalyse, totalIncome, totalExpense],
+                        data: [totalPlan, totalIncome, totalExpense],
                         backgroundColor: 'rgba(13, 110, 253, 0.25)',
                         borderColor: '#0d6efd',
                         borderWidth: 2,

@@ -59,9 +59,6 @@ def login():
             else:
                 redirect_url = url_for("dashboards.userIndex")
 
-            # Give user new session token
-            session["refresh_token"] = refresh_token
-
             # Save user Log
             data = {
                 "user_id": current_user.id,

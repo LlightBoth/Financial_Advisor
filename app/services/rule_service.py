@@ -1,4 +1,4 @@
-from app.models.rule import Rule
+from app.models.rule import Rule, RuleCondition
 from app.services.association_services import AssociationServices
 from extension import db
 
@@ -32,35 +32,72 @@ class RuleServices:
     @staticmethod
     def create_rule(data: dict):
         try:
-            facts = AssociationServices.get_rule_fact(data)
             rule = Rule(
+                name=data["name"],
                 conclusion=data["conclusion"],
                 certainty=data["certainty"],
                 advice=data["advice"],
-                facts=facts
             )
+
             db.session.add(rule)
+            db.session.flush()
+
+            # Create rule conditions
+            for condition_data in data.get("conditions", []):
+                condition = RuleCondition(
+                    rule_id=rule.id,
+                    fact=condition_data["fact"],
+                    operator=condition_data["operator"],
+                    value_fact=condition_data.get("value_fact"),
+                    value=condition_data.get("value"),
+                )
+
+                db.session.add(condition)
+
             db.session.commit()
+
             return rule
+
         except Exception:
             db.session.rollback()
             raise
+
 
     @staticmethod
     def update_rule(rule: Rule, data: dict):
         try:
+            rule.name = data["name"]
             rule.conclusion = data["conclusion"]
             rule.certainty = data["certainty"]
             rule.advice = data["advice"]
 
-            if "facts" in data:
-                rule.facts = AssociationServices.get_rule_fact(data)
-            
+            # Remove existing conditions
+            RuleCondition.query.filter_by(
+                rule_id=rule.id
+            ).delete(
+                synchronize_session=False
+            )
+
+            # Re-create conditions
+            for condition_data in data.get("conditions", []):
+                condition = RuleCondition(
+                    rule_id=rule.id,
+                    fact=condition_data["fact"],
+                    operator=condition_data["operator"],
+                    value_fact=condition_data.get("value_fact"),
+                    value=condition_data.get("value"),
+                )
+
+                db.session.add(condition)
+
             db.session.commit()
+
             return rule
+
         except Exception:
             db.session.rollback()
             raise
+
 
     @staticmethod
     def delete_rule(rule: Rule):

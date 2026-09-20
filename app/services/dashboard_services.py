@@ -2,7 +2,6 @@ from app.models.plan import Plan
 from app.models.user import User
 from app.models.income import Income
 from app.models.expense import Expense
-from app.models.history import History
 
 import random
 from datetime import date, datetime, timezone
@@ -23,9 +22,9 @@ class DashboardServices:
     def emp_get_all_expenses():
         return Expense.query.count()
     
-    @staticmethod
-    def emp_get_all_analyse_advisor():
-        return History.query.count()
+    # @staticmethod
+    # def emp_get_all_analyse_advisor():
+    #     return History.query.count()
     
     @staticmethod
     def emp_get_all_active_users():

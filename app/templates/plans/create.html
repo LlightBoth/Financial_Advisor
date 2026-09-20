@@ -1,10 +1,10 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %} Create Plan | Intelli App {% endblock %}
+{% block title %}Create Plan | Intelli App{% endblock %}
 
 {% block content %}
+
 <style>
-    /* Theme-adaptive Form Styling */
     .workspace-wrapper {
         max-width: 850px;
         margin: 0 auto;
@@ -36,74 +36,234 @@
         font-weight: 700;
         color: var(--bs-secondary-color);
     }
+
+    .step-section {
+        display: none;
+    }
+
+    .step-section.active {
+        display: block;
+    }
 </style>
 
 <div class="container-fluid pt-0 px-4">
+
     <div class="workspace-wrapper py-5">
-        
+
+        <!-- Header -->
         <div class="mb-5 text-center">
-            <span class="breadcrumb-custom mb-2 d-block">Planning / New Strategy</span>
-            <h1 class="display-6 fw-bold mb-2">Create Your Strategy</h1>
+            <span class="breadcrumb-custom mb-2 d-block">
+                Planning / New Strategy
+            </span>
+
+            <h1 class="display-6 fw-bold mb-2">
+                Create Your Strategy
+            </h1>
+
             <p class="text-muted mx-auto" style="max-width: 500px;">
-                Define your financial milestones. We'll help you track the progress and visualize the timeline.
+                Define your financial milestones. We'll help you track the
+                progress and analyze your plan.
             </p>
         </div>
 
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="card form-card-modern border-0">
-                    <div class="card-body p-4 p-md-5">
-                        
-                        <div class="d-flex align-items-center mb-5">
-                            <div class="step-icon me-3">
-                                <i class="bi bi-bullseye"></i>
-                            </div>
-                            <div>
-                                <h5 class="fw-bold mb-0">Strategy Framework</h5>
-                                <small class="text-muted">Enter the core details of your financial goal</small>
-                            </div>
+        <!-- Main Card -->
+        <div class="card form-card-modern border-0">
+
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Step Header -->
+                <div class="d-flex align-items-center mb-5">
+
+                    <div class="step-icon me-3">
+                        <i id="step-icon" class="bi bi-bullseye"></i>
+                    </div>
+
+                    <div>
+                        <h5 id="step-title" class="fw-bold mb-0">
+                            Strategy Framework
+                        </h5>
+
+                        <small id="step-description" class="text-muted">
+                            Enter the core details of your financial goal
+                        </small>
+                    </div>
+
+                </div>
+
+                <!-- ONE FORM -->
+                <form method="POST" novalidate>
+
+                    {{ form.hidden_tag() }}
+
+                    <!-- ===================== -->
+                    <!-- STEP 1 -->
+                    <!-- ===================== -->
+
+                    <div id="step-1" class="step-section active">
+
+                        {% include "plans/_form1.html" %}
+
+                        <div class="d-flex justify-content-end mt-4">
+
+                            <button
+                                type="button"
+                                class="btn btn-primary px-4"
+                                id="next-step"
+                            >
+                                Next
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+
                         </div>
 
-                        <form method="post" novalidate class="row g-4">
-                            {% include "plans/_form.html" %}
-                            
-                        </form>
                     </div>
-                </div>
-            </div>
 
-            <div class="col-12 mt-4">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start p-3">
-                            <i class="bi bi-check2-circle text-success fs-4 me-3"></i>
-                            <div>
-                                <h6 class="fw-bold mb-1 small">Real-time Tracking</h6>
-                                <p class="text-muted x-small mb-0">Monitor days remaining automatically.</p>
-                            </div>
+
+                    <!-- ===================== -->
+                    <!-- STEP 2 -->
+                    <!-- ===================== -->
+
+                    <div id="step-2" class="step-section">
+
+                        {% include "plans/_form2.html" %}
+
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary px-4"
+                                id="previous-step"
+                            >
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Back
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary px-4"
+                            >
+                                <i class="bi bi-check-circle me-2"></i>
+                                Save Plan
+                            </button>
+
                         </div>
+
                     </div>
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start p-3">
-                            <i class="bi bi-shield-lock text-primary fs-4 me-3"></i>
-                            <div>
-                                <h6 class="fw-bold mb-1 small">Secure Data</h6>
-                                <p class="text-muted x-small mb-0">Your financial goals are encrypted and private.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-start p-3">
-                            <i class="bi bi-lightbulb text-warning fs-4 me-3"></i>
-                            <div>
-                                <h6 class="fw-bold mb-1 small">Flexible Edits</h6>
-                                <p class="text-muted x-small mb-0">Adjust targets as your income changes.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+                </form>
+
             </div>
         </div>
+
+
+        <!-- Information -->
+        <div class="row g-3 mt-4">
+
+            <div class="col-md-4">
+                <div class="d-flex align-items-start p-3">
+                    <i class="bi bi-check2-circle text-success fs-4 me-3"></i>
+
+                    <div>
+                        <h6 class="fw-bold mb-1 small">
+                            Real-time Tracking
+                        </h6>
+
+                        <p class="text-muted x-small mb-0">
+                            Monitor days remaining automatically.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="d-flex align-items-start p-3">
+                    <i class="bi bi-shield-lock text-primary fs-4 me-3"></i>
+
+                    <div>
+                        <h6 class="fw-bold mb-1 small">
+                            Secure Data
+                        </h6>
+
+                        <p class="text-muted x-small mb-0">
+                            Your financial goals are private.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="d-flex align-items-start p-3">
+                    <i class="bi bi-lightbulb text-warning fs-4 me-3"></i>
+
+                    <div>
+                        <h6 class="fw-bold mb-1 small">
+                            Flexible Edits
+                        </h6>
+
+                        <p class="text-muted x-small mb-0">
+                            Adjust your targets as your situation changes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
+
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const step1 = document.getElementById("step-1");
+    const step2 = document.getElementById("step-2");
+
+    const nextButton = document.getElementById("next-step");
+    const previousButton = document.getElementById("previous-step");
+
+    const stepTitle = document.getElementById("step-title");
+    const stepDescription = document.getElementById("step-description");
+    const stepIcon = document.getElementById("step-icon");
+
+
+    nextButton.addEventListener("click", function () {
+
+        step1.classList.remove("active");
+        step2.classList.add("active");
+
+        stepTitle.textContent = "Financial Situation";
+        stepDescription.textContent =
+            "Tell us about your current financial situation";
+
+        stepIcon.className = "bi bi-bar-chart-line";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+
+
+    previousButton.addEventListener("click", function () {
+
+        step2.classList.remove("active");
+        step1.classList.add("active");
+
+        stepTitle.textContent = "Strategy Framework";
+        stepDescription.textContent =
+            "Enter the core details of your financial goal";
+
+        stepIcon.className = "bi bi-bullseye";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+
+});
+</script>
+
 {% endblock %}

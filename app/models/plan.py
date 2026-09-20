@@ -11,9 +11,18 @@ class Plan(db.Model):
     in_between = db.Column(db.Date, nullable=False)
     goal_cost = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(120), nullable=False)
-    value = db.Column(db.Boolean, default=True, nullable=False)
+    income = db.Column(db.Float, nullable=False)
+    expense = db.Column(db.Float, nullable=False)
+    martial_status = db.Column(db.String(20), nullable=False)
+    employment_status = db.Column(db.String(40), nullable=False)
+    debt_status = db.Column(db.String(40), nullable=False)
+    spending_habit = db.Column(db.String(40), nullable=False)
+    value = db.Column(db.Boolean, default=False, nullable=False)
 
-    saving = db.Column(db.Float, default=0.0)
+    debt_amount = db.Column(db.Numeric(12, 2), nullable=True)
+    has_budget = db.Column(db.Boolean, default=False, nullable=False)
+    saving = db.Column(db.Float, nullable=True)
+
     last_completed = db.Column(db.DateTime, nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

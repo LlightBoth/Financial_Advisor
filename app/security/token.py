@@ -35,11 +35,6 @@ class Token:
         if not check_password_hash(hashed_rf_token, rf_token):
             return False
 
-        # 4. Check if session token matches (safely get session key without KeyError)
-        session_rf_token = session.get("refresh_token")
-        if not session_rf_token or session_rf_token != rf_token:
-            return False
-
         return True
 
     @staticmethod

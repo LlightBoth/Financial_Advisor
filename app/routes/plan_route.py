@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, abort, flash, r
 from flask_login import login_required, current_user
 from app.forms.plan_forms import PlanForm, EditPlanForm, ConfirmDeleteForm
 
-from app.services.plan_services import PlanServices
+from app.services.plan_services import PlanServices, PlanAnalysisService
 from app.security.cookie import check_cookie_token
 from app.security.role_check import check_route_permission
 
@@ -30,10 +30,20 @@ def index():
 @plan_bp.route("/<int:plan_id>")
 @login_required
 def detail(plan_id):
-    plan = PlanServices.get_plan_id(plan_id, current_user.id)
+    plan = PlanServices.get_plan_id(plan_id,current_user.id)
+
     if plan is None:
         abort(404)
-    return render_template("plans/detail.html", plan=plan)
+
+    analysis = PlanAnalysisService.analyze_plan(plan)
+
+    return render_template(
+        "plans/detail.html",
+        plan=plan,
+        facts=analysis["facts"],
+        matched_rules=analysis["matched_rules"],
+    )
+
 
 @plan_bp.route("/create", methods=["GET", "POST"])
 @login_required
@@ -42,43 +52,82 @@ def create():
 
     if form.validate_on_submit():
         data = {
+            # Step 1 - Strategy Framework
             "goal": form.goal.data,
-            "in_between": form.in_between.data,
             "goal_cost": form.goal_cost.data,
+            "in_between": form.in_between.data,
             "description": form.description.data,
-            "value": form.value.data,
+
+            # Financial information
+            "income": form.income.data,
+            "expense": form.expense.data,
+            "debt_amount": form.debt_amount.data or 0,
+            "savings_amount": form.savings_amount.data or 0,
+            "has_budget": form.has_budget.data,
+
+            # Step 2 - Financial Situation
+            "martial_status": form.marital_status.data,
+            "employment_status": form.employment_status.data,
+            "debt_status": form.debt_status.data,
+            "spending_habit": form.spending_habit.data,
         }
 
         plan = PlanServices.create_plan(data, current_user)
-        flash(f"Plan '{plan.goal}' created successfully!", "success")
+
+        flash(f"Plan '{plan.goal}' created successfully!","success")
+
         return redirect(url_for("plans.index"))
 
-    return render_template("plans/create.html", form=form)
+    return render_template(
+        "plans/create.html",
+        form=form
+    )
 
 
 @plan_bp.route("/<int:plan_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(plan_id):
-    plan = PlanServices.get_plan_id(plan_id, current_user.id)
+    plan = PlanServices.get_plan_id(plan_id,current_user.id)
+
     if plan is None:
         abort(404)
-    
-    form = EditPlanForm(original_plan=plan, obj=plan)
+
+    form = EditPlanForm(original_plan=plan,obj=plan)
 
     if form.validate_on_submit():
         data = {
+            # Step 1 - Strategy Framework
             "goal": form.goal.data,
-            "in_between": form.in_between.data,
             "goal_cost": form.goal_cost.data,
+            "in_between": form.in_between.data,
             "description": form.description.data,
-            "value": form.value.data,
+
+            # Financial information
+            "income": form.income.data,
+            "expense": form.expense.data,
+            "debt_amount": form.debt_amount.data or 0,
+            "savings_amount": form.savings_amount.data or 0,
+            "has_budget": form.has_budget.data,
+
+            # Step 2 - Financial Situation
+            "martial_status": form.marital_status.data,
+            "employment_status": form.employment_status.data,
+            "debt_status": form.debt_status.data,
+            "spending_habit": form.spending_habit.data,
         }
 
-        PlanServices.update_plan(plan, data)
-        flash(f"Plan '{plan.goal}' updated successfully!", "success")
+        PlanServices.update_plan(plan,data)
+
+        flash(f"Plan '{plan.goal}' updated successfully!","success")
+
         return redirect(url_for("plans.index"))
 
-    return render_template("plans/edit.html", form=form, plan=plan)
+    return render_template(
+        "plans/edit.html",
+        form=form,
+        plan=plan
+    )
+
 
 
 @plan_bp.route("/<int:plan_id>/delete", methods=["GET"])

@@ -1,0 +1,708 @@
+{
+  "rules": [
+    {
+      "id": 1,
+      "name": "Positive Cash Flow",
+      "conditions": [
+        {
+          "fact": "monthly_income",
+          "operator": "greater_than",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has positive monthly cash flow.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Allocate part of the surplus to emergency savings.",
+        "Step 3: Allocate part of the surplus toward debt repayment if debt exists.",
+        "Step 4: Allocate part of the remaining surplus toward financial goals.",
+        "Step 5: Automate the monthly allocations.",
+        "Step 6: Review the allocation every month."
+      ]
+    },
+
+    {
+      "id": 2,
+      "name": "Negative Cash Flow",
+      "conditions": [
+        {
+          "fact": "monthly_income",
+          "operator": "less_than",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "The user is spending more than their monthly income.",
+      "advice": [
+        "Step 1: Calculate the monthly deficit.",
+        "Step 2: Identify the largest expense categories.",
+        "Step 3: Separate essential and non-essential expenses.",
+        "Step 4: Reduce non-essential expenses.",
+        "Step 5: Review recurring subscriptions and unnecessary services.",
+        "Step 6: Set a maximum monthly spending limit.",
+        "Step 7: Look for opportunities to increase reliable income.",
+        "Step 8: Recalculate cash flow at the end of the month."
+      ]
+    },
+
+    {
+      "id": 3,
+      "name": "Income Equals Expenses",
+      "conditions": [
+        {
+          "fact": "monthly_income",
+          "operator": "equals",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user's income is approximately equal to their expenses, leaving little or no monthly surplus.",
+      "advice": [
+        "Step 1: Review all monthly expenses.",
+        "Step 2: Identify unnecessary spending.",
+        "Step 3: Reduce variable expenses.",
+        "Step 4: Create a small monthly savings target.",
+        "Step 5: Increase the savings target when expenses decrease or income increases.",
+        "Step 6: Review the budget every month."
+      ]
+    },
+
+    {
+      "id": 4,
+      "name": "High Spending",
+      "conditions": [
+        {
+          "fact": "high_spending",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user's spending level is high relative to their income.",
+      "advice": [
+        "Step 1: Review the previous 30 days of transactions.",
+        "Step 2: Group expenses into categories.",
+        "Step 3: Identify the largest non-essential categories.",
+        "Step 4: Set spending limits for those categories.",
+        "Step 5: Reduce unnecessary purchases.",
+        "Step 6: Redirect the saved amount toward savings or debt repayment.",
+        "Step 7: Track spending again next month."
+      ]
+    },
+
+    {
+      "id": 5,
+      "name": "Low Spending With Income",
+      "conditions": [
+        {
+          "fact": "low_spending",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_income",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.80,
+      "conclusion": "The user is maintaining relatively low spending compared with their income.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Maintain reasonable essential spending.",
+        "Step 3: Increase emergency savings if necessary.",
+        "Step 4: Allocate surplus toward financial goals.",
+        "Step 5: Consider debt repayment if applicable.",
+        "Step 6: Continue monitoring spending."
+      ]
+    },
+
+    {
+      "id": "R006",
+      "name": "Debt With High Spending",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "high_spending",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "The user has outstanding debt while maintaining high spending.",
+      "advice": [
+        "Step 1: List all outstanding debts.",
+        "Step 2: Record each debt's balance, interest rate, and minimum payment.",
+        "Step 3: Stop unnecessary new borrowing.",
+        "Step 4: Reduce non-essential spending.",
+        "Step 5: Maintain minimum payments on all debts.",
+        "Step 6: Direct additional available cash toward high-cost debt.",
+        "Step 7: Track the debt balance every month.",
+        "Step 8: Redirect reduced spending toward debt repayment."
+      ]
+    },
+
+    {
+      "id": 7,
+      "name": "Debt With Positive Cash Flow",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "monthly_income",
+          "operator": "greater_than",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has debt but also has positive monthly cash flow.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Maintain required payments on all debts.",
+        "Step 3: Maintain an appropriate emergency reserve.",
+        "Step 4: Use part of the surplus for additional debt repayment.",
+        "Step 5: Prioritize higher-cost debt where appropriate.",
+        "Step 6: Recalculate the debt balance each month.",
+        "Step 7: Increase debt payments when the monthly surplus increases."
+      ]
+    },
+
+    {
+      "id": 8,
+      "name": "Debt Without Savings",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has debt but no savings reserve.",
+      "advice": [
+        "Step 1: Review all debt obligations.",
+        "Step 2: Continue making required debt payments.",
+        "Step 3: Reduce unnecessary expenses.",
+        "Step 4: Build an initial emergency reserve.",
+        "Step 5: Avoid unnecessary new borrowing.",
+        "Step 6: Increase the emergency reserve gradually.",
+        "Step 7: Direct additional available money toward debt repayment."
+      ]
+    },
+
+    {
+      "id": 9,
+      "name": "Debt With Savings",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user has both savings and outstanding debt.",
+      "advice": [
+        "Step 1: Determine the amount of available savings.",
+        "Step 2: Keep an appropriate emergency reserve.",
+        "Step 3: Review the interest rate of each debt.",
+        "Step 4: Continue required payments.",
+        "Step 5: Consider directing excess cash toward higher-cost debt.",
+        "Step 6: Continue rebuilding savings after additional debt payments.",
+        "Step 7: Review the balance between savings and debt reduction regularly."
+      ]
+    },
+
+    {
+      "id": 10,
+      "name": "No Debt With Savings",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": false
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user has savings and no outstanding debt.",
+      "advice": [
+        "Step 1: Determine essential monthly expenses.",
+        "Step 2: Maintain an appropriate emergency reserve.",
+        "Step 3: Define short-term and long-term financial goals.",
+        "Step 4: Separate emergency savings from goal-based savings.",
+        "Step 5: Automate regular savings contributions.",
+        "Step 6: Allocate surplus money according to the user's goals.",
+        "Step 7: Review the financial plan periodically."
+      ]
+    },
+
+    {
+      "id": 11,
+      "name": "No Savings",
+      "conditions": [
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user currently has no savings reserve.",
+      "advice": [
+        "Step 1: Determine a realistic initial savings target.",
+        "Step 2: Review monthly expenses.",
+        "Step 3: Identify expenses that can be reduced.",
+        "Step 4: Set a fixed monthly savings amount.",
+        "Step 5: Transfer the savings amount immediately after receiving income.",
+        "Step 6: Avoid using the savings for non-essential purchases.",
+        "Step 7: Increase the savings contribution when income increases."
+      ]
+    },
+
+    {
+      "id": 12,
+      "name": "Strong Savings",
+      "conditions": [
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "low_spending",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user has savings while maintaining relatively low spending.",
+      "advice": [
+        "Step 1: Continue maintaining controlled spending.",
+        "Step 2: Review the emergency reserve.",
+        "Step 3: Set additional financial goals.",
+        "Step 4: Allocate future surplus toward those goals.",
+        "Step 5: Review progress monthly.",
+        "Step 6: Avoid increasing lifestyle expenses unnecessarily as income grows."
+      ]
+    },
+
+    {
+      "id": 13,
+      "name": "No Budget",
+      "conditions": [
+        {
+          "fact": "has_budget",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user does not currently have a defined budget.",
+      "advice": [
+        "Step 1: Record monthly income.",
+        "Step 2: Record all monthly expenses.",
+        "Step 3: Categorize expenses.",
+        "Step 4: Separate essential and non-essential spending.",
+        "Step 6: Allocate money toward savings and goals.",
+        "Step 7: Track actual spending against the budget.",
+        "Step 8: Adjust the budget every month."
+      ]
+    },
+
+    {
+      "id": 14,
+      "name": "Budget With High Spending",
+      "conditions": [
+        {
+          "fact": "has_budget",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "high_spending",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user has a budget but is still spending at a high level.",
+      "advice": [
+        "Step 1: Compare planned spending with actual spending.",
+        "Step 2: Identify categories exceeding their limits.",
+        "Step 3: Determine why those categories exceed the budget.",
+        "Step 4: Reduce unnecessary spending.",
+        "Step 5: Adjust unrealistic budget limits.",
+        "Step 6: Track spending weekly.",
+        "Step 7: Review the budget at the end of the month."
+      ]
+    },
+
+    {
+      "id": 15,
+      "name": "No Financial Goal",
+      "conditions": [
+        {
+          "fact": "has_financial_goal",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.80,
+      "conclusion": "The user does not currently have a defined financial goal.",
+      "advice": [
+        "Step 1: Identify the user's main financial priority.",
+        "Step 2: Choose a specific financial goal.",
+        "Step 3: Define the target amount.",
+        "Step 4: Set a target date.",
+        "Step 5: Calculate the required monthly contribution.",
+        "Step 6: Add the contribution to the monthly budget.",
+        "Step 7: Track progress every month.",
+        "Step 8: Adjust the contribution when income or expenses change."
+      ]
+    },
+
+    {
+      "id": 16,
+      "name": "Goal With Positive Cash Flow",
+      "conditions": [
+        {
+          "fact": "has_financial_goal",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "monthly_income",
+          "operator": "greater_than",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has a financial goal and positive monthly cash flow.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Determine the amount required to achieve the goal.",
+        "Step 3: Calculate the required monthly contribution.",
+        "Step 4: Add the contribution to the monthly budget.",
+        "Step 5: Automate the contribution.",
+        "Step 6: Track progress every month.",
+        "Step 7: Increase contributions when additional surplus becomes available."
+      ]
+    },
+
+    {
+      "id": 17,
+      "name": "Unemployed With Expenses",
+      "conditions": [
+        {
+          "fact": "employed",
+          "operator": "equals",
+          "value": false
+        },
+        {
+          "fact": "has_expense",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has expenses but currently does not have employment.",
+      "advice": [
+        "Step 1: Identify essential monthly expenses.",
+        "Step 2: Reduce non-essential spending immediately.",
+        "Step 3: Review available savings.",
+        "Step 4: Create a short-term survival budget.",
+        "Step 5: Prioritize housing, food, utilities, and required debt payments.",
+        "Step 6: Avoid unnecessary new debt.",
+        "Step 7: Focus on obtaining a reliable source of income.",
+        "Step 8: Rebuild the financial plan after income is restored."
+      ]
+    },
+
+    {
+      "id": 18,
+      "name": "Employed Without Savings",
+      "conditions": [
+        {
+          "fact": "employed",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has employment income but has not established savings.",
+      "advice": [
+        "Step 1: Calculate monthly income and expenses.",
+        "Step 2: Identify an affordable monthly savings amount.",
+        "Step 3: Create an emergency savings target.",
+        "Step 4: Automate savings after receiving income.",
+        "Step 5: Reduce unnecessary expenses if necessary.",
+        "Step 6: Increase savings gradually as financial capacity improves.",
+        "Step 7: Review savings progress every month."
+      ]
+    },
+
+    {
+      "id": 19,
+      "name": "Income With No Budget",
+      "conditions": [
+        {
+          "fact": "has_income",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_budget",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user has income but does not currently have a structured budget.",
+      "advice": [
+        "Step 1: Record monthly income.",
+        "Step 2: Record fixed expenses.",
+        "Step 3: Record variable expenses.",
+        "Step 4: Set spending limits.",
+        "Step 5: Set a savings target.",
+        "Step 6: Allocate money toward financial goals.",
+        "Step 7: Track actual spending throughout the month.",
+        "Step 8: Review the budget monthly."
+      ]
+    },
+
+    {
+      "id": 20,
+      "name": "Debt Larger Than Savings",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "debt_amount",
+          "operator": "greater_than",
+          "value_fact": "savings_amount"
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "The user's outstanding debt is greater than their current savings.",
+      "advice": [
+        "Step 1: Review all debt balances and interest rates.",
+        "Step 2: Maintain an appropriate emergency reserve.",
+        "Step 3: Avoid using all savings to repay debt unless appropriate for the user's situation.",
+        "Step 4: Reduce unnecessary expenses.",
+        "Step 5: Direct available monthly surplus toward higher-cost debt.",
+        "Step 6: Continue making required payments on all debts.",
+        "Step 7: Reassess debt and savings balances each month."
+      ]
+    },
+
+    {
+      "id": 21,
+      "name": "Savings Larger Than Debt",
+      "conditions": [
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "savings_amount",
+          "operator": "greater_than",
+          "value_fact": "debt_amount"
+        }
+      ],
+      "certainty": 0.80,
+      "conclusion": "The user's savings balance is greater than their outstanding debt balance.",
+      "advice": [
+        "Step 1: Review the interest rate and terms of each debt.",
+        "Step 2: Maintain an appropriate emergency reserve.",
+        "Step 3: Continue required debt payments.",
+        "Step 4: Compare the cost of debt with the potential benefit of retaining excess cash.",
+        "Step 5: Decide how much surplus should remain in savings and how much should be directed toward debt.",
+        "Step 6: Continue building long-term savings after high-cost debt is controlled."
+      ]
+    },
+
+    {
+      "id": 22,
+      "name": "High Spending With No Budget",
+      "conditions": [
+        {
+          "fact": "high_spending",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_budget",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "The user has high spending and no budget structure to control it.",
+      "advice": [
+        "Step 1: Record every expense for the next 30 days.",
+        "Step 2: Categorize all spending.",
+        "Step 3: Identify unnecessary spending.",
+        "Step 5: Create a monthly budget.",
+        "Step 6: Track spending against each limit.",
+        "Step 7: Reduce categories that repeatedly exceed their limits.",
+        "Step 8: Redirect the savings toward emergency savings or debt repayment."
+      ]
+    },
+
+    {
+      "id": 23,
+      "name": "Low Spending With No Financial Goal",
+      "conditions": [
+        {
+          "fact": "low_spending",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_financial_goal",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.80,
+      "conclusion": "The user maintains relatively low spending but does not have a defined financial goal.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Determine how much can be saved each month.",
+        "Step 3: Define a short-term financial goal.",
+        "Step 4: Define a long-term financial goal.",
+        "Step 5: Set target amounts and deadlines.",
+        "Step 6: Allocate monthly surplus toward the goals.",
+        "Step 7: Track progress each month."
+      ]
+    },
+
+    {
+      "id": 24,
+      "name": "No Income",
+      "conditions": [
+        {
+          "fact": "has_income",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "The user currently has no regular income source.",
+      "advice": [
+        "Step 1: Review available savings and financial resources.",
+        "Step 2: Calculate essential monthly expenses.",
+        "Step 3: Reduce non-essential spending.",
+        "Step 4: Create a short-term financial survival budget.",
+        "Step 5: Prioritize essential expenses and required debt payments.",
+        "Step 6: Avoid unnecessary new debt.",
+        "Step 7: Focus on finding a reliable income source.",
+        "Step 8: Rebuild savings and financial goals after stable income is established."
+      ]
+    },
+
+    {
+      "id": 25,
+      "name": "Positive Cash Flow With No Savings",
+      "conditions": [
+        {
+          "fact": "monthly_income",
+          "operator": "greater_than",
+          "value_fact": "monthly_expense"
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": false
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "The user has money remaining after monthly expenses but has not established savings.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Set a fixed savings percentage or amount.",
+        "Step 3: Transfer the savings immediately after receiving income.",
+        "Step 4: Build an emergency reserve.",
+        "Step 5: Avoid using the new savings for unnecessary purchases.",
+        "Step 6: Increase the savings contribution when the surplus increases.",
+        "Step 7: Review savings progress every month."
+      ]
+    },
+
+    {
+      "id": 26,
+      "name": "Positive Cash Flow With Debt And Savings",
+      "conditions": [
+        {
+          "fact": "monthly_income",
+          "operator": "greater_than",
+          "value_fact": "monthly_expense"
+        },
+        {
+          "fact": "has_debt",
+          "operator": "equals",
+          "value": true
+        },
+        {
+          "fact": "has_savings",
+          "operator": "equals",
+          "value": true
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "The user has positive cash flow, savings, and outstanding debt.",
+      "advice": [
+        "Step 1: Calculate the monthly surplus.",
+        "Step 2: Maintain an appropriate emergency reserve.",
+        "Step 3: Review the interest rate of each debt.",
+        "Step 4: Continue required payments on all debts.",
+        "Step 5: Direct part of the surplus toward higher-cost debt.",
+        "Step 6: Continue regular savings contributions.",
+        "Step 7: Increase debt repayment as the balance decreases.",
+        "Step 8: Reallocate the freed debt-payment amount toward savings or financial goals after debt is reduced."
+      ]
+    }
+  ]
+}

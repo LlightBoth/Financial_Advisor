@@ -1,59 +1,131 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField
+from wtforms import (
+    StringField,
+    SubmitField,
+    FloatField,
+    TextAreaField,
+)
 from wtforms.validators import DataRequired, NumberRange
 
 from app.models import Rule
 
 
+# ============================================================
+# Create Rule Form
+# ============================================================
+
 class RuleForm(FlaskForm):
-    conclusion = StringField(
-        "Conclusion", 
+
+    name = StringField(
+        "Rule Name",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Conclusion Name"}
+        render_kw={
+            "placeholder": "e.g. Positive Cash Flow"
+        }
     )
+
+    conclusion = StringField(
+        "Conclusion",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "Conclusion when the rule matches"
+        }
+    )
+
     certainty = FloatField(
         "Certainty",
         validators=[
             DataRequired(),
-            NumberRange(min=0.0, max=1.0, message="Certainty must be between 0.0 and 1.0 (e.g. 0.85)")
+            NumberRange(
+                min=0.0,
+                max=1.0,
+                message=(
+                    "Certainty must be between "
+                    "0.0 and 1.0 (e.g. 0.85)"
+                )
+            )
         ],
-        render_kw={"placeholder": "Certainty factor from 0.0 to 1.0"}
+        render_kw={
+            "placeholder": "e.g. 0.85"
+        }
     )
-    advice = StringField(
+
+    advice = TextAreaField(
         "Advice",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Financial advice given when condition matches"}
+        render_kw={
+            "placeholder": (
+                "Enter financial advice, one step per line..."
+            ),
+            "rows": 8
+        }
     )
-    submit = SubmitField('Create')
+
+    submit = SubmitField("Create")
 
 
-# ----- EditRuleForm -----
+# ============================================================
+# Edit Rule Form
+# ============================================================
+
 class EditRuleForm(FlaskForm):
-    conclusion = StringField(
-        "Conclusion", 
+
+    name = StringField(
+        "Rule Name",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Conclusion Name"}
+        render_kw={
+            "placeholder": "e.g. Positive Cash Flow"
+        }
     )
+
+    conclusion = StringField(
+        "Conclusion",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "Conclusion when the rule matches"
+        }
+    )
+
     certainty = FloatField(
         "Certainty",
         validators=[
             DataRequired(),
-            NumberRange(min=0.0, max=1.0, message="Certainty must be between 0.0 and 1.0 (e.g. 0.85)")
+            NumberRange(
+                min=0.0,
+                max=1.0,
+                message=(
+                    "Certainty must be between "
+                    "0.0 and 1.0 (e.g. 0.85)"
+                )
+            )
         ],
-        render_kw={"placeholder": "Certainty factor from 0.0 to 1.0"}
+        render_kw={
+            "placeholder": "e.g. 0.85"
+        }
     )
-    advice = StringField(
+
+    advice = TextAreaField(
         "Advice",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Financial advice given when condition matches"}
+        render_kw={
+            "placeholder": (
+                "Enter financial advice, one step per line..."
+            ),
+            "rows": 8
+        }
     )
-    submit = SubmitField('Update')
+
+    submit = SubmitField("Update")
 
     def __init__(self, original_rule: Rule, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.original_rule = original_rule
 
 
-# ----- ConfirmDeleteForm -----
+# ============================================================
+# Confirm Delete Form
+# ============================================================
+
 class ConfirmDeleteForm(FlaskForm):
+
     submit = SubmitField("Confirm Delete")

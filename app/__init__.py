@@ -57,9 +57,7 @@ def create_app(config_class: type[Config] = Config):
     # Register blueprints Client-Side
     from app.routes.plan_route import plan_bp
     from app.routes.advisor_route import advisor_bp
-    from app.routes.loan_route import loan_bp
     from app.routes.dashboard_route import dashboard_bp
-    from app.routes.history_route import history_bp
     from app.routes.setting_route import setting_bp
     from app.routes.profile_route import profile_bp
     from app.routes.income_route import income_bp
@@ -76,10 +74,8 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(plan_bp)
     app.register_blueprint(advisor_bp)
     app.register_blueprint(dashboard_bp)
-    app.register_blueprint(history_bp)
     app.register_blueprint(setting_bp)
     app.register_blueprint(profile_bp)
-    app.register_blueprint(loan_bp)
     app.register_blueprint(income_bp)
     app.register_blueprint(expense_bp)
     app.register_blueprint(bot_bp)
@@ -120,8 +116,8 @@ def create_app(config_class: type[Config] = Config):
                 from app.models.role import Role
                 from app.models.permission import Permission
                 from app.models.fact import Fact
-                from app.models.rule import Rule
                 from app.security.seed_permissions import seed_system_permissions
+                from app.security.seed_rule_facts import seed_financial_system
 
                 db.create_all()
 
@@ -159,6 +155,7 @@ def create_app(config_class: type[Config] = Config):
 
                 # Seed permissions safely
                 seed_system_permissions()
+                seed_financial_system()
 
             except OperationalError:
                 # Table mismatch/pending migration detected, skip seeding safely

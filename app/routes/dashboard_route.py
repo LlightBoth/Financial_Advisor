@@ -88,7 +88,7 @@ def empIndex():
     total_plans = DashboardServices.emp_get_all_plans()
     total_incomes = DashboardServices.emp_get_all_incomes()
     total_expenses = DashboardServices.emp_get_all_expenses()
-    total_anayses = DashboardServices.emp_get_all_analyse_advisor()
+    # total_anayses = DashboardServices.emp_get_all_analyse_advisor()
     total_active_users = DashboardServices.emp_get_all_active_users()
     monthly_users_registered = DashboardServices.emp_get_all_users_registered()
 
@@ -101,7 +101,7 @@ def empIndex():
         total_plans = total_plans,
         total_incomes = total_incomes,
         total_expenses = total_expenses,
-        total_anayses = total_anayses,
+        # total_anayses = total_anayses,
         total_active_users=total_active_users,
         monthly_users_registered = monthly_users_registered,
         audit_logs= recent_logs,

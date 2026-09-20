@@ -83,19 +83,8 @@
                     <i class="bi bi-bullseye me-2"></i> <span>My Plans</span>
                 </a>
             </li>
-            <li class="nav-item mb-1">
-                <a href="{{ url_for('advisors.index') }}" class="nav-link {% if 'advisors' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-upc-scan me-2"></i> <span>Analyse</span>
-                </a>
-            </li>
             {% endif %}
-            {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'history.view') %}
-            <li class="nav-item mb-1">
-                <a href="{{ url_for('history.index') }}" class="nav-link {% if 'history' in request.endpoint %}active{% endif %}">
-                    <i class="bi bi-clock-history me-2"></i> <span>History</span>
-                </a>
-            </li>
-            {% endif %}
+            
             {% if is_management_user(current_user) %}
                 <li class="nav-section-title mt-3">ADMINISTRATION</li>
                 <li class="nav-item">
@@ -150,7 +139,6 @@
                     <li class="dropdown-header small fw-bold">Recent Alerts</li>
                     <li><a class="dropdown-item small" href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-check2-circle text-success me-2"></i>Complete Daily Tasks</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item small" href="{{ url_for('advisors.index') }}"><i class="bi bi-lightning text-warning me-2"></i>Run Financial Analysis</a></li>
                 </ul>
             </div>
 

@@ -29,8 +29,7 @@ def detail(fact_id):
     if fact is None:
         abort(404)
     return render_template("facts/detail.html", fact=fact)
-
-@fact_bp.route("/create", methods=["GET","POST"])
+@fact_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
     form = FactForm()
@@ -39,40 +38,62 @@ def create():
 
         data = {
             "description": form.description.data,
-            "value": form.value.data,
             "tags": form.tags.data,
+            "type": form.type.data,
+            "value": form.value.data,
         }
 
         fact = FactServices.create_fact(data)
-        flash(f"fact '{fact.description}' created successfully!", "success")
+
+        flash(
+            f"Fact '{fact.description}' created successfully!",
+            "success"
+        )
 
         return redirect(url_for("facts.index"))
 
-    return render_template("facts/create.html", form=form)
+    return render_template(
+        "facts/create.html",
+        form=form
+    )
 
 
-@fact_bp.route("/<int:fact_id>/edit", methods=["GET","POST"])
+@fact_bp.route("/<int:fact_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(fact_id):
     fact = FactServices.get_fact_id(fact_id)
+
     if fact is None:
         abort(404)
-    
-    form = FactForm(original_fact=fact, obj=fact)
+
+    form = FactForm(
+        original_fact=fact,
+        obj=fact
+    )
 
     if form.validate_on_submit():
 
         data = {
             "description": form.description.data,
-            "value": form.value.data,
             "tags": form.tags.data,
+            "type": form.type.data,
+            "value": form.value.data,
         }
 
         FactServices.update_fact(fact, data)
-        flash(f"fact '{fact.description}' updated successfully!", "success")
+
+        flash(
+            f"Fact '{fact.description}' updated successfully!",
+            "success"
+        )
+
         return redirect(url_for("facts.index"))
 
-    return render_template("facts/edit.html", form=form, fact=fact)
+    return render_template(
+        "facts/edit.html",
+        form=form,
+        fact=fact
+    )
 
 
 @fact_bp.route("/<int:fact_id>/delete", methods=["GET"])

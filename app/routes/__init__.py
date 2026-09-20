@@ -10,8 +10,6 @@ from .rule_route import rule_bp
 from .dashboard_route import dashboard_bp
 from .plan_route import plan_bp
 from .advisor_route import advisor_bp
-from .loan_route import loan_bp
-from .history_route import history_bp
 from .setting_route import setting_bp
 from .profile_route import profile_bp
 from .income_route import income_bp

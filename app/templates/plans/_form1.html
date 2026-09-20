@@ -1,0 +1,66 @@
+{% import "macros/form_macros.html" as f %}
+
+{{ f.render_field(
+    form.goal,
+    placeholder="e.g. Buy a new car",
+    icon="bi bi-bullseye"
+) }}
+
+<div class="row">
+    <div class="col-md-6">
+        {{ f.render_field(
+            form.goal_cost,
+            placeholder="e.g. 5000",
+            icon="bi bi-cash"
+        ) }}
+    </div>
+
+    <div class="col-md-6">
+        {{ f.render_field(
+            form.in_between,
+            icon="bi bi-calendar-event",
+            type="date"
+        ) }}
+    </div>
+</div>
+
+
+
+<div class="row">
+    <div class="col-md-6">
+        {{ f.render_field(
+            form.income,
+            placeholder="e.g. 3000",
+            icon="bi bi-cash-stack"
+        ) }}
+    </div>
+
+    <div class="col-md-6">
+        {{ f.render_field(
+            form.expense,
+            placeholder="e.g. 1800",
+            icon="bi bi-wallet2"
+        ) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        {{ f.render_field(
+            form.debt_amount,
+            placeholder="e.g. 3000",
+            icon="bi bi-cash-stack"
+        ) }}
+    </div>
+
+    <div class="col-md-6">
+        {{ f.render_switch(form.has_budget) }}
+    </div>
+</div>
+
+
+{{ f.render_field(
+    form.description,
+    placeholder="Describe your financial goal...",
+    icon="bi bi-card-text"
+) }}

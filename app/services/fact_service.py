@@ -14,29 +14,61 @@ class FactServices:
     @staticmethod
     def create_fact(data: dict):
         try:
+            value = data.get("value")
+
+            if data["type"] == "boolean":
+                value = str(value).lower() == "true"
+
+            elif data["type"] == "number":
+                value = float(value)
+
+            elif data["type"] == "string":
+                value = str(value)
+
             fact = Fact(
                 description=data["description"].lower(),
-                value=data.get("value", True),
-                tags=data["tags"].lower()
+                tags=data["tags"].lower(),
+                type=data["type"],
+                value=value
             )
+
             db.session.add(fact)
             db.session.commit()
+
             return fact
+
         except Exception:
             db.session.rollback()
             raise
 
+
     @staticmethod
     def update_fact(fact: Fact, data: dict):
         try:
+            value = data.get("value")
+
+            if data["type"] == "boolean":
+                value = str(value).lower() == "true"
+
+            elif data["type"] == "number":
+                value = float(value)
+
+            elif data["type"] == "string":
+                value = str(value)
+
             fact.description = data["description"].lower()
-            fact.value = data.get("value", True)
             fact.tags = data["tags"].lower()
+            fact.type = data["type"]
+            fact.value = value
+
             db.session.commit()
+
             return fact
+
         except Exception:
             db.session.rollback()
             raise
+
 
     @staticmethod
     def delete_fact(fact: Fact):

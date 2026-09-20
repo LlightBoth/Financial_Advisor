@@ -1,73 +1,372 @@
+from datetime import date
+
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, SubmitField, FloatField, DateField, TextAreaField
-from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms import (
+    BooleanField,
+    StringField,
+    SubmitField,
+    FloatField,
+    DateField,
+    TextAreaField,
+    RadioField,
+    SelectField,
+)
+from wtforms.validators import (
+    DataRequired,
+    Optional,
+    NumberRange,
+    InputRequired,
+)
 
 from app.models import Plan
 
 
 class PlanForm(FlaskForm):
+
+    # =========================
+    # Goal information
+    # =========================
+
     goal = StringField(
-        "Goal", 
+        "Financial Goal",
         validators=[DataRequired()],
-        render_kw={"placeholder": "e.g. Annual Marketing Strategy"}
+        render_kw={
+            "placeholder": "e.g. Buy a new car"
+        }
     )
+
+    goal_cost = FloatField(
+        "Goal Cost",
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=0.01,
+                message="Goal cost must be greater than 0."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
+    )
+
     in_between = DateField(
-        "In-Between", 
-        validators=[DataRequired()],
+        "Target Date",
+        format="%Y-%m-%d",
+        default=date.today,
+        validators=[DataRequired()]
     )
+
     description = TextAreaField(
         "Description",
         validators=[Optional()],
-        render_kw={"placeholder": "Short description describe your plan"}
+        render_kw={
+            "placeholder": "Describe your financial goal..."
+        }
     )
-    goal_cost = FloatField(
-        "Goal-Cost",
+
+
+    # =========================
+    # Financial information
+    # =========================
+
+    income = FloatField(
+        "Monthly Income",
         validators=[
-            DataRequired(),
-            NumberRange(min=0.01, message="Estimated budget must be greater than 0.")
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Income cannot be negative."
+            )
         ],
-        render_kw={"placeholder": "How much around does it cost?"}
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
     )
-    value = BooleanField("Value", default=True)
-    
-    submit = SubmitField('Launch Strategy')
+
+    expense = FloatField(
+        "Monthly Expenses",
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Expenses cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 2500"
+        }
+    )
+
+    debt_amount = FloatField(
+        "Debt Amount",
+        validators=[
+            Optional(),
+            NumberRange(
+                min=0,
+                message="Debt amount cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 10000"
+        }
+    )
+
+    debt_amount = FloatField(
+        "Debt Amount",
+        validators=[
+            Optional(), 
+            NumberRange(
+                min=0,
+                message="Savings amount cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 1000"
+        },
+        default=0
+    )
+    savings_amount = FloatField(
+        "Savings Amount",
+        validators=[
+            Optional(),
+            NumberRange(
+                min=0,
+                message="Savings amount cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 3000"
+        }
+    )
+    has_budget = BooleanField(
+        "I have a budget"
+    )
+
+    # =========================
+    # Personal information
+    # =========================
+
+    marital_status = SelectField(
+        "Marital Status",
+        choices=[
+            ("single", "Single"),
+            ("married", "Married"),
+        ],
+        validators=[InputRequired()],
+        coerce=str
+    )
+
+    employment_status = RadioField(
+        "Are you currently employed?",
+        choices=[
+            ("employed", "Yes, I am employed"),
+            ("not_employed", "No, I am not employed"),
+            ("unspecified", "Prefer not to say"),
+        ],
+        validators=[InputRequired()]
+    )
 
 
-# ----- EditPlanForm -----
+    # =========================
+    # Debt information
+    # =========================
+
+    debt_status = RadioField(
+        "Do you have any outstanding debt?",
+        choices=[
+            ("debt", "Yes, I have debt"),
+            ("no_debt", "No, I do not have debt"),
+            ("unspecified", "Prefer not to say"),
+        ],
+        validators=[InputRequired()]
+    )
+
+
+    # =========================
+    # Spending information
+    # =========================
+
+    spending_habit = RadioField(
+        "How would you describe your spending habits?",
+        choices=[
+            ("big_spend", "I tend to spend a lot"),
+            ("average_spend", "I spend moderately"),
+            ("low_spend", "I spend very little"),
+            ("unspecified", "Prefer not to say"),
+        ],
+        validators=[InputRequired()]
+    )
+
+
+    # =========================
+    # Plan status
+    # =========================
+
+    is_active = BooleanField(
+        "Active",
+        default=True
+    )
+
+    submit = SubmitField("Launch Strategy")
+
+
+# ==========================================
+# Edit Plan Form
+# ==========================================
+
 class EditPlanForm(FlaskForm):
+
     goal = StringField(
-        "Goal", 
+        "Financial Goal",
         validators=[DataRequired()],
-        render_kw={"placeholder": "e.g. Annual Marketing Strategy"}
+        render_kw={
+            "placeholder": "e.g. Buy a new car"
+        }
     )
+
+    goal_cost = FloatField(
+        "Goal Cost",
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=0.01,
+                message="Goal cost must be greater than 0."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
+    )
+
     in_between = DateField(
-        "In-Between", 
-        validators=[DataRequired()],
+        "Target Date",
+        format="%Y-%m-%d",
+        validators=[DataRequired()]
     )
+
     description = TextAreaField(
         "Description",
         validators=[Optional()],
-        render_kw={"placeholder": "Short description of your financial plan"}
+        render_kw={
+            "placeholder": "Describe your financial goal..."
+        }
     )
-    goal_cost = FloatField(
-        "Goal-Cost",
+
+    income = FloatField(
+        "Monthly Income",
         validators=[
-            DataRequired(),
-            NumberRange(min=0.01, message="Estimated budget must be greater than 0.")
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Income cannot be negative."
+            )
         ],
-        render_kw={"placeholder": "How much around does it cost?"}
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
     )
-    value = BooleanField(
-        "Value"
+
+    expense = FloatField(
+        "Monthly Expenses",
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Expenses cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 2500"
+        }
     )
-    
-    submit = SubmitField('Update')
+
+    debt_amount = FloatField(
+        "Debt Amount",
+        validators=[
+            Optional(),
+            NumberRange(
+                min=0,
+                message="Debt amount cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 10000"
+        }
+    )
+
+    savings_amount = FloatField(
+        "Savings Amount",
+        validators=[
+            Optional(),
+            NumberRange(
+                min=0,
+                message="Savings amount cannot be negative."
+            )
+        ],
+        render_kw={
+            "placeholder": "e.g. 3000"
+        }
+    )
+    has_budget = BooleanField(
+        "I have a budget"
+    )
+
+    marital_status = SelectField(
+        "Marital Status",
+        choices=[
+            ("single", "Single"),
+            ("married", "Married"),
+        ],
+        validators=[InputRequired()],
+        coerce=str
+    )
+
+    employment_status = RadioField(
+        "Are you currently employed?",
+        choices=[
+            ("employed", "Yes, I am employed"),
+            ("not_employed", "No, I am not employed"),
+            ("unspecified", "Prefer not to say"),
+        ],
+        validators=[InputRequired()]
+    )
+
+    debt_status = RadioField(
+        "Do you have any outstanding debt?",
+        choices=[
+            ("debt", "Yes, I have debt"),
+            ("no_debt", "No, I do not have debt"),
+            ("unspecified", "Prefer not to say"),
+        ],
+        validators=[InputRequired()]
+    )
+
+    spending_habit = RadioField(
+        "How would you describe your spending habits?",
+        choices=[
+            ("big_spend", "I tend to spend a lot"),
+            ("average_spend", "I spend moderately"),
+            ("low_spend", "I spend very little"),
+            ("unspecified", "Prefer not to say"),
+        ],
+        validators=[InputRequired()]
+    )
+
+    is_active = BooleanField(
+        "Active"
+    )
+
+    submit = SubmitField("Update")
 
     def __init__(self, original_plan: Plan, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.original_plan = original_plan
 
 
-# ----- ConfirmDeleteForm -----
+# ==========================================
+# Confirm Delete
+# ==========================================
+
 class ConfirmDeleteForm(FlaskForm):
+
     submit = SubmitField("Confirm Delete")
