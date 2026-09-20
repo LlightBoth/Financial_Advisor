@@ -88,23 +88,35 @@ class UserServices:
     @staticmethod
     def update(user: User, data: dict, password: Optional[str] = None):
         try:
-            if "username" in data and data["username"]:
+            # Basic information
+            if "username" in data:
                 user.username = data["username"]
-            if "email" in data and data["email"]:
+            if "email" in data:
                 user.email = data["email"]
-            if "full_name" in data and data["full_name"]:
+            if "full_name" in data:
                 user.full_name = data["full_name"]
+            if "phone" in data:
+                user.phone = data["phone"]
+            if "gender" in data:
+                user.gender = data["gender"]
+            if "description" in data:
+                user.description = data["description"]
+            # Account status
             if "is_active" in data:
                 user.is_active = data["is_active"]
 
+            # Password
             if password:
                 user.set_password(password)
 
+            # Save changes
             db.session.commit()
             return user
+
         except Exception:
             db.session.rollback()
             raise
+
 
     @staticmethod
     def update_user_online(user: User):

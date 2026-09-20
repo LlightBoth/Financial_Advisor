@@ -1,6 +1,6 @@
 import re
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, SubmitField, PasswordField, SelectField, EmailField
+from wtforms import BooleanField, StringField, SubmitField, PasswordField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, Optional
 
 from app.models import User, Role
@@ -142,8 +142,45 @@ class ConfirmDeleteForm(FlaskForm):
 
 # ----- PROFILE FORM -----
 class EditProfileForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired()])
-    email = EmailField("Email", validators=[DataRequired(), Email()])
+
+    username = StringField(
+        "Username",
+        validators=[DataRequired(), Length(max=80)]
+    )
+
+    full_name = StringField(
+        "Full Name",
+        validators=[DataRequired(), Length(max=80)]
+    )
+
+    email = StringField(
+        "Email",
+        validators=[DataRequired(), Email(), Length(max=80)]
+    )
+
+    phone = StringField(
+        "Phone",
+        validators=[Optional(), Length(max=24)]
+    )
+
+    gender = SelectField(
+        "Gender",
+        choices=[
+            ("", "Select gender"),
+            ("Male", "Male"),
+            ("Female", "Female"),
+            ("Other", "Other"),
+        ],
+        validators=[Optional()]
+    )
+
+    description = TextAreaField(
+        "About Me",
+        validators=[Optional(), Length(max=80)]
+    )
+
+    submit = SubmitField("Save Profile")
+
 
 class ChangePasswordProfileForm(FlaskForm):
     current_password = StringField("Current Password", validators=[DataRequired()])

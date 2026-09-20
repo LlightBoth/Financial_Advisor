@@ -8,7 +8,7 @@ class AIChat(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     descriptions = db.Column(db.Text, nullable=True)
-    counts = db.Column(db.Integer, default=1, nullable=False)
+    counts = db.Column(db.Integer, default=0, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 

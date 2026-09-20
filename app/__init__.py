@@ -7,6 +7,7 @@ from app.security.limiter import limiter
 from sqlalchemy import text
 import sys
 from sqlalchemy.exc import OperationalError
+from app.models.user import User
 
 
 # Initail App
@@ -111,54 +112,18 @@ def create_app(config_class: type[Config] = Config):
     if "migrate" not in sys.argv and "upgrade" not in sys.argv:
         with app.app_context():
             try:
-                from app.models.user import User
-                from app.models.plan import Plan
-                from app.models.role import Role
-                from app.models.permission import Permission
-                from app.models.fact import Fact
+                from app.security.seed_user_role import seed_users_and_roles
                 from app.security.seed_permissions import seed_system_permissions
                 from app.security.seed_rule_facts import seed_financial_system
 
                 db.create_all()
 
-                roles = ["user", "admin", "editor"]
-                for role_name in roles:
-                    if not Role.query.filter_by(name=role_name).first():
-                        db.session.add(Role(name=role_name))
-                db.session.commit()
-
-                admin_role = Role.query.filter_by(name="admin").first()
-
-                if not User.query.filter_by(username="admin").first():
-                    user_admin = User(
-                        username="admin",
-                        email="admin123@gmail.com",
-                        full_name="admin",
-                    )
-                    user_admin.set_password("Admin123")
-                    if admin_role:
-                        user_admin.roles.append(admin_role)
-                    db.session.add(user_admin)
-
-                if not User.query.filter_by(full_name="Dara").first():
-                    user2_admin = User(
-                        username="Dara",
-                        email="dara123@gmail.com",
-                        full_name="Dara",
-                    )
-                    user2_admin.set_password("Dara123")
-                    if admin_role:
-                        user2_admin.roles.append(admin_role)
-                    db.session.add(user2_admin)
-
-                db.session.commit()
-
-                # Seed permissions safely
+                seed_users_and_roles()
                 seed_system_permissions()
                 seed_financial_system()
 
             except OperationalError:
-                # Table mismatch/pending migration detected, skip seeding safely
                 db.session.rollback()
+
                 
     return app
