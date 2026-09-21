@@ -58,6 +58,7 @@ def create():
             "goal_cost": form.goal_cost.data,
             "in_between": form.in_between.data,
             "description": form.description.data,
+            "value": bool(form.value.data) if hasattr(form, "value") else False,
 
             # Financial information
             "income": form.income.data,
@@ -100,6 +101,7 @@ def edit(plan_id):
             "goal_cost": form.goal_cost.data,
             "in_between": form.in_between.data,
             "description": form.description.data,
+            "value": bool(form.value.data) if hasattr(form, "value") else False,
 
             # Financial information
             "income": form.income.data,

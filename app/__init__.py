@@ -68,6 +68,7 @@ def create_app(config_class: type[Config] = Config):
     from app.routes.expense_route import expense_bp
     from app.routes.bot_route import bot_bp
     from app.routes.audit_log_route import audit_log_bp
+    from app.routes.history_route import history_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(auth_bp)
@@ -85,6 +86,7 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(expense_bp)
     app.register_blueprint(bot_bp)
     app.register_blueprint(audit_log_bp)
+    app.register_blueprint(history_bp)
 
     # Register translation helpers for Jinja
     from app.utils.i18n import _, translate, get_locale, SUPPORTED_LANGUAGES

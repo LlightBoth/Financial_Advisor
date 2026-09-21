@@ -43,3 +43,10 @@ user_ai = db.Table(
     db.Column("user_id", db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
     db.Column("ai_id", db.Integer, db.ForeignKey("ai_chats.id", ondelete="CASCADE"), primary_key=True),
 )
+
+user_histories = db.Table(
+    "user_histories",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+    db.Column("history_id", db.Integer, db.ForeignKey("histories.id", ondelete="CASCADE"), primary_key=True),
+)
+

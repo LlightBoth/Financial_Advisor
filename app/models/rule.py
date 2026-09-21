@@ -8,7 +8,7 @@ class Rule(db.Model):
     __tablename__ = "rules"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=True, default="Financial Rule")
     conclusion = db.Column(db.String(255), nullable=False)
     certainty = db.Column(db.Float, nullable=False)
     advice = db.Column(db.JSON, nullable=False)

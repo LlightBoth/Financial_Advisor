@@ -58,6 +58,15 @@
                 </li>
                 {% endif %}
 
+                {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'permission.view') %}
+                <li>
+                    <a class="nav-link {% if request.endpoint == 'permissions.index' %}active{% endif %}"
+                        href="{{ url_for('permissions.index') }}">
+                        <i class="bi bi-shield-lock"></i> {{ _('nav.permissions') }}
+                    </a>
+                </li>
+                {% endif %}
+
                 {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'role.view') %}
                 <li>
                     <a class="nav-link {% if request.endpoint == 'roles.index' %}active{% endif %}"

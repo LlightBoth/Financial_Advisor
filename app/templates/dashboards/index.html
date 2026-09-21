@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}{{ _('dashboard.client_title') }}{% endblock %}
+{% block title %}{{ _('dashboard.title') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 py-4">
@@ -7,9 +7,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="fw-bold text-body-emphasis mb-1">
-                {{ _('dashboard.welcome_back', name=current_user.full_name or current_user.username) }}
+                {{ _('dashboard.financial_intelligence') }}
             </h4>
-            <p class="text-body-secondary small mb-0">{{ _('dashboard.financial_pulse') }}</p>
+            <p class="text-body-secondary small mb-0">{{ _('dashboard.header_subtitle') }}</p>
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -127,16 +127,18 @@
                         {{ _('dashboard.view_all') }}
                     </a>
                 </div>
-
-                <div class="d-flex flex-column gap-3">
-                    {% for plan in user_plans %}
-                    <div class="plan-progress-pill">
-                        <div class="d-flex justify-content-between align-items-end mb-2">
-                            <span class="small fw-bold">{{ plan.name }}</span>
-                            <span class="small fw-bold text-success">${{ "{:,.2f}".format(plan.saved) }} / ${{ "{:,.2f}".format(plan.goal) }}</span>
+                
+                <div class="list-group list-group-flush">
+                    {% for plan in active_plans %}
+                    <div class="list-group-item bg-transparent px-0 border-subtle">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-semibold text-body-emphasis">{{ plan.name }}</span>
+                            <span class="small fw-medium">${{ "{:,.2f}".format(plan.target_amount) }}</span>
                         </div>
-                        <div class="progress" style="height: 8px; border-radius: 10px; background: rgba(0,0,0,0.08);">
-                            <div class="progress-bar {{ plan.color }}" style="width: {{ plan.percent }}%; border-radius: 10px;"></div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-success rounded-pill" role="progressbar" 
+                                 style="width: {{ plan.percent }}%;" 
+                                 aria-valuenow="{{ plan.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
                     {% else %}
@@ -149,12 +151,12 @@
             </div>
         </div>
 
-        <!-- Daily Tasks -->
+        <!-- Daily Tasks Checklist -->
         <div class="col-md-6">
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="icon-box-modern purple" style="width: 36px; height: 36px; font-size: 1rem;">
+                        <div class="icon-box-modern blue" style="width: 36px; height: 36px; font-size: 1rem;">
                             <i class="bi bi-check2-square"></i>
                         </div>
                         <div>
@@ -164,25 +166,15 @@
                     </div>
                 </div>
 
-                <div class="vstack gap-2">
-                    {% for plan in user_plans %}
-                    <form method="POST" action="{{ url_for('dashboards.user_complete_task', plan_id=plan.id, amount=plan.daily) }}">
+                <div class="d-flex flex-column gap-3">
+                    {% for plan in active_plans %}
+                    <form method="POST" action="{{ url_for('dashboards.toggle_task', plan_id=plan.id) }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                        <label class="task-item d-flex align-items-center p-3 rounded-3 shadow-none transition-hover w-100" 
-                               style="cursor: pointer;" 
-                               onclick="this.closest('form').submit();">
-                            
-                            <div class="me-3">
-                                <div class="form-check m-0">
-                                    <input class="form-check-input rounded-circle p-2 shadow-none"
-                                        type="checkbox"
-                                        {% if plan.is_done or plan.percent >= 100 %}checked{% endif %}
-                                        style="cursor: pointer; width: 1.35rem; height: 1.35rem;">
-                                </div>
-                            </div>
-
-                            <div class="flex-grow-1">
+                        <label class="list-group-item d-flex gap-3 align-items-center p-3 rounded-3 border-subtle bg-body-tertiary cursor-pointer w-100">
+                            <input class="form-check-input flex-shrink-0 m-0 cursor-pointer" type="checkbox" 
+                                   onchange="this.form.submit()"
+                                   {% if plan.today_completed %} checked {% endif %}>
+                            <div class="d-flex flex-column w-100">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0 fw-bold small">{{ plan.name }}</h6>
                                     <span class="badge bg-primary-subtle text-primary rounded-pill fw-bold" style="font-size: 0.75rem;">
@@ -193,10 +185,6 @@
                                     <i class="bi bi-arrow-up-short text-success"></i>
                                     {{ plan.percent }}{{ _('dashboard.percent_reached') }}
                                 </div>
-                            </div>
-
-                            <div class="ms-2 text-muted opacity-25">
-                                <i class="bi bi-chevron-right"></i>
                             </div>
                         </label>
                     </form>
@@ -214,25 +202,25 @@
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-    const I18N = {
-        day: "{{ _('dashboard.day') }}",
-        val: "{{ _('dashboard.val') }}",
-        noTransactionData: "{{ _('dashboard.no_transaction_data') }}",
-        addTransactionHint: "{{ _('dashboard.add_transaction_hint') }}",
-        type: "{{ _('dashboard.type') }}",
-        amount: "{{ _('dashboard.amount') }}",
-        expense: "{{ _('dashboard.expense') }}",
-        income: "{{ _('dashboard.income') }}",
-        days: {
-            Mon: "{{ _('day.mon') }}",
-            Tue: "{{ _('day.tue') }}",
-            Wed: "{{ _('day.wed') }}",
-            Thu: "{{ _('day.thu') }}",
-            Fri: "{{ _('day.fri') }}",
-            Sat: "{{ _('day.sat') }}",
-            Sun: "{{ _('day.sun') }}"
+    const I18N = {{ {
+        "day": _("dashboard.chart_day"),
+        "val": _("dashboard.chart_val"),
+        "type": _("dashboard.chart_type"),
+        "amount": _("dashboard.chart_amount"),
+        "income": _("dashboard.income"),
+        "expense": _("dashboard.expenses"),
+        "noTransactionData": _("dashboard.no_transaction_data"),
+        "addTransactionHint": _("dashboard.add_transaction_hint"),
+        "days": {
+            "Mon": _("dashboard.day_mon"),
+            "Tue": _("dashboard.day_tue"),
+            "Wed": _("dashboard.day_wed"),
+            "Thu": _("dashboard.day_thu"),
+            "Fri": _("dashboard.day_fri"),
+            "Sat": _("dashboard.day_sat"),
+            "Sun": _("dashboard.day_sun")
         }
-    };
+    } | tojson }};
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);

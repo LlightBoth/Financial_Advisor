@@ -55,11 +55,11 @@ def create_user_with_role(username, email, role_name):
 
 def test_role_has_permission(app):
     with app.app_context():
-        p1 = Permission(code="user.create", name="Create User", module="User")
-        p2 = Permission(code="user.delete", name="Delete User", module="User")
+        p1 = Permission.query.filter_by(code="user.create").first() or Permission(code="user.create", name="Create User", module="User")
+        p2 = Permission.query.filter_by(code="user.delete").first() or Permission(code="user.delete", name="Delete User", module="User")
         r = Role(name="manager", descriptions="Manager Role")
         r.permissions.extend([p1, p2])
-        db.session.add_all([p1, p2, r])
+        db.session.add(r)
         db.session.commit()
 
         assert r.has_permission("user.create") is True

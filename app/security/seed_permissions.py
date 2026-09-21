@@ -109,4 +109,18 @@ def seed_system_permissions():
             if admin_role and existing not in admin_role.permissions:
                 admin_role.permissions.append(existing)
 
+    # 3. Assign client permissions to user role
+    user_role = Role.query.filter_by(name="user").first()
+    client_permission_codes = {
+        "plan.view", "plan.create", "plan.edit", "plan.delete",
+        "income.view", "income.create", "income.edit", "income.delete",
+        "expense.view", "expense.create", "expense.edit", "expense.delete",
+        "loan.view", "loan.create", "loan.edit", "loan.delete",
+        "history.view", "advisor.view", "dashboard.client.view",
+    }
+    if user_role:
+        for perm in Permission.query.all():
+            if perm.code in client_permission_codes and perm not in user_role.permissions:
+                user_role.permissions.append(perm)
+
     db.session.commit()
