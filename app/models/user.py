@@ -32,7 +32,6 @@ class User(UserMixin, db.Model):
     ai_chats = db.relationship("AIChat", secondary=user_ai, back_populates="users")
 
 
-
     # Methods To Help
     def set_password(self, pw): 
         # Generate_Hash_Password
