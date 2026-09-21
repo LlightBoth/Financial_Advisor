@@ -6,6 +6,8 @@ from app.services.user_services import UserServices
 from app.services.role_services import RoleServices
 from app.services.permission_services import PermissionServices
 
+
+from app.security.cookie import check_cookie_token
 from app.security.role_check import check_route_permission
 
 
@@ -15,6 +17,7 @@ role_bp = Blueprint("roles", __name__, url_prefix="/roles")
 # Middleware route: automatically enforces granular RBAC for all routes in blueprint
 @role_bp.before_request
 def check_token():
+    check_cookie_token(current_user)
     check_route_permission()
 
 

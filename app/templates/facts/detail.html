@@ -1,74 +1,299 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Fact Detail {% endblock %}
+{% block title %}Fact #{{ fact.id }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+
+<div class="container-fluid py-4 max-width-wrapper">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
         <div>
-            <h1 class="h3 mb-0 fw-bold">Fact Overview</h1>
+            <div class="d-flex align-items-center gap-2 mb-4">
+
+                <a href="{{ url_for('facts.index') }}"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Back
+                </a>
+
+            </div>
+
+            <h2 class="fw-bold mb-1 text-body">
+                Fact Detail
+            </h2>
+
+            <p class="text-body-secondary mb-0">
+                Detailed information about this knowledge base fact.
+            </p>
         </div>
-        <div class="btn-group shadow-sm">
-            <a href="{{ url_for('facts.edit', fact_id=fact.id) }}" class="btn btn-outline-primary btn-sm px-3">
-                <i class="bi bi-pencil me-1"></i> Edit
-            </a>
-            <a href="{{ url_for('facts.index') }}" class="btn btn-outline-secondary btn-sm px-3">
-                <i class="bi bi-arrow-left me-1"></i> Back to list
-            </a>
-        </div>
+
+        <!-- Status -->
+        {% if fact.value %}
+
+            <span class="badge bg-success-subtle text-success
+                         border border-success-subtle
+                         rounded-pill fs-6 px-3 py-2">
+
+                <i class="bi bi-check-circle-fill me-1"></i>
+                ACTIVE
+
+            </span>
+
+        {% else %}
+
+            <span class="badge bg-secondary-subtle text-secondary
+                         border border-secondary-subtle
+                         rounded-pill fs-6 px-3 py-2">
+
+                <i class="bi bi-dash-circle-fill me-1"></i>
+                INACTIVE
+
+            </span>
+
+        {% endif %}
+
     </div>
 
+
     <!-- Main Detail Card -->
-    <div class="card border shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Record ID: #{{ fact.id }}</span>
-            
-            <!-- Status Badge Display -->
-            {% if fact.value %} 
-                <span class="badge text-bg-success px-3 py-2 fs-6">Active</span>
-            {% else %}
-                <span class="badge text-bg-secondary px-3 py-2 fs-6">Inactive</span>
-            {% endif %}
+    <div class="card border-subtle shadow-sm overflow-hidden">
+
+        <!-- Card Header -->
+        <div class="card-header bg-body-tertiary py-3 px-4
+                    border-bottom d-flex justify-content-between align-items-center">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <i class="bi bi-lightbulb text-warning fs-5"></i>
+
+                <h5 class="mb-0 fw-semibold text-body">
+                    Fact Information
+                </h5>
+
+            </div>
+
+            <span class="font-monospace text-body-secondary small">
+                #{{ fact.id }}
+            </span>
+
         </div>
 
-        <div class="card-body p-4 bg-body">
-            <div class="row g-4">
-                
-                <!-- Description Section -->
-                <div class="col-12">
-                    <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description : </span>
-                        <p class="mb-0 {% if not fact.description %}text-muted fst-italic{% else %}text-body fs-5{% endif %}">
-                            {{ fact.description if fact.description else "No description provided." }}
-                        </p>
-                    </div>
+
+        <!-- Card Body -->
+        <div class="card-body p-0">
+
+            <!-- Description -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Description
+                    </span>
+
                 </div>
 
-                <!-- Tags Section -->
-                <div class="col-12">
-                    <hr class="text-muted opacity-25">
-                    <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Tags : </span>
-                        {% if fact.tags %}
-                            <span class="badge bg-body-secondary text-body border px-2 py-1">{{ fact.tags }}</span>
-                        {% else %}
-                            <span class="text-muted fst-italic">No tags provided.</span>
-                        {% endif %}
-                    </div>
-                </div>
+                <div class="col-md-9 col-lg-10 px-4 py-3">
 
-                <!-- Timestamps -->
-                <div class="col-12">
-                    <hr class="text-muted opacity-25">
-                    <div class="d-flex justify-content-between text-muted small">
-                        <span>Created: <strong class="text-body">{{ fact.created_at.strftime("%b %d, %Y, %I:%M %p") if fact.created_at else "N/A" }}</strong></span>
-                        <span>Last updated: <strong class="text-body">{{ fact.updated_at.strftime("%b %d, %Y, %I:%M %p") if fact.updated_at else "N/A" }}</strong></span>
-                    </div>
+                    {% if fact.description %}
+
+                        <span class="text-body fw-semibold">
+                            {{ fact.description }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-body-secondary fst-italic">
+                            No description provided
+                        </span>
+
+                    {% endif %}
+
                 </div>
 
             </div>
+
+
+            <!-- Tags -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Tags
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if fact.tags %}
+
+                        <span class="badge
+                                     bg-body-secondary
+                                     text-body
+                                     border border-subtle
+                                     px-3 py-2">
+
+                            <i class="bi bi-tag me-1 text-body-secondary"></i>
+                            {{ fact.tags }}
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-body-secondary fst-italic">
+                            No tags provided
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Value / Status -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Value
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if fact.value %}
+
+                        <span class="text-success fw-semibold">
+
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            True
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-secondary fw-semibold">
+
+                            <i class="bi bi-x-circle-fill me-1"></i>
+                            False
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Created At -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Created At
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if fact.created_at %}
+
+                        <span class="fw-semibold text-body font-monospace">
+
+                            {{ fact.created_at.strftime("%Y-%m-%d %H:%M:%S") }}
+
+                        </span>
+
+                        <small class="text-body-secondary ms-2">
+                            UTC
+                        </small>
+
+                    {% else %}
+
+                        <span class="text-body-secondary">
+                            —
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Updated At -->
+            <div class="row g-0">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Last Updated
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if fact.updated_at %}
+
+                        <span class="fw-semibold text-body font-monospace">
+
+                            {{ fact.updated_at.strftime("%Y-%m-%d %H:%M:%S") }}
+
+                        </span>
+
+                        <small class="text-body-secondary ms-2">
+                            UTC
+                        </small>
+
+                    {% else %}
+
+                        <span class="text-body-secondary">
+                            —
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
         </div>
+
     </div>
+
+
+    <!-- Actions -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+
+        <a href="{{ url_for('facts.index') }}"
+           class="btn btn-outline-secondary btn-sm px-3">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Facts
+
+        </a>
+
+        <a href="{{ url_for('facts.edit', fact_id=fact.id) }}"
+           class="btn btn-primary btn-sm px-3">
+
+            <i class="bi bi-pencil me-1"></i>
+            Edit Fact
+
+        </a>
+
+    </div>
+
 </div>
+
 {% endblock %}

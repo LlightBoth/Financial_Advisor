@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Financial AI</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    <link href="{{ url_for('static', filename='css/client/bot.css') }}" rel="stylesheet">
+</head>
+
+<body class="bg-body-tertiary">
+
+<div class="financial-ai-app">
+
+    <!-- Navbar -->
+    <header class="ai-navbar bg-body border-bottom shadow-sm">
+        <div class="container-fluid px-3 px-md-4">
+            <div class="d-flex align-items-center justify-content-between py-2">
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="ai-brand-icon"><i class="bi bi-robot"></i></div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h1 class="h6 fw-bold mb-0 text-body">Financial AI</h1>
+                            <span class="ai-online-badge"><span></span> Online</span>
+                        </div>
+                        <small class="text-body-secondary">Your personal financial assistant</small>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill d-none d-md-flex align-items-center gap-2" onclick="newChat()"><i class="bi bi-plus-lg"></i> New Chat</button>
+
+                    <a href="{{ url_for('dashboards.userIndex') }}" class="btn btn-outline-secondary btn-sm rounded-pill d-flex align-items-center gap-2">
+                        <i class="bi bi-grid-1x2"></i>
+                        <span class="d-none d-md-inline">Dashboard</span>
+                    </a>
+
+                    <div class="dropdown">
+                        <button class="btn btn-light border btn-sm rounded-circle" data-bs-toggle="dropdown" aria-label="Chat options" style="width:38px;height:38px;">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><button class="dropdown-item" onclick="newChat()"><i class="bi bi-plus-circle me-2"></i>New conversation</button></li>
+                            <li><button class="dropdown-item" onclick="copyConversation()"><i class="bi bi-copy me-2"></i>Copy conversation</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item text-danger" onclick="clearChat()"><i class="bi bi-trash3 me-2"></i>Clear conversation</button></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Chat -->
+    <main id="chat-container" class="ai-chat-container">
+        <div id="message-list" class="container chat-content">
+
+            <div class="text-center py-3">
+                <span class="ai-session-notice"><i class="bi bi-shield-check"></i> Your financial conversations are private</span>
+            </div>
+
+            <!-- Welcome -->
+            <div id="welcome-message" class="ai-message-row">
+                <div class="ai-avatar"><i class="bi bi-robot"></i></div>
+
+                <div class="ai-message-wrapper">
+                    <div class="ai-message-header"><strong>Financial Assistant</strong><span>Just now</span></div>
+
+                    <div class="ai-message">
+                        <p class="mb-2">Hello {{ current_user.full_name or current_user.username }}!</p>
+                        <p class="mb-3">I can help you understand your finances, manage expenses, plan savings, and work toward your financial goals.</p>
+
+                        <div class="ai-suggestions">
+                            <button type="button" onclick="useSuggestion(this)"><i class="bi bi-wallet2"></i> Analyze my spending</button>
+                            <button type="button" onclick="useSuggestion(this)"><i class="bi bi-piggy-bank"></i> Help me save money</button>
+                            <button type="button" onclick="useSuggestion(this)"><i class="bi bi-bar-chart"></i> Show my financial overview</button>
+                            <button type="button" onclick="useSuggestion(this)"><i class="bi bi-bullseye"></i> Help me create a financial plan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+
+    <!-- Input -->
+    <footer class="ai-input-area bg-body border-top">
+        <div class="container py-3">
+
+            <!-- <div id="typing-status" class="small text-body-secondary mb-2 d-none">
+                <span class="spinner-grow spinner-grow-sm text-primary me-1"></span> Financial Assistant is thinking...
+            </div> -->
+
+            <form id="chat-form" class="ai-input-form">
+                <div class="ai-input-wrapper">
+                    <textarea id="user-input" class="form-control" rows="1" placeholder="Ask about your finances..." autocomplete="off" required></textarea>
+                    <button type="submit" id="send-btn" class="ai-send-btn" aria-label="Send message"><i class="bi bi-arrow-up"></i></button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-body-secondary"><i class="bi bi-lock me-1"></i> Verify important financial information before making decisions.</small>
+                    <small id="character-count" class="text-body-secondary">0</small>
+                </div>
+            </form>
+
+        </div>
+    </footer>
+
+</div>
+
+
+<style>
+:root { --ai-primary:#6366f1; --ai-primary-soft:rgba(99,102,241,.10); }
+
+.financial-ai-app { height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+.ai-navbar { flex-shrink:0; z-index:20; }
+.ai-brand-icon { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; background:var(--ai-primary-soft); color:var(--ai-primary); font-size:1.2rem; }
+.ai-online-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 8px; border-radius:50px; background:rgba(25,135,84,.10); color:var(--bs-success); font-size:.68rem; font-weight:600; }
+.ai-online-badge span { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+.ai-chat-container { flex:1; overflow-y:auto; scroll-behavior:smooth; }
+.chat-content { max-width:900px; padding:10px 15px 40px; }
+
+.ai-session-notice { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:50px; background:var(--bs-secondary-bg); color:var(--bs-secondary-color); font-size:.72rem; }
+
+.ai-message-row { display:flex; align-items:flex-start; gap:12px; margin-bottom:22px; }
+.ai-message-row.user { justify-content:flex-end; }
+.ai-avatar { width:38px; height:38px; flex-shrink:0; display:flex; align-items:center; justify-content:center; border-radius:12px; background:var(--ai-primary); color:white; box-shadow:0 4px 12px rgba(99,102,241,.20); }
+.user-avatar { background:var(--bs-secondary); }
+
+.ai-message-wrapper { max-width:min(760px,85%); }
+.ai-message-header { display:flex; align-items:center; gap:8px; margin-bottom:5px; font-size:.75rem; }
+.ai-message-header strong { color:var(--ai-primary); }
+.ai-message-header span { color:var(--bs-secondary-color); }
+
+.ai-message { padding:14px 17px; border-radius:5px 18px 18px 18px; background:var(--bs-body-bg); border:1px solid var(--bs-border-color-subtle); color:var(--bs-body-color); box-shadow:0 3px 12px rgba(0,0,0,.04); line-height:1.65; }
+.user-message { background:var(--ai-primary); color:white; border:none; border-radius:18px 5px 18px 18px; }
+
+.ai-suggestions { display:flex; flex-wrap:wrap; gap:8px; }
+.ai-suggestions button { border:1px solid var(--bs-border-color); background:var(--bs-body-bg); color:var(--bs-body-color); border-radius:10px; padding:8px 11px; font-size:.78rem; transition:.2s ease; }
+.ai-suggestions button:hover { border-color:var(--ai-primary); color:var(--ai-primary); background:var(--ai-primary-soft); }
+
+.ai-message p:last-child { margin-bottom:0; }
+.ai-message pre { padding:12px; border-radius:10px; background:var(--bs-tertiary-bg); overflow-x:auto; }
+.ai-message code { font-size:.88em; }
+.ai-message table { width:100%; margin:12px 0; border-collapse:collapse; }
+.ai-message th,.ai-message td { padding:8px; border:1px solid var(--bs-border-color); }
+
+.ai-input-area { flex-shrink:0; }
+.ai-input-form { max-width:900px; margin:auto; }
+.ai-input-wrapper { display:flex; align-items:flex-end; gap:8px; padding:7px; border:1px solid var(--bs-border-color); border-radius:17px; background:var(--bs-body-bg); box-shadow:0 4px 20px rgba(0,0,0,.05); }
+.ai-input-wrapper textarea { resize:none; border:none; box-shadow:none!important; background:transparent; color:var(--bs-body-color); max-height:140px; }
+.ai-input-wrapper textarea:focus { outline:none; }
+.ai-send-btn { width:42px; height:42px; flex-shrink:0; border:none; border-radius:12px; background:var(--ai-primary); color:white; display:flex; align-items:center; justify-content:center; transition:.2s ease; }
+.ai-send-btn:hover { transform:translateY(-1px); box-shadow:0 5px 15px rgba(99,102,241,.30); }
+.ai-send-btn:disabled { opacity:.55; transform:none; }
+
+@media(max-width:576px) {
+    .chat-content { padding-left:10px; padding-right:10px; }
+    .ai-message-wrapper { max-width:88%; }
+    .ai-message { font-size:.92rem; }
+}
+</style>
+
+
+<script>
+const messageList = document.getElementById("message-list");
+const chatContainer = document.getElementById("chat-container");
+const chatForm = document.getElementById("chat-form");
+const userInput = document.getElementById("user-input");
+const sendBtn = document.getElementById("send-btn");
+const characterCount = document.getElementById("character-count");
+
+let currentChatId = null;
+
+
+/* =========================
+   INITIALIZATION
+========================= */
+
+document.addEventListener("DOMContentLoaded", loadCurrentChat);
+
+
+/* =========================
+   LOAD SAVED CHAT
+========================= */
+
+async function loadCurrentChat() {
+    try {
+        const res = await fetch(
+            "{{ url_for('bots.current_chat') }}",
+            {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(
+                data.error || "Unable to load conversation."
+            );
+        }
+
+        currentChatId = data.chat_id;
+
+        if (data.messages && data.messages.length) {
+            clearMessageList();
+
+            data.messages.forEach(message => {
+                appendMessageUI(
+                    message.content,
+                    message.is_ai ? "ai" : "user",
+                    false
+                );
+            });
+        }
+
+        scrollToBottom();
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+/* =========================
+   SEND MESSAGE
+========================= */
+
+chatForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const message = userInput.value.trim();
+
+    if (!message || sendBtn.disabled) {
+        return;
+    }
+
+    appendMessageUI(message, "user");
+
+    userInput.value = "";
+    userInput.style.height = "auto";
+    characterCount.textContent = "0";
+
+    setLoading(true);
+
+    const loadingId = appendLoading();
+
+    try {
+        const csrfToken =
+            document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content");
+
+        const res = await fetch(
+            "{{ url_for('bots.chat') }}",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({
+                    message: message,
+                    chat_id: currentChatId
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        removeMessage(loadingId);
+
+        if (!res.ok) {
+            appendMessageUI(
+                data.error || "Something went wrong.",
+                "error"
+            );
+
+            return;
+        }
+
+        // Server-created chat ID
+        currentChatId = data.chat_id;
+
+        appendMessageUI(
+            data.response,
+            "ai"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        removeMessage(loadingId);
+
+        appendMessageUI(
+            "Unable to connect to the financial assistant.",
+            "error"
+        );
+
+    } finally {
+        setLoading(false);
+        userInput.focus();
+    }
+});
+
+
+/* =========================
+   RENDER MESSAGE
+========================= */
+
+function appendMessageUI(text, sender, shouldScroll = true) {
+    const row = document.createElement("div");
+
+    const isUser = sender === "user";
+
+    row.className = `ai-message-row ${isUser ? "user" : ""}`;
+
+    if (isUser) {
+
+        row.innerHTML = `
+            <div class="ai-message-wrapper">
+                <div class="ai-message-header justify-content-end">
+                    <span>${formatTime()}</span>
+                    <strong class="text-body-secondary">You</strong>
+                </div>
+                <div class="ai-message user-message">
+                    ${escapeHtml(text)}
+                </div>
+            </div>
+
+            <div class="ai-avatar user-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+        `;
+
+    } else {
+
+        let content;
+
+        if (sender === "error") {
+
+            content = `
+                <div class="text-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    ${escapeHtml(text)}
+                </div>
+            `;
+
+        } else {
+
+            const markdown =
+                typeof marked !== "undefined"
+                    ? marked.parse(text)
+                    : escapeHtml(text);
+
+            content = DOMPurify.sanitize(markdown);
+        }
+
+        row.innerHTML = `
+            <div class="ai-avatar">
+                <i class="bi bi-robot"></i>
+            </div>
+
+            <div class="ai-message-wrapper">
+                <div class="ai-message-header">
+                    <strong>Financial Assistant</strong>
+                    <span>${formatTime()}</span>
+                </div>
+
+                <div class="ai-message">
+                    ${content}
+                </div>
+            </div>
+        `;
+    }
+
+    messageList.appendChild(row);
+
+    if (shouldScroll) {
+        scrollToBottom();
+    }
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+function appendLoading() {
+    const id = `loading-${Date.now()}`;
+
+    const row = document.createElement("div");
+
+    row.id = id;
+    row.className = "ai-message-row";
+
+    row.innerHTML = `
+        <div class="ai-avatar">
+            <i class="bi bi-robot"></i>
+        </div>
+
+        <div class="ai-message-wrapper">
+            <div class="ai-message">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="spinner-grow spinner-grow-sm text-primary"></div>
+                    <span class="text-body-secondary">
+                        Thinking...
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    messageList.appendChild(row);
+
+    scrollToBottom();
+
+    return id;
+}
+
+
+/* =========================
+   LOADING STATE
+========================= */
+
+function setLoading(loading) {
+    sendBtn.disabled = loading;
+    userInput.disabled = loading;
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+userInput.addEventListener("input", () => {
+    userInput.style.height = "auto";
+
+    userInput.style.height =
+        Math.min(userInput.scrollHeight, 140) + "px";
+
+    characterCount.textContent =
+        userInput.value.length;
+});
+
+
+/* Enter = Send */
+/* Shift + Enter = New line */
+
+userInput.addEventListener("keydown", event => {
+    if (
+        event.key === "Enter" &&
+        !event.shiftKey
+    ) {
+        event.preventDefault();
+
+        chatForm.requestSubmit();
+    }
+});
+
+
+/* =========================
+   SUGGESTIONS
+========================= */
+
+function useSuggestion(button) {
+    userInput.value =
+        button.innerText.trim();
+
+    userInput.dispatchEvent(
+        new Event("input")
+    );
+
+    userInput.focus();
+}
+
+
+/* =========================
+   NEW CHAT
+========================= */
+
+function newChat() {
+    currentChatId = null;
+
+    clearMessageList();
+
+    appendWelcomeMessage();
+
+    userInput.focus();
+}
+
+
+/* =========================
+   CLEAR CURRENT CHAT
+========================= */
+
+async function clearChat() {
+    if (!currentChatId) {
+        newChat();
+        return;
+    }
+
+    if (!confirm("Clear this conversation?")) {
+        return;
+    }
+
+    try {
+        const csrfToken =
+            document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content");
+
+        const res = await fetch(
+            `/bots/chat/${currentChatId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(
+                data.error ||
+                "Unable to clear conversation."
+            );
+
+            return;
+        }
+
+        currentChatId = null;
+
+        clearMessageList();
+
+        appendWelcomeMessage();
+
+    } catch (error) {
+        console.error(error);
+
+        alert(
+            "Unable to clear conversation."
+        );
+    }
+}
+
+
+/* =========================
+   CLEAR UI
+========================= */
+
+function clearMessageList() {
+    messageList.innerHTML = `
+        <div class="text-center py-3">
+            <span class="ai-session-notice">
+                <i class="bi bi-shield-check"></i>
+                Your financial conversations are private
+            </span>
+        </div>
+    `;
+}
+
+
+/* =========================
+   WELCOME
+========================= */
+
+function appendWelcomeMessage() {
+    const wrapper =
+        document.createElement("div");
+
+    wrapper.id = "welcome-message";
+    wrapper.className = "ai-message-row";
+
+    wrapper.innerHTML = `
+        <div class="ai-avatar">
+            <i class="bi bi-robot"></i>
+        </div>
+
+        <div class="ai-message-wrapper">
+            <div class="ai-message-header">
+                <strong>Financial Assistant</strong>
+                <span>Just now</span>
+            </div>
+
+            <div class="ai-message">
+                <p class="mb-2">
+                    Hello {{ current_user.full_name or current_user.username }}!
+                </p>
+
+                <p class="mb-3">
+                    I can help you understand your finances,
+                    manage expenses, plan savings, and work
+                    toward your financial goals.
+                </p>
+
+                <div class="ai-suggestions">
+                    <button
+                        type="button"
+                        onclick="useSuggestion(this)"
+                    >
+                        <i class="bi bi-wallet2"></i>
+                        Analyze my spending
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="useSuggestion(this)"
+                    >
+                        <i class="bi bi-piggy-bank"></i>
+                        Help me save money
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="useSuggestion(this)"
+                    >
+                        <i class="bi bi-bullseye"></i>
+                        Help me create a financial plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    messageList.appendChild(wrapper);
+
+    scrollToBottom();
+}
+
+
+/* =========================
+   COPY CONVERSATION
+========================= */
+
+async function copyConversation() {
+    const messages = [
+        ...messageList.querySelectorAll(
+            ".ai-message"
+        )
+    ]
+        .map(element =>
+            element.innerText.trim()
+        )
+        .filter(Boolean);
+
+    if (!messages.length) {
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(
+            messages.join("\n\n")
+        );
+
+        alert("Conversation copied.");
+
+    } catch (error) {
+        alert(
+            "Unable to copy conversation."
+        );
+    }
+}
+
+
+/* =========================
+   REMOVE ELEMENT
+========================= */
+
+function removeMessage(id) {
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+        element.remove();
+    }
+}
+
+
+/* =========================
+   SCROLL
+========================= */
+
+function scrollToBottom() {
+    requestAnimationFrame(() => {
+        chatContainer.scrollTop =
+            chatContainer.scrollHeight;
+    });
+}
+
+
+/* =========================
+   TIME
+========================= */
+
+function formatTime() {
+    return new Date().toLocaleTimeString(
+        [],
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(text) {
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

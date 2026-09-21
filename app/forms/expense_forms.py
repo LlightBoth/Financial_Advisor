@@ -1,3 +1,4 @@
+from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import ( StringField, SubmitField, FloatField, DateField, SelectField )
 from wtforms.validators import DataRequired, Optional, NumberRange
@@ -52,7 +53,9 @@ class ExpenseForm(BaseLocalizedForm):
 
     expense_date = DateField(
         _l("expense.expense_date"),
-        validators=[DataRequired(message=_l("validation.required"))]
+        validators=[DataRequired(message=_l("validation.required"))],
+        default=date.today,
+        format='%Y-%m-%d'
     )
 
     recurring_period = SelectField(

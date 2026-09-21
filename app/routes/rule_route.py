@@ -15,14 +15,17 @@ rule_bp = Blueprint("rules", __name__, url_prefix="/rules")
 # Middleware route
 @rule_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
+    check_cookie_token(current_user)
     check_route_permission()
 
 
 @rule_bp.route("/")
 @login_required
 def index():
-    rules = RuleServices.get_all_rule()
+    status_value = request.args.get("status", "all")
+    sort_by = request.args.get("sort_by", "asc")
+
+    rules = RuleServices.get_filter_rule(status_value, sort_by)
     return render_template("rules/index.html", rules=rules)
 
 @rule_bp.route("/<int:rule_id>")
@@ -33,58 +36,185 @@ def detail(rule_id):
         abort(404)
     return render_template("rules/detail.html", rule=rule)
 
-
-@rule_bp.route("/create", methods=["GET","POST"])
+@rule_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
     form = RuleForm()
     facts = FactServices.get_all_fact()
 
     if form.validate_on_submit():
-        facts_selected = request.form.getlist("fact_ids")
+
+        # Convert advice textarea into a list
+        advice = [
+            line.strip()
+            for line in form.advice.data.splitlines()
+            if line.strip()
+        ]
+
+        # Conditions should come from your condition fields
+        conditions = []
+
+        # Example expected form fields:
+        #
+        # fact_0
+        # operator_0
+        # value_fact_0
+        # value_0
+        #
+        # fact_1
+        # operator_1
+        # value_fact_1
+        # value_1
+
+        index = 0
+
+        while True:
+            fact = request.form.get(f"fact_{index}")
+
+            if not fact:
+                break
+
+            operator = request.form.get(f"operator_{index}")
+            value_fact = request.form.get(f"value_fact_{index}")
+            value = request.form.get(f"value_{index}")
+
+            condition = {
+                "fact": fact,
+                "operator": operator,
+            }
+
+            if value_fact:
+                condition["value_fact"] = value_fact
+            elif value is not None and value != "":
+                # Convert common boolean values
+                if value.lower() == "true":
+                    condition["value"] = True
+                elif value.lower() == "false":
+                    condition["value"] = False
+                else:
+                    condition["value"] = value
+
+            conditions.append(condition)
+
+            index += 1
+
         data = {
+            "name": form.name.data,
             "conclusion": form.conclusion.data,
             "certainty": form.certainty.data,
-            "advice": form.advice.data,
-            "facts": facts_selected,
+            "advice": advice,
+            "conditions": conditions,
         }
 
         rule = RuleServices.create_rule(data)
 
-        flash(f"Rule '{rule.conclusion}' created successfully!", "success")
+        flash(
+            f"Rule '{rule.name}' created successfully!",
+            "success"
+        )
 
         return redirect(url_for("rules.index"))
 
-    return render_template("rules/create.html", form=form, facts=facts)
+    return render_template(
+        "rules/create.html",
+        form=form,
+        facts=facts
+    )
 
 
-@rule_bp.route("/<int:rule_id>/edit", methods=["GET","POST"])
+@rule_bp.route("/<int:rule_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(rule_id):
     rule = RuleServices.get_rule_id(rule_id)
+
     if rule is None:
         abort(404)
-    
-    form = RuleForm(original_rule=rule, obj=rule)
+
+    form = EditRuleForm(
+        original_rule=rule,
+        obj=rule
+    )
+
     facts = FactServices.get_all_fact()
 
-    current_fact_ids = [fact.id for fact in rule.facts]
-
     if form.validate_on_submit():
-        facts_selected = request.form.getlist("fact_ids")
+
+        # Convert advice textarea into a list
+        advice = [
+            line.strip()
+            for line in form.advice.data.splitlines()
+            if line.strip()
+        ]
+
+        conditions = []
+
+        index = 0
+
+        while True:
+            fact = request.form.get(f"fact_{index}")
+
+            if not fact:
+                break
+
+            operator = request.form.get(f"operator_{index}")
+            value_fact = request.form.get(f"value_fact_{index}")
+            value = request.form.get(f"value_{index}")
+
+            condition = {
+                "fact": fact,
+                "operator": operator,
+            }
+
+            if value_fact:
+                condition["value_fact"] = value_fact
+
+            elif value is not None and value != "":
+                if value.lower() == "true":
+                    condition["value"] = True
+                elif value.lower() == "false":
+                    condition["value"] = False
+                else:
+                    condition["value"] = value
+
+            conditions.append(condition)
+
+            index += 1
+
         data = {
+            "name": form.name.data,
             "conclusion": form.conclusion.data,
             "certainty": form.certainty.data,
-            "advice": form.advice.data,
-            "facts": facts_selected,
+            "advice": advice,
+            "conditions": conditions,
         }
 
         RuleServices.update_rule(rule, data)
-        flash(f"Rule '{rule.conclusion}' updated successfully!", "success")
+
+        flash(
+            f"Rule '{rule.name}' updated successfully!",
+            "success"
+        )
+
         return redirect(url_for("rules.index"))
 
-    return render_template("rules/edit.html", form=form, rule=rule, facts=facts, current_fact_ids=current_fact_ids)
+    # Existing conditions for edit page
+    current_conditions = [
+        {
+            "fact": condition.fact,
+            "operator": condition.operator,
+            "value_fact": condition.value_fact,
+            "value": condition.value,
+        }
+        for condition in rule.conditions
+    ]
 
+    return render_template(
+        "rules/edit.html",
+        form=form,
+        rule=rule,
+        facts=facts,
+        current_conditions=current_conditions,
+    )
 
 @rule_bp.route("/<int:rule_id>/delete", methods=["GET"])
 @login_required

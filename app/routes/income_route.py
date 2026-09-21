@@ -1,15 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for, abort, flash
+from flask import Blueprint, render_template, redirect, url_for, abort, flash, request
 from flask_login import login_required, current_user
 
-from app.forms.income_forms import (
-    IncomeForm,
-    EditIncomeForm,
-    IncomeDeleteForm
-)
+from app.forms.income_forms import (IncomeForm, EditIncomeForm, IncomeDeleteForm)
 
 from app.services.income_services import IncomeServices
 from app.security.cookie import check_cookie_token
 from app.utils.i18n import _
+from app.security.role_check import check_route_permission
 
 from datetime import date
 
@@ -20,8 +17,8 @@ income_bp = Blueprint("incomes", __name__, url_prefix="/incomes")
 # Middleware
 @income_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 
 # --------------------------------------------------
@@ -30,7 +27,9 @@ def check_token():
 @income_bp.route("/")
 @login_required
 def index():
-    incomes = IncomeServices.get_all_income(current_user)
+    # Reads ?sort_by value from URL; defaults to 'date'
+    sort_value = request.args.get("sort", "general")
+    incomes = IncomeServices.get_filter_income(current_user, sort_value)
     return render_template("incomes/index.html", incomes=incomes, today=date.today())
 
 

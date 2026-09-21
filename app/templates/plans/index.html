@@ -18,74 +18,128 @@
         </a>
     </div>
 
+    <!-- Body -->
+    <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
+        <span class="badge text-body-secondary bg-body-tertiary border fw-normal px-2 py-1 me-2">
+            <i class="bi bi-funnel me-1"></i>Sort By
+        </span>
+        <form action="{{ url_for('plans.index') }}" method="GET" class="d-flex gap-2">
+            <select name="status" id="status" class="form-select form-select-sm">
+                <option value="" disabled selected>Status</option>
+                <option value="general" {{ 'selected' if request.args.get('status') == 'general' }}>All</option>
+                <option value="complete" {{ 'selected' if request.args.get('status') == 'complete' }}>Complete</option>
+                <option value="incomplete" {{ 'selected' if request.args.get('status') == 'incomplete' }}>Incomplete</option>
+            </select>
+            <select name="sort" id="sort" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort by...</option>
+                <option value="day" {{ 'selected' if request.args.get('sort') == 'day' }}>Day</option>
+                <option value="price" {{ 'selected' if request.args.get('sort') == 'price' }}>Price</option>
+            </select>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Filter</button>
+        </form>
+    </div>
+
     <!-- Plans Grid -->
     <div class="row g-4 pb-5">
         {% for plan in plans %}
         <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100 plan-card shadow-sm">
-                <i class="bi bi-graph-up-arrow card-bg-icon"></i>
+            <div class="card h-100 plan-card shadow-sm border-0 position-relative overflow-hidden cursor-pointer" style="cursor: pointer;" onclick="window.location.href='{{ url_for('plans.detail', plan_id=plan.id) }}'">
+                <i class="bi bi-graph-up-arrow card-bg-icon position-absolute opacity-10" style="font-size: 8rem; right: -20px; bottom: -20px; pointer-events: none;"></i>
                 
                 <div class="card-body p-4 d-flex flex-column">
                     
+                    <!-- Top Row: Days Remaining & Actions Dropdown -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="timeline-pill text-primary">
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold d-inline-flex align-items-center">
                             <i class="bi bi-hourglass-split me-1"></i>
                             {{ _("plan.days_remaining", days=(plan.in_between - today).days) }}
-                        </div>
+                        </span>
                         
-                        <div class="dropdown">
-                            <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ _('common.actions') }}">
+                        <!-- Prevent card click event from firing when clicking dropdown -->
+                        <div class="dropdown" onclick="event.stopPropagation();">
+                            <button class="btn btn-link text-muted p-0 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ _('common.actions') }}">
                                 <i class="bi bi-three-dots-vertical fs-5"></i>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                                <li><a class="dropdown-item py-2 small" href="{{ url_for('plans.edit', plan_id=plan.id) }}"><i class="bi bi-pencil me-2"></i>{{ _("plan.edit_strategy") }}</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item py-2 small text-danger" href="{{ url_for('plans.delete', plan_id=plan.id) }}"><i class="bi bi-trash3 me-2"></i>{{ _("plan.remove_plan") }}</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 py-2">
+                                <li>
+                                    <a class="dropdown-item py-2 small d-flex align-items-center" href="{{ url_for('plans.detail', plan_id=plan.id) }}">
+                                        <i class="bi bi-eye me-2 text-muted"></i>{{ _("finance.analysis") }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 small d-flex align-items-center" href="{{ url_for('plans.edit', plan_id=plan.id) }}">
+                                        <i class="bi bi-pencil me-2 text-muted"></i>{{ _("plan.edit_strategy") }}
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 small text-danger d-flex align-items-center" href="{{ url_for('plans.delete', plan_id=plan.id) }}">
+                                        <i class="bi bi-trash3 me-2"></i>{{ _("plan.remove_plan") }}
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </div>
 
-                    <h5 class="fw-bold mb-2 text-body-emphasis">{{ plan.goal | title }}</h5>
+                    <!-- Title and Completion Status -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start justify-content-between gap-2">
+                            <h5 class="fw-bold text-body-emphasis mb-1 text-truncate" title="{{ plan.goal | title }}">
+                                {{ plan.goal | title }}
+                            </h5>
+                            <span class="badge {{ 'bg-success-subtle text-success' if plan.value else 'bg-secondary-subtle text-secondary' }} px-2.5 py-1 rounded-pill small fw-medium flex-shrink-0">
+                                {{ _('plan.status_completed') if plan.value else _('plan.status_incompleted') }}
+                            </span>
+                        </div>
+                        
+                        <div class="d-flex align-items-center text-muted small mt-1">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            <span class="me-1">{{ _("plan.target_date") }}:</span>
+                            <span class="fw-semibold text-body">{{ plan.in_between.strftime('%b %d, %Y') }}</span>
+                        </div>
+                    </div>
                     
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="bi bi-calendar-event text-muted me-2"></i>
-                        <span class="text-label me-2">{{ _("plan.target_date") }}:</span>
-                        <span class="small fw-bold">{{ plan.in_between.strftime('%b %d, %Y') }}</span>
+                    <!-- Description -->
+                    <div class="flex-grow-1">
+                        {% if plan.description %}
+                        <p class="description-text text-muted small mb-4" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ plan.description | capitalize }}
+                        </p>
+                        {% else %}
+                        <p class="description-text text-muted small fst-italic mb-4">
+                            {{ _("common.no_description_provided") }}
+                        </p>
+                        {% endif %}
                     </div>
 
-                    {% if plan.description %}
-                    <p class="description-text mb-4">
-                        {{ plan.description | capitalize }}
-                    </p>
-                    {% else %}
-                    <p class="description-text mb-4 text-muted fst-italic">
-                        {{ _("common.no_description_provided") }}
-                    </p>
-                    {% endif %}
-
+                    <!-- Footer: Target Budget -->
                     <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-end">
                         <div>
-                            <span class="text-label d-block mb-1">{{ _("plan.target_budget") }}</span>
-                            <div class="cost-badge">
-                                <i class="bi bi-currency-dollar me-1"></i>
+                            <span class="text-uppercase text-muted tracking-wide d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">{{ _("plan.target_budget") }}</span>
+                            <div class="h5 fw-bold text-body mb-0 d-flex align-items-center">
+                                <i class="bi bi-currency-dollar text-success me-0"></i>
                                 {{ "{:,}".format(plan.goal_cost) }}
                             </div>
                         </div>
-                        
+
                         <a href="{{ url_for('plans.detail', plan_id=plan.id) }}" class="btn btn-outline-primary btn-sm px-3 rounded-pill fw-semibold">
                             {{ _("finance.analysis") }} <i class="bi bi-arrow-right-short ms-1"></i>
                         </a>
                     </div>
+
                 </div>
             </div>
         </div>
         {% else %}
+        <!-- Empty State -->
         <div class="col-12 text-center py-5">
-            <div class="card border-0 shadow-sm p-5 text-center rounded-4">
-                <i class="bi bi-clipboard-x display-4 text-muted opacity-50 mb-3"></i>
-                <h5 class="fw-bold">{{ _("plan.no_plans_active") }}</h5>
-                <p class="text-muted small mx-auto" style="max-width: 400px;">{{ _("plan.no_plans_hint") }}</p>
-                <div class="mt-2">
+            <div class="card border-0 shadow-sm p-5 text-center rounded-4 mx-auto" style="max-width: 500px;">
+                <div class="mb-3">
+                    <i class="bi bi-clipboard-x display-4 text-muted opacity-50"></i>
+                </div>
+                <h5 class="fw-bold mb-2">{{ _("plan.no_plans_active") }}</h5>
+                <p class="text-muted small mb-4">{{ _("plan.no_plans_hint") }}</p>
+                <div>
                     <a href="{{ url_for('plans.create') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
                         <i class="bi bi-plus-lg me-1"></i> {{ _("plan.get_started") }}
                     </a>
@@ -95,4 +149,5 @@
         {% endfor %}
     </div>
 </div>
+
 {% endblock %}

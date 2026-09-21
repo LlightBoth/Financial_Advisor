@@ -93,6 +93,12 @@
                         <i class="bi bi-gear"></i> {{ _('nav.setting') }}
                     </a>
                 </li>
+                <li>
+                    <a class="nav-link {% if request.endpoint == 'audit_logs.index' %}active{% endif %}"
+                        href="{{ url_for('audit_logs.index') }}">
+                        <i class="bi bi-journal-text"></i>Logs
+                    </a>
+                </li>
             </ul>
 
             <div class="sidebar-footer mt-auto px-3">
@@ -167,12 +173,18 @@
                                         <i class="bi bi-person me-2"></i> {{ _('nav.my_profile') }}
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="/settings/emp">
+                                        <i class="bi bi-gear me-2"></i> Setting
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 
                         <!-- Logout -->
                         <a class="btn btn-sm {% if not current_user.is_authenticated %}btn-primary{% else %}btn-outline-danger{% endif %}"
-                            href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}">
+                            href="{{ url_for('auth.login' if not current_user.is_authenticated else 'auth.logout') }}"
+                            onclick="localStorage.removeItem('financial_chat_history')">
                             <i
                                 class="bi {% if not current_user.is_authenticated %}bi-box-arrow-in-right{% else %}bi-box-arrow-right{% endif %} me-1"></i>
                             {{ _('nav.login') if not current_user.is_authenticated else _('nav.logout') }}

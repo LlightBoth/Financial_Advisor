@@ -33,7 +33,7 @@
                     </thead>
                     <tbody>
                         {% for role in roles %}
-                            <tr class="border-bottom border-subtle">
+                            <tr onclick="window.location.href='{{ url_for('roles.detail', role_id=role.id) }}'" style="cursor: pointer;" class="border-bottom border-subtle">
                                 <!-- Role Name -->
                                 <td class="py-3 px-4">
                                     <div class="d-flex align-items-center gap-3">

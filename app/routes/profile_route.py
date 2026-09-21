@@ -4,7 +4,7 @@ from flask_login import current_user, login_required
 from app.forms.user_forms import EditProfileForm, ChangePasswordProfileForm
 from app.models.user import User
 from app.security.cookie import check_cookie_token
-from app.security.role_check import check_user_role
+from app.security.role_check import check_route_permission
 from app.services.user_services import UserServices
 from app.services.plan_services import PlanServices
 from app.services.income_services import IncomeServices
@@ -16,8 +16,8 @@ profile_bp = Blueprint("profiles", __name__, url_prefix="/profiles")
 # Middleware route
 @profile_bp.before_request
 def check_token():
-    # check_cookie_token(current_user)
-    pass
+    check_cookie_token(current_user)
+    check_route_permission()
 
 
 # ----- Employee Route -----
@@ -25,45 +25,81 @@ def check_token():
 @login_required
 def empIndex():
     form = EditProfileForm(obj=current_user)
-    emp_plan_count = PlanServices.get_user_all_plan_count(current_user)
+
+    # Profile completion
+    profile_fields = [
+        current_user.username,
+        current_user.full_name,
+        current_user.email,
+        current_user.phone,
+        current_user.gender,
+        current_user.description,
+    ]
+
+    completed_fields = sum(
+        1 for field in profile_fields
+        if field and str(field).strip()
+    )
+    profile_completion = int((completed_fields / len(profile_fields)) * 100)
 
     return render_template(
         "profiles/empIndex.html",
         form=form,
         current_user=current_user,
-        emp_plan_count=emp_plan_count
+        profile_completion=profile_completion,
     )
 
 
 @profile_bp.route("/emp/<int:user_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_emp_profile(user_id):
+    # Only the user or admin can edit the profile
     if user_id != current_user.id and not current_user.has_role("admin"):
         abort(404)
 
-    emp = UserServices.get_by_id(user_id)
-    if emp is None:
+    user = UserServices.get_by_id(user_id)
+    if user is None:
         abort(404)
 
-    form = EditProfileForm(obj=emp)
-    emp_plan_count = PlanServices.get_user_all_plan_count(current_user)
+    form = EditProfileForm(obj=user)
+
+    # Profile completion
+    profile_fields = [
+        user.username,
+        user.full_name,
+        user.email,
+        user.phone,
+        user.gender,
+        user.description,
+    ]
+
+    completed_fields = sum(
+        1 for field in profile_fields
+        if field and str(field).strip()
+    )
+
+    profile_completion = int((completed_fields / len(profile_fields)) * 100)
 
     if form.validate_on_submit():
         data = {
             "username": form.username.data,
-            "email": form.email.data
+            "full_name": form.full_name.data,
+            "email": form.email.data,
+            "phone": form.phone.data,
+            "gender": form.gender.data,
+            "description": form.description.data,
         }
-
-        UserServices.update(emp, data)
+        UserServices.update(user, data)
         flash("Profile updated successfully.", "success")
-        return redirect(url_for("profiles.edit_emp_profile", user_id=emp.id))
+        return redirect(url_for("profiles.edit_emp_profile", user_id=user.id))
 
     return render_template(
         "profiles/empIndex.html",
         form=form,
-        current_user=emp,
-        emp_plan_count=emp_plan_count
+        current_user=user,
+        profile_completion=profile_completion,
     )
+    
 
 
 @profile_bp.route("/emp/<int:user_id>/change_pw", methods=["GET", "POST"])
@@ -111,24 +147,48 @@ def userIndex():
     total_income = IncomeServices.get_income_total(current_user)
     total_expense = ExpenseServices.get_expense_total(current_user)
 
+    # Calculate savings
     sum_saving = total_income - total_expense
-    if sum_saving > 0 and total_income > 0:
+
+    # Calculate saving rate
+    if total_income > 0 and sum_saving > 0:
         sum_saving_rate = (sum_saving * 100) / total_income
     else:
         sum_saving_rate = 0.0
-        
+
+    # Profile completion
+    profile_fields = [
+        current_user.username,
+        current_user.full_name,
+        current_user.email,
+        current_user.phone,
+        current_user.gender,
+        current_user.description,
+    ]
+
+    completed_fields = sum(
+        1 for field in profile_fields
+        if field and str(field).strip()
+    )
+    profile_completion = int((completed_fields / len(profile_fields)) * 100)
+
     return render_template(
         "profiles/userIndex.html",
         form=form,
         current_user=current_user,
-        sum_saving_rate=sum_saving_rate,
         user_plan_count=user_plan_count,
+        total_income=total_income,
+        total_expenses=total_expense,
+        net_savings=sum_saving,
+        sum_saving_rate=sum_saving_rate,
+        profile_completion=profile_completion,
     )
 
 
 @profile_bp.route("/<int:user_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_profile(user_id):
+    # Only the user or admin can edit the profile
     if user_id != current_user.id and not current_user.has_role("admin"):
         abort(404)
 
@@ -137,22 +197,46 @@ def edit_profile(user_id):
         abort(404)
 
     form = EditProfileForm(obj=user)
-    user_plan_count = PlanServices.get_user_all_plan_count(current_user)
-    total_income = IncomeServices.get_income_total(current_user)
-    total_expense = ExpenseServices.get_expense_total(current_user)
 
+    # Use the user being displayed/edited
+    user_plan_count = PlanServices.get_user_all_plan_count(user)
+    total_income = IncomeServices.get_income_total(user)
+    total_expense = ExpenseServices.get_expense_total(user)
+    # Calculate savings
     sum_saving = total_income - total_expense
-    if sum_saving > 0 and total_income > 0:
+
+    # Calculate saving rate
+    if total_income > 0 and sum_saving > 0:
         sum_saving_rate = (sum_saving * 100) / total_income
     else:
         sum_saving_rate = 0.0
 
+    # Profile completion
+    profile_fields = [
+        user.username,
+        user.full_name,
+        user.email,
+        user.phone,
+        user.gender,
+        user.description,
+    ]
+
+    completed_fields = sum(
+        1 for field in profile_fields
+        if field and str(field).strip()
+    )
+
+    profile_completion = int((completed_fields / len(profile_fields)) * 100)
+
     if form.validate_on_submit():
         data = {
             "username": form.username.data,
-            "email": form.email.data
+            "full_name": form.full_name.data,
+            "email": form.email.data,
+            "phone": form.phone.data,
+            "gender": form.gender.data,
+            "description": form.description.data,
         }
-
         UserServices.update(user, data)
         flash("Profile updated successfully.", "success")
         return redirect(url_for("profiles.edit_profile", user_id=user.id))
@@ -162,8 +246,13 @@ def edit_profile(user_id):
         form=form,
         current_user=user,
         user_plan_count=user_plan_count,
-        sum_saving_rate=sum_saving_rate
+        total_income=total_income,
+        total_expenses=total_expense,
+        net_savings=sum_saving,
+        sum_saving_rate=sum_saving_rate,
+        profile_completion=profile_completion,
     )
+
 
 
 @profile_bp.route("/<int:user_id>/change_pw", methods=["GET", "POST"])

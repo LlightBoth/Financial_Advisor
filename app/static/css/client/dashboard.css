@@ -14,7 +14,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 0;
+    padding: 0.75rem 0;
     margin-bottom: 1.5rem;
     border-bottom: 1px solid var(--bs-border-color);
 }
@@ -101,4 +101,35 @@
     height: 22px;
     border-radius: 6px;
     cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+    .dash-header-banner {
+        font-size: 0.75rem;
+        padding: 0.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    .dash-header-banner .btn {
+        padding: 12px;
+        font-size: 0.8rem;
+    }
+    .stat-card {
+        padding: 12px !important;
+    }
+
+    .metric-value {
+        font-size: 1.1rem;
+    }
+
+    .metric-label {
+        font-size: 0.7rem;
+    }
+
+    .icon-box-modern {
+        width: 32px;
+        height: 32px;
+    }
+    .hidePhone {
+        display: none;
+    }
 }

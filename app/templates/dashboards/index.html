@@ -1,26 +1,23 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}{{ _('dashboard.title') }} — {{ _('app.name') }}{% endblock %}
+{% block title %}{{ _('dashboard.client_title') }}{% endblock %}
 
 {% block content %}
-<link href="{{ url_for('static', filename='css/client/dashboard.css') }}" rel="stylesheet">
-
-<div class="container-fluid pb-5">
-    
-    <!-- Header Banner -->
-    <div class="dash-header-banner">
+<div class="container-fluid px-4 py-4">
+    <!-- Welcome Header & Action Banner -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">{{ _('dashboard.financial_intelligence') }}</h3>
-            <span class="text-muted small">{{ _('dashboard.header_subtitle') }}</span>
+            <h4 class="fw-bold text-body-emphasis mb-1">
+                {{ _('dashboard.welcome_back', name=current_user.full_name or current_user.username) }}
+            </h4>
+            <p class="text-body-secondary small mb-0">{{ _('dashboard.financial_pulse') }}</p>
         </div>
-        <div class="d-flex gap-2">
-            <form action="{{ url_for('advisors.analyseIndex') }}" method="POST" class="d-inline">
-                {% if csrf_token is defined %}
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                {% endif %}
+
+        <div class="d-flex align-items-center gap-2">
+            <form method="POST" action="{{ url_for('advisors.personalAnalyse') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
                 <input type="hidden" name="income" value="{{ total_income | default(0) }}">
                 <input type="hidden" name="expense" value="{{ total_expense | default(0) }}">
-                <input type="hidden" name="goal_cost" value="{{ (total_income | default(0)) }}">
 
                 <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold">
                     <i class="bi bi-cpu-fill me-1"></i> {{ _('dashboard.ai_advisory_scan') }}
@@ -31,19 +28,17 @@
 
     <!-- Metric Cards Grid -->
     <div class="row g-4 mb-4">
-        <!-- Total Balance Saving -->
+        <!-- Total Balance Savings -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box-modern blue">
-                        <i class="bi bi-wallet2"></i>
-                    </div>
+            <div class="card stat-card shadow-sm p-4 h-100 border-0">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Account Reserve</span>
                     <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">
                         <i class="bi bi-arrow-up-right me-1"></i> {{ _('dashboard.live') }}
                     </span>
                 </div>
-                <div class="metric-label">{{ _('dashboard.total_balance_saving') }}</div>
-                <div class="metric-value {% if sum_saving >= 0 %} text-success {% else %} text-danger {% endif %}">
+                <div class="metric-label text-body-secondary fw-medium mb-1">{{ _('dashboard.total_balance_saving') }}</div>
+                <div class="metric-value fs-2 fw-bold mb-2 {% if sum_saving >= 0 %} text-success {% else %} text-danger {% endif %}">
                     ${{ "{:,.2f}".format(sum_saving or 0) }}
                 </div>
             </div>
@@ -51,42 +46,38 @@
 
         <!-- Income Growth Rate -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box-modern green">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
+            <div class="card stat-card shadow-sm p-4 h-100 border-0">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Performance</span>
                     <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
                         <i class="bi bi-activity me-1"></i> {{ _('dashboard.rate') }}
                     </span>
                 </div>
-                <div class="metric-label">{{ _('dashboard.income_growth') }}</div>
-                <div class="metric-value text-body-emphasis">
-                    {{ "{:,.2f}".format(sum_saving_rate or 0) }}%
+                <div class="metric-label text-body-secondary fw-medium mb-1">{{ _('dashboard.income_growth') }}</div>
+                <div class="metric-value fs-2 fw-bold text-body-emphasis mb-2">
+                    {% if sum_saving_rate > 0 %}+{% endif %}{{ "{:,.2f}".format(sum_saving_rate or 0) }}%
                 </div>
             </div>
         </div>
 
         <!-- Risk Status -->
         <div class="col-md-4">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="icon-box-modern amber">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
+            <div class="card stat-card shadow-sm p-4 h-100 border-0">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Risk Metrics</span>
                     <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1.5 small fw-bold">
                         {{ _('dashboard.score') }}
                     </span>
                 </div>
-                <div class="metric-label">{{ _('dashboard.risk_profile_status') }}</div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">{{ _('dashboard.risk_profile_status') }}</div>
                 {% if sum_saving_rate >= 75 %}
-                    <div class="metric-value text-success">{{ _('dashboard.risk_excellent') }}</div>
+                    <div class="metric-value fs-2 fw-bold text-success mb-2">{{ _('dashboard.risk_excellent') }}</div>
                 {% elif sum_saving_rate >= 25 %}
-                    <div class="metric-value text-warning">{{ _('dashboard.risk_moderate') }}</div>
+                    <div class="metric-value fs-2 fw-bold text-warning mb-2">{{ _('dashboard.risk_moderate') }}</div>
                 {% elif sum_saving_rate == 0 %}
-                    <div class="metric-value text-muted">{{ _('dashboard.risk_neutral') }}</div>
+                    <div class="metric-value fs-2 fw-bold text-muted mb-2">{{ _('dashboard.risk_neutral') }}</div>
                 {% else %}
-                    <div class="metric-value text-danger">{{ _('dashboard.risk_risky') }}</div>
+                    <div class="metric-value fs-2 fw-bold text-danger mb-2">{{ _('dashboard.risk_risky') }}</div>
                 {% endif %}
             </div>
         </div>
@@ -94,7 +85,7 @@
 
     <!-- Charts Row -->
     <div class="row g-4 mb-4">
-        <!-- Weekly Performance -->
+        <!-- Monthly Performance -->
         <div class="col-12 col-lg-8">
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -105,7 +96,7 @@
             </div>
         </div>
 
-        <!-- Distribution Breakdown -->
+        <!-- Income vs Expense Ratio -->
         <div class="col-12 col-lg-4">
             <div class="card stat-card shadow-sm p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -117,7 +108,7 @@
         </div>
     </div>
 
-    <!-- Savings Plans & Tasks Row -->
+    <!-- Goals & Daily Milestones Grid -->
     <div class="row g-4">
         <!-- Active Goal Plans -->
         <div class="col-md-6">
@@ -136,7 +127,7 @@
                         {{ _('dashboard.view_all') }}
                     </a>
                 </div>
-                
+
                 <div class="d-flex flex-column gap-3">
                     {% for plan in user_plans %}
                     <div class="plan-progress-pill">
@@ -223,93 +214,151 @@
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-    const I18N = {{ {
-        "day": _("dashboard.chart_day"),
-        "val": _("dashboard.chart_val"),
-        "type": _("dashboard.chart_type"),
-        "amount": _("dashboard.chart_amount"),
-        "income": _("dashboard.income"),
-        "expense": _("dashboard.expenses"),
-        "noTransactionData": _("dashboard.no_transaction_data"),
-        "addTransactionHint": _("dashboard.add_transaction_hint"),
-        "days": {
-            "Mon": _("dashboard.day_mon"),
-            "Tue": _("dashboard.day_tue"),
-            "Wed": _("dashboard.day_wed"),
-            "Thu": _("dashboard.day_thu"),
-            "Fri": _("dashboard.day_fri"),
-            "Sat": _("dashboard.day_sat"),
-            "Sun": _("dashboard.day_sun")
+    const I18N = {
+        day: "{{ _('dashboard.day') }}",
+        val: "{{ _('dashboard.val') }}",
+        noTransactionData: "{{ _('dashboard.no_transaction_data') }}",
+        addTransactionHint: "{{ _('dashboard.add_transaction_hint') }}",
+        type: "{{ _('dashboard.type') }}",
+        amount: "{{ _('dashboard.amount') }}",
+        expense: "{{ _('dashboard.expense') }}",
+        income: "{{ _('dashboard.income') }}",
+        days: {
+            Mon: "{{ _('day.mon') }}",
+            Tue: "{{ _('day.tue') }}",
+            Wed: "{{ _('day.wed') }}",
+            Thu: "{{ _('day.thu') }}",
+            Fri: "{{ _('day.fri') }}",
+            Sat: "{{ _('day.sat') }}",
+            Sun: "{{ _('day.sun') }}"
         }
-    } | tojson }};
+    };
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawCharts);
 
-    const weeklySaving = {{ weekly_saving | tojson | safe }};
+    // Dynamic Flask/Jinja2 variables
+    const weeklySaving = {{ weekly_saving | tojson | safe if weekly_saving is defined else '{}' }};
+    const monthlyData = {{ monthly_cashflow | tojson | safe if monthly_cashflow is defined else '[]' }};
     const totalIncome = Number({{ total_income | default(0) | tojson }}) || 0;
     const totalExpense = Number({{ total_expense | default(0) | tojson }}) || 0;
 
     function drawCharts() {
-        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+        const currentTheme = localStorage.getItem('theme') || document.documentElement.getAttribute('data-bs-theme') || 'light';
+        const isDark = currentTheme === 'dark';
         const isKhmer = document.documentElement.getAttribute('lang') === 'km';
+        
         const labelColor = isDark ? '#94a3b8' : '#64748b';
         const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
         const chartFont = isKhmer ? 'Khmer OS Battambang' : 'Inter';
         
-        var options = {
+        const sharedOptions = {
             backgroundColor: 'transparent',
-            chartArea: {width: '88%', height: '78%'},
-            legend: 'none',
+            chartArea: { width: '85%', height: '75%' },
+            legend: { 
+                position: 'top', 
+                alignment: 'end',
+                textStyle: { color: labelColor, fontSize: 12, fontName: chartFont }
+            },
             hAxis: { textStyle: { color: labelColor, fontSize: 11, fontName: chartFont } },
             vAxis: { 
                 gridlines: { color: gridColor }, 
-                textStyle: { color: labelColor, fontSize: 11, fontName: chartFont } 
+                textStyle: { color: labelColor, fontSize: 11, fontName: chartFont },
+                format: '$#,##0'
             }
         };
 
-        // 1. Line / Area chart
-        var dataMain = google.visualization.arrayToDataTable([
-            [I18N.day, I18N.val],
-            [I18N.days.Mon, weeklySaving.Mon],
-            [I18N.days.Tue, weeklySaving.Tue],
-            [I18N.days.Wed, weeklySaving.Wed],
-            [I18N.days.Thu, weeklySaving.Thu],
-            [I18N.days.Fri, weeklySaving.Fri],
-            [I18N.days.Sat, weeklySaving.Sat],
-            [I18N.days.Sun, weeklySaving.Sun],
-        ]);
+        // 1. Main Dashboard Chart (ComboChart if monthlyData, else AreaChart)
+        const mainChartEl = document.getElementById('chart_main');
+        if (monthlyData && monthlyData.length > 0 && mainChartEl) {
+            var dataMain = new google.visualization.DataTable();
+            dataMain.addColumn('string', 'Month');
+            dataMain.addColumn('number', I18N.income);
+            dataMain.addColumn('number', I18N.expense);
+            dataMain.addColumn('number', 'Net Cash Flow');
 
-        new google.visualization.AreaChart(document.getElementById('chart_main')).draw(dataMain, { 
-            ...options, 
-            colors: ['#3b82f6'],
-            areaOpacity: 0.15
-        });
+            const formattedData = monthlyData.map(row => [
+                String(row[0]),
+                Number(row[1]) || 0,
+                Number(row[2]) || 0,
+                Number(row[3]) || 0
+            ]);
 
-        // 2. Pie chart
-        if (totalIncome === 0 && totalExpense === 0) {
-            document.getElementById('chart_side').innerHTML = `
-                <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary">
-                    <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
+            dataMain.addRows(formattedData);
+
+            var comboOptions = {
+                ...sharedOptions,
+                seriesType: 'bars',
+                series: {
+                    0: { color: '#10b981' },
+                    1: { color: '#ef4444' },
+                    2: { 
+                        type: 'line', 
+                        color: '#3b82f6', 
+                        lineWidth: 3, 
+                        pointSize: 6,
+                        curveType: 'function'
+                    }
+                }
+            };
+
+            new google.visualization.ComboChart(mainChartEl).draw(dataMain, comboOptions);
+        } else if (weeklySaving && Object.keys(weeklySaving).length > 0 && mainChartEl) {
+            var dataMain = google.visualization.arrayToDataTable([
+                [I18N.day, I18N.val],
+                [I18N.days.Mon, weeklySaving.Mon || 0],
+                [I18N.days.Tue, weeklySaving.Tue || 0],
+                [I18N.days.Wed, weeklySaving.Wed || 0],
+                [I18N.days.Thu, weeklySaving.Thu || 0],
+                [I18N.days.Fri, weeklySaving.Fri || 0],
+                [I18N.days.Sat, weeklySaving.Sat || 0],
+                [I18N.days.Sun, weeklySaving.Sun || 0],
+            ]);
+
+            var areaOptions = {
+                ...sharedOptions,
+                colors: ['#3b82f6'],
+                legend: 'none'
+            };
+
+            new google.visualization.AreaChart(mainChartEl).draw(dataMain, areaOptions);
+        } else if (mainChartEl) {
+            mainChartEl.innerHTML = `
+                <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
+                    <i class="bi bi-bar-chart-line fs-1 mb-2 opacity-50 text-primary"></i>
                     <div class="fw-semibold small">${I18N.noTransactionData}</div>
-                    <small class="text-muted">${I18N.addTransactionHint}</small>
                 </div>
             `;
-            return;
         }
 
-        var dataSide = google.visualization.arrayToDataTable([
-            [I18N.type, I18N.amount], 
-            [I18N.expense, Number(totalExpense)], 
-            [I18N.income, Number(totalIncome)]
-        ]);
+        // 2. Donut Pie Chart (Side Dashboard Chart)
+        const sideChartEl = document.getElementById('chart_side');
+        if (sideChartEl) {
+            if (totalIncome === 0 && totalExpense === 0) {
+                sideChartEl.innerHTML = `
+                    <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
+                        <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
+                        <div class="fw-semibold small">${I18N.noTransactionData}</div>
+                        <small class="text-muted">${I18N.addTransactionHint}</small>
+                    </div>
+                `;
+                return;
+            }
 
-        new google.visualization.PieChart(document.getElementById('chart_side')).draw(dataSide, { 
-            ...options, 
-            pieHole: 0.65, 
-            colors: ['#ef4444', '#10b981'] 
-        });
+            var dataSide = google.visualization.arrayToDataTable([
+                [I18N.type, I18N.amount], 
+                [I18N.expense, totalExpense], 
+                [I18N.income, totalIncome]
+            ]);
+
+            new google.visualization.PieChart(sideChartEl).draw(dataSide, { 
+                ...sharedOptions, 
+                pieHole: 0.65, 
+                colors: ['#ef4444', '#10b981'] 
+            });
+        }
     }
+
     window.addEventListener('resize', drawCharts);
 </script>
 {% endblock %}

@@ -7,7 +7,7 @@
         {{ f.render_field(form.amount, placeholder="0.00", icon="bi bi-currency-dollar") }}
     </div>
     <div class="col-12 col-md-6">
-        {{ f.render_field(form.income_date, icon="bi bi-calendar-event") }}
+        {{ f.render_field(form.income_date, icon="bi bi-calendar-event", type="date") }}
     </div>
     <div class="col-12 col-md-6">
         {{ f.render_select(form.category, icon="bi bi-tag") }}

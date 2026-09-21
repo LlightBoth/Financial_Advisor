@@ -2,42 +2,219 @@
 
 {{ form.hidden_tag() }}
 
-{{ f.render_field(form.conclusion, placeholder="e.g. Budget is stable and healthy", icon="bi bi-lightbulb") }}
-{{ f.render_field(form.certainty, placeholder="e.g. 0.85 (0.0 to 1.0)", icon="bi bi-percent") }}
-{{ f.render_textarea(form.advice, rows=3, placeholder="Financial advice given when conditions match...") }}
+{{ f.render_field(
+form.conclusion,
+placeholder="e.g. User has positive monthly cash flow",
+icon="bi bi-lightbulb"
+) }}
+
+{{ f.render_field(
+form.certainty,
+placeholder="e.g. 0.85 (0.0 to 1.0)",
+icon="bi bi-percent"
+) }}
+
+{{ f.render_textarea(
+form.advice,
+rows=5,
+placeholder="Financial advice given when conditions match..."
+) }}
 
 {% if facts %}
-<div class="mb-4">
-    <label class="form-label fw-semibold small text-body-secondary mb-2 d-block">
-        <i class="bi bi-info-circle me-1"></i> Trigger Conditions (Facts)
-    </label>
-    
-    <div class="card bg-body-tertiary border border-subtle rounded-3 p-3">
-        <div class="row g-2">
-            {% for fact in facts %}
-                <div class="col-12 col-md-6">
-                    <div class="form-check form-switch p-2 bg-body rounded-2 border border-subtle d-flex align-items-center justify-content-between px-3">
-                        <label class="form-check-label small mb-0 cursor-pointer" for="fact_{{ fact.id }}">
-                            <span class="fw-semibold text-body d-block">{{ fact.description }}</span>
-                            <code class="text-secondary small">{{ fact.tags }}</code>
-                        </label>
-                        <input type="checkbox"
-                               class="form-check-input ms-2"
-                               id="fact_{{ fact.id }}"
-                               name="fact_ids"
-                               value="{{ fact.id }}"
-                               {% if current_fact_ids and fact.id in current_fact_ids %} checked {% endif %}>
-                    </div>
-                </div>
-            {% endfor %}
+
+<div class="mb-4"> <label class="form-label fw-semibold small text-body-secondary mb-2 d-block"> <i class="bi bi-diagram-3 me-1"></i> Trigger Conditions </label>
+<div id="conditions-container">
+
+    {% for condition in rule.conditions if rule is defined and rule.conditions %}
+    <div class="condition-row card bg-body-tertiary border border-subtle rounded-3 p-3 mb-3">
+
+        <div class="row g-3 align-items-end">
+
+            <!-- Fact -->
+            <div class="col-12 col-md-4">
+                <label class="form-label small fw-semibold">
+                    Fact
+                </label>
+
+                <select
+                    name="condition_fact[]"
+                    class="form-select"
+                    required
+                >
+                    <option value="">Select fact</option>
+
+                    {% for fact in facts %}
+                    <option
+                        value="{{ fact.tags }}"
+                        {% if condition.fact == fact.tags %}selected{% endif %}
+                    >
+                        {{ fact.description }} ({{ fact.tags }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Operator -->
+            <div class="col-12 col-md-3">
+                <label class="form-label small fw-semibold">
+                    Operator
+                </label>
+
+                <select
+                    name="condition_operator[]"
+                    class="form-select"
+                    required
+                >
+                    <option value="">Select operator</option>
+
+                    <option value="equals"
+                        {% if condition.operator == "equals" %}selected{% endif %}>
+                        Equals
+                    </option>
+
+                    <option value="not_equals"
+                        {% if condition.operator == "not_equals" %}selected{% endif %}>
+                        Not Equals
+                    </option>
+
+                    <option value="greater_than"
+                        {% if condition.operator == "greater_than" %}selected{% endif %}>
+                        Greater Than
+                    </option>
+
+                    <option value="less_than"
+                        {% if condition.operator == "less_than" %}selected{% endif %}>
+                        Less Than
+                    </option>
+
+                    <option value="greater_than_or_equal"
+                        {% if condition.operator == "greater_than_or_equal" %}selected{% endif %}>
+                        Greater Than / Equal
+                    </option>
+
+                    <option value="less_than_or_equal"
+                        {% if condition.operator == "less_than_or_equal" %}selected{% endif %}>
+                        Less Than / Equal
+                    </option>
+                </select>
+            </div>
+
+            <!-- Value Type -->
+            <div class="col-12 col-md-2">
+                <label class="form-label small fw-semibold">
+                    Compare With
+                </label>
+
+                <select
+                    name="condition_type[]"
+                    class="form-select condition-type"
+                >
+                    <option
+                        value="fact"
+                        {% if condition.value_fact %}selected{% endif %}
+                    >
+                        Fact
+                    </option>
+
+                    <option
+                        value="value"
+                        {% if condition.value is not none and not condition.value_fact %}selected{% endif %}
+                    >
+                        Value
+                    </option>
+                </select>
+            </div>
+
+            <!-- Comparison Value -->
+            <div class="col-12 col-md-2">
+                <label class="form-label small fw-semibold">
+                    Value
+                </label>
+
+                <select
+                    name="condition_value_fact[]"
+                    class="form-select value-fact-input"
+                    {% if not condition.value_fact %}style="display:none"{% endif %}
+                >
+                    <option value="">Select fact</option>
+
+                    {% for fact in facts %}
+                    <option
+                        value="{{ fact.tags }}"
+                        {% if condition.value_fact == fact.tags %}selected{% endif %}
+                    >
+                        {{ fact.tags }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <input
+                    type="text"
+                    name="condition_value[]"
+                    class="form-control literal-value-input"
+                    placeholder="true / false / 1000"
+                    value="{% if condition.value is not none %}{{ condition.value }}{% endif %}"
+                    {% if condition.value_fact %}style="display:none"{% endif %}
+                />
+            </div>
+
+            <!-- Remove -->
+            <div class="col-12 col-md-1">
+                <button
+                    type="button"
+                    class="btn btn-outline-danger w-100 remove-condition"
+                    title="Remove condition"
+                >
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+
         </div>
     </div>
+    {% endfor %}
+
 </div>
-{% endif %}
+
+<button
+    type="button"
+    id="add-condition"
+    class="btn btn-outline-primary btn-sm"
+>
+    <i class="bi bi-plus-circle me-1"></i>
+    Add Condition
+</button>
+
+</div> {% endif %}
 
 {{ f.render_form_buttons(
-    submit_label="Save Rule", 
-    cancel_url=url_for('rules.index'), 
-    submit_class="btn-primary", 
-    submit_icon="bi bi-check-circle"
+submit_label="Save Rule",
+cancel_url=url_for('rules.index'),
+submit_class="btn-primary",
+submit_icon="bi bi-check-circle"
 ) }}
+
+<script> 
+    document.addEventListener("DOMContentLoaded", 
+    function () { 
+        const container = document.getElementById("conditions-container"); 
+        const addButton = document.getElementById("add-condition"); 
+        if (!container || !addButton) { return; } 
+        function updateConditionType(row) { 
+            const type = row.querySelector(".condition-type").value; 
+            const factInput = row.querySelector(".value-fact-input");
+            const literalInput = row.querySelector(".literal-value-input"); 
+            if (type === "fact") { factInput.style.display = ""; 
+                literalInput.style.display = "none"; literalInput.value = ""; 
+            } else { 
+                factInput.style.display = "none"; 
+                literalInput.style.display = ""; 
+                factInput.value = ""; 
+                } 
+            } 
+        function attachConditionEvents(row) {
+            const typeSelect = row.querySelector(".condition-type"); 
+            if (typeSelect) { 
+                typeSelect.addEventListener("change", function () { 
+                    updateConditionType(row); }
+                ); 
+            updateConditionType(row); } const removeButton = row.querySelector(".remove-condition"); if (removeButton) { removeButton.addEventListener("click", function () { row.remove(); }); } } document .querySelectorAll(".condition-row") .forEach(attachConditionEvents); addButton.addEventListener("click", function () { const row = document.createElement("div"); row.className = "condition-row card bg-body-tertiary border border-subtle rounded-3 p-3 mb-3"; row.innerHTML = ` <div class="row g-3 align-items-end"> <div class="col-12 col-md-4"> <label class="form-label small fw-semibold"> Fact </label> <select name="condition_fact[]" class="form-select" required > <option value="">Select fact</option> {% for fact in facts %} <option value="{{ fact.tags }}"> {{ fact.description }} ({{ fact.tags }}) </option> {% endfor %} </select> </div> <div class="col-12 col-md-3"> <label class="form-label small fw-semibold"> Operator </label> <select name="condition_operator[]" class="form-select" required > <option value="">Select operator</option> <option value="equals">Equals</option> <option value="not_equals">Not Equals</option> <option value="greater_than">Greater Than</option> <option value="less_than">Less Than</option> <option value="greater_than_or_equal"> Greater Than / Equal </option> <option value="less_than_or_equal"> Less Than / Equal </option> </select> </div> <div class="col-12 col-md-2"> <label class="form-label small fw-semibold"> Compare With </label> <select name="condition_type[]" class="form-select condition-type" > <option value="fact">Fact</option> <option value="value">Value</option> </select> </div> <div class="col-12 col-md-2"> <label class="form-label small fw-semibold"> Value </label> <select name="condition_value_fact[]" class="form-select value-fact-input" > <option value="">Select fact</option> {% for fact in facts %} <option value="{{ fact.tags }}"> {{ fact.tags }} </option> {% endfor %} </select> <input type="text" name="condition_value[]" class="form-control literal-value-input" placeholder="true / false / 1000" style="display:none" /> </div> <div class="col-12 col-md-1"> <button type="button" class="btn btn-outline-danger w-100 remove-condition" > <i class="bi bi-trash"></i> </button> </div> </div> `; container.appendChild(row); attachConditionEvents(row); }); }); </script>

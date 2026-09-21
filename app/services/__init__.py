@@ -9,10 +9,9 @@ from .rule_service import RuleServices
 from .association_services import AssociationServices
 
 # Client-Side
-from .plan_services import PlanServices
+from .plan_services import PlanServices, PlanAnalysisService
 from .advisor_services import AdvisorServices
-from .loan_services import LoanServices
-from .history_services import HistoryServices
 from .dashboard_services import DashboardServices 
 from .income_services import IncomeServices
 from .expense_services import ExpenseServices
+from .audit_log_services import AuditLogService

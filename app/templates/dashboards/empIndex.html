@@ -2,44 +2,7 @@
 {% block title %} Admin Command Center {% endblock %}
 
 {% block content %}
-<style>
-    /* Admin Custom Utility Styles */
-    .admin-card-accent-primary {
-        border: 2px solid var(--bs-primary) !important;
-    }
-    .admin-card-accent-warning {
-        border: 2px solid var(--bs-warning) !important;
-    }
-
-    /* Standardized Card Hover & Layout Fixes */
-    .table-hover tbody tr:hover {
-        background-color: var(--bs-tertiary-bg);
-        cursor: pointer;
-    }
-
-    .icon-box {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-    }
-
-    /* Mobile Chart Height Tweaks */
-    .chart-container {
-        position: relative;
-        width: 100%;
-        height: 220px;
-    }
-
-    @media (min-width: 768px) {
-        .chart-container {
-            height: 280px;
-        }
-    }
-</style>
+<link href="{{ url_for('static', filename='css/emp/dashboard.css') }}" rel="stylesheet">
 
 <div class="container-fluid px-3 px-sm-4 py-3 py-md-4 pb-5">
     
@@ -51,38 +14,47 @@
         </div>
     </header>
 
-    <!-- Top Summary Stat Cards (Fixed Dark Mode Contrast with 'border border-subtle') -->
+    <!-- Top Summary Stat Cards (Strictly No Icons) -->
     <div class="row g-3 mb-3 mb-md-4">
-        <div class="col-12 col-sm-6 col-xl-4">
+        <!-- Total Users Card -->
+        <div class="col-12 col-sm-6 col-xl-4" onclick="window.location.href='{{ url_for('users.index') }}';" style="cursor: pointer;">
             <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3">
-                    <div class="icon-box bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
-                    <i class="bi bi-arrow-up-right text-success fs-5"></i>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">User Base</span>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">Live</span>
                 </div>
-                <div class="text-body-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Total Users</div>
-                <div class="h3 h2-md fw-bold mb-0 text-body">{{ total_users | default(0) }}</div>
+                <div class="metric-value fs-2 fw-bold text-body mb-2">
+                    {{ total_users | default(0) }}
+                </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Total Users</div>
             </div>
         </div>
 
+        <!-- Total Plans Card -->
         <div class="col-12 col-sm-6 col-xl-4">
             <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3">
-                    <div class="icon-box bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
-                    <i class="bi bi-activity text-success fs-5"></i>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Overview</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">Active</span>
                 </div>
-                <div class="text-body-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Total Plans</div>
-                <div class="h3 h2-md fw-bold mb-0 text-body">{{ total_plans | default(0) }}</div>
+                <div class="metric-value fs-2 fw-bold text-body mb-2">
+                    {{ total_plans | default(0) }}
+                </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Total Plans</div>
             </div>
         </div>
 
+        <!-- Risk Status Card -->
         <div class="col-12 col-sm-12 col-xl-4">
             <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-2 mb-md-3">
-                    <div class="icon-box bg-warning-subtle text-warning"><i class="bi bi-shield-check"></i></div>
-                    <i class="bi bi-patch-check text-body-tertiary fs-5"></i>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Risk Profile</span>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1.5 small fw-bold">Score</span>
                 </div>
-                <div class="text-body-secondary text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Risk Status</div>
-                <div class="h3 h2-md fw-bold mb-0 text-warning">Moderate</div>
+                <div class="metric-value fs-2 fw-bold text-warning mb-2">
+                    Moderate
+                </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Risk Profile Status</div>
             </div>
         </div>
     </div>
@@ -90,8 +62,8 @@
     <!-- Charts Row -->
     <div class="row g-3 mb-3 mb-md-4">
         <div class="col-12 col-lg-8">
-            <div class="card admin-card-accent-primary bg-body-tertiary border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
-                <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">User Monthly Registrations</h6>
+            <div class="card admin-card-accent-primary bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
+                <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">User Monthly Registrations & Trend</h6>
                 <div class="chart-container">
                     <canvas id="barChart"></canvas>
                 </div>
@@ -99,7 +71,7 @@
         </div>
 
         <div class="col-12 col-lg-4">
-            <div class="card admin-card-accent-warning bg-body-tertiary border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
+            <div class="card admin-card-accent-warning bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
                 <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">Distribution</h6>
                 <div class="chart-container">
                     <canvas id="radarChart"></canvas>
@@ -110,12 +82,17 @@
 
     <!-- Recent Users & System Activity -->
     <div class="row g-3">
-        <!-- Recent Users View (Card list on Mobile, Table on Tablet/Desktop) -->
+        <!-- Recent Users View -->
         <div class="col-12 col-lg-8">
             <div class="card bg-body-tertiary border border-subtle shadow-sm rounded-4 overflow-hidden h-100">
-                <div class="card-header bg-body py-3 px-3 px-md-4 border-bottom border-subtle d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-body">Recent User Registrations</h6>
-                    <a href="#" class="btn btn-link btn-sm text-decoration-none p-0">View All</a>
+               <div class="card-header bg-body py-3 px-3 px-md-4 border-bottom border-subtle d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="mb-0 fw-bold text-body">Recent User Registrations</h6>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 extra-small fw-bold">
+                            {{ total_active_users | length if total_active_users is iterable else (total_active_users | default(0)) }}
+                        </span>
+                    </div>
+                    <a href="{{ url_for('users.index') }}" class="btn btn-link btn-sm text-decoration-none p-0">View All</a>
                 </div>
 
                 <!-- Desktop/Tablet View (Table) -->
@@ -180,35 +157,46 @@
             </div>
         </div>
 
-        <!-- Activity Stream -->
+        <!-- Activity Stream (Dynamic Audit Logs) -->
         <div class="col-12 col-lg-4">
-            <div class="card bg-body-tertiary border border-subtle shadow-sm rounded-4 p-3 p-md-4 h-100">
-                <h6 class="fw-bold mb-3 mb-md-4 text-body">System Activity</h6>
+            <div class="card bg-body border border-subtle shadow-sm rounded-4 p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
+                    <h6 class="fw-bold text-body mb-0">System Activity</h6>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 extra-small fw-bold">Live Log</span>
+                </div>
+
                 <div class="vstack gap-3 gap-md-4">
-                    <div class="d-flex gap-3 align-items-start">
-                        <div class="text-primary fs-5 lh-1"><i class="bi bi-plus-circle-fill"></i></div>
-                        <div>
-                            <div class="small fw-bold text-body">New Plan Created</div>
-                            <div class="text-body-secondary small">User 'John Doe' added 'Car 2026'</div>
-                            <div class="text-body-tertiary" style="font-size: 0.7rem;">2 mins ago</div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-3 align-items-start">
-                        <div class="text-danger fs-5 lh-1"><i class="bi bi-shield-lock-fill"></i></div>
-                        <div>
-                            <div class="small fw-bold text-body">Failed Login Attempt</div>
-                            <div class="text-body-secondary small">IP: 192.168.1.1 (3 attempts)</div>
-                            <div class="text-body-tertiary" style="font-size: 0.7rem;">15 mins ago</div>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-3 align-items-start">
-                        <div class="text-success fs-5 lh-1"><i class="bi bi-check-circle-fill"></i></div>
-                        <div>
-                            <div class="small fw-bold text-body">New Plan Created</div>
-                            <div class="text-body-secondary small">User 'Jake Dog' added 'House 2026'</div>
-                            <div class="text-body-tertiary" style="font-size: 0.7rem;">2 hours ago</div>
-                        </div>
-                    </div>
+                    {% if audit_logs %}
+                        {% for log in audit_logs %}
+                            <div class="d-flex justify-content-between align-items-start pb-2 border-bottom border-subtle">
+                                <div>
+                                    <div class="small fw-bold text-body">
+                                        {{ log.action }}
+                                    </div>
+                                    <div class="text-body-secondary small">
+                                        {% if log.user %}
+                                            User '{{ log.user.username }}'
+                                        {% else %}
+                                            Anonymous / System
+                                        {% endif %}
+                                        {% if log.ip_address %}
+                                            &bull; IP: {{ log.ip_address }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-body-tertiary mt-1" style="font-size: 0.7rem;">
+                                        {{ log.created_at.strftime('%b %d, %Y %H:%M') }}
+                                    </div>
+                                </div>
+
+                                <!-- Status Badge -->
+                                <span class="badge {% if log.status == 'SUCCESS' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} rounded-pill extra-small fw-bold flex-shrink-0 ms-2">
+                                    {{ log.status }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-muted small py-3 text-center">No recent audit logs available.</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -223,7 +211,6 @@
         const totalIncome = Number({{ total_incomes | default(0) | tojson }}) || 0;
         const totalExpense = Number({{ total_expenses | default(0) | tojson }}) || 0;
         const totalPlan = Number({{ total_plans | default(0) | tojson }}) || 0;
-        const totalAnalyse = Number({{ total_anayses | default(0) | tojson }}) || 0;
         const monthlyUsers = {{ monthly_users_registered | default([]) | tojson }} || [];
 
         // Helper to dynamically match Chart colors with Bootstrap's theme state
@@ -237,7 +224,7 @@
 
         let colors = getChartColors();
 
-        // 1. Bar Chart Setup
+        // 1. Combo Chart Setup (Bar + Line Overlay)
         const labels = monthlyUsers.map(item => {
             if (!item.month) return '';
             const [year, month] = item.month.split('-');
@@ -253,22 +240,44 @@
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'New Users',
-                        data: userCounts,
-                        backgroundColor: '#0d6efd',
-                        borderRadius: 4
-                    }]
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Growth Trend',
+                            data: userCounts,
+                            borderColor: '#0dcaf0',
+                            backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.35,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0dcaf0',
+                            fill: false,
+                            order: 1
+                        },
+                        {
+                            type: 'bar',
+                            label: 'New Users',
+                            data: userCounts,
+                            backgroundColor: 'rgba(13, 110, 253, 0.85)',
+                            hoverBackgroundColor: '#0d6efd',
+                            borderRadius: 6,
+                            order: 2
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { 
-                        legend: { labels: { color: colors.textColor, font: { size: 11 } } } 
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            labels: { color: colors.textColor, font: { size: 11, weight: '500' }, usePointStyle: true } 
+                        } 
                     },
                     scales: {
                         x: { ticks: { color: colors.textColor, font: { size: 10 } }, grid: { color: colors.gridColor } },
-                        y: { ticks: { color: colors.textColor, font: { size: 10 } }, grid: { color: colors.gridColor } }
+                        y: { ticks: { color: colors.textColor, font: { size: 10 }, precision: 0 }, grid: { color: colors.gridColor }, beginAtZero: true }
                     }
                 }
             });
@@ -282,10 +291,10 @@
             radarChartInstance = new Chart(radarCtx, {
                 type: 'radar',
                 data: {
-                    labels: ['Plan', 'Analyse', 'Income', 'Expense'],
+                    labels: ['Plan', 'Income', 'Expense'],
                     datasets: [{
                         label: 'Client Distribution',
-                        data: [totalPlan, totalAnalyse, totalIncome, totalExpense],
+                        data: [totalPlan, totalIncome, totalExpense],
                         backgroundColor: 'rgba(13, 110, 253, 0.25)',
                         borderColor: '#0d6efd',
                         borderWidth: 2,

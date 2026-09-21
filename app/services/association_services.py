@@ -11,7 +11,9 @@ from extension import db
 class AssociationServices:
     @staticmethod
     def get_role_permission(data: dict):
+        # Get All Permissions from role 
         permission_id = [pid for pid in data["permissions"]]
+        # Select All permission allow
         permissions = Permission.query.filter(Permission.id.in_(permission_id)).all()
         return permissions
     

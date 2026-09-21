@@ -1,65 +1,116 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %} My Profile {% endblock %}
+
+{% block title %}My Profile{% endblock %}
 
 {% block content %}
 
 <style>
-/* --- Design Tokens --- */
+/* =========================================================
+   PROFILE PAGE
+   ========================================================= */
+
 :root {
     --intelli-indigo: #6366f1;
-    --intelli-indigo-soft: rgba(99, 102, 241, 0.1);
+    --intelli-indigo-dark: #4f46e5;
+    --intelli-indigo-soft: rgba(99, 102, 241, 0.10);
+    --profile-radius: 20px;
 }
 
-/* --- Global Text Fixes --- */
-/* This forces headers and paragraphs to respect the Bootstrap theme color */
-.profile-header h2, 
-.profile-header h5, 
-.stat-card h5,
-.stat-card h6 {
-    color: var(--bs-heading-color) !important;
-}
+/* ---------- Header ---------- */
 
-.profile-header p, 
-.stat-card p, 
-.stat-card span {
-    color: var(--bs-body-color) !important;
-}
-
-/* --- Container Adjustments --- */
 .profile-header {
     background-color: var(--bs-tertiary-bg);
     border: 1px solid var(--bs-border-color);
     border-radius: 24px;
     padding: 2.5rem;
     margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Custom contrast for Light Mode header */
 [data-bs-theme="light"] .profile-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(
+        135deg,
+        #f8fafc 0%,
+        #eef2ff 100%
+    );
 }
 
-/* Custom contrast for Dark Mode header */
 [data-bs-theme="dark"] .profile-header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: linear-gradient(
+        135deg,
+        #1e293b 0%,
+        #0f172a 100%
+    );
 }
 
+.profile-header::after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.08);
+    right: -80px;
+    top: -120px;
+}
 
-/* --- Stat Cards --- */
+.profile-header-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* ---------- Avatar ---------- */
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 5px solid rgba(99, 102, 241, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Cards ---------- */
+
 .stat-card {
     background-color: var(--bs-card-bg);
     border: 1px solid var(--bs-border-color);
-    border-radius: 20px;
+    border-radius: var(--profile-radius);
     padding: 1.5rem;
     box-shadow: var(--bs-box-shadow-sm);
 }
 
-/* --- Form Inputs --- */
+.stat-card:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+/* ---------- Stat Boxes ---------- */
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--intelli-indigo-soft);
+    color: var(--intelli-indigo);
+    font-size: 1.25rem;
+}
+
+.stat-number {
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+/* ---------- Inputs ---------- */
+
 .profile-input {
     background-color: var(--bs-body-bg) !important;
     border: 2px solid var(--bs-border-color) !important;
-    color: var(--bs-body-color) !important; /* Fixes invisible input text */
+    color: var(--bs-body-color) !important;
     border-radius: 12px;
+    min-height: 46px;
 }
 
 .profile-input:focus {
@@ -68,138 +119,694 @@
     box-shadow: 0 0 0 4px var(--intelli-indigo-soft) !important;
 }
 
-/* --- Secondary Text (The "Muted" Fix) --- */
-.text-muted-alt {
-    color: var(--bs-secondary-color) !important;
-    opacity: 0.8;
-}
-
-/* --- Buttons --- */
-.btn-advisor-glow {
-    background-color: var(--intelli-indigo);
-    color: #ffffff !important; /* Always white on indigo background */
-    border: none;
-    font-weight: 700;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.btn-advisor-glow:hover {
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-    transform: translateY(-2px);
-}
-
-.form-control::placeholder {
-    color: var(--bs-secondary-color) !important;
-    opacity: 0.8 !important;
-}
-
 .profile-input::placeholder {
     color: var(--bs-secondary-color) !important;
     opacity: 0.8 !important;
 }
+.profile-input option {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+
+/* ---------- Buttons ---------- */
+
+.btn-advisor-glow {
+    background-color: var(--intelli-indigo);
+    color: white !important;
+    border: none;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+}
+
+.btn-advisor-glow:hover {
+    background-color: var(--intelli-indigo-dark);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+
+/* ---------- Information Rows ---------- */
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--bs-secondary-color);
+    font-size: 0.9rem;
+}
+
+.info-value {
+    font-weight: 600;
+}
+
+/* ---------- Profile Completion ---------- */
+
+.profile-progress {
+    height: 9px;
+    border-radius: 20px;
+    background-color: var(--bs-secondary-bg);
+}
+
+.profile-progress .progress-bar {
+    background: linear-gradient(
+        90deg,
+        var(--intelli-indigo),
+        #818cf8
+    );
+    border-radius: 20px;
+}
+
+/* ---------- Activity ---------- */
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--intelli-indigo-soft);
+    color: var(--intelli-indigo);
+}
+
+/* ---------- Plan Card ---------- */
+
+.plan-mini-card {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 16px;
+    padding: 1rem;
+    transition: 0.2s ease;
+}
+
+.plan-mini-card:hover {
+    border-color: var(--intelli-indigo);
+    transform: translateY(-2px);
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+
+    .profile-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-header .text-md-start {
+        text-align: center !important;
+    }
+
+    .profile-header .text-md-end {
+        text-align: center !important;
+    }
+
+}
 </style>
 
+
 <div class="container py-5">
+
+    <!-- =====================================================
+         PROFILE HEADER
+         ===================================================== -->
+
     <div class="profile-header shadow-lg">
-        <div class="row align-items-center">
-            <div class="col-md-auto text-center text-md-start mb-3 mb-md-0">
-                <div class="avatar-wrapper rounded-circle d-inline-block">
-                    <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&size=120&background=6366f1&color=fff" 
-                         class="rounded-circle img-fluid" alt="User Avatar">
+
+        <div class="profile-header-content">
+
+            <div class="row align-items-center">
+
+                <!-- Avatar -->
+                <div class="col-md-auto text-center mb-4 mb-md-0">
+
+                    <img
+                        src="https://ui-avatars.com/api/?name={{ current_user.full_name|urlencode }}&size=240&background=6366f1&color=fff&bold=true"
+                        class="rounded-circle profile-avatar"
+                        alt="User Avatar">
+
                 </div>
+
+
+                <!-- User Info -->
+                <div class="col-md text-center text-md-start">
+
+                    <div class="d-flex align-items-center
+                                justify-content-center
+                                justify-content-md-start
+                                gap-2 mb-2">
+
+                        <h2 class="fw-bold mb-0">
+                            {{ current_user.full_name }}
+                        </h2>
+
+                        {% if current_user.is_active %}
+
+                            <span class="badge rounded-pill text-bg-success">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge rounded-pill text-bg-danger">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <p class="mb-1">
+                        <i class="bi bi-at me-1"></i>
+                        {{ current_user.username }}
+                    </p>
+
+                    <p class="mb-1">
+                        <i class="bi bi-envelope me-1"></i>
+                        {{ current_user.email }}
+                    </p>
+
+                    <p class="text-secondary mb-0">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        Member since : 
+                        {{ current_user.created_at.strftime("%B %Y") }}
+                    </p>
+
+                </div>
+
+
+                <!-- Edit -->
+                <div class="col-md-auto mt-4 mt-md-0 text-center">
+
+                    <a href="#personal-information"
+                       class="btn btn-advisor-glow px-4 py-2">
+
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Edit Profile
+
+                    </a>
+
+                </div>
+
             </div>
-            <div class="col-md">
-                <h2 class="fw-bold mb-1">{{ current_user.username }}</h2>
-                <p class="info mb-1"><i class="bi bi-envelope"></i>  {{current_user.email}} </p>
-                <p class="info mb-3"><i class="bi bi-calendar-check"></i>  {{current_user.created_at.strftime("%b/%m")}} </p>
-            </div>
-            <div class="col-md-auto mt-3 mt-md-0 text-md-end">
-                <button class="btn btn-light rounded-pill px-4 fw-bold" onclick="alert('Coming Soon...')">
-                    <i class="bi bi-pencil-square"></i>Edit Banner
-                </button>
-            </div>
+
         </div>
+
     </div>
 
+
+    <!-- =====================================================
+         TOP STATISTICS
+         ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Plans -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-secondary small mb-1">
+                            Plans
+                        </div>
+                        <div class="stat-number">
+                            {{ user_plan_count|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="stat-icon">
+                        <i class="bi bi-kanban"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Income -->
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <div class="text-secondary small mb-1">
+                            Income Records
+                        </div>
+
+                        <div class="stat-number">
+                            {{ current_user.incomes|length }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Expenses -->
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <div class="text-secondary small mb-1">
+                            Expense Records
+                        </div>
+
+                        <div class="stat-number">
+                            {{ current_user.expenses|length }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- AI Chats -->
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="stat-card">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <div class="text-secondary small mb-1">
+                            AI Conversations
+                        </div>
+
+                        <div class="stat-number">
+                            {{ current_user.ai_chats|length }}
+                        </div>
+
+                    </div>
+
+                    <div class="stat-icon">
+                        <i class="bi bi-robot"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
     <div class="row g-4">
+
+        <!-- =================================================
+             LEFT COLUMN
+             ================================================= -->
+
         <div class="col-lg-4">
-            <div class="stat-card p-4 mb-4">
-                <h6 class="small text-uppercase fw-bold mb-4">Quick Stats</h6>
+
+
+            <!-- Profile Completion -->
+
+            <div class="stat-card mb-4">
+
                 <div class="d-flex justify-content-between mb-3">
-                    <span class="text-muted">Plans</span>
-                    <span class="fw-bold"> {{ user_plan_count }} </span>
+
+                    <h6 class="fw-bold mb-0">
+                        Profile Completion
+                    </h6>
+
+                    <span class="fw-bold text-primary">
+                        {{ profile_completion|default(70) }}%
+                    </span>
+
                 </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span class="text-muted">Member Since</span>
-                    <span class="fw-bold"> {{ current_user.created_at.strftime('%b/%m/%Y') }} </span>
+
+                <div class="progress profile-progress mb-3">
+
+                    <div
+                        class="progress-bar"
+                        style="width: {{ profile_completion|default(70) }}%;">
+                    </div>
+
                 </div>
-                <div class="d-flex justify-content-between">
-                    <span class="text-muted">Risk Level</span>
-                    {% if sum_saving_rate >= 75 %}
-                        <span class="text-success fw-bold">Excellent</span>
-                    {% elif sum_saving_rate >= 25 %}
-                        <span class="text-warning fw-bold">Moderate</span>
+
+                <p class="small text-secondary mb-0">
+
+                    Add your personal information to make
+                    your profile more complete.
+
+                </p>
+
+            </div>
+
+
+            <!-- Quick Stats -->
+
+            <div class="stat-card mb-4">
+
+                <h6 class="small text-uppercase fw-bold mb-4">
+                    Quick Stats
+                </h6>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Plans
+                    </span>
+
+                    <span class="info-value">
+                        {{ user_plan_count|default(0) }}
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Member Since
+                    </span>
+
+                    <span class="info-value">
+                        {{ current_user.created_at.strftime('%b %Y') }}
+                    </span>
+
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Saving Rate</span>
+                    <span class="info-value text-primary">
+                        {{ "{:,.2f}".format(sum_saving_rate or 0) }}%
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">
+                        Account
+                    </span>
+
+                    {% if current_user.is_active %}
+                        <span class="text-success fw-bold">
+                            Active
+                        </span>
                     {% else %}
-                        <span class="text-danger fw-bold">Moderate</span>
+                        <span class="text-danger fw-bold">
+                            Inactive
+                        </span>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="stat-card p-4">
-                <h6 class=" small text-uppercase fw-bold mb-4">Connected Accounts</h6>
-                <div class="d-flex align-items-center mb-3">
-                    <i class="fab fa-github fa-lg  me-3"></i>
-                    <span>github.com/{{ current_user.username }}</span>
+            <!-- Financial Overview -->
+            <div class="stat-card mb-4">
+                <h6 class="small text-uppercase fw-bold mb-4">
+                    Financial Overview
+                </h6>
+
+
+                <div class="d-flex justify-content-between mb-3">
+
+                    <span class="text-secondary">
+                        Total Income
+                    </span>
+
+                    <span class="fw-bold text-success">
+                        ${{ total_income|default("0.00") }}
+                    </span>
+
                 </div>
-                <div class="d-flex align-items-center">
-                    <i class="fab fa-linkedin fa-lg text-info me-3"></i>
-                    <span>linkedin.com/in/{{ current_user.username }}</span>
+
+
+                <div class="d-flex justify-content-between mb-3">
+
+                    <span class="text-secondary">
+                        Total Expenses
+                    </span>
+
+                    <span class="fw-bold text-danger">
+                        ${{ total_expenses|default("0.00") }}
+                    </span>
+
                 </div>
+
+
+                <hr>
+
+
+                <div class="d-flex justify-content-between">
+
+                    <span class="fw-bold">
+                        Net Savings
+                    </span>
+
+                    <span class="fw-bold text-primary">
+                        ${{ net_savings|default("0.00") }}
+                    </span>
+
+                </div>
+
             </div>
+
+
         </div>
+
+
+        <!-- =================================================
+             RIGHT COLUMN
+             ================================================= -->
 
         <div class="col-lg-8">
-            <div class="stat-card p-4 h-100">
-                <h5 class=" mb-4">Personal Information</h5>
-                <form action="/profiles/{{ current_user.id }}/edit" method="POST">
+
+
+            <!-- Personal Information -->
+
+            <div
+                class="stat-card mb-4"
+                id="personal-information">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-4">
+
+                    <div>
+
+                        <h5 class="fw-bold mb-1">
+                            Personal Information
+                        </h5>
+
+                        <p class="small text-secondary mb-0">
+                            Manage your personal information.
+                        </p>
+
+                    </div>
+
+                    <i class="bi bi-person-circle
+                              fs-2 text-primary"></i>
+
+                </div>
+
+
+                <form
+                    action="/profiles/{{ current_user.id }}/edit"
+                    method="POST">
+
                     {{ form.hidden_tag() }}
+
+
                     <div class="row g-3">
+                        <!-- User ID -->
                         <div class="col-md-6">
-                            <label class="form-label  small">Display Name</label>
-                            <input 
-                                type="text" 
-                                name="username" 
-                                class="form-control profile-input" 
-                                value="{{ current_user.username }}">
+                            <label class="form-label small fw-semibold">Account ID</label>
+                            <input type="text" class="form-control profile-input" value="#{{ current_user.id }}" readonly>
                         </div>
 
+                        <!-- Full Name -->
                         <div class="col-md-6">
-                            <label class="form-label  small">Email Address</label>
-                            <input 
-                                type="email" 
-                                name="email" 
-                                class="form-control profile-input" 
-                                value="{{ current_user.email }}">
+
+                            <label class="form-label small fw-semibold">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="full_name"
+                                class="form-control profile-input"
+                                value="{{ current_user.full_name }}"
+                                required>
+
                         </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+
+                            <label class="form-label small fw-semibold">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control profile-input"
+                                value="{{ current_user.email }}"
+                                required>
+
+                        </div>
+                        
+                        <!-- Username -->
+                        <div class="col-md-6">
+
+                            <label class="form-label small fw-semibold">
+                                Username
+                            </label>
+
+                            <input
+                                type="text"
+                                name="username"
+                                class="form-control profile-input"
+                                value="{{ current_user.username }}"
+                                required>
+
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-6">
+
+                            <label class="form-label small fw-semibold">
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                name="phone"
+                                class="form-control profile-input"
+                                value="{{ current_user.phone or '' }}"
+                                placeholder="+855 ...">
+
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">
+                                Gender
+                            </label>
+                            <select name="gender" class="form-select profile-input">
+                                <option value="">
+                                    Select gender
+                                </option>
+                                <option value="Male"
+                                    {% if current_user.gender == 'Male' %}
+                                        selected
+                                    {% endif %}>
+                                    Male
+                                </option>
+                                <option value="Female"
+                                    {% if current_user.gender == 'Female' %}
+                                        selected
+                                    {% endif %}>
+                                    Female
+                                </option>
+                                <option value="Other"
+                                    {% if current_user.gender == 'Other' %}
+                                        selected
+                                    {% endif %}>
+                                    Other
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Description -->
                         <div class="col-12">
-                            <label class="form-label  small">Professional Bio</label>
-                            <textarea 
-                                name="bio"
-                                class="form-control profile-input text-body-secondary" 
-                                placeholder="Describe yourself..."
-                                rows="5">
-                            </textarea>
+
+                            <label class="form-label small fw-semibold">
+                                About Me
+                            </label>
+
+                            <textarea
+                                name="description"
+                                class="form-control profile-input"
+                                placeholder="Tell us a little about yourself..."
+                                rows="4"
+                                maxlength="80">{{ current_user.description or '' }}</textarea>
+
+                            <div class="form-text">
+                                Maximum 80 characters.
+                            </div>
+
                         </div>
-                        <div class="col-md-12 text-end mt-4">
-                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
+
+                        <!-- Save -->
+
+                        <div class="col-12 text-end mt-4">
+
+                            <button
+                                type="submit"
+                                class="btn btn-advisor-glow px-5 py-2">
+
+                                <i class="bi bi-check2-circle me-2"></i>
                                 Save Profile
+
                             </button>
+
                         </div>
+
                     </div>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}

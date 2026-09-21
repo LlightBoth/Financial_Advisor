@@ -5,15 +5,15 @@
 <div class="container py-4">
 
     <!-- Header & Navigation -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-        <div>
-            <h3 class="fw-bold mb-0 text-body">
-                <i class="bi bi-cpu-fill text-primary me-2"></i>{{ _("advisor.analyse_heading") }}
-            </h3>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4 gap-2">
+        <h4 class="fw-bold mb-0 text-body text-truncate me-2">
+            <i class="bi bi-cpu-fill text-primary me-2"></i>{{ _("advisor.analyse_heading") }}
+        </h4>
 
-        <a href="{{ url_for('dashboards.userIndex') }}" class="btn btn-outline-secondary rounded-3 btn-sm shadow-sm align-self-start align-self-md-auto">
-            <i class="bi bi-arrow-left me-1"></i> {{ _("advisor.back_to_dashboard") }}
+        <a href="{{ url_for('dashboards.userIndex') }}" class="btn btn-outline-secondary rounded-3 btn-sm shadow-sm flex-shrink-0">
+            <i class="bi bi-arrow-left me-1"></i>
+            <span class="d-none d-sm-inline">{{ _("advisor.back_to_dashboard") }}</span>
+            <span class="d-sm-none">Back</span>
         </a>
     </div>
 
@@ -158,7 +158,7 @@
                         </div>
 
                         <div class="mt-4 pt-2">
-                            <a href="{{ url_for('advisors.index') }}"
+                            <a href="{{ url_for('plans.index') }}"
                             class="btn btn-primary rounded-3 w-100 shadow-sm">
                                 <i class="bi bi-house-door me-1"></i>
                                 {{ _("advisor.manual_analyse") }}
