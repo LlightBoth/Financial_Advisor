@@ -20,7 +20,11 @@ integrate.txt
 
 # IDE files
 .vscode/
+<<<<<<< HEAD
 .idea/
 
 # myown files
 myRun-commands.md
+=======
+.idea/
+>>>>>>> db7059c0c6405aa5b522fc9661c3cbc8a68363b5
