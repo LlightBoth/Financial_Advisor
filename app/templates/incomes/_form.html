@@ -1,0 +1,28 @@
+{% import "macros/form_macros.html" as f %}
+
+{{ form.hidden_tag() }}
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.amount, placeholder="0.00", icon="bi bi-currency-dollar") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.income_date, icon="bi bi-calendar-event", type="date") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_select(form.category, icon="bi bi-tag") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_select(form.recurring_period, icon="bi bi-arrow-repeat") }}
+    </div>
+    <div class="col-12">
+        {{ f.render_textarea(form.description, rows=3, placeholder="Add details or notes about this income stream...") }}
+    </div>
+</div>
+
+{{ f.render_form_buttons(
+    submit_label="Save Income", 
+    cancel_url=url_for('incomes.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}

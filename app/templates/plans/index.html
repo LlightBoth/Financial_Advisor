@@ -1,0 +1,149 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %}My Plans — Financial Advisor{% endblock %}
+
+{% block content %}
+<link href="{{ url_for('static', filename='css/client/plan.css') }}" rel="stylesheet">
+
+<div class="container-fluid pt-0 px-2 px-md-3">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center py-4 border-bottom mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Savings Milestones & Plans</h3>
+            <p class="text-muted small mb-0">Track and project your long-term wealth targets.</p>
+        </div>
+        <a href="{{ url_for('plans.create') }}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm fw-semibold">
+            <i class="bi bi-plus-circle-fill"></i>
+            <span>Create New Plan</span>
+        </a>
+    </div>
+
+    <!-- Body -->
+    <div class="d-flex justify-content-end align-items-center mb-4 gap-2">
+        <span class="badge text-body-secondary bg-body-tertiary border fw-normal px-2 py-1 me-2">
+            <i class="bi bi-funnel me-1"></i>Sort By
+        </span>
+        <form action="{{ url_for('plans.index') }}" method="GET" class="d-flex gap-2">
+            <select name="status" id="status" class="form-select form-select-sm">
+                <option value="" disabled selected>Status</option>
+                <option value="general" {{ 'selected' if request.args.get('status') == 'general' }}>All</option>
+                <option value="complete" {{ 'selected' if request.args.get('status') == 'complete' }}>Complete</option>
+                <option value="incomplete" {{ 'selected' if request.args.get('status') == 'incomplete' }}>Incomplete</option>
+            </select>
+            <select name="sort" id="sort" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort by...</option>
+                <option value="day" {{ 'selected' if request.args.get('sort') == 'day' }}>Day</option>
+                <option value="price" {{ 'selected' if request.args.get('sort') == 'price' }}>Price</option>
+            </select>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Filter</button>
+        </form>
+    </div>
+
+    <!-- Plans Grid -->
+    <div class="row g-4 pb-5">
+        {% for plan in plans %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100 plan-card shadow-sm border-0 position-relative overflow-hidden cursor-pointer" style="cursor: pointer;" onclick="window.location.href='{{ url_for('plans.detail', plan_id=plan.id) }}'">
+                <i class="bi bi-graph-up-arrow card-bg-icon position-absolute opacity-10" style="font-size: 8rem; right: -20px; bottom: -20px; pointer-events: none;"></i>
+                
+                <div class="card-body p-4 d-flex flex-column">
+                    
+                    <!-- Top Row: Days Remaining & Actions Dropdown -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold d-inline-flex align-items-center">
+                            <i class="bi bi-hourglass-split me-1"></i>
+                            {{ (plan.in_between - today).days }} Days Remaining
+                        </span>
+                        
+                        <!-- Prevent card click event from firing when clicking dropdown -->
+                        <div class="dropdown" onclick="event.stopPropagation();">
+                            <button class="btn btn-link text-muted p-0 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Plan actions">
+                                <i class="bi bi-three-dots-vertical fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 py-2">
+                                <li>
+                                    <a class="dropdown-item py-2 small d-flex align-items-center" href="{{ url_for('plans.detail', plan_id=plan.id) }}">
+                                        <i class="bi bi-eye me-2 text-muted"></i>View Strategy
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 small d-flex align-items-center" href="{{ url_for('plans.edit', plan_id=plan.id) }}">
+                                        <i class="bi bi-pencil me-2 text-muted"></i>Edit Strategy
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 small text-danger d-flex align-items-center" href="{{ url_for('plans.delete', plan_id=plan.id) }}">
+                                        <i class="bi bi-trash3 me-2"></i>Remove Plan
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Title and Completion Status -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-start justify-content-between gap-2">
+                            <h5 class="fw-bold text-body-emphasis mb-1 text-truncate" title="{{ plan.goal | title }}">
+                                {{ plan.goal | title }}
+                            </h5>
+                            <span class="badge {{ 'bg-success-subtle text-success' if plan.value else 'bg-secondary-subtle text-secondary' }} px-2.5 py-1 rounded-pill small fw-medium flex-shrink-0">
+                                {{ 'Completed' if plan.value else 'Incomplete' }}
+                            </span>
+                        </div>
+                        
+                        <div class="d-flex align-items-center text-muted small mt-1">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            <span class="me-1">Target Date:</span>
+                            <span class="fw-semibold text-body">{{ plan.in_between.strftime('%b %d, %Y') }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="flex-grow-1">
+                        {% if plan.description %}
+                        <p class="description-text text-muted small mb-4" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ plan.description | capitalize }}
+                        </p>
+                        {% else %}
+                        <p class="description-text text-muted small fst-italic mb-4">
+                            No description provided.
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Footer: Target Budget -->
+                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-end">
+                        <div>
+                            <span class="text-uppercase text-muted tracking-wide d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Target Budget</span>
+                            <div class="h5 fw-bold text-body mb-0 d-flex align-items-center">
+                                <i class="bi bi-currency-dollar text-success me-0"></i>
+                                {{ "{:,}".format(plan.goal_cost) }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="col-12 text-center py-5">
+            <div class="card border-0 shadow-sm p-5 text-center rounded-4 mx-auto" style="max-width: 500px;">
+                <div class="mb-3">
+                    <i class="bi bi-clipboard-x display-4 text-muted opacity-50"></i>
+                </div>
+                <h5 class="fw-bold mb-2">No Plans Active</h5>
+                <p class="text-muted small mb-4">You haven't set any financial goals yet. Establish your first milestone today!</p>
+                <div>
+                    <a href="{{ url_for('plans.create') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+                        <i class="bi bi-plus-lg me-1"></i> Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

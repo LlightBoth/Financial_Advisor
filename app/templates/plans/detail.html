@@ -1,0 +1,1014 @@
+{% extends "layouts/clientBase.html" %}
+
+{% block title %}{{ plan.goal }} | Plan Overview{% endblock %}
+
+{% block content %}
+
+<style>
+    .plan-page {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .plan-hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 24px;
+        background:
+            linear-gradient(
+                135deg,
+                rgba(var(--bs-primary-rgb), 0.12),
+                rgba(var(--bs-primary-rgb), 0.03)
+            );
+        border: 1px solid var(--bs-border-color-translucent);
+    }
+
+    .plan-hero::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(var(--bs-primary-rgb), 0.08);
+        right: -70px;
+        top: -80px;
+    }
+
+    .hero-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 17px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bs-primary);
+        color: #fff;
+        font-size: 1.5rem;
+        box-shadow: 0 8px 20px rgba(var(--bs-primary-rgb), 0.25);
+    }
+
+    .metric-card {
+        height: 100%;
+        border: 1px solid var(--bs-border-color-translucent);
+        border-radius: 18px;
+        background: var(--bs-body-bg);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .metric-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .section-card {
+        border: 1px solid var(--bs-border-color-translucent);
+        border-radius: 20px;
+        background: var(--bs-body-bg);
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--bs-secondary-color);
+    }
+
+    .info-row {
+        padding: 14px 0;
+        border-bottom: 1px solid var(--bs-border-color-translucent);
+    }
+
+    .info-row:last-child {
+        border-bottom: 0;
+    }
+
+    .profile-item {
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--bs-tertiary-bg);
+    }
+
+    .profile-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(var(--bs-primary-rgb), 0.1);
+        color: var(--bs-primary);
+    }
+
+    .description-box {
+        min-height: 120px;
+        padding: 20px;
+        border-radius: 15px;
+        background: var(--bs-tertiary-bg);
+    }
+
+    .status-badge {
+        border-radius: 50px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .date-box {
+        border-radius: 16px;
+        padding: 18px;
+        background: var(--bs-tertiary-bg);
+    }
+
+    .amount {
+        letter-spacing: -0.03em;
+    }
+</style>
+
+<div class="container-fluid py-4 px-3 px-md-4">
+
+    <div class="plan-page">
+
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+
+            <div>
+                <div class="text-muted small mb-1">
+                    Planning / Plan Overview
+                </div>
+
+                <h1 class="h3 fw-bold mb-0">
+                    Plan Overview
+                </h1>
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a
+                    href="{{ url_for('plans.index') }}"
+                    class="btn btn-outline-secondary rounded-3 px-3"
+                >
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Back
+                </a>
+
+                <a
+                    href="{{ url_for('plans.edit', plan_id=plan.id) }}"
+                    class="btn btn-primary rounded-3 px-3"
+                >
+                    <i class="bi bi-pencil me-1"></i>
+                    Edit Plan
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- HERO -->
+        <!-- ================================================= -->
+
+        <div class="plan-hero p-4 p-md-5 mb-4">
+
+            <div class="position-relative" style="z-index: 2;">
+
+                <div class="row align-items-center g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="d-flex align-items-start gap-3">
+
+                            <div class="hero-icon flex-shrink-0">
+                                <i class="bi bi-bullseye"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="d-flex align-items-center gap-2 mb-2">
+
+                                    {% if plan.value %}
+                                        <span class="badge text-bg-success status-badge">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Completed
+                                        </span>
+                                    {% else %}
+                                        <span class="badge text-bg-warning status-badge">
+                                            <i class="bi bi-clock me-1"></i>
+                                            In Progress
+                                        </span>
+                                    {% endif %}
+
+                                    <span class="text-muted small">
+                                        Plan #{{ plan.id }}
+                                    </span>
+
+                                </div>
+
+                                <h2 class="display-6 fw-bold mb-2">
+                                    {{ plan.goal }}
+                                </h2>
+
+                                <p class="text-muted mb-0">
+                                    Your financial strategy and progress overview.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="text-lg-end">
+
+                            <div class="text-muted small text-uppercase fw-semibold mb-1">
+                                Target Amount
+                            </div>
+
+                            <div class="display-5 fw-bold text-success amount">
+                                ${{ "%.2f"|format(plan.goal_cost|float) }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- FINANCIAL METRICS -->
+        <!-- ================================================= -->
+
+        {% set income = plan.income|float if plan.income else 0 %}
+        {% set expense = plan.expense|float if plan.expense else 0 %}
+        {% set surplus = income - expense %}
+
+        <div class="row g-3 mb-4">
+            <!-- Income -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="text-muted small">
+                                Monthly Income
+                            </div>
+                        </div>
+                        <div class="metric-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold mb-0">
+                        ${{ "%.2f"|format(income) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="text-muted small">
+                                Monthly Expenses
+                            </div>
+                        </div>
+                        <div class="metric-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold mb-0">
+                        ${{ "%.2f"|format(expense) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Surplus -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="text-muted small">
+                                Monthly Surplus
+                            </div>
+                        </div>
+                        <div class="metric-icon
+                            {% if surplus >= 0 %}
+                                bg-success-subtle text-success
+                            {% else %}
+                                bg-danger-subtle text-danger
+                            {% endif %}
+                        ">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold mb-0
+                        {% if surplus < 0 %}text-danger{% else %}text-success{% endif %}
+                    ">
+                        ${{ "%.2f"|format(surplus) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Saving Amount -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="text-muted small">
+                                Saving Amount
+                            </div>
+                        </div>
+                        <div class="metric-icon bg-success-subtle text-success">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                    </div>
+                    <div class="h4 fw-bold mb-0 text-primary">
+                        ${{ "%.2f"|format(plan.saving|float) }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- MAIN CONTENT -->
+        <!-- ================================================= -->
+
+        <div class="row g-4">
+
+            <!-- =========================================================
+                LEFT COLUMN
+            ========================================================== -->
+            <div class="col-lg-7">
+
+                <!-- =====================================================
+                    TARGET DATE
+                ====================================================== -->
+                <div class="section-card p-4 mb-4">
+
+                    <div class="d-flex align-items-center gap-2 mb-4">
+
+                        <div class="metric-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+
+                        <div>
+                            <div class="section-title">
+                                Timeline
+                            </div>
+
+                            <h5 class="fw-bold mb-0">
+                                Target Date
+                            </h5>
+                        </div>
+
+                    </div>
+
+
+                    <div class="date-box">
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+
+                            <div>
+
+                                <div class="text-muted small mb-1">
+                                    Your target completion date
+                                </div>
+
+                                <div class="h4 fw-bold mb-0">
+
+                                    {% if plan.in_between %}
+
+                                        {% if plan.in_between.strftime is defined %}
+                                            {{ plan.in_between.strftime("%B %d, %Y") }}
+                                        {% else %}
+                                            {{ plan.in_between }}
+                                        {% endif %}
+
+                                    {% else %}
+
+                                        <span class="text-muted">
+                                            No target date set
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="text-sm-end">
+
+                                <span class="badge text-bg-primary status-badge">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    Target
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                    FINANCIAL ANALYSIS
+                ====================================================== -->
+                {% if matched_rules %}
+
+                <div class="section-card p-4 mb-4">
+
+                    <!-- Section Header -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <div class="metric-icon bg-primary-subtle text-primary">
+                                <i class="bi bi-stars"></i>
+                            </div>
+
+                            <div>
+
+                                <div class="section-title">
+                                    Financial Analysis
+                                </div>
+
+                                <h5 class="fw-bold mb-0">
+                                    Recommendations
+                                </h5>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Number of Rules -->
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+
+                            <i class="bi bi-lightbulb me-1"></i>
+
+                            {{ matched_rules|length }}
+
+                            {{ 'Recommendation' if matched_rules|length == 1 else 'Recommendations' }}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Intro -->
+                    <div class="p-3 rounded-3 bg-body-tertiary border mb-4">
+
+                        <div class="d-flex align-items-start gap-2">
+
+                            <i class="bi bi-info-circle text-primary mt-1"></i>
+
+                            <div class="small text-muted">
+                                These recommendations are based on the financial information
+                                associated with this plan. Select a recommendation below
+                                to view its details.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                        RULE ACCORDION
+                    ================================================== -->
+                    <div class="accordion" id="recommendationsAccordion">
+
+                        {% for rule in matched_rules %}
+
+                        <div class="accordion-item border rounded-4 mb-3 overflow-hidden">
+
+                            <!-- Rule Header -->
+                            <h2 class="accordion-header" id="heading{{ rule.id }}">
+
+                                <button
+                                    class="accordion-button {% if not loop.first %}collapsed{% endif %} py-3 px-4"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#rule{{ rule.id }}"
+                                    aria-expanded="{{ 'true' if loop.first else 'false' }}"
+                                    aria-controls="rule{{ rule.id }}"
+                                >
+
+                                    <div class="d-flex align-items-center w-100 gap-3">
+
+                                        <!-- Rule Number -->
+                                        <div
+                                            class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0 fw-bold"
+                                            style="width: 36px; height: 36px;"
+                                        >
+                                            {{ loop.index }}
+                                        </div>
+
+
+                                        <!-- Rule Name -->
+                                        <div class="flex-grow-1 text-start">
+
+                                            <div class="fw-semibold">
+                                                {{ rule.name }}
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                Rule #{{ rule.id }}
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- Confidence -->
+                                        <div class="me-2">
+
+                                            <span class="badge text-bg-primary rounded-pill px-3 py-2">
+
+                                                {{ (rule.certainty * 100)|round|int }}%
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+
+                            <!-- Rule Content -->
+                            <div
+                                id="rule{{ rule.id }}"
+                                class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
+                                aria-labelledby="heading{{ rule.id }}"
+                                data-bs-parent="#recommendationsAccordion"
+                            >
+
+                                <div class="accordion-body p-4">
+
+                                    <!-- Confidence Description -->
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                                        <div class="small text-muted">
+                                            Confidence level
+                                        </div>
+
+                                        <div class="small fw-semibold text-primary">
+                                            {{ (rule.certainty * 100)|round|int }}% confidence
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Conclusion -->
+                                    <div class="p-3 rounded-3 bg-primary-subtle mb-4">
+
+                                        <div class="small fw-semibold text-primary mb-2">
+
+                                            <i class="bi bi-lightbulb me-1"></i>
+
+                                            Conclusion
+
+                                        </div>
+
+                                        <div class="text-body">
+                                            {{ rule.conclusion }}
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Advice -->
+                                    {% if rule.advice %}
+
+                                    <div>
+
+                                        <div class="small text-muted text-uppercase fw-semibold mb-3">
+
+                                            Recommended Steps
+
+                                        </div>
+
+
+                                        <div class="d-flex flex-column gap-3">
+
+                                            {% for advice in rule.advice %}
+
+                                            <div class="d-flex align-items-start gap-3">
+
+                                                <!-- Step Number -->
+                                                <div
+                                                    class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center flex-shrink-0 fw-semibold small"
+                                                    style="width: 30px; height: 30px;"
+                                                >
+                                                    {{ loop.index }}
+                                                </div>
+
+
+                                                <div class="pt-1 text-body">
+
+                                                    {{ advice }}
+
+                                                </div>
+
+                                            </div>
+
+                                            {% endfor %}
+
+                                        </div>
+
+                                    </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+                {% else %}
+
+                <!-- =====================================================
+                    EMPTY STATE
+                ====================================================== -->
+                <div class="section-card p-4 mb-4">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="metric-icon bg-secondary-subtle text-secondary">
+
+                            <i class="bi bi-info-circle"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="section-title">
+                                Financial Analysis
+                            </div>
+
+                            <h5 class="fw-bold mb-1">
+                                No recommendations found
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                There are currently no rules matching this plan's
+                                financial information.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =========================================================
+                RIGHT COLUMN
+            ========================================================== -->
+            <div class="col-lg-5">
+
+
+                <!-- =====================================================
+                    FINANCIAL PROFILE
+                ====================================================== -->
+                <div class="section-card p-4 mb-4">
+
+                    <div class="d-flex align-items-center gap-2 mb-4">
+
+                        <div class="metric-icon bg-warning-subtle text-warning">
+
+                            <i class="bi bi-person-lines-fill"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="section-title">
+                                Profile
+                            </div>
+
+                            <h5 class="fw-bold mb-0">
+                                Financial Situation
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <!-- Marital Status -->
+                        <div class="col-12">
+
+                            <div class="profile-item d-flex align-items-center gap-3">
+
+                                <div class="profile-icon">
+                                    <i class="bi bi-person"></i>
+                                </div>
+
+                                <div>
+
+                                    <div class="text-muted small">
+                                        Marital Status
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ plan.martial_status or "Not specified" }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Employment -->
+                        <div class="col-12">
+
+                            <div class="profile-item d-flex align-items-center gap-3">
+
+                                <div class="profile-icon">
+                                    <i class="bi bi-briefcase"></i>
+                                </div>
+
+                                <div>
+
+                                    <div class="text-muted small">
+                                        Employment
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ plan.employment_status or "Not specified" }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Debt -->
+                        <div class="col-12">
+
+                            <div class="profile-item d-flex align-items-center gap-3">
+
+                                <div class="profile-icon">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+
+                                <div>
+
+                                    <div class="text-muted small">
+                                        Debt Status
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ plan.debt_status or "Not specified" }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Spending -->
+                        <div class="col-12">
+
+                            <div class="profile-item d-flex align-items-center gap-3">
+
+                                <div class="profile-icon">
+                                    <i class="bi bi-cart"></i>
+                                </div>
+
+                                <div>
+
+                                    <div class="text-muted small">
+                                        Spending Habit
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ plan.spending_habit or "Not specified" }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                    PLAN INFORMATION
+                ====================================================== -->
+                <div class="section-card p-4 mb-4">
+
+                    <div class="section-title mb-3">
+                        Plan Information
+                    </div>
+
+
+                    <div class="info-row d-flex justify-content-between gap-3">
+
+                        <span class="text-muted">
+                            Plan ID
+                        </span>
+
+                        <strong>
+                            #{{ plan.id }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-row d-flex justify-content-between gap-3">
+
+                        <span class="text-muted">
+                            Status
+                        </span>
+
+                        {% if plan.value %}
+
+                            <span class="text-success fw-semibold">
+                                Completed
+                            </span>
+
+                        {% else %}
+
+                            <span class="text-warning fw-semibold">
+                                In Progress
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="info-row d-flex justify-content-between gap-3">
+
+                        <span class="text-muted">
+                            Created
+                        </span>
+
+                        <strong class="text-end">
+                            {{ plan.created_at.strftime("%b %d, %Y") if plan.created_at else "N/A" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-row d-flex justify-content-between gap-3">
+
+                        <span class="text-muted">
+                            Last updated
+                        </span>
+
+                        <strong class="text-end">
+                            {{ plan.updated_at.strftime("%b %d, %Y") if plan.updated_at else "N/A" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                    FINANCIAL SUMMARY
+                ====================================================== -->
+                <div class="section-card p-4">
+
+                    <div class="d-flex align-items-center gap-2 mb-4">
+
+                        <div class="metric-icon bg-success-subtle text-success">
+
+                            <i class="bi bi-bar-chart-line"></i>
+
+                        </div>
+
+                        <div>
+
+                            <div class="section-title">
+                                Financial Overview
+                            </div>
+
+                            <h5 class="fw-bold mb-0">
+                                Monthly Cash Flow
+                            </h5>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Income -->
+                    <div class="info-row d-flex justify-content-between align-items-center">
+
+                        <span class="text-muted">
+                            Monthly income
+                        </span>
+
+                        <strong class="text-success">
+                            +${{ "%.2f"|format(income) }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- Expenses -->
+                    <div class="info-row d-flex justify-content-between align-items-center">
+
+                        <span class="text-muted">
+                            Monthly expenses
+                        </span>
+
+                        <strong class="text-danger">
+                            -${{ "%.2f"|format(expense) }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- Surplus -->
+                    <div class="info-row d-flex justify-content-between align-items-center">
+
+                        <span class="fw-semibold">
+                            Available monthly surplus
+                        </span>
+
+                        <strong
+                            class="{% if surplus >= 0 %}text-success{% else %}text-danger{% endif %}"
+                        >
+                            ${{ "%.2f"|format(surplus) }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- FOOTER -->
+        <!-- ================================================= -->
+
+        <div class="text-center text-muted small mt-4 pb-2">
+
+            <i class="bi bi-shield-check me-1"></i>
+            Your financial plan is private and secure.
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

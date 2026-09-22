@@ -1,0 +1,176 @@
+{% extends "layouts/base.html" %}
+{% block title %}Users Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-sm-4 py-3">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1 text-body">Users</h1>
+            <p class="text-body-secondary small mb-0">Manage system user accounts, roles, and status</p>
+        </div>
+        {% if user_has_permission(current_user, 'user.create') %}
+        <a href="{{ url_for('users.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 rounded-3 shadow-sm px-3">
+            <i class="bi bi-plus-lg"></i>
+            <span>New User</span>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filter/Sort -->
+    <form action="{{ url_for('users.index') }}" method="GET" class="row g-2 align-items-center mb-4">
+    <!-- Search Input -->
+        <div class="col-12 col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text text-body-secondary bg-body-tertiary">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search fullname..." value="{{ request.args.get('search', '') }}">
+            </div>
+        </div>
+
+        <!-- Sort By Field -->
+        <div class="col-6 col-md-2">
+            <select name="info" id="info" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort by...</option>
+                <option value="fullname" {{ 'selected' if request.args.get('info') == 'fullname' }}>Full Name</option>
+                <option value="username" {{ 'selected' if request.args.get('info') == 'username' }}>Username</option>
+                <option value="date" {{ 'selected' if request.args.get('info') == 'date' }}>Join Date</option>
+                <option value="online" {{ 'selected' if request.args.get('info') == 'online' }}>Online</option>
+                <option value="offline" {{ 'selected' if request.args.get('info') == 'offline' }}>Offline</option>
+            </select>
+        </div>
+
+        <div class="col-6 col-md-2">
+            <select name="role_by" id="role_by" class="form-select form-select-sm">
+                <option value="" disabled selected>Sort role...</option>
+                <option value="all" {{ 'selected' if request.args.get('role_by') == 'all' }}>All-Role</option>
+                <option value="user" {{ 'selected' if request.args.get('role_by') == 'user' }}>User</option>
+                <option value="editor" {{ 'selected' if request.args.get('role_by') == 'editor' }}>Editor</option>
+                <option value="manager" {{ 'selected' if request.args.get('role_by') == 'manager' }}>Manager</option>
+                <option value="admin" {{ 'selected' if request.args.get('role_by') == 'admin' }}>Admin</option>
+            </select>
+        </div>
+
+        <!-- Sort Direction -->
+        <div class="col-6 col-md-2">
+            <select name="sort_by" id="sort_by" class="form-select form-select-sm">
+                <option value="asc" {{ 'selected' if request.args.get('sort_by') == 'asc' }}>Ascending</option>
+                <option value="desc" {{ 'selected' if request.args.get('sort_by') == 'desc' }}>Descending</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12 col-md-2 d-grid">
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
+        </div>
+    </form>
+
+    {% if users %}
+        <div class="card bg-body border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-body-tertiary text-uppercase small text-body-secondary border-bottom border-subtle">
+                        <tr>
+                            <th class="py-3 px-4" style="letter-spacing: 0.05em;">User</th>
+                            <th class="py-3 d-none d-md-table-cell" style="letter-spacing: 0.05em;">Email</th>
+                            <th class="py-3 text-center" style="letter-spacing: 0.05em;">Status</th>
+                            <th class="py-3" style="letter-spacing: 0.05em;">Role</th>
+                            <th class="py-3 d-none d-lg-table-cell" style="letter-spacing: 0.05em;">Created</th>
+                            <th class="py-3 px-4 text-end" style="width: 140px; letter-spacing: 0.05em;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr class="border-bottom border-subtle">
+                                <!-- User & Full Name -->
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;">
+                                            <i class="bi bi-person fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url_for('users.detail', user_id=user.id) }}" class="text-decoration-none fw-bold text-body">
+                                                {{ user.username }}
+                                            </a>
+                                            <div class="text-body-secondary small">
+                                                {{ user.full_name or '—' }}
+                                                <span class="d-md-none text-muted"> • {{ user.email }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Email -->
+                                <td class="py-3 d-none d-md-table-cell">
+                                    <span class="text-body-secondary small">{{ user.email }}</span>
+                                </td>
+
+                                <!-- Status -->
+                                <td class="py-3 text-center">
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1">
+                                            <i class="bi bi-check-circle me-1"></i>Active
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1">
+                                            <i class="bi bi-x-circle me-1"></i>Inactive
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Role Badge -->
+                                <td class="py-3">
+                                    {% if user.roles %}
+                                        {% for role in user.roles %}
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1">
+                                                <i class="bi bi-shield-lock me-1"></i>{{ role.name }}
+                                            </span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="badge bg-secondary-subtle text-body-secondary border border-subtle rounded-pill px-2.5 py-1">
+                                            No Role
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Created Date -->
+                                <td class="py-3 d-none d-lg-table-cell">
+                                    <span class="text-body-secondary small">
+                                        {{ user.created_at.strftime('%b %d, %Y') if user.created_at else '—' }}
+                                    </span>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="py-3 px-4 text-end">
+                                    <div class="btn-group gap-1">
+                                        <a href="{{ url_for('users.detail', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="View Profile">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if user_has_permission(current_user, 'user.edit') %}
+                                        <a href="{{ url_for('users.edit', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary rounded-2" title="Edit User">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if user_has_permission(current_user, 'user.delete') %}
+                                        <a href="{{ url_for('users.delete_confirm', user_id=user.id) }}" class="btn btn-sm btn-outline-danger rounded-2" title="Delete User">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        {% with icon="bi-people", title="No Users Found", message="No registered users found in the system.", action_url=url_for('users.create'), action_text="Add New User" %}
+            {% include "partials/_empty_state.html" %}
+        {% endwith %}
+    {% endif %}
+
+</div>
+{% endblock %}

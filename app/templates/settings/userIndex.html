@@ -1,0 +1,185 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %} Account Settings {% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --settings-indigo: #3b82f6;
+}
+
+/* Settings Navigation Tabs */
+.tab-content-wrapper .nav-pills .nav-link,
+
+.nav-pills .nav-link:hover {
+    color: var(--bs-body-color);
+    background-color: var(--bs-tertiary-bg);
+}
+
+.nav-pills .nav-link.active {
+    background: rgba(59, 130, 246, 0.12) !important;
+    color: var(--text-secondary) !important;
+}
+
+.nav-pills .nav-link.text-danger.active {
+    background: rgba(220, 53, 69, 0.12) !important;
+    color: var(--bs-danger) !important;
+    box-shadow: inset 3px 0 0 var(--bs-danger);
+}
+
+/* Adaptive Settings Card */
+.settings-card {
+    background: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 16px;
+    padding: 2.25rem;
+    color: var(--bs-body-color);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
+}
+
+.settings-card h4, 
+.settings-card h5, 
+.settings-card h6 {
+    color: var(--bs-heading-color);
+    font-weight: 600;
+}
+
+/* Form Control Glass */
+.form-control-glass {
+    background-color: var(--bs-body-bg) !important;
+    border: 1px solid var(--bs-border-color) !important;
+    color: var(--bs-body-color) !important;
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+}
+
+.form-control-glass:focus {
+    border-color: var(--settings-indigo) !important;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+}
+
+/* Danger Zone Special Styling */
+.settings-card.danger-zone-card {
+    border-color: rgba(220, 53, 69, 0.3);
+}
+</style>
+
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3">
+            <div class="settings-card p-3 shadow-sm">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
+                    <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#tab-app" type="button">
+                        <i class="fas fa-sliders-h me-2"></i> Preferences
+                    </button>
+                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-security" type="button">
+                        <i class="fas fa-shield-alt me-2"></i> Password & Security
+                    </button>
+                    <button class="nav-link text-start text-danger" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Danger Zone
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-lg-9 tab-content-wrapper">
+            <div class="tab-content" id="v-pills-tabContent">
+                
+                <!-- App Preferences Tab -->
+                <div class="tab-pane fade show active" id="tab-app">
+                    <div class="settings-card">
+                        <h4 class="mb-1">App Preferences</h4>
+                        <p class="text-secondary small mb-4">Manage your general layout and language configurations.</p>
+                        <form>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold text-uppercase text-secondary">Display Language</label>
+                                    <select name="language" class="form-select form-control-glass">
+                                        <option value="en" selected>English (US)</option>
+                                        <option value="kh">Khmer (coming soon)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="button" onclick="alert('On Working...')" class="btn btn-primary mt-4 px-4 rounded-pill">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Password & Security Tab -->
+                <div class="tab-pane fade" id="tab-security">
+                    <div class="settings-card">
+                        <h4 class="mb-1">Update Password</h4>
+                        <p class="text-secondary small mb-4">Ensure your account is using a long, random password to stay secure.</p>
+                        <form action="/profiles/{{current_user.id}}/change_pw" method="POST">
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-uppercase text-secondary">Current Password</label>
+                                {{ form.current_password(class="form-control form-control-glass") }}
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold text-uppercase text-secondary">New Password</label>
+                                    {{ form.new_password(class="form-control form-control-glass") }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold text-uppercase text-secondary">Confirm New Password</label>
+                                    {{ form.confirm_password(class="form-control form-control-glass") }}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning px-4 rounded-pill fw-semibold">
+                                Update Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Danger Zone Tab -->
+                <div class="tab-pane fade" id="tab-danger">
+                    <div class="settings-card danger-zone-card">
+                        <h4 class="text-danger mb-1">Danger Zone</h4>
+                        <p class="text-secondary small mb-4">Irreversible and destructive actions regarding your client account.</p>
+                        
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-3 rounded-3 bg-body border border-danger-subtle gap-3">
+                            <div>
+                                <h6 class="mb-1 text-danger">Delete Account</h6>
+                                <p class="small text-secondary mb-0">Once you delete your account, all data will be permanently wiped.</p>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger px-4 rounded-pill text-nowrap" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content settings-card p-0 shadow-lg">
+            <div class="modal-header border-bottom border-subtle px-4 py-3">
+                <h5 class="modal-title text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Are you absolutely sure?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <p class="text-secondary small mb-2">This action cannot be undone. To confirm, please type your username below:</p>
+                <input type="text" class="form-control form-control-glass" placeholder="{{ current_user.username }}">
+            </div>
+            <div class="modal-footer border-top border-subtle px-4 py-3">
+                <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                <form action="/users/{{current_user.id}}/delete" method="POST" class="m-0">
+                    {{form.hidden_tag()}}
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">Confirm Deletion</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% import "macros/form_macros.html" as f %}
+
+{{ form.hidden_tag() }}
+
+{{ f.render_field(form.code, placeholder="e.g. users:create", icon="bi bi-key") }}
+{{ f.render_field(form.name, placeholder="e.g. Create Users", icon="bi bi-tag") }}
+{{ f.render_select(form.module, icon="bi bi-layers") }}
+{{ f.render_textarea(form.descriptions, rows=3, placeholder="Describe what this permission allows...") }}
+
+{{ f.render_form_buttons(
+    submit_label="Apply Permission", 
+    cancel_url=url_for('permissions.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}

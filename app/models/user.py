@@ -1,0 +1,63 @@
+from datetime import datetime
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from extension import db
+from app.models.associations import user_roles, user_plans, user_incomes, user_expenses, user_ai
+
+
+class User(UserMixin, db.Model):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    full_name = db.Column(db.String(80), nullable=False)
+    phone = db.Column(db.String(24), nullable=True)
+    gender = db.Column(db.String(8), nullable=True)
+    description = db.Column(db.String(80), nullable=True)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    google_id = db.Column(db.String(100), unique=True, nullable=True)
+    refresh_token = db.Column(db.Text, unique=True, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    # Relation-Ship
+    roles = db.relationship("Role", secondary=user_roles, back_populates="users")
+    plans = db.relationship("Plan", secondary=user_plans, back_populates="users")
+    incomes = db.relationship("Income", secondary=user_incomes, back_populates="users")
+    expenses = db.relationship("Expense", secondary=user_expenses, back_populates="users")
+    ai_chats = db.relationship("AIChat", secondary=user_ai, back_populates="users")
+
+
+    # Methods To Help
+    def set_password(self, pw): 
+        # Generate_Hash_Password
+        self.password_hash = generate_password_hash(pw)
+
+    def check_password(self, pw):
+        # return true/false with password check
+        return check_password_hash(self.password_hash, pw)
+    
+    def has_role(self, role_name):
+        return any(role.name == role_name for role in self.roles)
+    
+    @property
+    def primary_role(self):
+        return self.roles[0].name if self.roles else "user"
+
+    def get_permission_codes(self):
+        codes = set()
+        for role in self.roles:
+            for permission in role.permissions:
+                codes.add(permission.code)
+        return codes
+    
+    def has_permission(self, permission_code):
+        if self.has_role("admin"):
+            return True
+        return permission_code in self.get_permission_codes()
+    
+    def __repr__(self):
+        return f"<User {self.username}>"

@@ -1,0 +1,44 @@
+{% import "macros/form_macros.html" as f %}
+
+{{ form.hidden_tag() }}
+
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.username, placeholder="e.g. john_doe", icon="bi bi-person") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.email, placeholder="e.g. john@example.com", icon="bi bi-envelope") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.full_name, placeholder="e.g. John Doe", icon="bi bi-card-text") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_select(form.role_module, icon="bi bi-shield-lock") }}
+    </div>
+</div>
+
+<div class="my-2">
+    {{ f.render_switch(form.is_active) }}
+</div>
+
+<hr class="my-4 border-subtle">
+
+<h6 class="fw-bold mb-3 text-body">
+    <i class="bi bi-lock me-1"></i> Security Credentials
+</h6>
+
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.password, placeholder="Enter secure password", icon="bi bi-key") }}
+    </div>
+    <div class="col-12 col-md-6">
+        {{ f.render_field(form.confirm_password, placeholder="Confirm password", icon="bi bi-key-fill") }}
+    </div>
+</div>
+
+{{ f.render_form_buttons(
+    submit_label="Save User", 
+    cancel_url=url_for('users.index'), 
+    submit_class="btn-primary", 
+    submit_icon="bi bi-check-circle"
+) }}

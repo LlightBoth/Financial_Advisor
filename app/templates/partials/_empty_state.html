@@ -1,0 +1,18 @@
+{# Reusable Empty State Card #}
+<div class="card bg-body-tertiary border-0 shadow-sm rounded-4 p-5 text-center my-4">
+    <div class="mb-3 text-body-tertiary fs-1">
+        <i class="{{ icon or 'bi-inbox' }}"></i>
+    </div>
+    <h5 class="fw-bold text-body mb-2">{{ title or 'No Records Found' }}</h5>
+    <p class="text-body-secondary mb-4 small mx-auto" style="max-width: 420px;">
+        {{ message or 'There are currently no items to display.' }}
+    </p>
+    {% if action_url %}
+        <div>
+            <a href="{{ action_url }}" class="btn btn-primary rounded-3 px-4 shadow-sm d-inline-flex align-items-center gap-2">
+                <i class="bi bi-plus-lg"></i>
+                <span>{{ action_text or 'Add New Item' }}</span>
+            </a>
+        </div>
+    {% endif %}
+</div>

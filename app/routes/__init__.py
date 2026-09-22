@@ -1,0 +1,18 @@
+# Server-Side
+from .user_routes import user_bp
+from .auth_route import auth_bp
+from .role_route import role_bp
+from .permission_route import permission_bp
+from .fact_route import fact_bp
+from .rule_route import rule_bp
+
+# Client-Side
+from .dashboard_route import dashboard_bp
+from .plan_route import plan_bp
+from .advisor_route import advisor_bp
+from .setting_route import setting_bp
+from .profile_route import profile_bp
+from .income_route import income_bp
+from .expense_route import expense_bp
+from .bot_route import bot_bp
+from .audit_log_route import audit_log_bp

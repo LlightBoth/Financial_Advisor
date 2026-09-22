@@ -1,0 +1,266 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Rule #{{ rule.id }}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4 max-width-wrapper">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-4">
+
+                <a href="{{ url_for('rules.index') }}"
+                   class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Back
+                </a>
+
+            </div>
+
+            <h2 class="fw-bold mb-1 text-body">
+                Rule Detail
+            </h2>
+
+            <p class="text-body-secondary mb-0">
+                Detailed information about this rule.
+            </p>
+        </div>
+
+        <!-- Certainty -->
+        <span class="badge bg-info-subtle text-info
+                     border border-info-subtle
+                     rounded-pill fs-6 px-3 py-2">
+
+            <i class="bi bi-percent me-1"></i>
+            Certainty: {{ rule.certainty }}
+
+        </span>
+
+    </div>
+
+
+    <!-- Main Detail Card -->
+    <div class="card border-subtle shadow-sm overflow-hidden">
+
+        <!-- Card Header -->
+        <div class="card-header bg-body-tertiary py-3 px-4
+                    border-bottom d-flex justify-content-between align-items-center">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <i class="bi bi-diagram-3 text-primary fs-5"></i>
+
+                <h5 class="mb-0 fw-semibold text-body">
+                    Rule Information
+                </h5>
+
+            </div>
+
+            <span class="font-monospace text-body-secondary small">
+                #{{ rule.id }}
+            </span>
+
+        </div>
+
+
+        <!-- Card Body -->
+        <div class="card-body p-0">
+
+            <!-- Conclusion -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Conclusion
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if rule.conclusion %}
+
+                        <span class="fw-semibold text-body">
+                            {{ rule.conclusion }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-body-secondary fst-italic">
+                            No conclusion provided
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Advice -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Advice
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if rule.advice %}
+
+                        <div class="text-body">
+                            {{ rule.advice }}
+                        </div>
+
+                    {% else %}
+
+                        <span class="text-body-secondary fst-italic">
+                            No advice provided
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Certainty -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Certainty
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    <span class="badge bg-info-subtle text-info
+                                 border border-info-subtle
+                                 px-3 py-2">
+
+                        <i class="bi bi-percent me-1"></i>
+                        {{ rule.certainty }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Created At -->
+            <div class="row g-0 border-bottom">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Created At
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if rule.created_at %}
+
+                        <span class="fw-semibold text-body font-monospace">
+
+                            {{ rule.created_at.strftime("%Y-%m-%d %H:%M:%S") }}
+
+                        </span>
+
+                        <small class="text-body-secondary ms-2">
+                            UTC
+                        </small>
+
+                    {% else %}
+
+                        <span class="text-body-secondary">
+                            —
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Updated At -->
+            <div class="row g-0">
+
+                <div class="col-md-3 col-lg-2 px-4 py-3">
+
+                    <span class="text-body-secondary small">
+                        Last Updated
+                    </span>
+
+                </div>
+
+                <div class="col-md-9 col-lg-10 px-4 py-3">
+
+                    {% if rule.updated_at %}
+
+                        <span class="fw-semibold text-body font-monospace">
+
+                            {{ rule.updated_at.strftime("%Y-%m-%d %H:%M:%S") }}
+
+                        </span>
+
+                        <small class="text-body-secondary ms-2">
+                            UTC
+                        </small>
+
+                    {% else %}
+
+                        <span class="text-body-secondary">
+                            —
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Actions -->
+    <div class="d-flex justify-content-end gap-2 mt-4">
+
+        <a href="{{ url_for('rules.index') }}"
+           class="btn btn-outline-secondary btn-sm px-3">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Rules
+
+        </a>
+
+        <a href="{{ url_for('rules.edit', rule_id=rule.id) }}"
+           class="btn btn-primary btn-sm px-3">
+
+            <i class="bi bi-pencil me-1"></i>
+            Edit Rule
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

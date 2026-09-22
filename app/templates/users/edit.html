@@ -1,0 +1,10 @@
+{% extends "layouts/base.html" %}
+{% block title %} Edit User {% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3"> Edit User </h1>
+<form method="post" novalidate>
+    {% set roles = roles %}
+    {% include "users/_form.html" %}
+</form>
+{% endblock %}

@@ -1,0 +1,348 @@
+{% extends "layouts/base.html" %}
+{% block title %} Admin Command Center {% endblock %}
+
+{% block content %}
+<link href="{{ url_for('static', filename='css/emp/dashboard.css') }}" rel="stylesheet">
+
+<div class="container-fluid px-3 px-sm-4 py-3 py-md-4 pb-5">
+    
+    <!-- Dashboard Header -->
+    <header class="dash-header mb-3 mb-md-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h4 class="h3-md fw-bold mb-0 text-uppercase tracking-wider text-body">Admin Overview</h4>
+            <span class="text-body-secondary small">System status: <span class="text-success fw-bold">Active</span></span>
+        </div>
+    </header>
+
+    <!-- Top Summary Stat Cards (Strictly No Icons) -->
+    <div class="row g-3 mb-3 mb-md-4">
+        <!-- Total Users Card -->
+        <div class="col-12 col-sm-6 col-xl-4" onclick="window.location.href='{{ url_for('users.index') }}';" style="cursor: pointer;">
+            <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">User Base</span>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">Live</span>
+                </div>
+                <div class="metric-value fs-2 fw-bold text-body mb-2">
+                    {{ total_users | default(0) }}
+                </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Total Users</div>
+            </div>
+        </div>
+
+        <!-- Total Plans Card -->
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Overview</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">Active</span>
+                </div>
+                <div class="metric-value fs-2 fw-bold text-body mb-2">
+                    {{ total_plans | default(0) }}
+                </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Total Plans</div>
+            </div>
+        </div>
+
+        <!-- Risk Status Card -->
+        <div class="col-12 col-sm-12 col-xl-4">
+            <div class="card bg-body border border-subtle shadow-sm p-3 p-md-4 rounded-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase tracking-wider text-muted fw-bold extra-small">Risk Profile</span>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1.5 small fw-bold">Score</span>
+                </div>
+                <div class="metric-value fs-2 fw-bold text-warning mb-2">
+                    Moderate
+                </div>
+                <div class="metric-label text-body-secondary fw-medium mb-1">Risk Profile Status</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-3 mb-md-4">
+        <div class="col-12 col-lg-8">
+            <div class="card admin-card-accent-primary bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
+                <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">User Monthly Registrations & Trend</h6>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card admin-card-accent-warning bg-body border border-subtle shadow-sm p-3 p-md-4 h-100 rounded-4">
+                <h6 class="fw-bold text-uppercase text-body-secondary mb-3" style="font-size: 0.75rem; letter-spacing: 0.05em;">Distribution</h6>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Users & System Activity -->
+    <div class="row g-3">
+        <!-- Recent Users View -->
+        <div class="col-12 col-lg-8">
+            <div class="card bg-body-tertiary border border-subtle shadow-sm rounded-4 overflow-hidden h-100">
+               <div class="card-header bg-body py-3 px-3 px-md-4 border-bottom border-subtle d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="mb-0 fw-bold text-body">Recent User Registrations</h6>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 extra-small fw-bold">
+                            {{ total_active_users | length if total_active_users is iterable else (total_active_users | default(0)) }}
+                        </span>
+                    </div>
+                    <a href="{{ url_for('users.index') }}" class="btn btn-link btn-sm text-decoration-none p-0">View All</a>
+                </div>
+
+                <!-- Desktop/Tablet View (Table) -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr class="text-uppercase small fw-bold text-body-secondary border-bottom border-subtle" style="font-size: 0.7rem;">
+                                <th class="border-0 px-4 bg-transparent">User</th>
+                                <th class="border-0 bg-transparent">Email</th>
+                                <th class="border-0 bg-transparent">Joined</th> 
+                                <th class="border-0 bg-transparent">Status</th>       
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in total_active_users %}
+                                <tr class="border-bottom border-subtle">
+                                    <td class="px-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3 rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                                 style="width: 36px; height: 36px; font-weight: 600;">
+                                                {{ u.full_name[0]|upper if u.full_name else 'U' }}
+                                            </div>
+                                            <span class="fw-bold text-body">{{ u.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-body-secondary">{{ u.email }}</td>
+                                    <td><span class="text-body-secondary small">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '-' }}</span></td>
+                                    <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1">Active</span></td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-body-secondary py-4">No recent user registrations found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile View (Card List) -->
+                <div class="d-md-none p-3 vstack gap-3">
+                    {% for u in total_active_users %}
+                        <div class="p-3 bg-body rounded-3 border border-subtle d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center min-w-0 me-2">
+                                <div class="me-3 rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                     style="width: 40px; height: 40px; font-weight: 600;">
+                                    {{ u.full_name[0]|upper if u.full_name else 'U' }}
+                                </div>
+                                <div class="text-truncate">
+                                    <div class="fw-bold text-body text-truncate">{{ u.username }}</div>
+                                    <div class="text-body-secondary small text-truncate">{{ u.email }}</div>
+                                </div>
+                            </div>
+                            <div class="text-end flex-shrink-0">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 mb-1 d-block">Active</span>
+                                <span class="text-body-tertiary" style="font-size: 0.7rem;">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '' }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-body-secondary py-3">No recent user registrations.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Stream (Dynamic Audit Logs) -->
+        <div class="col-12 col-lg-4">
+            <div class="card bg-body border border-subtle shadow-sm rounded-4 p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
+                    <h6 class="fw-bold text-body mb-0">System Activity</h6>
+                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 extra-small fw-bold">Live Log</span>
+                </div>
+
+                <div class="vstack gap-3 gap-md-4">
+                    {% if audit_logs %}
+                        {% for log in audit_logs %}
+                            <div class="d-flex justify-content-between align-items-start pb-2 border-bottom border-subtle">
+                                <div>
+                                    <div class="small fw-bold text-body">
+                                        {{ log.action }}
+                                    </div>
+                                    <div class="text-body-secondary small">
+                                        {% if log.user %}
+                                            User '{{ log.user.username }}'
+                                        {% else %}
+                                            Anonymous / System
+                                        {% endif %}
+                                        {% if log.ip_address %}
+                                            &bull; IP: {{ log.ip_address }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-body-tertiary mt-1" style="font-size: 0.7rem;">
+                                        {{ log.created_at.strftime('%b %d, %Y %H:%M') }}
+                                    </div>
+                                </div>
+
+                                <!-- Status Badge -->
+                                <span class="badge {% if log.status == 'SUCCESS' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} rounded-pill extra-small fw-bold flex-shrink-0 ms-2">
+                                    {{ log.status }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-muted small py-3 text-center">No recent audit logs available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Safe Injection of Jinja Variables
+        const totalIncome = Number({{ total_incomes | default(0) | tojson }}) || 0;
+        const totalExpense = Number({{ total_expenses | default(0) | tojson }}) || 0;
+        const totalPlan = Number({{ total_plans | default(0) | tojson }}) || 0;
+        const monthlyUsers = {{ monthly_users_registered | default([]) | tojson }} || [];
+
+        // Helper to dynamically match Chart colors with Bootstrap's theme state
+        const getChartColors = () => {
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            return {
+                textColor: isDark ? '#adb5bd' : '#6c757d',
+                gridColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'
+            };
+        };
+
+        let colors = getChartColors();
+
+        // 1. Combo Chart Setup (Bar + Line Overlay)
+        const labels = monthlyUsers.map(item => {
+            if (!item.month) return '';
+            const [year, month] = item.month.split('-');
+            return new Date(year, month - 1).toLocaleString('en-US', { month: 'short' });
+        });
+
+        const userCounts = monthlyUsers.map(item => item.count);
+        const barCtx = document.getElementById('barChart');
+        let barChartInstance = null;
+
+        if (barCtx) {
+            barChartInstance = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Growth Trend',
+                            data: userCounts,
+                            borderColor: '#0dcaf0',
+                            backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.35,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0dcaf0',
+                            fill: false,
+                            order: 1
+                        },
+                        {
+                            type: 'bar',
+                            label: 'New Users',
+                            data: userCounts,
+                            backgroundColor: 'rgba(13, 110, 253, 0.85)',
+                            hoverBackgroundColor: '#0d6efd',
+                            borderRadius: 6,
+                            order: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            display: true,
+                            position: 'top',
+                            labels: { color: colors.textColor, font: { size: 11, weight: '500' }, usePointStyle: true } 
+                        } 
+                    },
+                    scales: {
+                        x: { ticks: { color: colors.textColor, font: { size: 10 } }, grid: { color: colors.gridColor } },
+                        y: { ticks: { color: colors.textColor, font: { size: 10 }, precision: 0 }, grid: { color: colors.gridColor }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // 2. Radar Chart Setup
+        const radarCtx = document.getElementById('radarChart');
+        let radarChartInstance = null;
+
+        if (radarCtx) {
+            radarChartInstance = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Plan', 'Income', 'Expense'],
+                    datasets: [{
+                        label: 'Client Distribution',
+                        data: [totalPlan, totalIncome, totalExpense],
+                        backgroundColor: 'rgba(13, 110, 253, 0.25)',
+                        borderColor: '#0d6efd',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#0d6efd'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            grid: { color: colors.gridColor },
+                            angleLines: { color: colors.gridColor },
+                            pointLabels: { color: colors.textColor, font: { size: 11, weight: '600' } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: { 
+                        legend: { labels: { color: colors.textColor, font: { size: 11 } } } 
+                    }
+                }
+            });
+        }
+
+        // Live Dynamic Theme Updates for Charts when HTML theme toggles
+        const observer = new MutationObserver(() => {
+            const updatedColors = getChartColors();
+            
+            if (barChartInstance) {
+                barChartInstance.options.plugins.legend.labels.color = updatedColors.textColor;
+                barChartInstance.options.scales.x.ticks.color = updatedColors.textColor;
+                barChartInstance.options.scales.x.grid.color = updatedColors.gridColor;
+                barChartInstance.options.scales.y.ticks.color = updatedColors.textColor;
+                barChartInstance.options.scales.y.grid.color = updatedColors.gridColor;
+                barChartInstance.update();
+            }
+
+            if (radarChartInstance) {
+                radarChartInstance.options.plugins.legend.labels.color = updatedColors.textColor;
+                radarChartInstance.options.scales.r.grid.color = updatedColors.gridColor;
+                radarChartInstance.options.scales.r.angleLines.color = updatedColors.gridColor;
+                radarChartInstance.options.scales.r.pointLabels.color = updatedColors.textColor;
+                radarChartInstance.update();
+            }
+        });
+
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+    });
+</script>
+{% endblock %}

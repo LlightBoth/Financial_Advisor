@@ -1,0 +1,21 @@
+{% import "macros/form_macros.html" as f %}
+
+{{ f.render_field(
+    form.marital_status,
+    icon="bi bi-person"
+) }}
+
+{{ f.render_field(
+    form.employment_status,
+    icon="bi bi-briefcase"
+) }}
+
+{{ f.render_field(
+    form.debt_status,
+    icon="bi bi-credit-card"
+) }}
+
+{{ f.render_field(
+    form.spending_habit,
+    icon="bi bi-cart"
+) }}
