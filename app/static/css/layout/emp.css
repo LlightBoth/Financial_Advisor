@@ -12,6 +12,115 @@ body {
     flex-direction: column;
     color: var(--bs-body-color);
 }
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sidebar-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    color: #fff;
+}
+
+.sidebar-logo-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #6366f1
+    );
+
+    color: #fff;
+    font-size: 1.35rem;
+
+    box-shadow:
+        0 8px 20px rgba(79, 70, 229, 0.35);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.sidebar-brand-link:hover .sidebar-logo-icon {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(79, 70, 229, 0.45);
+}
+
+.sidebar-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+}
+
+.brand-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.025em;
+}
+
+.brand-subtitle {
+    margin-top: 4px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #6366f1;
+    letter-spacing: 0.01em;
+}
+
+
+.burger-menu {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 11px;
+
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.burger-menu i {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.burger-menu:hover {
+    background: rgba(79, 70, 229, 0.18);
+    color: #818cf8;
+    transform: scale(1.05);
+}
+
+.burger-menu:active {
+    transform: scale(0.95);
+}
 
 /* Sidebar Styling - Usually remains dark for Admin Apps */
 #sidebar {

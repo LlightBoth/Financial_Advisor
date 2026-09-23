@@ -7,22 +7,18 @@
 <div class="container">
 
     <!-- Header -->
-    <div class="mb-4">
-
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mt-3 mb-1">Update Expense</h2>
+        
+            <p class="text-muted mb-0">
+                Update a record of expense and keep your financial records up to date.
+            </p>
+        </div>
         <a href="{{ url_for('expenses.index') }}"
-           class="text-decoration-none text-muted small">
-            <i class="bi bi-arrow-left me-1"></i>
-            Back to Expenses
+           class="text-decoration-none text-muted small btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1 btn btn-outline-secondary btn-sm px-3"> Back to Expense</i>
         </a>
-
-        <h2 class="fw-bold mt-3 mb-1">
-            Add Expense
-        </h2>
-
-        <p class="text-muted mb-0">
-            Update a expense and keep your financial records up to date.
-        </p>
-
     </div>
 
 

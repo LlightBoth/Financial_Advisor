@@ -57,14 +57,74 @@ h1, h2, h3, h4, h5, h6, .brand-text {
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
-.brand-text {
-    letter-spacing: -0.02em;
+.sidebar-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
 }
 
-.brand-text span {
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sidebar-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    color: #fff;
+}
+
+.sidebar-logo-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #6366f1
+    );
+
+    color: #fff;
+    font-size: 1.35rem;
+
+    box-shadow:
+        0 8px 20px rgba(79, 70, 229, 0.35);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.sidebar-brand-link:hover .sidebar-logo-icon {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(79, 70, 229, 0.45);
+}
+.brand-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.025em;
+}
+
+.brand-subtitle {
+    margin-top: 4px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #6366f1;
+    letter-spacing: 0.01em;
 }
 
 .nav-section-title {
@@ -246,6 +306,32 @@ header {
     font-size: 16px;
 }
 
+/* Demo Button */
+.demo-btn {
+    background: #e4e8ff;
+    color: #4f46e5;
+    border: 1px solid #cdd4ff;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.demo-btn:hover {
+    background: #4f46e5;
+    color: white;
+    transform: translateY(-1px);
+}
+@media screen and (max-width: 768px) {
+    .demo-btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .demo-btn span {
+        display: none;
+    }
+}
 
 /* Notification types */
 

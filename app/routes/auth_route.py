@@ -70,7 +70,7 @@ def login():
 
             # Save user Log
             data = {
-                "user_id": current_user.id,
+                "user_id": user.id,
                 "action": "USER_LOGIN",
                 "status": "SUCCESS",
                 "ip_address": request.remote_addr,
@@ -115,14 +115,14 @@ def register():
         if user:
             # Save user Log
             # data = {
-            AuditLogService.create_audit_log = {
+            AuditLogService.create_audit_log({
                 # "user_id": current_user.id,
                 "user_id": user.id,
                 "action": "USER_REGISTER",
                 "status": "SUCCESS",
                 "ip_address": request.remote_addr,
                 "user_agent": request.user_agent.string
-            }
+            })
             # AuditLogService.create_audit_log(data)
             flash("Registration successful. Please login.", "success")
             return redirect(url_for("auth.login"))

@@ -17,16 +17,21 @@
 
     <div class="app-wrapper">
         <nav id="sidebar" class="sidebar d-flex flex-column ">
-            <div class="d-flex align-items-center justify-content-between mb-4 text-white text-decoration-none px-3">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-currency-dollar fs-4 me-2 text-info"></i>
-                    <span class="fs-5 fw-bold">Financial Advisor</span>
-                </div>
-
-                <div class="burger-menu">
-                    <i class="bi bi-list fs-1 text-info"></i>
-                </div>
+            <div class="sidebar-brand px-3 mt-2 mb-4">
+                <a href="/" class="sidebar-brand-link text-decoration-none">
+                    <div class="sidebar-logo-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <span class="brand-title">Financial</span>
+                        <span class="brand-subtitle">Consultant</span>
+                    </div>
+                </a>
+                <button type="button" class="burger-menu" aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
+                </button>
             </div>
+
             <ul class="sidebar-nav nav nav-pills flex-column mb-auto">
                 {% if user_has_role(current_user, 'admin') or user_has_permission(current_user, 'dashboard.admin.view') or user_has_permission(current_user, 'dashboard.emp.view') %}
                 <li class="nav-item">

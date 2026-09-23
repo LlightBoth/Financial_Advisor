@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Financial Advisor{% endblock %}</title>
+    <title>{% block title %}Financial Consultant{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
@@ -12,44 +12,22 @@
     <link href="{{ url_for('static', filename='css/layout/client.css') }}" rel="stylesheet">
 </head>
 <body>
-<style>
-    .demo-btn {
-        background: #e4e8ff;
-        color: #4f46e5;
-        border: 1px solid #cdd4ff;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-
-    .demo-btn:hover {
-        background: #4f46e5;
-        color: white;
-        transform: translateY(-1px);
-    }
-    @media screen and (max-width: 768px) {
-        .demo-btn {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            justify-content: center;
-        }
-
-        .demo-btn span {
-            display: none;
-        }
-    }
-</style>
 <div class="app-wrapper">
     
     <!-- Sidebar -->
     <nav class="sidebar d-flex flex-column py-3 px-3">
-        <div class="sidebar-brand-wrapper d-flex align-items-center justify-content-between mb-4">
-            <a href="/" class="d-flex align-items-center text-white text-decoration-none gap-2">
-                <div class="sidebar-logo-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
-                <span class="fs-5 fw-bold brand-text">Financial <span>Advisor</span></span>
-            </a>
+        <div class="sidebar-brand-wrapper d-flex align-items-center justify-content-between">
+            <div class="sidebar-brand px-3 mt-2 mb-2">
+                <a href="/" class="sidebar-brand-link text-decoration-none">
+                    <div class="sidebar-logo-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <span class="brand-title">Financial</span>
+                        <span class="brand-subtitle">Consultant</span>
+                    </div>
+                </a>
+            </div>
 
             <div class="burger-menu">
                 <i class="bi bi-list fs-2 text-white"></i>
@@ -340,7 +318,7 @@
 
     <!-- Footer -->
     <footer class="app-footer px-4 py-3">
-        <small class="text-muted">© 2026 Financial Advisor App — Real-Time Financial Planning</small>
+        <small class="text-muted">© 2026 Financial Consultant App — Real-Time Financial Planning</small>
     </footer>
 </div>
 
