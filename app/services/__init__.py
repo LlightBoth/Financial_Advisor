@@ -16,3 +16,5 @@ from .income_services import IncomeServices
 from .expense_services import ExpenseServices
 from .audit_log_services import AuditLogService
 from .consultant_validator import ConsultantInputValidator
+from .bot_services import AIChatBotServices
+from .notification_services import NotificationServices

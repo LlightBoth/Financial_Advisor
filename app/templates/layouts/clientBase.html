@@ -371,6 +371,9 @@
         });
     }
 
+    // CSRF Token for AJAX requests
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() if csrf_token is defined else '' }}";
+
     // Mark Notification button
     document.querySelectorAll(".notification-item").forEach(item => {
         item.addEventListener("click", async function (event) {
@@ -437,6 +440,7 @@
     if (markAllButton) {
         markAllButton.addEventListener("click", async function (event) {
             event.preventDefault();
+            event.stopPropagation();
 
             const markAllUrl = "{{ url_for('notifications.mark_all_as_read') }}";
 
