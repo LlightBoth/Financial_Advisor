@@ -291,11 +291,13 @@
     position: relative;
     width: 128px;
     height: 128px;
-    margin: 0 auto 1.25rem;
+    margin: 0.6rem auto 1.25rem;
     border-radius: 50%;
-    padding: 4px;
-    background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #10b981, #f59e0b, #3b82f6);
-    animation: ringSpin 6s linear infinite;
+    /* padding: 4px; */
+    padding: 9px;
+    /* background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #10b981, #f59e0b, #3b82f6); */
+    background: none;
+    /* animation: ringSpin 6s linear infinite; */
 }
 
 .team-lead-card .avatar-ring {
@@ -303,12 +305,79 @@
     height: 152px;
 }
 
+/* Layer 1: spinning gradient ring (thin, masked so it's only a ring) */
+.avatar-ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #10b981, #f59e0b, #3b82f6);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+    filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.55));
+    animation: ringSpin 6s linear infinite, ringGlow 3s ease-in-out infinite alternate;
+    z-index: 0;
+}
+
+/* Layer 2: outer dashed "circuit" ring with orbiting data dots (counter-rotates) */
+.avatar-ring::after {
+    content: '';
+    position: absolute;
+    inset: -9px;
+    border-radius: 50%;
+    border: 2px dashed rgba(59, 130, 246, 0.4);
+    background:
+        radial-gradient(circle at 50% 0%,   #10b981 0 4px, transparent 5px),   /* profit green */
+        radial-gradient(circle at 50% 100%, #f59e0b 0 4px, transparent 5px),   /* gold coin */
+        radial-gradient(circle at 0% 50%,   #8b5cf6 0 3px, transparent 4px),   /* data node */
+        radial-gradient(circle at 100% 50%, #3b82f6 0 3px, transparent 4px);   /* data node */
+    background-origin: border-box;
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.5));
+    animation: ringSpinReverse 14s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.avatar-badge {
+    position: absolute;
+    right: -2px;
+    bottom: 4px;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.95rem;
+    background: var(--primary-gradient);
+    border: 3px solid var(--bg-main);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    animation: badgeFloat 3s ease-in-out infinite;
+}
+
+@keyframes badgeFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+}
+
 @keyframes ringSpin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-.avatar-ring-inner {
+@keyframes ringSpinReverse {
+    0%   { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes ringGlow {
+    0%   { filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.4)); }
+    100% { filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.8)); }
+}
+
+/* .avatar-ring-inner {
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -318,6 +387,26 @@
     align-items: center;
     justify-content: center;
     border: 3px solid var(--bg-main);
+} */
+
+/* Photo stays completely still */
+.avatar-ring-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--bg-main);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avatar-ring::before,
+    .avatar-ring::after { animation: none; }
 }
 
 .avatar-ring-inner img {
