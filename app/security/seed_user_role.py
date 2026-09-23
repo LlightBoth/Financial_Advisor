@@ -2,7 +2,6 @@ from extension import db
 from app.models.user import User
 from app.models.role import Role
 
-
 def seed_roles():
     role_names = ["user", "admin", "editor"]
 
