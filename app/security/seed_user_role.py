@@ -123,6 +123,7 @@ def seed_users():
             db.or_(
                 User.username == data["username"],
                 User.email == data["email"],
+                User.full_name == data["full_name"],
             )
         ).first()
 
