@@ -657,3 +657,139 @@ def test_plan_crud_khmer(app, client):
     with app.app_context():
         deleted = db.session.get(Plan, plan_id)
         assert deleted is None
+
+
+def test_plans_index_filter_and_sort_regression(app, client):
+    """Regression test: verify /plans/ filter and sort parameters and dropdown states."""
+    user_id = create_and_login_user(app, client)
+
+    with app.app_context():
+        user = db.session.get(User, user_id)
+        p1 = Plan(
+            goal="Tech Gadget",
+            in_between=date(2027, 1, 1),
+            goal_cost=1500.0,
+            saving=300.0,
+            saving_type="manual",
+            value=False
+        )
+        p2 = Plan(
+            goal="Emergency Fund",
+            in_between=date(2026, 12, 31),
+            goal_cost=5000.0,
+            saving=5000.0,
+            saving_type="monthly",
+            value=True
+        )
+        p1.users.append(user)
+        p2.users.append(user)
+        db.session.add_all([p1, p2])
+        db.session.commit()
+
+    # 1. Test saving_type=manual maintains selected state
+    res = client.get("/plans/?saving_type=manual")
+    assert res.status_code == 200
+    html = res.data.decode("utf-8")
+    assert 'value="manual" selected' in html or '<option value="manual" selected>' in html
+    assert "Tech Gadget" in html
+
+    # 2. Test status=complete filters to only completed plans
+    res_comp = client.get("/plans/?status=complete")
+    assert res_comp.status_code == 200
+    html_comp = res_comp.data.decode("utf-8")
+    assert "Emergency Fund" in html_comp
+    assert "Tech Gadget" not in html_comp
+
+    # 3. Test status=incomplete filters to only incomplete plans
+    res_incomp = client.get("/plans/?status=incomplete")
+    assert res_incomp.status_code == 200
+    html_incomp = res_incomp.data.decode("utf-8")
+    assert "Tech Gadget" in html_incomp
+    assert "Emergency Fund" not in html_incomp
+
+    # 4. Test sort by price
+    res_sort = client.get("/plans/?sort=price")
+    assert res_sort.status_code == 200
+    assert "Emergency Fund" in res_sort.data.decode("utf-8")
+
+
+def test_plan_saving_zero_daily_amount_regression(app, client):
+    """Regression test: verify plan with daily saving_type but 0.0 saving_amount renders manual input instead of $0.00 button."""
+    user_id = create_and_login_user(app, client)
+
+    with app.app_context():
+        user = db.session.get(User, user_id)
+        plan = Plan(
+            goal="Zero Daily Plan",
+            in_between=date(2027, 5, 1),
+            goal_cost=10000.0,
+            saving=0.0,
+            saving_amount=0.0,
+            saving_type="daily",
+            value=False
+        )
+        plan.users.append(user)
+        db.session.add(plan)
+        db.session.commit()
+        plan_id = plan.id
+
+    # 1. GET: Must NOT show "Add $0.00 Daily Saving", must show manual input
+    res = client.get(f"/plans/{plan_id}")
+    assert res.status_code == 200
+    html = res.data.decode("utf-8")
+    assert "Add $0.00 Daily Saving" not in html
+    assert 'name="amount"' in html
+
+    # 2. POST valid amount
+    save_res = client.post(f"/plans/{plan_id}/save", data={"amount": "50.0"}, follow_redirects=True)
+    assert save_res.status_code == 200
+    save_html = save_res.data.decode("utf-8")
+    assert "$50.00 added to your savings." in save_html
+
+    with app.app_context():
+        p = db.session.get(Plan, plan_id)
+        assert p.saving == 50.0
+
+    # 3. POST zero amount is rejected
+    zero_res = client.post(f"/plans/{plan_id}/save", data={"amount": "0.0"}, follow_redirects=True)
+    assert zero_res.status_code == 200
+    assert "Please enter a valid saving amount." in zero_res.data.decode("utf-8")
+
+
+def test_plan_saving_daily_amount_button_workflow(app, client):
+    """Verify plan with positive daily saving_amount renders quick-add button and custom toggle."""
+    user_id = create_and_login_user(app, client)
+
+    with app.app_context():
+        user = db.session.get(User, user_id)
+        plan = Plan(
+            goal="Car Fund",
+            in_between=date(2027, 8, 1),
+            goal_cost=5000.0,
+            saving=100.0,
+            saving_amount=20.0,
+            saving_type="daily",
+            value=False
+        )
+        plan.users.append(user)
+        db.session.add(plan)
+        db.session.commit()
+        plan_id = plan.id
+
+    # 1. GET: Displays Add $20.00 Daily Saving button
+    res = client.get(f"/plans/{plan_id}")
+    assert res.status_code == 200
+    html = res.data.decode("utf-8")
+    assert "Add $20.00 Daily Saving" in html
+    assert "Enter custom amount" in html
+
+    # 2. POST quick daily saving
+    save_res = client.post(f"/plans/{plan_id}/save", data={"amount": "20.0"}, follow_redirects=True)
+    assert save_res.status_code == 200
+    assert "$20.00 added to your savings." in save_res.data.decode("utf-8")
+
+    with app.app_context():
+        p = db.session.get(Plan, plan_id)
+        assert p.saving == 120.0
+
+

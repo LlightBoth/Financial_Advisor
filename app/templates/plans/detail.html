@@ -179,6 +179,34 @@
 
 
         <!-- ================================================= -->
+        <!-- FINANCIAL METRICS & SETTINGS -->
+        <!-- ================================================= -->
+
+        {% set goal_cost = plan.goal_cost|float %}
+        {% set saving = plan.saving|float if plan.saving else 0 %}
+        {% set progress = (saving / goal_cost * 100) if goal_cost > 0 else 0 %}
+        {% set progress = [progress, 100]|min %}
+        {% set income = plan.income|float if plan.income else 0 %}
+        {% set expense = plan.expense|float if plan.expense else 0 %}
+        {% set surplus = income - expense %}
+        {% set saving_amount = plan.saving_amount|float if plan.saving_amount else 0 %}
+        {% set saving_type = plan.saving_type|lower if plan.saving_type else 'manual' %}
+
+        {% if saving_amount <= 0 or saving_type == 'manual' %}
+            {% set saving_label = 'Flexible Saving' %}
+            {% set saving_frequency = 'Self-Paced' %}
+        {% elif saving_type == 'daily' %}
+            {% set saving_label = 'Daily Saving' %}
+            {% set saving_frequency = 'Daily' %}
+        {% elif saving_type == 'monthly' %}
+            {% set saving_label = 'Monthly Saving' %}
+            {% set saving_frequency = 'Monthly' %}
+        {% else %}
+            {% set saving_label = 'Manual Saving' %}
+            {% set saving_frequency = 'Manual' %}
+        {% endif %}
+
+        <!-- ================================================= -->
         <!-- HERO -->
         <!-- ================================================= -->
 
@@ -254,32 +282,6 @@
             </div>
 
         </div>
-
-
-        <!-- ================================================= -->
-        <!-- FINANCIAL METRICS -->
-        <!-- ================================================= -->
-
-        {% set goal_cost = plan.goal_cost|float %}
-        {% set saving = plan.saving|float if plan.saving else 0 %}
-        {% set progress = (saving / goal_cost * 100) if goal_cost > 0 else 0 %}
-        {% set progress = [progress, 100]|min %}
-        {% set income = plan.income|float if plan.income else 0 %}
-        {% set expense = plan.expense|float if plan.expense else 0 %}
-        {% set surplus = income - expense %}
-        {% set saving_amount = plan.saving_amount|float if plan.saving_amount else 0 %}
-        {% set saving_type = plan.saving_type|lower if plan.saving_type else 'manually' %}
-
-        {% if saving_type == 'daily' %}
-            {% set saving_label = 'Daily Saving' %}
-            {% set saving_frequency = 'Day' %}
-        {% elif saving_type == 'monthly' %}
-            {% set saving_label = 'Monthly Saving' %}
-            {% set saving_frequency = 'Month' %}
-        {% else %}
-            {% set saving_label = 'Manual Saving' %}
-            {% set saving_frequency = 'Manual' %}
-        {% endif %}
 
         <div class="row g-3 mb-4">
             <!-- Income -->
@@ -417,9 +419,9 @@
             <div class="d-flex align-items-center gap-2 mb-3">
                 <i class="bi bi-plus-circle text-success"></i>
                 <div>
-                    <strong class="d-block">Add to your savings</strong>
+                    <strong class="d-block">{{ _("Add to your savings") }}</strong>
                     <span class="text-muted small">
-                        Record money you've put toward this goal.
+                        {{ _("Record money you've put toward this goal.") }}
                     </span>
                 </div>
             </div>
@@ -427,29 +429,45 @@
             <form method="POST" action="{{ url_for('plans.add_saving', plan_id=plan.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                {% if plan.saving_type == "daily" %}
-                    <input type="hidden" name="amount" value="{{ saving_amount }}">
-                    <button type="submit" class="btn btn-success w-100 rounded-3">
-                        <i class="bi bi-plus-circle me-1"></i>
-                        Add ${{ "%.2f"|format(saving_amount) }} Daily Saving
-                    </button>
-                {% elif plan.saving_type == "monthly" %}
-                    <input type="hidden" name="amount" value="{{ saving_amount }}">
-                    <button type="submit" class="btn btn-success w-100 rounded-3">
-                        <i class="bi bi-plus-circle me-1"></i>
-                        Add ${{ "%.2f"|format(saving_amount) }} Monthly Saving
-                    </button>
+                {% if plan.saving_type in ["daily", "monthly"] and saving_amount > 0 %}
+                    <div id="quick-saving-group" class="d-flex flex-column gap-2">
+                        <button type="submit" name="amount" value="{{ saving_amount }}" class="btn btn-success w-100 rounded-3">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            {{ _("Add") }} ${{ "%.2f"|format(saving_amount) }} {{ _("Daily") if plan.saving_type == 'daily' else _("Monthly") }} {{ _("Saving") }}
+                        </button>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-link btn-sm text-decoration-none text-muted" onclick="document.getElementById('quick-saving-group').classList.add('d-none'); document.getElementById('manual-saving-group').classList.remove('d-none'); document.getElementById('manual-saving-input').focus();">
+                                <i class="bi bi-pencil-square me-1"></i>{{ _("Enter custom amount") }}
+                            </button>
+                        </div>
+                    </div>
+                    <div id="manual-saving-group" class="d-none">
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" id="manual-saving-input" name="amount" class="form-control" min="0.01" step="0.01" placeholder="{{ _('Enter amount saved') }}">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                {{ _("Add Saving") }}
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="form-text mb-0">{{ _("Enter any amount you've saved toward this goal.") }}</span>
+                            <button type="button" class="btn btn-link btn-sm text-decoration-none text-muted p-0" onclick="document.getElementById('manual-saving-group').classList.add('d-none'); document.getElementById('quick-saving-group').classList.remove('d-none');">
+                                {{ _("Cancel") }}
+                            </button>
+                        </div>
+                    </div>
                 {% else %}
                     <div class="input-group">
                         <span class="input-group-text">$</span>
-                        <input type="number" name="amount" class="form-control" min="0.01" step="0.01" placeholder="Enter amount saved" required>
+                        <input type="number" name="amount" class="form-control" min="0.01" step="0.01" placeholder="{{ _('Enter amount saved') }}" required>
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-plus-circle me-1"></i>
-                            Add Saving
+                            {{ _("Add Saving") }}
                         </button>
                     </div>
                     <div class="form-text mt-2">
-                        Enter the amount you have actually saved toward this goal.
+                        {{ _("Enter the amount you have actually saved toward this goal.") }}
                     </div>
                 {% endif %}
             </form>
@@ -457,8 +475,8 @@
     {% else %}
         <div class="alert alert-success mb-0">
             <i class="bi bi-check-circle me-1"></i>
-            <strong>Goal completed.</strong>
-            You've reached your savings target.
+            <strong>{{ _("Goal completed.") }}</strong>
+            {{ _("You've reached your savings target.") }}
         </div>
     {% endif %}
 </div>

@@ -164,7 +164,9 @@ def delete(plan_id):
 @plan_bp.post("/<int:plan_id>/save")
 @login_required
 def add_saving(plan_id):
-    plan = PlanServices.get_plan_id(plan_id)
+    plan = PlanServices.get_plan_id(plan_id, current_user.id)
+    if plan is None:
+        abort(404)
     amount = request.form.get("amount", type=float)
 
     if not amount or amount <= 0:

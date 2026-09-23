@@ -41,6 +41,7 @@ ACTION_MAP = {
     "edit": "edit",
     "delete": "delete",
     "delete_confirm": "delete",
+    "add_saving": "edit",
 }
 
 # Module blueprint aliases (maps blueprint name to permission prefix)
