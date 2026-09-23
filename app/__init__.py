@@ -18,8 +18,10 @@ def create_app(config_class: type[Config] = Config):
     # Fix Remote IP reading behind Render's reverse proxy
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
-    migrate = Migrate(app, db)
-    
+    # Ensure instance directory exists for SQLite
+    import os
+    os.makedirs(app.instance_path, exist_ok=True)
+
     # Initialize DB,CSRF For App
     db.init_app(app)
     csrf.init_app(app)
