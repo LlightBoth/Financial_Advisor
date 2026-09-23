@@ -1,5 +1,6 @@
 import flask
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFError
 from config import Config
 from extension import db, csrf, login_manager
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -69,7 +70,16 @@ def create_app(config_class: type[Config] = Config):
             "notification_count": 0
         }
     
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return f"CSRF ERROR: {e.description}", 400
+    
+    @app.errorhandler(403)
+    def handle_forbidden(e):
+        print(">>> 403 ERROR:", e)
+        return f"403 ERROR: {e}", 403
 
+    
     # Register blueprints Server-Side
     from app.routes.user_routes import user_bp
     from app.routes.auth_route import auth_bp

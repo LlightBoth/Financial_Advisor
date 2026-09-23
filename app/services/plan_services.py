@@ -156,7 +156,7 @@ class PlanServices:
 
 
     @staticmethod
-    def update_plan(plan: Plan, data: dict, user: None):
+    def update_plan(plan: Plan, data: dict):
         try:
             target_date = PlanServices.calculate_target_date(
                 goal_cost=data["goal_cost"],

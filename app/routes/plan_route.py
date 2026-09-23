@@ -159,7 +159,19 @@ def delete(plan_id):
 @plan_bp.post("/<int:plan_id>/save")
 @login_required
 def add_saving(plan_id):
-    plan = PlanServices.get_plan_id(plan_id)
+    print("USER:", current_user.username)
+    print("PLAN EDIT:", current_user.has_permission("plan.edit"))
+    print("PLAN ADD SAVING:", current_user.has_permission("plan.add_saving"))
+
+
+    plan = PlanServices.get_plan_id(
+        plan_id,
+        current_user.id
+    )
+
+    if plan is None:
+        abort(404)
+
     amount = request.form.get("amount", type=float)
 
     if not amount or amount <= 0:
@@ -167,9 +179,20 @@ def add_saving(plan_id):
         return redirect(url_for("plans.detail", plan_id=plan.id))
 
     try:
-        PlanServices.add_saving(plan, amount, current_user)
-        flash(f"${amount:,.2f} added to your savings.", "success")
+        PlanServices.add_saving(
+            plan,
+            amount,
+            current_user
+        )
+
+        flash(
+            f"${amount:,.2f} added to your savings.",
+            "success"
+        )
+
     except ValueError as e:
         flash(str(e), "danger")
 
-    return redirect(url_for("plans.detail", plan_id=plan.id))
+    return redirect(
+        url_for("plans.detail", plan_id=plan.id)
+    )

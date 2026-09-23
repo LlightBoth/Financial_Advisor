@@ -41,7 +41,9 @@ ACTION_MAP = {
     "edit": "edit",
     "delete": "delete",
     "delete_confirm": "delete",
+    "add_saving": "edit",
 }
+
 
 # Module blueprint aliases (maps blueprint name to permission prefix)
 MODULE_MAP = {
@@ -52,9 +54,6 @@ MODULE_MAP = {
     "plans": "plan",
     "incomes": "income",
     "expenses": "expense",
-    "loans": "loan",
-    "histories": "history",
-    "advisors": "advisor",
     "settings": "setting",
     "dashboards": "dashboard",
 }
