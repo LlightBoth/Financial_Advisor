@@ -160,6 +160,274 @@ header {
     justify-content: center;
 }
 
+/* =========================================
+   NOTIFICATIONS
+   ========================================= */
+
+.notification-menu {
+    width: 390px;
+    max-width: calc(100vw - 24px);
+    overflow: hidden;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+
+/* Header */
+
+.notification-header {
+    background: var(--bs-body-bg);
+}
+
+
+/* Notification list */
+
+.notification-list {
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+
+/* Individual notification */
+
+.notification-item {
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 14px 16px;
+
+    color: var(--bs-body-color);
+    text-decoration: none;
+
+    border-bottom: 1px solid
+        var(--bs-border-color-translucent);
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+.notification-item:hover {
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+}
+
+
+/* Unread notification */
+
+.notification-item.unread {
+    background: rgba(79, 70, 229, 0.07);
+}
+
+
+.notification-item.unread:hover {
+    background: rgba(79, 70, 229, 0.12);
+}
+
+
+/* Icon */
+
+.notification-icon {
+    flex: 0 0 38px;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+}
+
+
+/* Notification types */
+
+.notification-icon.income {
+    background: rgba(25, 135, 84, 0.12);
+    color: #198754;
+}
+
+.notification-icon.expense {
+    background: rgba(220, 53, 69, 0.12);
+    color: #dc3545;
+}
+
+.notification-icon.plan {
+    background: rgba(13, 110, 253, 0.12);
+    color: #0d6efd;
+}
+
+.notification-icon.ai {
+    background: rgba(111, 66, 193, 0.12);
+    color: #6f42c1;
+}
+
+.notification-icon.warning {
+    background: rgba(255, 193, 7, 0.15);
+    color: #b58100;
+}
+
+.notification-icon.system {
+    background: rgba(108, 117, 125, 0.12);
+    color: #6c757d;
+}
+
+
+/* Content */
+
+.notification-content {
+    min-width: 0;
+    flex: 1;
+}
+
+
+.notification-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.35;
+
+    margin-bottom: 3px;
+}
+
+
+.notification-text {
+    font-size: 0.8rem;
+
+    color: var(--bs-secondary-color);
+
+    line-height: 1.4;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+
+.notification-time {
+    margin-top: 6px;
+
+    font-size: 0.7rem;
+
+    color: var(--bs-secondary-color);
+}
+
+
+/* Small unread dot */
+
+.notification-unread-dot {
+    position: absolute;
+
+    top: 17px;
+    right: 12px;
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #4f46e5;
+}
+
+
+/* Bell badge */
+
+.notification-badge {
+    position: absolute;
+
+    top: -3px;
+    right: -3px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: #dc3545;
+    color: white;
+
+    border: 2px solid var(--bs-body-bg);
+
+    font-size: 0.62rem;
+    font-weight: 700;
+
+    line-height: 1;
+}
+
+
+/* Footer */
+
+.notification-footer {
+    background: var(--bs-body-bg);
+}
+
+
+.notification-footer button {
+    color: #4f46e5;
+    font-weight: 500;
+}
+
+
+.notification-footer button:hover {
+    background: var(--bs-tertiary-bg);
+}
+
+
+/* Dark mode */
+
+[data-bs-theme="dark"] .notification-item.unread {
+    background: rgba(99, 102, 241, 0.13);
+}
+
+
+[data-bs-theme="dark"] .notification-item.unread:hover {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+
+[data-bs-theme="dark"] .notification-unread-dot {
+    background: #818cf8;
+}
+
+
+[data-bs-theme="dark"] .notification-badge {
+    border-color: var(--bs-body-bg);
+}
+
+
+/* Mobile */
+
+@media (max-width: 576px) {
+
+    .notification-menu {
+        width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px);
+
+        margin-right: 10px;
+    }
+
+    .notification-list {
+        max-height: 65vh;
+    }
+}
+
+
+
+
 /* --- Main Viewport --- */
 main {
     grid-area: body;

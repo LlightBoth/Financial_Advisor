@@ -1,0 +1,394 @@
+{% extends "layouts/clientBase.html" %}
+{% block title %}Currency Converter - Financial Advisor{% endblock %}
+
+{% block content %}
+
+<style> /* ========================================= Currency Converter Automatically supports Bootstrap light/dark ========================================= */ .currency-page { padding: 1rem 1.5rem 3rem; } .currency-container { max-width: 1100px; margin: 0 auto; } .currency-hero { margin-bottom: 1.5rem; } .currency-hero h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; color: var(--bs-emphasis-color); } .currency-hero p { color: var(--bs-secondary-color); margin-bottom: 0; } /* Main converter card */ .converter-card { background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: 1.25rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); overflow: hidden; } [data-bs-theme="dark"] .converter-card { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25); } .converter-card-header { padding: 1.5rem; border-bottom: 1px solid var(--bs-border-color); } .converter-card-body { padding: 1.5rem; } /* Currency input boxes */ .currency-box { background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); border-radius: 1rem; padding: 1rem; transition: all 0.2s ease; } .currency-box:focus-within { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12); } .currency-label { color: var(--bs-secondary-color); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.5rem; } .currency-input-row { display: flex; align-items: center; gap: 0.75rem; } .currency-flag { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); } 
+.currency-select {
+    min-width: 135px;
+    border: 1px solid transparent !important;
+    background-color: transparent !important;
+    color: var(--bs-emphasis-color) !important;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none !important;
+}
+
+.currency-select option {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-emphasis-color);
+}
+
+[data-bs-theme="dark"] .currency-select option {
+    background-color: #212529;
+    color: #f8f9fa;
+}
+
+.currency-select:focus {
+    background-color: transparent !important;
+    color: var(--bs-emphasis-color) !important;
+    border-color: #4f46e5 !important;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15) !important;
+}
+
+.currency-amount {
+    flex: 1;
+    min-width: 100px;
+    width: 100%;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.6rem;
+    background: var(--bs-body-bg);
+    color: var(--bs-emphasis-color);
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: right;
+    outline: none;
+    padding: 0.55rem 0.75rem;
+}
+
+.currency-amount:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.currency-amount::placeholder {
+    color: var(--bs-secondary-color);
+    opacity: 0.6;
+}
+.swap-wrapper { display: flex; justify-content: center; align-items: center; position: relative; z-index: 2; } .swap-btn { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--bs-border-color); background: var(--bs-body-bg); color: #4f46e5; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); } .swap-btn:hover { background: #4f46e5; color: white; border-color: #4f46e5; transform: rotate(180deg); } /* Result */ .conversion-result { margin-top: 1.5rem; padding: 1.25rem; border-radius: 1rem; background: linear-gradient( 135deg, rgba(79, 70, 229, 0.10), rgba(99, 102, 241, 0.04) ); border: 1px solid rgba(79, 70, 229, 0.15); } .result-label { color: var(--bs-secondary-color); font-size: 0.8rem; margin-bottom: 0.35rem; } .result-value { color: var(--bs-emphasis-color); font-size: 1.8rem; font-weight: 750; word-break: break-word; } .result-rate { color: var(--bs-secondary-color); font-size: 0.85rem; margin-top: 0.35rem; } /* Exchange rate cards */ .rate-card { height: 100%; background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: 1rem; padding: 1rem; transition: transform 0.2s ease, box-shadow 0.2s ease; } .rate-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06); } [data-bs-theme="dark"] .rate-card:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); } .rate-currency { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem; } .rate-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--bs-tertiary-bg); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; } .rate-name { font-weight: 600; color: var(--bs-emphasis-color); font-size: 0.9rem; } .rate-code { font-size: 0.72rem; color: var(--bs-secondary-color); } .rate-value { font-size: 1.15rem; font-weight: 700; color: var(--bs-emphasis-color); } .rate-description { font-size: 0.75rem; color: var(--bs-secondary-color); margin-top: 0.15rem; } /* Mobile */ @media (max-width: 768px) { .currency-page { padding: 1rem 0.75rem 2rem; } .currency-hero h1 { font-size: 1.5rem; } .converter-card-body { padding: 1rem; } .currency-input-row { gap: 0.5rem; } .result-value { font-size: 1.4rem; } } </style> <div class="currency-page">
+<div class="currency-container">
+
+    <!-- Page heading -->
+    <div class="currency-hero">
+
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge rounded-pill text-bg-primary px-3 py-2">
+                <i class="bi bi-currency-exchange me-1"></i>
+                Currency
+            </span>
+        </div>
+
+        <h1>Currency Converter</h1>
+
+        <p>
+            Convert between US Dollar, Cambodian Riel, and Chinese Yuan.
+        </p>
+
+    </div>
+
+
+    <!-- Converter -->
+    <div class="converter-card">
+
+        <div class="converter-card-header">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <div class="fw-semibold">
+                        Convert money
+                    </div>
+
+                    <div class="small text-muted">
+                        Enter an amount and select your currencies.
+                    </div>
+                </div>
+
+                <i class="bi bi-calculator fs-4 text-primary"></i>
+
+            </div>
+
+        </div>
+
+
+        <div class="converter-card-body">
+
+            <div class="row align-items-center g-3">
+
+                <!-- From -->
+                <div class="col-12 col-lg-5">
+
+                    <div class="currency-box">
+
+                        <div class="currency-label">
+                            From
+                        </div>
+
+                        <div class="currency-input-row">
+
+                            <div class="currency-flag" id="fromFlag">
+                                🇺🇸
+                            </div>
+
+                            <select
+                                class="form-select currency-select"
+                                id="fromCurrency">
+                                <option value="USD" selected>USD · Dollar</option>
+                                <option value="KHR">KHR · Riel</option>
+                                <option value="CNY">CNY · Yuan</option>
+                            </select>
+
+                            <input
+                                type="number"
+                                class="currency-amount"
+                                id="fromAmount"
+                                value="1"
+                                min="0"
+                                step="any"
+                                placeholder="Enter amount"
+                                aria-label="Amount to convert">
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- Swap -->
+                <div class="col-12 col-lg-2">
+
+                    <div class="swap-wrapper">
+
+                        <button
+                            type="button"
+                            class="swap-btn"
+                            id="swapCurrencies"
+                            title="Swap currencies"
+                            aria-label="Swap currencies">
+
+                            <i class="bi bi-arrow-left-right"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- To -->
+                <div class="col-12 col-lg-5">
+
+                    <div class="currency-box">
+
+                        <div class="currency-label">
+                            To
+                        </div>
+
+                        <div class="currency-input-row">
+
+                            <div
+                                class="currency-flag"
+                                id="toFlag">
+                                🇰🇭
+                            </div>
+
+                            <select
+                                class="form-select currency-select"
+                                id="toCurrency">
+
+                                <option value="USD">
+                                    USD · Dollar
+                                </option>
+
+                                <option value="KHR" selected>
+                                    KHR · Riel
+                                </option>
+
+                                <option value="CNY">
+                                    CNY · Yuan
+                                </option>
+
+                            </select>
+
+                            <input
+                                type="text"
+                                class="currency-amount"
+                                id="toAmount"
+                                value="4,055"
+                                readonly>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Result -->
+            <div class="conversion-result">
+
+                <div class="result-label">
+                    Converted amount
+                </div>
+
+                <div class="result-value" id="resultValue">
+                    4,055 KHR
+                </div>
+
+                <div class="result-rate" id="resultRate">
+                    1 USD = 4,055 KHR
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Exchange Rates -->
+    <div class="mt-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div>
+                <h5 class="fw-semibold mb-1">
+                    Exchange Rates
+                </h5>
+
+                <div class="small text-muted">
+                    Reference rates used by this converter
+                </div>
+            </div>
+
+            <i class="bi bi-graph-up-arrow text-primary"></i>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <!-- USD -->
+            <div class="col-12 col-md-4">
+
+                <div class="rate-card">
+
+                    <div class="rate-currency">
+
+                        <div class="rate-icon">
+                            🇺🇸
+                        </div>
+
+                        <div>
+                            <div class="rate-name">
+                                US Dollar
+                            </div>
+
+                            <div class="rate-code">
+                                USD
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="rate-value">
+                        1 USD
+                    </div>
+
+                    <div class="rate-description">
+                        Base currency
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- KHR -->
+            <div class="col-12 col-md-4">
+
+                <div class="rate-card">
+
+                    <div class="rate-currency">
+
+                        <div class="rate-icon">
+                            🇰🇭
+                        </div>
+
+                        <div>
+                            <div class="rate-name">
+                                Cambodian Riel
+                            </div>
+
+                            <div class="rate-code">
+                                KHR
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="rate-value">
+                        1 USD ≈ 4,055 KHR
+                    </div>
+
+                    <div class="rate-description">
+                        USD to KHR
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CNY -->
+            <div class="col-12 col-md-4">
+
+                <div class="rate-card">
+
+                    <div class="rate-currency">
+
+                        <div class="rate-icon">
+                            🇨🇳
+                        </div>
+
+                        <div>
+                            <div class="rate-name">
+                                Chinese Yuan
+                            </div>
+
+                            <div class="rate-code">
+                                CNY
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="rate-value">
+                        1 USD ≈ 6.71 CNY
+                    </div>
+
+                    <div class="rate-description">
+                        USD to CNY
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Info -->
+    <div class="alert alert-light border mt-4 small d-flex gap-2 align-items-start"
+         data-bs-theme="light">
+
+        <i class="bi bi-info-circle text-primary mt-1"></i>
+
+        <div>
+            <strong>Note:</strong>
+            Exchange rates are reference values and may differ from
+            bank, card, or cash-exchange rates.
+        </div>
+
+    </div>
+
+</div>
+
+</div> <script> document.addEventListener("DOMContentLoaded", function () { /* * ========================================== * Currency configuration * ========================================== * * All rates are based on USD. * * 1 USD = 4055 KHR * 1 USD = 6.71 CNY * * To update the rates later, only change * these numbers. */ const rates = { USD: 1, KHR: 4055, CNY: 6.71 }; const currencyInfo = { USD: { symbol: "$", name: "US Dollar", flag: "🇺🇸", decimals: 2 }, KHR: { symbol: "៛", name: "Cambodian Riel", flag: "🇰🇭", decimals: 0 }, CNY: { symbol: "¥", name: "Chinese Yuan", flag: "🇨🇳", decimals: 2 } }; const fromCurrency = document.getElementById("fromCurrency"); const toCurrency = document.getElementById("toCurrency"); const fromAmount = document.getElementById("fromAmount"); const toAmount = document.getElementById("toAmount"); const fromFlag = document.getElementById("fromFlag"); const toFlag = document.getElementById("toFlag"); const resultValue = document.getElementById("resultValue"); const resultRate = document.getElementById("resultRate"); const swapButton = document.getElementById("swapCurrencies"); /* * Format number */ function formatNumber(value, currency) { const decimals = currencyInfo[currency].decimals; return new Intl.NumberFormat("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value); } /* * Convert currencies */ function convertCurrency() { const amount = parseFloat(fromAmount.value); const from = fromCurrency.value; const to = toCurrency.value; if ( isNaN(amount) || amount < 0 ) { toAmount.value = ""; resultValue.textContent = "Enter an amount"; resultRate.textContent = ""; return; } /* * Convert: * * amount / fromRate * toRate */ const converted = (amount / rates[from]) * rates[to]; const formatted = formatNumber(converted, to); toAmount.value = formatted; resultValue.textContent = `${formatted} ${to}`; /* * Calculate one unit rate */ const oneUnitRate = rates[to] / rates[from]; const formattedRate = formatNumber(oneUnitRate, to); resultRate.textContent = `1 ${from} = ${formattedRate} ${to}`; } /* * Update flags */ function updateFlags() { fromFlag.textContent = currencyInfo[fromCurrency.value].flag; toFlag.textContent = currencyInfo[toCurrency.value].flag; } /* * Currency changed */ fromCurrency.addEventListener( "change", function () { updateFlags(); convertCurrency(); } ); toCurrency.addEventListener( "change", function () { updateFlags(); convertCurrency(); } ); /* * Amount changed */ fromAmount.addEventListener( "input", convertCurrency ); /* * Swap currencies */ swapButton.addEventListener( "click", function () { const oldFrom = fromCurrency.value; const oldTo = toCurrency.value; /* * Swap currency selections */ fromCurrency.value = oldTo; toCurrency.value = oldFrom; updateFlags(); /* * Keep the converted amount * as the new input amount. */ const currentResult = parseFloat( toAmount.value.replace(/,/g, "") ); if (!isNaN(currentResult)) { fromAmount.value = currentResult; } convertCurrency(); } ); /* * Initial conversion */ updateFlags(); convertCurrency(); }); </script>
+{% endblock %}

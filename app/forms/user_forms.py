@@ -183,7 +183,7 @@ class EditProfileForm(FlaskForm):
 
 
 class ChangePasswordProfileForm(FlaskForm):
-    current_password = StringField("Current Password", validators=[DataRequired()])
-    new_password = StringField("New Password", validators=[DataRequired()])
-    confirm_password = StringField("Confirm Password", validators=[DataRequired()])
+    current_password = PasswordField("Current Password", validators=[DataRequired()])
+    new_password = PasswordField("New Password", validators=[DataRequired(), strong_password])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired()])
 

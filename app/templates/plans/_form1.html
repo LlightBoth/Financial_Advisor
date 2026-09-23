@@ -6,27 +6,14 @@
     icon="bi bi-bullseye"
 ) }}
 
-<div class="row">
-    <div class="col-md-6">
-        {{ f.render_field(
-            form.goal_cost,
-            placeholder="e.g. 5000",
-            icon="bi bi-cash"
-        ) }}
-    </div>
-
-    <div class="col-md-6">
-        {{ f.render_field(
-            form.in_between,
-            icon="bi bi-calendar-event",
-            type="date"
-        ) }}
-    </div>
-</div>
-
-
+{{ f.render_field(
+    form.goal_cost,
+    placeholder="e.g. 5000",
+    icon="bi bi-cash"
+) }}
 
 <div class="row">
+
     <div class="col-md-6">
         {{ f.render_field(
             form.income,
@@ -42,9 +29,11 @@
             icon="bi bi-wallet2"
         ) }}
     </div>
+
 </div>
 
 <div class="row">
+
     <div class="col-md-6">
         {{ f.render_field(
             form.debt_amount,
@@ -54,10 +43,18 @@
     </div>
 
     <div class="col-md-6">
-        {{ f.render_switch(form.has_budget) }}
+        {{ f.render_switch(
+            form.has_budget
+        ) }}
     </div>
+
 </div>
 
+{{ f.render_field(
+    form.saving,
+    placeholder="e.g. 500",
+    icon="bi bi-piggy-bank"
+) }}
 
 {{ f.render_field(
     form.description,
