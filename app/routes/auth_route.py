@@ -357,6 +357,10 @@ def get_google_flow():
     from google_auth_oauthlib.flow import Flow
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+    
+    if not client_id or not client_secret:
+        return None
+
     client_config = {
         "web": {
             "client_id": client_id,
@@ -365,39 +369,28 @@ def get_google_flow():
             "token_uri": "https://oauth2.googleapis.com/token",
         }
     }
-    # Standard identity scopes for Google Sign-In
-    scopes = [
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email",
-        "openid"
-    ]
-    redirect_uri = os.getenv("GOOGLE_REDIRECT_URI") or url_for("auth.google_callback", _external=True)
     return Flow.from_client_config(
         client_config=client_config,
-        scopes=scopes,
-        redirect_uri=redirect_uri
+        scopes=[
+            "openid",
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email"
+        ],
+        redirect_uri=url_for("auth.google_callback", _external=True)
     )
 
 
 @auth_bp.route("/google")
-@auth_bp.route("/auth/google")
 def google_login():
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
-    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-
-    if not client_id or not client_secret:
-        flash(
-            "Google Sign-In is not configured yet. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to your .env file.",
-            "warning"
-        )
-        return redirect(url_for("auth.login"))
-
     flow = get_google_flow()
+    if not flow:
+        flash("Google Sign-In is not configured yet. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env", "warning")
+        return redirect(url_for("auth.login"))
     
     authorization_url, state = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",
-        prompt="consent"  # Ensures Google returns a refresh_token every time
+        prompt="consent"
     )
     
     session["oauth_state"] = state
@@ -408,20 +401,16 @@ def google_login():
 
 
 @auth_bp.route("/google/callback")
-@auth_bp.route("/auth/google/callback")
 def google_callback():
     state = session.get("oauth_state")
     if not state or state != request.args.get("state"):
         flash("Invalid state parameter during authentication.", "danger")
         return redirect(url_for("auth.login"))
 
-    client_id = os.getenv("GOOGLE_CLIENT_ID")
-    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-    if not client_id or not client_secret:
-        flash("Google Sign-In is not configured yet.", "danger")
-        return redirect(url_for("auth.login"))
-
     flow = get_google_flow()
+    if not flow:
+        flash("Google Sign-In configuration missing.", "danger")
+        return redirect(url_for("auth.login"))
 
     if "code_verifier" in session:
         flow.code_verifier = session.pop("code_verifier")
@@ -438,6 +427,7 @@ def google_callback():
     credentials = flow.credentials
     from google.oauth2 import id_token
     from google.auth.transport import requests as google_requests
+
     request_session = requests.Session()
     cached_session = google_requests.Request(session=request_session)
 
@@ -455,16 +445,30 @@ def google_callback():
     google_id = id_info.get("sub")
     email = id_info.get("email")
     full_name = id_info.get("name") or "Google User"
-    username = email.split("@")[0]
+    base_username = email.split("@")[0]
 
-    # Look up user in database
+    # Check if user already exists
     user = User.query.filter((User.email == email) | (User.google_id == google_id)).first()
 
     if not user:
+        # Generate unique username
+        username = base_username
+        counter = 1
+        while User.query.filter_by(username=username).first():
+            username = f"{base_username}_{counter}"
+            counter += 1
+
+        # Generate unique full_name if needed
+        unique_name = full_name
+        name_counter = 1
+        while User.query.filter_by(full_name=unique_name).first():
+            unique_name = f"{full_name} {name_counter}"
+            name_counter += 1
+
         dummy_password = generate_password_hash(os.urandom(24).hex())
         user = User(
             username=username,
-            full_name=full_name,
+            full_name=unique_name,
             email=email,
             google_id=google_id,
             password_hash=dummy_password,
@@ -480,21 +484,22 @@ def google_callback():
     else:
         if not user.google_id:
             user.google_id = google_id
-            db.session.commit()
+        user.is_active = True
+        db.session.commit()
 
-    # 1. Ensure user is active and log in user via Flask-Login
+    # 1. Update online status
     UserServices.update_user_online(user)
+
+    # 2. Log in user session via Flask-Login
     session.permanent = True
     login_user(user, remember=True)
 
-    # 2. Create Application Session Tokens
+    # 3. Create Application Session Tokens
     access_token = Token.get_new_token()
     refresh_token = Token.generate_refresh_token(user)
-
-    # Store token in session (matching standard login flow)
     session["refresh_token"] = refresh_token
 
-    # 3. Create Audit Log
+    # 4. Create Audit Log
     data = {
         "user_id": user.id,
         "action": "USER_GOOGLE_LOGIN",
@@ -506,13 +511,21 @@ def google_callback():
 
     flash("Successfully logged in with Google!", "success")
 
-    # 4. Determine redirect URL based on role
+    # 5. Determine redirect URL based on role / permission
     if user.has_role("admin"):
         redirect_url = url_for("dashboards.empIndex")
+    elif user.has_permission("user.view"):
+        redirect_url = url_for("users.index")
+    elif user.has_permission("rule.view"):
+        redirect_url = url_for("rules.index")
+    elif user.has_permission("role.view"):
+        redirect_url = url_for("roles.index")
+    elif user.has_permission("fact.view"):
+        redirect_url = url_for("facts.index")
     else:
         redirect_url = url_for("dashboards.userIndex")
 
-    # 5. Build response and set cookies cleanly via get_cookie
+    # 6. Build response and set cookies cleanly via get_cookie
     return get_cookie(redirect_url, access_token, refresh_token)
 
 @auth_bp.route("/logout")
