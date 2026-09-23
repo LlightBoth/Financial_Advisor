@@ -16,12 +16,12 @@
         {{ f.render_select(form.recurring_period, icon="bi bi-arrow-repeat") }}
     </div>
     <div class="col-12">
-        {{ f.render_textarea(form.description, rows=3, placeholder="Add details or notes about this expense...") }}
+        {{ f.render_textarea(form.description, rows=3, placeholder=_('expense.description_placeholder')) }}
     </div>
 </div>
 
 {{ f.render_form_buttons(
-    submit_label="Save Expense", 
+    submit_label=submit_label or _('expense.save_expense'), 
     cancel_url=url_for('expenses.index'), 
     submit_class="btn-primary", 
     submit_icon="bi bi-check-circle"

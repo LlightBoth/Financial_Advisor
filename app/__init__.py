@@ -12,6 +12,7 @@ from app.models.user import User
 from app.models.notification import Notification
 from app.services.notification_services import NotificationServices
 from flask_login import current_user
+from flask_wtf.csrf import CSRFError
 
 
 
@@ -42,13 +43,19 @@ def create_app(config_class: type[Config] = Config):
 
     # Optional setting
     login_manager.login_view = "auth.login" # Blueprint.rout name
-    login_manager.login_message = "Please login to view this page"
+    login_manager.login_message = "message.please_login"
     login_manager.login_message_category = "warning"
+    from app.utils.i18n import translate
+    login_manager.localize_callback = translate
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return f"CSRF ERROR: {e.description}", 400
 
     # This function tells Flask-login how to load a user from a session
     @login_manager.user_loader
     def load_user(user_id):
-        user = User.query.get(int(user_id))
+        user = db.session.get(User, int(user_id))
         return user
 
     # Global Notification
@@ -58,7 +65,7 @@ def create_app(config_class: type[Config] = Config):
             return {
                 "notifications": NotificationServices.get_user_notifications(
                     current_user.id,
-                    limit=3
+                    limit=5
                 ),
                 "notification_count": NotificationServices.get_unread_count(
                     current_user.id
@@ -87,11 +94,13 @@ def create_app(config_class: type[Config] = Config):
     from app.routes.permission_route import permission_bp
     from app.routes.fact_route import fact_bp
     from app.routes.rule_route import rule_bp
+    from app.routes.lang_route import lang_bp
 
     # Register blueprints Client-Side
     from app.routes.plan_route import plan_bp
-    from app.routes.advisor_route import advisor_bp
+    from app.routes.advisor_route import advisor_bp, consult_api_bp
     from app.routes.dashboard_route import dashboard_bp
+    from app.routes.history_route import history_bp
     from app.routes.setting_route import setting_bp
     from app.routes.profile_route import profile_bp
     from app.routes.income_route import income_bp
@@ -107,9 +116,12 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(permission_bp)
     app.register_blueprint(fact_bp)
     app.register_blueprint(rule_bp)
+    app.register_blueprint(lang_bp)
     app.register_blueprint(plan_bp)
     app.register_blueprint(advisor_bp)
+    app.register_blueprint(consult_api_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(history_bp)
     app.register_blueprint(setting_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(income_bp)
@@ -118,6 +130,21 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(audit_log_bp)
     app.register_blueprint(notification_bp)
     app.register_blueprint(currency_bp)
+
+    # Register translation helpers for Jinja
+    from app.utils.i18n import _, translate, get_locale, SUPPORTED_LANGUAGES
+
+    app.jinja_env.globals["_"] = _
+    app.jinja_env.globals["translate"] = translate
+    app.jinja_env.globals["get_locale"] = get_locale
+    app.jinja_env.globals["SUPPORTED_LANGUAGES"] = SUPPORTED_LANGUAGES
+
+    @app.context_processor
+    def inject_i18n():
+        return {
+            "current_lang": get_locale(),
+            "supported_languages": SUPPORTED_LANGUAGES,
+        }
 
     # Root landing page for visitors
     @app.route("/")

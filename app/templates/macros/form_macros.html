@@ -91,7 +91,8 @@
     submit_label="Save Changes",
     cancel_url="#",
     submit_class="btn-primary",
-    submit_icon="bi bi-check-lg"
+    submit_icon="bi bi-check-lg",
+    cancel_label=None
 ) %}
 <div class="d-flex align-items-center gap-2 mt-4 pt-2 border-top border-subtle">
 
@@ -107,11 +108,8 @@
     </button>
 
     {% if cancel_url and cancel_url != '#' %}
-        <a
-            href="{{ cancel_url }}"
-            class="btn btn-outline-secondary px-3 rounded-3"
-        >
-            Cancel
+        <a href="{{ cancel_url }}" class="btn btn-outline-secondary px-3 rounded-3">
+            {{ cancel_label or _('common.cancel') }}
         </a>
     {% endif %}
 

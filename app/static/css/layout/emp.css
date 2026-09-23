@@ -6,6 +6,7 @@
 
 body {
     /* DYNAMIC: Flips between white and dark gray */
+    font-family: var(--font-body);
     background-color: var(--bs-tertiary-bg); 
     display: flex;
     min-height: 100vh;
@@ -120,6 +121,10 @@ body {
 
 .burger-menu:active {
     transform: scale(0.95);
+}
+
+h1, h2, h3, h4, h5, h6, .brand-text {
+    font-family: var(--font-heading);
 }
 
 /* Sidebar Styling - Usually remains dark for Admin Apps */

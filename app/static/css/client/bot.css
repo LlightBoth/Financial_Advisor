@@ -88,3 +88,38 @@ body {
     flex-shrink: 0;
     font-size: 1.2rem;
 }
+
+/* ==========================================================================
+   Chatbot Khmer Typography (Strict Single Font Policy: Khmer OS Battambang ONLY)
+   Strictly NO fallback chain containing other fonts.
+   ========================================================================== */
+
+.khmer-text {
+    font-family: "Khmer OS Battambang", sans-serif;
+    line-height: 1.8;
+}
+
+.khmer-text strong,
+.khmer-text b,
+.khmer-text h1,
+.khmer-text h2,
+.khmer-text h3,
+.khmer-text h4,
+.khmer-text h5,
+.khmer-text h6 {
+    font-family: "Khmer OS Battambang", sans-serif;
+    font-weight: 700;
+}
+
+.khmer-text::placeholder,
+input.khmer-text::placeholder,
+textarea.khmer-text::placeholder {
+    font-family: "Khmer OS Battambang", sans-serif;
+    line-height: 1.8;
+}
+
+button.khmer-text,
+.btn.khmer-text {
+    font-family: "Khmer OS Battambang", sans-serif;
+    line-height: 1.8;
+}

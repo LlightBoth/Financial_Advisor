@@ -1,10 +1,10 @@
 {% extends "layouts/authBase.html" %}
-{% block title %}Create Account{% endblock %}
+{% block title %}{{ _('auth.create_account') }}{% endblock %}
 
 {% block auth_content %}
 <div class="auth-header">
-    <h3>Create Account</h3>
-    <p>Start your journey with intelligent financial advisory</p>
+    <h3>{{ _('auth.create_account') }}</h3>
+    <p>{{ _('auth.register_subtitle') }}</p>
 </div>
 
 <form method="post" novalidate>
@@ -14,7 +14,7 @@
         <!-- Full Name Field -->
         <div class="col-md-6">
             <label for="full_name" class="auth-form-label">
-                <i class="bi bi-person text-primary"></i> Full Name
+                <i class="bi bi-person text-primary"></i> {{ _('auth.full_name') }}
             </label>
             {{ form.full_name(class="form-control-auth", placeholder="Full Name", id="full_name", autocomplete="name", autofocus=true) }}
             {% for error in form.full_name.errors %}
@@ -25,7 +25,7 @@
         <!-- Username Field -->
         <div class="col-md-6">
             <label for="username" class="auth-form-label">
-                <i class="bi bi-at text-primary"></i> Username
+                <i class="bi bi-at text-primary"></i> {{ _('auth.username') }}
             </label>
             {{ form.username(class="form-control-auth", placeholder="Username", id="username", autocomplete="username") }}
             {% for error in form.username.errors %}
@@ -36,7 +36,7 @@
         <!-- Email Field -->
         <div class="col-12">
             <label for="email" class="auth-form-label">
-                <i class="bi bi-envelope text-primary"></i> Email Address
+                <i class="bi bi-envelope text-primary"></i> {{ _('auth.email_address') }}
             </label>
             {{ form.email(class="form-control-auth", placeholder="name@example.com", id="email", autocomplete="email") }}
             {% for error in form.email.errors %}
@@ -47,10 +47,10 @@
         <!-- Password Field (Full Width) -->
         <div class="col-12">
             <label for="regPassword" class="auth-form-label">
-                <i class="bi bi-key text-primary"></i> Password
+                <i class="bi bi-key text-primary"></i> {{ _('auth.password') }}
             </label>
             <div class="auth-input-group">
-                {{ form.password(class="form-control-auth", placeholder="Create a strong password (min 8 characters)", id="regPassword", autocomplete="new-password") }}
+                {{ form.password(class="form-control-auth", placeholder=_('auth.enter_password_min8'), id="regPassword", autocomplete="new-password") }}
                 <button type="button" class="auth-password-toggle" id="toggleRegPassword" aria-label="Toggle password visibility">
                     <i class="bi bi-eye" id="toggleRegIcon"></i>
                 </button>
@@ -68,8 +68,8 @@
                     <div class="strength-segment" id="seg4"></div>
                 </div>
                 <div class="strength-text">
-                    <span>Password Security</span>
-                    <span id="strengthLabel" class="fw-semibold">Enter password</span>
+                    <span>{{ _('auth.password_security') }}</span>
+                    <span id="strengthLabel" class="fw-semibold">{{ _('auth.strength_enter') }}</span>
                 </div>
             </div>
         </div>
@@ -78,12 +78,12 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <label for="confirmPassword" class="auth-form-label mb-0">
-                    <i class="bi bi-shield-check text-primary"></i> Confirm Password
+                    <i class="bi bi-shield-check text-primary"></i> {{ _('auth.confirm_password') }}
                 </label>
                 <span id="matchFeedback" class="small fw-semibold" style="font-size: 0.75rem;"></span>
             </div>
             <div class="auth-input-group mt-1">
-                {{ form.confirm_password(class="form-control-auth", placeholder="Re-enter your password", id="confirmPassword", autocomplete="new-password") }}
+                {{ form.confirm_password(class="form-control-auth", placeholder=_('auth.reenter_password'), id="confirmPassword", autocomplete="new-password") }}
                 <button type="button" class="auth-password-toggle" id="toggleConfirmPassword" aria-label="Toggle confirm password visibility">
                     <i class="bi bi-eye" id="toggleConfirmIcon"></i>
                 </button>
@@ -99,15 +99,15 @@
     <!-- Submit Button -->
     <div class="mt-4">
         <button type="submit" class="btn-auth-submit">
-            <span>Create Account</span>
+            <span>{{ _('auth.create_account') }}</span>
             <i class="bi bi-arrow-right"></i>
         </button>
     </div>
 
     <!-- Switch to Login -->
     <div class="auth-switch-prompt">
-        Already have an account? 
-        <a href="{{ url_for('auth.login') }}" class="auth-link ms-1">Sign In</a>
+        {{ _('auth.already_have_account') }} 
+        <a href="{{ url_for('auth.login') }}" class="auth-link ms-1">{{ _('auth.sign_in') }}</a>
     </div>
 
         <!-- Google Sign Up Button -->
@@ -154,6 +154,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const strengthLabel = document.getElementById("strengthLabel");
     const matchFeedback = document.getElementById("matchFeedback");
 
+    const I18N = {
+        strengthEnter: "{{ _('auth.strength_enter') }}",
+        strengthWeak: "{{ _('auth.strength_weak') }}",
+        strengthFair: "{{ _('auth.strength_fair') }}",
+        strengthGood: "{{ _('auth.strength_good') }}",
+        strengthStrong: "{{ _('auth.strength_strong') }}",
+        passwordsMatch: "{{ _('auth.passwords_match') }}",
+        passwordsDontMatch: "{{ _('auth.passwords_dont_match') }}"
+    };
+
     function checkStrength() {
         if (!passwordInput || !seg1 || !strengthLabel) return;
         const val = passwordInput.value;
@@ -169,29 +179,29 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (val.length === 0) {
-            strengthLabel.textContent = "Enter password";
+            strengthLabel.textContent = I18N.strengthEnter;
             strengthLabel.style.color = "var(--text-dim)";
         } else if (score === 1) {
             seg1.classList.add("active-weak");
-            strengthLabel.textContent = "Weak";
+            strengthLabel.textContent = I18N.strengthWeak;
             strengthLabel.style.color = "#ef4444";
         } else if (score === 2) {
             seg1.classList.add("active-fair");
             seg2.classList.add("active-fair");
-            strengthLabel.textContent = "Fair";
+            strengthLabel.textContent = I18N.strengthFair;
             strengthLabel.style.color = "#f59e0b";
         } else if (score === 3) {
             seg1.classList.add("active-good");
             seg2.classList.add("active-good");
             seg3.classList.add("active-good");
-            strengthLabel.textContent = "Good";
+            strengthLabel.textContent = I18N.strengthGood;
             strengthLabel.style.color = "#3b82f6";
         } else if (score >= 4) {
             seg1.classList.add("active-strong");
             seg2.classList.add("active-strong");
             seg3.classList.add("active-strong");
             seg4.classList.add("active-strong");
-            strengthLabel.textContent = "Strong";
+            strengthLabel.textContent = I18N.strengthStrong;
             strengthLabel.style.color = "#10b981";
         }
         checkMatch();
@@ -209,11 +219,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (pwd === cpwd) {
-            matchFeedback.textContent = "✓ Passwords match";
+            matchFeedback.textContent = I18N.passwordsMatch;
             matchFeedback.style.color = "#10b981";
             confirmInput.style.borderColor = "rgba(16, 185, 129, 0.6)";
         } else {
-            matchFeedback.textContent = "✗ Passwords do not match";
+            matchFeedback.textContent = I18N.passwordsDontMatch;
             matchFeedback.style.color = "#ef4444";
             confirmInput.style.borderColor = "rgba(239, 68, 68, 0.6)";
         }

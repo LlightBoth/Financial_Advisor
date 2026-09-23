@@ -1,18 +1,34 @@
-# Python cache
+# Python cache & compiled bytecode
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
-# Virtual environment
+# Test & coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
 venv/
 env/
 .venv/
+.venv_train/
+
+# Documentation
+docs/
+
+# Scratch & temporary run files
+scratch/
+
+# Large merged base models (>100MB exceeds GitHub limit)
+# LoRA adapters (adapter_model.safetensors, 35MB) are KEPT so friends can run the model!
+*_merged/
+training/huggingface/
+*_merged/*.safetensors
 
 # Flask instance folder (contains database and secrets)
-instance/
-instance/financial.db.backup
-
-# Environment variables
+# Environment variables & secrets
 credentials.json
 token.json
 .env

@@ -9,6 +9,7 @@ from app.forms.expense_forms import (
 
 from app.services.expense_services import ExpenseServices
 from app.security.cookie import check_cookie_token
+from app.utils.i18n import _
 from app.security.role_check import check_route_permission
 
 from datetime import date
@@ -68,7 +69,7 @@ def create():
         }
 
         expense = ExpenseServices.create_expense(data, current_user)
-        flash(f"Expense '${expense.amount:.2f}' created successfully!", "success")
+        flash(_("message.expense_created_success", amount=f"${expense.amount:.2f}"), "success")
         return redirect(url_for("expenses.index"))
 
     return render_template("expenses/create.html", form=form)
@@ -96,7 +97,7 @@ def edit(expense_id):
         }
 
         ExpenseServices.update_expense(expense, data)
-        flash(f"Expense '${expense.amount:.2f}' updated successfully!", "success")
+        flash(_("message.expense_updated_success", amount=f"${expense.amount:.2f}"), "success")
         return redirect(url_for("expenses.index"))
 
     return render_template("expenses/edit.html", form=form, expense=expense)
@@ -129,5 +130,5 @@ def delete(expense_id):
     form = ExpenseDeleteForm()
     if form.validate_on_submit():
         ExpenseServices.delete_expense(expense)
-        flash("Expense deleted successfully!", "success")
+        flash(_("message.expense_deleted_success"), "success")
     return redirect(url_for("expenses.index"))

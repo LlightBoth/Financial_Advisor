@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}My Plans — Financial Advisor{% endblock %}
+{% block title %}{{ _("plan.page_title") }}{% endblock %}
 
 {% block content %}
 <link href="{{ url_for('static', filename='css/client/plan.css') }}" rel="stylesheet">
@@ -9,12 +9,12 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center py-4 border-bottom mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Savings Milestones & Plans</h3>
-            <p class="text-muted small mb-0">Track and project your long-term wealth targets.</p>
+            <h3 class="fw-bold mb-1">{{ _("plan.index_title") }}</h3>
+            <p class="text-muted small mb-0">{{ _("plan.index_subtitle") }}</p>
         </div>
         <a href="{{ url_for('plans.create') }}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill shadow-sm fw-semibold">
             <i class="bi bi-plus-circle-fill"></i>
-            <span>Create New Plan</span>
+            <span>{{ _("plan.create_new_plan") }}</span>
         </a>
     </div>
 
@@ -25,10 +25,10 @@
         </span>
         <form action="{{ url_for('plans.index') }}" method="GET" class="d-flex gap-2">
             <select name="status" id="status" class="form-select form-select-sm">
-                <option value="" disabled selected>Status</option>
+                <option value="" disabled selected>{{ _("plan.status") }}</option>
                 <option value="general" {{ 'selected' if request.args.get('status') == 'general' }}>All</option>
-                <option value="complete" {{ 'selected' if request.args.get('status') == 'complete' }}>Complete</option>
-                <option value="incomplete" {{ 'selected' if request.args.get('status') == 'incomplete' }}>Incomplete</option>
+                <option value="complete" {{ 'selected' if request.args.get('status') == 'complete' }}>{{ _("plan.status_completed") }}</option>
+                <option value="incomplete" {{ 'selected' if request.args.get('status') == 'incomplete' }}>{{ _("plan.status_incompleted") }}</option>
             </select>
             <select name="sort" id="sort" class="form-select form-select-sm">
                 <option value="" disabled selected>Sort info</option>
@@ -41,7 +41,7 @@
                 <option value="general" {{ 'selected' if request.args.get('saving_type') == 'general' }}>All</option>
                 <option value="daily" {{ 'selected' if request.args.get('saving_type') == 'daily' }}>Daily</option>
                 <option value="monthly" {{ 'selected' if request.args.get('saving_type') == 'monthly' }}>Monthly</option>
-                <option value="manual" {{ 'selected' if request.args.get('saving_type') == 'price' }}>Manual</option>
+                <option value="manual" {{ 'selected' if request.args.get('saving_type') == 'manual' }}>Manual</option>
             </select>
             <button type="submit" class="btn btn-outline-secondary btn-sm">Filter</button>
         </form>
@@ -56,6 +56,7 @@
         {% set remaining = [target - saved, 0]|max %}
         {% set progress = ((saved / target) * 100) if target > 0 else 0 %}
         {% set progress = [progress, 100]|min %}
+        {% set days_left = (plan.in_between - today).days if plan.in_between else 0 %}
 
         <div class="col-12 col-md-6 col-xl-4">
 
@@ -79,9 +80,13 @@
                             <i class="bi bi-hourglass-split me-1"></i>
 
                             {% if plan.value or saved >= target %}
-                                Completed
+                                {{ _("plan.status_completed") }}
+                            {% elif days_left < 0 %}
+                                Overdue
+                            {% elif days_left == 0 %}
+                                Due Today
                             {% else %}
-                                {{ (plan.in_between - today).days }} Days Remaining
+                                {{ _("plan.days_remaining", days=days_left) }}
                             {% endif %}
                         </span>
 
@@ -107,7 +112,7 @@
                                         href="{{ url_for('plans.detail', plan_id=plan.id) }}"
                                     >
                                         <i class="bi bi-eye me-2 text-muted"></i>
-                                        View Strategy
+                                        {{ _("finance.analysis") }}
                                     </a>
                                 </li>
 
@@ -117,7 +122,7 @@
                                         href="{{ url_for('plans.edit', plan_id=plan.id) }}"
                                     >
                                         <i class="bi bi-pencil me-2 text-muted"></i>
-                                        Edit Strategy
+                                        {{ _("plan.edit_strategy") }}
                                     </a>
                                 </li>
 
@@ -128,10 +133,10 @@
                                 <li>
                                     <a
                                         class="dropdown-item py-2 small text-danger d-flex align-items-center"
-                                        href="{{ url_for('plans.delete', plan_id=plan.id) }}"
+                                        href="{{ url_for('plans.delete_confirm', plan_id=plan.id) }}"
                                     >
                                         <i class="bi bi-trash3 me-2"></i>
-                                        Remove Plan
+                                        {{ _("plan.remove_plan") }}
                                     </a>
                                 </li>
 
@@ -159,21 +164,29 @@
                                 else 'bg-secondary-subtle text-secondary' }}
                                 px-2 py-1 rounded-pill small fw-medium flex-shrink-0"
                             >
-                                {{ 'Completed' if plan.value or saved >= target else 'In Progress' }}
+                                {{ _("plan.status_completed") if plan.value or saved >= target else _("plan.status_incompleted") }}
                             </span>
 
                         </div>
 
-                        <!-- Target Date -->
-                        <div class="d-flex align-items-center text-muted small mt-1">
+                        <!-- Target Date & Target Budget -->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 text-muted small mt-1">
 
-                            <i class="bi bi-calendar-event me-1"></i>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                <span class="me-1">{{ _("plan.target_date") }}:</span>
+                                <span class="fw-semibold text-body">
+                                    {{ plan.in_between.strftime('%b %d, %Y') if plan.in_between else 'N/A' }}
+                                </span>
+                            </div>
 
-                            <span class="me-1">Target Date:</span>
-
-                            <span class="fw-semibold text-body">
-                                {{ plan.in_between.strftime('%b %d, %Y') }}
-                            </span>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-bullseye me-1"></i>
+                                <span class="me-1">{{ _("plan.target_budget") }}:</span>
+                                <span class="fw-semibold text-body">
+                                    ${{ "{:,.2f}".format(target) }}
+                                </span>
+                            </div>
 
                         </div>
 
@@ -200,7 +213,7 @@
                         {% else %}
 
                         <p class="description-text text-muted small fst-italic mb-3">
-                            No description provided.
+                            {{ _("common.no_description_provided") }}
                         </p>
 
                         {% endif %}
@@ -336,12 +349,11 @@
                 </div>
 
                 <h5 class="fw-bold mb-2">
-                    No Plans Active
+                    {{ _("plan.no_plans_active") }}
                 </h5>
 
                 <p class="text-muted small mb-4">
-                    You haven't set any financial goals yet.
-                    Establish your first milestone today!
+                    {{ _("plan.no_plans_hint") }}
                 </p>
 
                 <div>
@@ -350,7 +362,7 @@
                         class="btn btn-primary px-4 py-2 rounded-pill shadow-sm"
                     >
                         <i class="bi bi-plus-lg me-1"></i>
-                        Get Started
+                        {{ _("plan.get_started") }}
                     </a>
                 </div>
 

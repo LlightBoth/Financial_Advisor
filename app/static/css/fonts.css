@@ -1,0 +1,248 @@
+/* ==========================================================================
+   Financial Advisor — Central Typography System (Bilingual Khmer & English)
+   Fully Offline-Compatible | Zero CDN Dependencies
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Offline Local Font Faces (@font-face)
+   Priority: Installed System Font (local) -> App-bundled TTF (offline asset)
+   -------------------------------------------------------------------------- */
+
+/* Khmer OS Battambang — Regular */
+@font-face {
+    font-family: 'Khmer OS Battambang';
+    src: local('Khmer OS Battambang'),
+         local('Khmer OS Battambang-Kh Auto'),
+         local('Battambang'),
+         url('../fonts/KhmerOSBattambang-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Khmer OS Battambang — Bold */
+@font-face {
+    font-family: 'Khmer OS Battambang';
+    src: local('Khmer OS Battambang Bold'),
+         local('Khmer OS Battambang-Kh Auto Bold'),
+         url('../fonts/KhmerOSBattambang-Regular.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Khmer OS Siemreap — Regular */
+@font-face {
+    font-family: 'Khmer OS Siemreap';
+    src: local('Khmer OS Siemreap'),
+         local('Khmer OS Siemreap-Kh Auto'),
+         local('Siemreap'),
+         url('../fonts/KhmerOSSiemreap-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Khmer OS Muol Light — Traditional Headline Font */
+@font-face {
+    font-family: 'Khmer OS Muol Light';
+    src: local('Khmer OS Muol Light'),
+         local('Khmer OS Muol Light-Kh Auto'),
+         local('Khmer OS Muollight'),
+         local('Moul'),
+         local('MoolBoran'),
+         url('../fonts/KhmerOSMuolLight.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Khmer OS Muol Light';
+    src: local('Khmer OS Muol Light'),
+         local('Khmer OS Muol Light-Kh Auto'),
+         local('Khmer OS Muollight'),
+         local('Moul'),
+         local('MoolBoran'),
+         url('../fonts/KhmerOSMuolLight.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Noto Sans Khmer — Modern High-legibility Fallback */
+@font-face {
+    font-family: 'Noto Sans Khmer';
+    src: local('Noto Sans Khmer'),
+         local('NotoSansKhmer-Regular'),
+         url('../fonts/NotoSansKhmer-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Noto Sans Khmer';
+    src: local('Noto Sans Khmer Bold'),
+         local('NotoSansKhmer-Bold'),
+         url('../fonts/NotoSansKhmer-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* --------------------------------------------------------------------------
+   2. Typography Variables & Font Stacks
+   -------------------------------------------------------------------------- */
+:root {
+    /* English Typography (Clean, modern, system-first) */
+    --font-english-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-english-heading: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-english-code: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+    /* Khmer Typography Stacks (Ordered by aesthetic suitability & offline reliability) */
+    --font-khmer-body: 'Khmer OS Battambang', 'Khmer OS Siemreap', 'Noto Sans Khmer', 'Battambang', 'Siemreap', 'Leelawadee UI', 'Khmer UI', 'DaunPenh', system-ui, sans-serif;
+    --font-khmer-heading: 'Khmer OS Muol Light', 'Khmer OS Battambang', 'Khmer OS Siemreap', 'Noto Sans Khmer', 'MoolBoran', 'Leelawadee UI', system-ui, sans-serif;
+
+    /* Dynamic Application Font Tokens (Default = English) */
+    --font-body: var(--font-english-body);
+    --font-heading: var(--font-english-heading);
+    --font-code: var(--font-english-code);
+
+    /* Baseline Vertical Metrics */
+    --app-line-height-body: 1.5;
+    --app-line-height-heading: 1.25;
+    --app-letter-spacing: normal;
+}
+
+/* --------------------------------------------------------------------------
+   3. Language-Aware Dynamic Typography Activation
+   Driven directly by <html lang="{{ current_lang }}">
+   -------------------------------------------------------------------------- */
+
+/* Default / English Typography */
+html,
+html[lang="en"],
+body {
+    font-family: var(--font-body);
+    line-height: var(--app-line-height-body);
+}
+
+h1, h2, h3, h4, h5, h6,
+.brand-text,
+.auth-brand-text {
+    font-family: var(--font-heading);
+    line-height: var(--app-line-height-heading);
+}
+
+/* Khmer Typography Activation */
+html[lang="km"],
+:lang(km),
+[lang="km"] body {
+    --font-body: var(--font-khmer-body);
+    --font-heading: var(--font-khmer-heading);
+    --app-line-height-body: 1.65;
+    --app-line-height-heading: 1.4;
+    --app-letter-spacing: 0;
+
+    font-family: var(--font-khmer-body);
+    line-height: var(--app-line-height-body);
+}
+
+/* Khmer Headings & Display Titles */
+html[lang="km"] h1,
+html[lang="km"] h2,
+html[lang="km"] h3,
+html[lang="km"] h4,
+html[lang="km"] h5,
+html[lang="km"] h6,
+html[lang="km"] .brand-text,
+html[lang="km"] .auth-brand-text,
+html[lang="km"] .dash-header-banner h3 {
+    font-family: var(--font-khmer-heading);
+    line-height: var(--app-line-height-heading);
+    letter-spacing: normal !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. Explicit Typography Utility Classes
+   -------------------------------------------------------------------------- */
+.font-english {
+    font-family: var(--font-english-body) !important;
+}
+
+.font-english-heading {
+    font-family: var(--font-english-heading) !important;
+}
+
+.font-khmer {
+    font-family: var(--font-khmer-body) !important;
+    line-height: 1.65 !important;
+    letter-spacing: 0 !important;
+}
+
+.font-khmer-heading {
+    font-family: var(--font-khmer-heading) !important;
+    line-height: 1.4 !important;
+    letter-spacing: normal !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. Khmer Component-Level Micro-Adjustments
+   Prevents subscript clipping, text squeeze, and excessive spacing
+   -------------------------------------------------------------------------- */
+
+/* Buttons */
+html[lang="km"] .btn {
+    font-family: var(--font-khmer-body);
+    line-height: 1.5;
+    letter-spacing: 0 !important;
+    padding-top: calc(0.375rem + 1px);
+    padding-bottom: calc(0.375rem + 1px);
+}
+
+/* Form Controls & Inputs */
+html[lang="km"] .form-control,
+html[lang="km"] .form-select,
+html[lang="km"] .form-floating > label {
+    font-family: var(--font-khmer-body);
+    line-height: 1.5;
+    letter-spacing: 0 !important;
+}
+
+/* Badges & Tags */
+html[lang="km"] .badge {
+    font-family: var(--font-khmer-body);
+    line-height: 1.35;
+    letter-spacing: 0 !important;
+    font-weight: 600;
+}
+
+/* Navigation Links & Breadcrumbs */
+html[lang="km"] .nav-link,
+html[lang="km"] .breadcrumb-item,
+html[lang="km"] .dropdown-item {
+    font-family: var(--font-khmer-body);
+    line-height: 1.55;
+    letter-spacing: 0 !important;
+}
+
+/* Metric Cards & Stat Labels */
+html[lang="km"] .metric-label,
+html[lang="km"] .nav-section-title {
+    letter-spacing: 0 !important;
+    text-transform: none; /* Avoid English all-caps transforming Khmer text */
+}
+
+/* Table Headers and Data Cells */
+html[lang="km"] .table th,
+html[lang="km"] .table td {
+    line-height: 1.6;
+    vertical-align: middle;
+}
+
+/* Alerts & Flash Notifications */
+html[lang="km"] .alert {
+    line-height: 1.6;
+    letter-spacing: 0 !important;
+}

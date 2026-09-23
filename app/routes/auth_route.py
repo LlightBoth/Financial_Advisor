@@ -8,10 +8,9 @@ from app.services.auth_services import AuthService
 from app.services.user_services import UserServices
 from app.services.audit_log_services import AuditLogService
 from app.security.cookie import get_cookie, remove_cookie
+from app.utils.i18n import _
 from app.security.token import Token
-from google_auth_oauthlib.flow import Flow
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
+# Google OAuth packages are imported lazily in get_google_flow and google_callback
 
 # Import your database models and extension
 from app.models import User, Role
@@ -26,9 +25,6 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 from werkzeug.security import generate_password_hash
 
-# Allow HTTP for local development & relax scope ordering
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = os.getenv('OAUTHLIB_INSECURE_TRANSPORT', '1')
-os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute; 20 per hour")
@@ -36,23 +32,17 @@ def login():
     form = LoginForm() 
 
     if form.validate_on_submit():
-        # print debug email and passwd and also return result
-        print("DEBUG email:", repr(form.email.data))
-        print("DEBUG password:", repr(form.password.data))
-        
         # AuthService returns a User object + access/refresh tokens
         user, access_token, refresh_token = AuthService.login_user(
             form.email.data, form.password.data
         )
-        
-        print("DEBUG user returned:", user)
 
         if user:
             # print("LOGIN SUCCESS")
             # print("USER:", user.username)
 
             login_user(user, remember=form.is_remember.data)
-            flash("Login successful", "success")
+            flash(_("message.login_success"), "success")
 
             # Decide redirect dynamically based on user's highest permitted landing module
             if user.has_role("admin"):
@@ -82,15 +72,16 @@ def login():
             return get_cookie(redirect_url, access_token, refresh_token)
 
         # Save user Log
+        user_id = current_user.id if current_user.is_authenticated else None
         data = {
-            "user_id": None,
+            "user_id": user_id,
             "action": "USER_LOGIN",
             "status": "FAILED",
             "ip_address": request.remote_addr,
             "user_agent": request.user_agent.string
         }
         AuditLogService.create_audit_log(data)
-        flash("Invalid credentials", "danger")
+        flash(_("message.login_failed"), "danger")
 
     return render_template("auth/login.html", form=form)
 
@@ -114,38 +105,27 @@ def register():
         user = AuthService.register_user(data, password)
         if user:
             # Save user Log
-            # data = {
-            AuditLogService.create_audit_log({
-                # "user_id": current_user.id,
+            log_data = {
                 "user_id": user.id,
                 "action": "USER_REGISTER",
                 "status": "SUCCESS",
                 "ip_address": request.remote_addr,
                 "user_agent": request.user_agent.string
-            })
-            # AuditLogService.create_audit_log(data)
-            flash("Registration successful. Please login.", "success")
+            }
+            AuditLogService.create_audit_log(log_data)
+            flash(_("message.registration_success"), "success")
             return redirect(url_for("auth.login"))
         
         # Save user Log
-        # data = {
-        #     "user_id": current_user.id,
-        #     "action": "USER_REGISTER",
-        #     "status": "FAILED",
-        #     "ip_address": request.remote_addr,
-        #     "user_agent": request.user_agent.string
-        # }
-        # AuditLogService.create_audit_log(data)
-        
-        AuditLogService.create_audit_log({
-                    "user_id": None,
-                    "action": "USER_REGISTER",
-                    "status": "FAILED",
-                    "ip_address": request.remote_addr,
-                    "user_agent": request.user_agent.string
-                })
-        flash("Registration failed. Try again.", "danger")
-        return redirect(url_for("auth.register"))   # send back to register, not login
+        log_data = {
+            "user_id": None,
+            "action": "USER_REGISTER",
+            "status": "FAILED",
+            "ip_address": request.remote_addr,
+            "user_agent": request.user_agent.string
+        }
+        AuditLogService.create_audit_log(log_data)
+        flash(_("message.registration_failed"), "danger")
 
     return render_template("auth/register.html", form=form)
 
@@ -254,14 +234,14 @@ def forgot_password():
         if user:
             # Check if Gmail API delivered the message successfully
             if get_session(user.email):
-                flash('If an account exists with that email, a password reset code has been sent.', 'info')
+                flash(_('message.password_reset_sent'), 'info')
                 return redirect(url_for('auth.verify_otp'))
             else:
-                flash('An error occurred while sending the email. Please try again later.', 'danger')
+                flash(_('message.email_send_failed'), 'danger')
                 return redirect(url_for('auth.forgot_password'))
         else:
             # Flash standard security message to prevent user enumeration
-            flash('If an account exists with that email, a password reset code has been sent.', 'info')
+            flash(_('message.password_reset_sent'), 'info')
             return redirect(url_for('auth.forgot_password'))
 
     return render_template('auth/forgot_password.html', form=form)
@@ -272,7 +252,7 @@ def verify_otp():
     email = session.get('pending_user_email')
 
     if not email:
-        flash('Session expired. Please request a new password reset.', 'error')
+        flash(_('message.session_expired'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     if request.method == 'POST':
@@ -282,7 +262,7 @@ def verify_otp():
 
         # 1. Check expiration
         if time.time() > otp_expiry:
-            flash('The OTP code has expired. Please request a new one.', 'error')
+            flash(_('message.otp_expired'), 'error')
             return redirect(url_for('auth.forgot_password'))
 
         # 2. Verify OTP code
@@ -292,10 +272,10 @@ def verify_otp():
             session.pop('otp_expiry', None)
             session['otp_verified'] = True  # ✅ Set authorization flag
 
-            flash('Email verified successfully!', 'success')
+            flash(_('message.otp_verified'), 'success')
             return redirect(url_for('auth.reset_password'))
         else:
-            flash('Invalid OTP code. Please try again.', 'error')
+            flash(_('message.invalid_otp'), 'error')
 
     return render_template('auth/verify_otp.html')
 
@@ -306,7 +286,7 @@ def resend_otp():
     user_email = session.get('pending_user_email')
 
     if not user_email:
-        flash('Session expired. Please enter your email again.', 'error')
+        flash(_('message.session_expired_reenter'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     # Regenerate OTP with string email
@@ -315,7 +295,7 @@ def resend_otp():
     # TODO: Resend email here
     # send_otp_email(user_email, session['generated_otp'])
 
-    flash('A new OTP code has been sent to your email address.', 'info')
+    flash(_('message.new_otp_sent'), 'info')
     return redirect(url_for('auth.verify_otp'))
 
 
@@ -327,12 +307,12 @@ def reset_password():
 
     # Security check: User MUST have verified their OTP first
     if not user_email or not is_verified:
-        flash('Unauthorized access or session expired. Please verify your email.', 'error')
+        flash(_('message.unauthorized_reset'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     user = AuthService.find_user_email(user_email)
     if not user:
-        flash('User account not found.', 'error')
+        flash(_('message.user_not_found'), 'error')
         return redirect(url_for('auth.forgot_password'))
 
     if request.method == 'POST':
@@ -340,11 +320,11 @@ def reset_password():
         confirm_password = request.form.get('confirm_password')
 
         if not password or len(password) < 8:
-            flash('Password must be at least 8 characters long.', 'error')
+            flash(_('validation.password_min8'), 'error')
             return render_template('auth/new_password.html')
 
         if password != confirm_password:
-            flash('Passwords do not match.', 'error')
+            flash(_('validation.password_mismatch'), 'error')
             return render_template('auth/new_password.html')
 
         data = {
@@ -361,7 +341,7 @@ def reset_password():
         session.pop('pending_user_email', None)
         session.pop('otp_verified', None)
 
-        flash('Password reset successful! Please log in with your new password.', 'success')
+        flash(_('message.password_reset_success'), 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/new_password.html')
@@ -373,32 +353,14 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = os.getenv('OAUTHLIB_INSECURE_TRANSPO
 os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 
-# def get_google_flow():
-#     client_config = {
-#         "web": {
-#             "client_id": os.getenv("GOOGLE_CLIENT_ID"),
-#             "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
-#             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-#             "token_uri": "https://oauth2.googleapis.com/token",
-#         }
-#     }
-#     return Flow.from_client_config(
-#         client_config=client_config,
-#         scopes=[
-#             "https://www.googleapis.com/auth/userinfo.profile",
-#             "https://www.googleapis.com/auth/userinfo.email",
-#             "https://www.googleapis.com/auth/gmail.send",
-#             "openid"
-#         ],
-#         redirect_uri=url_for("auth.google_callback", _external=True)
-#     )
-
 def get_google_flow():
+    from google_auth_oauthlib.flow import Flow
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     
     if not client_id or not client_secret:
         return None
+
     client_config = {
         "web": {
             "client_id": client_id,
@@ -418,22 +380,6 @@ def get_google_flow():
     )
 
 
-# @auth_bp.route("/auth/google")
-# def google_login():
-#     flow = get_google_flow()
-    
-#     authorization_url, state = flow.authorization_url(
-#         access_type="offline",
-#         include_granted_scopes="true",
-#         prompt="consent"  # Ensures Google returns a refresh_token every time
-#     )
-    
-#     session["oauth_state"] = state
-#     if hasattr(flow, "code_verifier") and flow.code_verifier:
-#         session["code_verifier"] = flow.code_verifier
-
-#     return redirect(authorization_url)
-
 @auth_bp.route("/google")
 def google_login():
     flow = get_google_flow()
@@ -450,16 +396,21 @@ def google_login():
     session["oauth_state"] = state
     if hasattr(flow, "code_verifier") and flow.code_verifier:
         session["code_verifier"] = flow.code_verifier
+
     return redirect(authorization_url)
 
-# @auth_bp.route("/auth/google/callback")
-# def google_callback():
+
+@auth_bp.route("/google/callback")
+def google_callback():
     state = session.get("oauth_state")
     if not state or state != request.args.get("state"):
         flash("Invalid state parameter during authentication.", "danger")
         return redirect(url_for("auth.login"))
 
     flow = get_google_flow()
+    if not flow:
+        flash("Google Sign-In configuration missing.", "danger")
+        return redirect(url_for("auth.login"))
 
     if "code_verifier" in session:
         flow.code_verifier = session.pop("code_verifier")
@@ -474,6 +425,9 @@ def google_login():
     session.pop("oauth_state", None)
 
     credentials = flow.credentials
+    from google.oauth2 import id_token
+    from google.auth.transport import requests as google_requests
+
     request_session = requests.Session()
     cached_session = google_requests.Request(session=request_session)
 
@@ -488,110 +442,14 @@ def google_login():
         flash("Invalid token received from Google.", "danger")
         return redirect(url_for("auth.login"))
 
-    google_id = id_info.get("sub")
-    email = id_info.get("email")
-    full_name = id_info.get("name") or "Google User"
-    username = email.split("@")[0]
-
-    # Look up user in database
-    user = User.query.filter((User.email == email) | (User.google_id == google_id)).first()
-
-    if not user:
-        dummy_password = generate_password_hash(os.urandom(24).hex())
-        user = User(
-            username=username,
-            full_name=full_name,
-            email=email,
-            google_id=google_id,
-            password_hash=dummy_password,
-            is_active=True
-        )
-
-        default_role = Role.query.filter_by(name="user").first()
-        if default_role:
-            user.roles.append(default_role)
-
-        db.session.add(user)
-        db.session.commit()
-    else:
-        if not user.google_id:
-            user.google_id = google_id
-            db.session.commit()
-
-    # 1. Log in user via Flask-Login
-    session.permanent = True
-    login_user(user, remember=True)
-
-    # 2. Create Application Session Tokens
-    access_token = Token.get_new_token()
-    refresh_token = Token.generate_refresh_token(user)
-
-    # Store token in session (matching standard login flow)
-    session["refresh_token"] = refresh_token
-
-    # 3. Create Audit Log
-    data = {
-        "user_id": user.id,
-        "action": "USER_GOOGLE_LOGIN",
-        "status": "SUCCESS",
-        "ip_address": request.remote_addr,
-        "user_agent": request.user_agent.string
-    }
-    AuditLogService.create_audit_log(data)
-
-    flash("Successfully logged in with Google!", "success")
-
-    # 4. Determine redirect URL based on role
-    if user.has_role("admin"):
-        redirect_url = url_for("dashboards.empIndex")
-    else:
-        redirect_url = url_for("dashboards.userIndex")
-
-    # 5. Build response and set cookies cleanly
-    response = redirect(redirect_url)
-    response.set_cookie("access_token", access_token, httponly=True, path="/", samesite="Lax")
-    response.set_cookie("refresh_token", refresh_token, httponly=True, path="/", samesite="Lax")
-
-    return response
-
-@auth_bp.route("/google/callback")
-def google_callback():
-    state = session.get("oauth_state")
-    if not state or state != request.args.get("state"):
-        flash("Invalid state parameter during authentication.", "danger")
-        return redirect(url_for("auth.login"))
-    flow = get_google_flow()
-    if not flow:
-        flash("Google Sign-In configuration missing.", "danger")
-        return redirect(url_for("auth.login"))
-    if "code_verifier" in session:
-        flow.code_verifier = session.pop("code_verifier")
-    try:
-        flow.fetch_token(authorization_response=request.url)
-    except Exception:
-        session.pop("oauth_state", None)
-        flash("Authentication expired or invalid. Please try logging in again.", "warning")
-        return redirect(url_for("auth.login"))
-    session.pop("oauth_state", None)
-    credentials = flow.credentials
-    request_session = requests.Session()
-    cached_session = google_requests.Request(session=request_session)
-    try:
-        id_info = id_token.verify_oauth2_token(
-            id_token=credentials.id_token,
-            request=cached_session,
-            audience=os.getenv("GOOGLE_CLIENT_ID"),
-            clock_skew_in_seconds=10
-        )
-    except ValueError:
-        flash("Invalid token received from Google.", "danger")
-        return redirect(url_for("auth.login"))
     google_id = id_info.get("sub")
     email = id_info.get("email")
     full_name = id_info.get("name") or "Google User"
     base_username = email.split("@")[0]
+
     # Check if user already exists
     user = User.query.filter((User.email == email) | (User.google_id == google_id)).first()
+
     if not user:
         # Generate unique username
         username = base_username
@@ -599,18 +457,28 @@ def google_callback():
         while User.query.filter_by(username=username).first():
             username = f"{base_username}_{counter}"
             counter += 1
+
+        # Generate unique full_name if needed
+        unique_name = full_name
+        name_counter = 1
+        while User.query.filter_by(full_name=unique_name).first():
+            unique_name = f"{full_name} {name_counter}"
+            name_counter += 1
+
         dummy_password = generate_password_hash(os.urandom(24).hex())
         user = User(
             username=username,
-            full_name=full_name,
+            full_name=unique_name,
             email=email,
             google_id=google_id,
             password_hash=dummy_password,
             is_active=True
         )
+
         default_role = Role.query.filter_by(name="user").first()
         if default_role:
             user.roles.append(default_role)
+
         db.session.add(user)
         db.session.commit()
     else:
@@ -618,16 +486,20 @@ def google_callback():
             user.google_id = google_id
         user.is_active = True
         db.session.commit()
+
     # 1. Update online status
     UserServices.update_user_online(user)
-    # 2. Log in user session
+
+    # 2. Log in user session via Flask-Login
     session.permanent = True
     login_user(user, remember=True)
-    # 3. Create tokens
+
+    # 3. Create Application Session Tokens
     access_token = Token.get_new_token()
     refresh_token = Token.generate_refresh_token(user)
     session["refresh_token"] = refresh_token
-    # 4. Audit Log
+
+    # 4. Create Audit Log
     data = {
         "user_id": user.id,
         "action": "USER_GOOGLE_LOGIN",
@@ -636,8 +508,10 @@ def google_callback():
         "user_agent": request.user_agent.string
     }
     AuditLogService.create_audit_log(data)
+
     flash("Successfully logged in with Google!", "success")
-    # 5. Determine redirect URL
+
+    # 5. Determine redirect URL based on role / permission
     if user.has_role("admin"):
         redirect_url = url_for("dashboards.empIndex")
     elif user.has_permission("user.view"):
@@ -650,26 +524,25 @@ def google_callback():
         redirect_url = url_for("facts.index")
     else:
         redirect_url = url_for("dashboards.userIndex")
+
+    # 6. Build response and set cookies cleanly via get_cookie
     return get_cookie(redirect_url, access_token, refresh_token)
 
 @auth_bp.route("/logout")
 @login_required
 def logout():
-    
-    user = current_user._get_current_object()
-    
     # Save user Log
     data = {
-        "user_id": user.id,
+        "user_id": current_user.id,
         "action": "USER_LOGOUT",
         "status": "SUCCESS",
         "ip_address": request.remote_addr,
         "user_agent": request.user_agent.string
     }
     AuditLogService.create_audit_log(data)
-    
-    logout_user()
+
+    # logout_user()
     session.pop("refresh_token", None)
     session.clear()
-    AuthService.logout_user(user)
+    AuthService.logout_user(current_user)
     return remove_cookie()

@@ -14,9 +14,7 @@ google-auth-httplib2
 google-auth-oauthlib
 redis
 python-dotenv
-
-#this for Google login 
-google-auth
-google-auth-oauthlib
-google-auth-httplib2
 requests
+
+# Google login & oauth
+google-auth

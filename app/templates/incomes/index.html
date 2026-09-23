@@ -1,6 +1,6 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %}Income Ledger — Financial Advisor{% endblock %}
+{% block title %}{{ _('income.page_title') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-2 px-2 px-md-3">
@@ -8,12 +8,12 @@
     <!-- Header -->
     <div class="header-title d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Income Tracking</h3>
-            <p class="text-muted small mb-0">Record and monitor all recurring and one-time earnings.</p>
+            <h3 class="fw-bold mb-1">{{ _('income.streams_title') }}</h3>
+            <p class="text-muted small mb-0">{{ _('income.streams_subtitle') }}</p>
         </div>
 
         <a href="{{ url_for('incomes.create') }}" class="btn btn-primary px-4 py-2 mt-3 mt-md-0 rounded-pill shadow-sm fw-semibold">
-            <i class="bi bi-plus-lg me-1"></i> Add Income
+            <i class="bi bi-plus-lg me-1"></i> {{ _('income.add_income') }}
         </a>
     </div>
 
@@ -23,15 +23,15 @@
         <div class="col-12 col-md-4">
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase text-muted fw-bold small">Total Earned</span>
+                    <span class="text-uppercase text-muted fw-bold small">{{ _('income.total_earned') }}</span>
                     <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1.5 small fw-bold">
-                        <i class="bi bi-activity me-1"></i> Live
+                        <i class="bi bi-activity me-1"></i> {{ _('dashboard.live') }}
                     </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-success">
                     ${{ "%.2f"|format(incomes|sum(attribute="amount")|float) }}
                 </h3>
-                <div class="text-muted small mt-1">Cumulative recorded earnings</div>
+                <div class="text-muted small mt-1">{{ _('income.cumulative_earnings') }}</div>
             </div>
         </div>
         
@@ -39,15 +39,15 @@
         <div class="col-12 col-md-4">
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase text-muted fw-bold small">Transaction Logs</span>
+                    <span class="text-uppercase text-muted fw-bold small">{{ _('income.transaction_logs') }}</span>
                     <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1.5 small fw-bold">
-                        <i class="bi bi-activity me-1"></i> Logs
+                        <i class="bi bi-receipt fs-5"></i> Logs
                     </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
                     {{ incomes|length }}
                 </h3>
-                <div class="text-muted small mt-1">Total revenue entries</div>
+                <div class="text-muted small mt-1">{{ _('income.total_entries') }}</div>
             </div>
         </div>
 
@@ -55,15 +55,15 @@
         <div class="col-12 col-md-4">
             <div class="card stat-card-clean shadow-sm h-100 p-3">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-uppercase text-muted fw-bold small">Recurring Streams</span>
+                    <span class="text-uppercase text-muted fw-bold small">{{ _('income.recurring_streams') }}</span>
                     <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1.5 small fw-bold">
-                        <i class="bi bi-activity me-1"></i> Rate
+                        <i class="bi bi-arrow-repeat me-1"></i> Rate
                     </span>
                 </div>
                 <h3 class="fw-bold mb-0 text-body-emphasis">
                     {{ incomes|selectattr("recurring_period")|list|length }}
                 </h3>
-                <div class="text-muted small mt-1">Automated recurring flows</div>
+                <div class="text-muted small mt-1">{{ _('income.recurring_flows') }}</div>
             </div>
         </div>
     </div>
@@ -87,8 +87,8 @@
     <div class="card border shadow-sm rounded-4 overflow-hidden" style="background-color: var(--bs-card-bg);">
         <div class="card-header bg-transparent border-bottom p-3 px-4 d-flex justify-content-between align-items-center">
             <div>
-                <h6 class="fw-bold mb-0">Transaction History</h6>
-                <small class="text-muted">Detailed log of verified incomes</small>
+                <h6 class="fw-bold mb-0">{{ _('income.history_title') }}</h6>
+                <small class="text-muted">{{ _('income.history_subtitle') }}</small>
             </div>
         </div>
 
@@ -99,12 +99,12 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-body-secondary border-bottom">
                             <tr class="text-uppercase text-muted small" style="font-size: 0.75rem;">
-                                <th class="ps-4 py-3">Date</th>
-                                <th class="py-3">Category</th>
-                                <th class="py-3">Description</th>
-                                <th class="py-3">Frequency</th>
-                                <th class="text-end py-3">Amount</th>
-                                <th class="text-end py-3 pe-4">Actions</th>
+                                <th class="ps-4 py-3">{{ _('common.date') }}</th>
+                                <th class="py-3">{{ _('finance.category') }}</th>
+                                <th class="py-3">{{ _('common.description') }}</th>
+                                <th class="py-3">{{ _('income.frequency') }}</th>
+                                <th class="text-end py-3">{{ _('finance.amount') }}</th>
+                                <th class="text-end py-3 pe-4">{{ _('common.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,23 +115,23 @@
                                     </td>
                                     <td>
                                         <span class="badge bg-success-subtle text-success px-2.5 py-1.5 rounded-pill fw-semibold">
-                                            {{ income.category }}
+                                            {{ _(income.category) }}
                                         </span>
                                     </td>
                                     <td>
                                         {% if income.description %}
                                             <span class="text-body">{{ income.description }}</span>
                                         {% else %}
-                                            <span class="text-muted fst-italic small">No description</span>
+                                            <span class="text-muted fst-italic small">{{ _('common.no_description') }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if income.recurring_period %}
                                             <span class="badge bg-primary-subtle text-primary fw-normal px-2 py-1 rounded-pill">
-                                                <i class="bi bi-arrow-repeat me-1"></i>{{ income.recurring_period }}
+                                                <i class="bi bi-arrow-repeat me-1"></i>{{ _(income.recurring_period) }}
                                             </span>
                                         {% else %}
-                                            <span class="text-muted small">One-time</span>
+                                            <span class="text-muted small">{{ _('period.one_time') }}</span>
                                         {% endif %}
                                     </td>
                                     <td class="text-end fw-bold text-success font-monospace">
@@ -139,13 +139,13 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group btn-group-sm shadow-none rounded-3 border">
-                                            <a href="{{ url_for('incomes.detail', income_id=income.id) }}" class="btn btn-light" title="View Details">
+                                            <a href="{{ url_for('incomes.detail', income_id=income.id) }}" class="btn btn-light" title="{{ _('common.view_details') }}">
                                                 <i class="bi bi-eye text-secondary"></i>
                                             </a>
-                                            <a href="{{ url_for('incomes.edit', income_id=income.id) }}" class="btn btn-light" title="Edit Record">
+                                            <a href="{{ url_for('incomes.edit', income_id=income.id) }}" class="btn btn-light" title="{{ _('common.edit_record') }}">
                                                 <i class="bi bi-pencil text-secondary"></i>
                                             </a>
-                                            <a href="{{ url_for('incomes.delete', income_id=income.id) }}" class="btn btn-light text-danger" title="Delete">
+                                            <a href="{{ url_for('incomes.delete', income_id=income.id) }}" class="btn btn-light text-danger" title="{{ _('common.delete') }}">
                                                 <i class="bi bi-trash3"></i>
                                             </a>
                                         </div>
@@ -162,7 +162,7 @@
                         <div class="p-3 border-bottom">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="badge bg-success-subtle text-success px-2.5 py-1.5 rounded-pill fw-semibold">
-                                    {{ income.category }}
+                                    {{ _(income.category) }}
                                 </span>
                                 <span class="fw-bold text-success font-monospace fs-5">
                                     +${{ "%.2f"|format(income.amount|float) }}
@@ -173,22 +173,22 @@
                                 {% if income.description %}
                                     <div class="small fw-semibold mb-1">{{ income.description }}</div>
                                 {% else %}
-                                    <div class="text-muted fst-italic small mb-1">No description</div>
+                                    <div class="text-muted fst-italic small mb-1">{{ _('common.no_description') }}</div>
                                 {% endif %}
 
                                 <div class="d-flex align-items-center gap-2 text-muted x-small">
                                     <span><i class="bi bi-calendar3 me-1"></i>{{ income.income_date.strftime('%b %d, %Y') }}</span>
                                     {% if income.recurring_period %}
                                         <span>&bull;</span>
-                                        <span class="text-primary"><i class="bi bi-arrow-repeat me-1"></i>{{ income.recurring_period }}</span>
+                                        <span class="text-primary"><i class="bi bi-arrow-repeat me-1"></i>{{ _(income.recurring_period) }}</span>
                                     {% endif %}
                                 </div>
                             </div>
 
                             <div class="d-flex gap-2">
-                                <a href="{{ url_for('incomes.detail', income_id=income.id) }}" class="btn btn-sm btn-outline-secondary flex-fill rounded-pill">View</a>
-                                <a href="{{ url_for('incomes.edit', income_id=income.id) }}" class="btn btn-sm btn-outline-secondary flex-fill rounded-pill">Edit</a>
-                                <a href="{{ url_for('incomes.delete', income_id=income.id) }}" class="btn btn-sm btn-outline-danger flex-fill rounded-pill">Remove</a>
+                                <a href="{{ url_for('incomes.detail', income_id=income.id) }}" class="btn btn-sm btn-outline-secondary flex-fill rounded-pill">{{ _('common.view') }}</a>
+                                <a href="{{ url_for('incomes.edit', income_id=income.id) }}" class="btn btn-sm btn-outline-secondary flex-fill rounded-pill">{{ _('common.edit') }}</a>
+                                <a href="{{ url_for('incomes.delete', income_id=income.id) }}" class="btn btn-sm btn-outline-danger flex-fill rounded-pill">{{ _('common.delete') }}</a>
                             </div>
                         </div>
                     {% endfor %}
@@ -196,12 +196,12 @@
             {% else %}
                 <div class="text-center py-5 px-4">
                     <i class="bi bi-wallet2 display-5 text-muted opacity-50 mb-3 d-block"></i>
-                    <h5 class="fw-bold">No Income Records Yet</h5>
+                    <h5 class="fw-bold">{{ _('income.no_records_yet') }}</h5>
                     <p class="text-muted small mx-auto mb-3" style="max-width: 400px;">
-                        Start logging your income sources to populate real-time cashflow analytics.
+                        {{ _('income.no_records_hint') }}
                     </p>
                     <a href="{{ url_for('incomes.create') }}" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
-                        <i class="bi bi-plus-lg me-1"></i> Add First Income
+                        <i class="bi bi-plus-lg me-1"></i> {{ _('income.add_first_income') }}
                     </a>
                 </div>
             {% endif %}

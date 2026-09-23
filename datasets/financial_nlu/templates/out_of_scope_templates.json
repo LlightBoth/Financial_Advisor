@@ -1,0 +1,222 @@
+[
+  {
+    "template_id": "T_OOS_INVEST_001",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Which tech stock should I buy before earnings season?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_INVEST_002",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Is Bitcoin going to break one hundred thousand dollars this month or should I sell now?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_INVEST_003",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "What forex leverage should I use for trading the dollar against the yen?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_INVEST_004",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Give me a list of ten penny stocks that will go up this week.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_INVEST_005",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Should I put all my savings into Ethereum or wait for a dip?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_INVEST_006",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Tell me the best day-trading strategy for small-cap stocks.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_INVEST_007",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "What call options should I buy on the S and P 500 index right now?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_LOAN_001",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_loan",
+    "text_pattern": "Can you approve my mortgage application for two hundred and fifty thousand dollars?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_LOAN_002",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_loan",
+    "text_pattern": "Which bank has the lowest interest rate so I can apply for a personal loan today?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_OOS_LOAN_003",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_loan",
+    "text_pattern": "Can you increase my credit card limit to ten thousand dollars?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  }
+]

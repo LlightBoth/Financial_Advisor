@@ -1,20 +1,20 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %} Income Detail {% endblock %}
+{% block title %} {{ _('income.detail_title') }} {% endblock %}
 
 {% block content %}
 <div class="container py-4">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 fw-bold">Income Overview</h1>
+            <h1 class="h3 mb-0 fw-bold">{{ _('income.overview') }}</h1>
         </div>
         <div class="btn-group shadow-sm">
             <a href="{{ url_for('incomes.edit', income_id=income.id) }}" class="btn btn-outline-primary btn-sm px-3">
-                <i class="bi bi-pencil me-1"></i> Edit
+                <i class="bi bi-pencil me-1"></i> {{ _('common.edit') }}
             </a>
             <a href="{{ url_for('incomes.index') }}" class="btn btn-outline-secondary btn-sm px-3">
-                <i class="bi bi-arrow-left me-1"></i> Back to list
+                <i class="bi bi-arrow-left me-1"></i> {{ _('common.back_to_list') }}
             </a>
         </div>
     </div>
@@ -22,7 +22,7 @@
     <!-- Main Detail Card -->
     <div class="card border shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-body-secondary py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
-            <span class="text-muted small">Record ID: #{{ income.id }}</span>
+            <span class="text-muted small">{{ _('common.record_id') }}: #{{ income.id }}</span>
             
             {# Dynamic Category Badge Mapping #}
             {% set category_classes = {
@@ -33,7 +33,7 @@
                 'Rental': 'text-bg-secondary'
             } %}
             <span class="badge {{ category_classes.get(income.category, 'text-bg-dark') }} px-3 py-2 fs-6">
-                {{ income.category }}
+                {{ _(income.category) }}
             </span>
         </div>
 
@@ -43,7 +43,7 @@
                 <!-- Amount Highlight Box (Using text-primary/success for income) -->
                 <div class="col-md-12">
                     <div class="p-3 bg-body-tertiary border rounded-3 d-flex align-items-center justify-content-between">
-                        <span class="text-muted fw-medium text-uppercase fs-7">Total Amount</span>
+                        <span class="text-muted fw-medium text-uppercase fs-7">{{ _('finance.total_amount') }}</span>
                         <h2 class="text-success fw-bold mb-0">${{ "%.2f"|format(income.amount|float) }}</h2>
                     </div>
                 </div>
@@ -51,18 +51,18 @@
                 <!-- Detail Grid -->
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Income Date</span>
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">{{ _('income.income_date') }}</span>
                         <span class="fw-medium fs-6">{{ income.income_date.strftime("%b %d, %Y") }}</span>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Recurring Period</span>
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">{{ _('income.recurring_period') }}</span>
                         {% if income.recurring_period %}
-                            <span class="badge bg-body-secondary text-body border px-2 py-1">{{ income.recurring_period }}</span>
+                            <span class="badge bg-body-secondary text-body border px-2 py-1">{{ _(income.recurring_period) }}</span>
                         {% else %}
-                            <span class="badge bg-secondary-subtle text-secondary px-2 py-1">One-time</span>
+                            <span class="badge bg-secondary-subtle text-secondary px-2 py-1">{{ _('period.one_time') }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -70,9 +70,9 @@
                 <div class="col-12">
                     <hr class="text-muted opacity-25">
                     <div class="mb-3">
-                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">Description</span>
+                        <span class="d-block text-muted small text-uppercase fw-semibold mb-1">{{ _('common.description') }}</span>
                         <p class="mb-0 {% if not income.description %}text-muted fst-italic{% else %}text-body{% endif %}">
-                            {{ income.description if income.description else "No description provided." }}
+                            {{ income.description if income.description else _('common.no_description_provided') }}
                         </p>
                     </div>
                 </div>
@@ -80,8 +80,8 @@
                 <div class="col-12">
                     <hr class="text-muted opacity-25">
                     <div class="d-flex justify-content-between text-muted small">
-                        <span>Created: <strong class="text-body">{{ income.created_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
-                        <span>Last updated: <strong class="text-body">{{ income.updated_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
+                        <span>{{ _('common.created_at') }}: <strong class="text-body">{{ income.created_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
+                        <span>{{ _('common.updated_at') }}: <strong class="text-body">{{ income.updated_at.strftime("%b %d, %Y, %H:%M %p") }}</strong></span>
                     </div>
                 </div>
 

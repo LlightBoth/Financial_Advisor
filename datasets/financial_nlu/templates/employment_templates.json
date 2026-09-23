@@ -1,0 +1,125 @@
+[
+  {
+    "template_id": "T_EMPLOYMENT_001",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I am currently employed and earn {monthly_income} per month. My expenses are {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_EMPLOYMENT_002",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I lost my job recently and have no income. My monthly expenses are still {monthly_expense}.",
+    "required_slots": ["monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "monthly_income": 0,
+      "employment_status": "not employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_EMPLOYMENT_003",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I am unemployed and do not have any income right now. I still spend about {monthly_expense} each month on basic needs.",
+    "required_slots": ["monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "monthly_income": 0,
+      "employment_status": "not employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_EMPLOYMENT_004",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I have a full-time job earning {monthly_income} monthly. I spend {monthly_expense} and I am a big spender.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": "big spend",
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_EMPLOYMENT_005",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I work and bring home {monthly_income} a month. My spending is moderate at {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": "average spend",
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_EMPLOYMENT_006",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I do not have a job and have zero income coming in. My expenses are around {monthly_expense} and I have debt.",
+    "required_slots": ["monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "monthly_income": 0,
+      "employment_status": "not employed",
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  }
+]

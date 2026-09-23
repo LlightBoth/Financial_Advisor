@@ -5,7 +5,7 @@ from flask import url_for
 from app.services.notification_services import NotificationServices
 
 from extension import db
-from sqlalchemy import func
+from sqlalchemy import func, or_, and_
 import math
 
 class PlanServices:
@@ -24,9 +24,19 @@ class PlanServices:
         # Filter by status
         if status_value and status_value != "general":
             if status_value == "complete":
-                query = query.filter(Plan.value.is_(True))
+                query = query.filter(
+                    or_(
+                        Plan.value.is_(True),
+                        and_(Plan.goal_cost > 0, Plan.saving >= Plan.goal_cost)
+                    )
+                )
             elif status_value == "incomplete":
-                query = query.filter(Plan.value.is_(False))
+                query = query.filter(
+                    and_(
+                        Plan.value.is_(False),
+                        or_(Plan.saving.is_(None), Plan.goal_cost.is_(None), Plan.saving < Plan.goal_cost)
+                    )
+                )
 
         # Filter by saving type
         if saving_type and saving_type != "general":
@@ -156,7 +166,7 @@ class PlanServices:
 
 
     @staticmethod
-    def update_plan(plan: Plan, data: dict):
+    def update_plan(plan: Plan, data: dict, user=None):
         try:
             target_date = PlanServices.calculate_target_date(
                 goal_cost=data["goal_cost"],

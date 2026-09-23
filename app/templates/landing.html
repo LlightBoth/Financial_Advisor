@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="{{ current_lang }}" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Consultant</title>
-    <meta name="description" content="Intelligent financial advisory platform. Track cashflow, set milestone savings goals, manage recurring expenses, and receive tailored financial recommendations.">
+    <title>{{ _("landing.page_title") }}</title>
+    <meta name="description" content="{{ _('landing.page_meta_desc') }}">
     
     <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,12 +12,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Landing Page CSS with Cache Buster -->
-    <link href="{{ url_for('static', filename='css/landing.css') }}?v=4.4" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/fonts.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/landing.css') }}?v=4.5" rel="stylesheet">
 
     <!-- Early Theme Initialization to Prevent Flash -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
         })();
     </script>
@@ -25,11 +26,11 @@
 <body>
 
     <!-- Animated Mesh Background -->
-    <!-- <div class="landing-bg-glow" aria-hidden="true">
+    <div class="landing-bg-glow" aria-hidden="true">
         <div class="glow-orb glow-orb-1"></div>
         <div class="glow-orb glow-orb-2"></div>
         <div class="glow-orb glow-orb-3"></div>
-    </div> -->
+    </div>
 
     <!-- Navigation Header -->
     <nav class="landing-navbar">
@@ -42,32 +43,47 @@
 
         <!-- Center Navigation Menu Links (Desktop) -->
         <div class="nav-menu-links d-none d-lg-flex">
-            <a href="#overview" class="nav-menu-link">Overview</a>
-            <a href="#features" class="nav-menu-link">Features</a>
-            <a href="#advisory" class="nav-menu-link">Advisory</a>
-            <a href="#security" class="nav-menu-link">Security</a>
+            <a href="#overview" class="nav-menu-link">{{ _("landing.nav_overview") }}</a>
+            <a href="#features" class="nav-menu-link">{{ _("landing.nav_features") }}</a>
+            <a href="#advisory" class="nav-menu-link">{{ _("landing.nav_advisory") }}</a>
+            <a href="#security" class="nav-menu-link">{{ _("landing.nav_security") }}</a>
             <a href="{{ url_for('about') }}" class="nav-menu-link">About & FAQ</a>
         </div>
 
         <div class="nav-actions">
+            <!-- Language Switcher -->
+            <div class="d-flex align-items-center me-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('common.language') }}">
+                    <a href="{{ url_for('lang.set_language', language='en', next=url_for('home')) }}" 
+                       class="btn btn-sm {% if current_lang == 'en' %}btn-primary text-white{% else %}btn-outline-secondary text-secondary{% endif %} py-1 px-2" 
+                       style="font-size: 0.8rem; border-radius: 6px;"
+                       title="English">English</a>
+                    <span class="d-flex align-items-center text-muted px-1">|</span>
+                    <a href="{{ url_for('lang.set_language', language='km', next=url_for('home')) }}" 
+                       class="btn btn-sm {% if current_lang == 'km' %}btn-primary text-white{% else %}btn-outline-secondary text-secondary{% endif %} py-1 px-2" 
+                       style="font-size: 0.8rem; border-radius: 6px;"
+                       title="ខ្មែរ">ខ្មែរ</a>
+                </div>
+            </div>
+
             <!-- Dark/Light Mode Toggle Button -->
-            <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="Toggle Dark/Light Mode" title="Toggle Dark/Light Mode">
+            <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="{{ _('landing.toggle_theme') }}" title="{{ _('landing.toggle_theme') }}">
                 <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
             </button>
 
-            <!-- {% if current_user.is_authenticated %}
+            {% if current_user.is_authenticated %}
                 <a href="{{ url_for('dashboards.userIndex') }}" class="btn-nav-cta d-none d-sm-inline-flex">
-                    <i class="bi bi-grid-1x2-fill"></i> Workspace
+                    <i class="bi bi-grid-1x2-fill"></i> {{ _("common.workspace") }}
                 </a>
-            {% else %} -->
-                <a href="{{ url_for('auth.register') }}" class="btn-nav-ghost d-none d-sm-inline-flex">Sign Up</a>
-                <a href="{{ url_for('auth.login') }}" class="btn-nav-cta">
-                    Get Started <i class="bi bi-arrow-right"></i>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-nav-ghost d-none d-sm-inline-flex">{{ _("nav.login") }}</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">
+                    {{ _("landing.get_started") }} <i class="bi bi-arrow-right"></i>
                 </a>
-            <!-- {% endif %} -->
+            {% endif %}
 
             <!-- Mobile Menu Toggle Button (Hamburger) -->
-            <button type="button" class="mobile-menu-btn d-lg-none" id="mobileMenuToggle" aria-label="Open Navigation Menu">
+            <button type="button" class="mobile-menu-btn d-lg-none" id="mobileMenuToggle" aria-label="{{ _('landing.open_nav_menu') }}">
                 <i class="bi bi-list" id="mobileMenuIcon"></i>
             </button>
         </div>
@@ -82,23 +98,23 @@
                 </div>
                 <div class="brand-title">Financial <span>Consultant</span></div>
             </a>
-            <button type="button" class="drawer-close-btn" id="mobileDrawerClose" aria-label="Close Menu">
+            <button type="button" class="drawer-close-btn" id="mobileDrawerClose" aria-label="{{ _('landing.close_nav_menu') }}">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
 
         <div class="mobile-drawer-links">
             <a href="#overview" class="mobile-drawer-link">
-                <i class="bi bi-speedometer2 text-primary"></i> Financial Overview
+                <i class="bi bi-speedometer2 text-primary"></i> {{ _("landing.drawer_overview") }}
             </a>
             <a href="#features" class="mobile-drawer-link">
-                <i class="bi bi-grid-fill text-info"></i> Features & Tools
+                <i class="bi bi-grid-fill text-info"></i> {{ _("landing.drawer_features") }}
             </a>
             <a href="#advisory" class="mobile-drawer-link">
-                <i class="bi bi-lightbulb-fill text-warning"></i> Wealth Advisory
+                <i class="bi bi-lightbulb-fill text-warning"></i> {{ _("landing.drawer_advisory") }}
             </a>
             <a href="#security" class="mobile-drawer-link">
-                <i class="bi bi-shield-check text-success"></i> Security & Privacy
+                <i class="bi bi-shield-check text-success"></i> {{ _("landing.drawer_security") }}
             </a>
             <a href="{{ url_for('about') }}" class="mobile-drawer-link">
                 <i class="bi bi-patch-question-fill text-primary"></i> About & FAQ
@@ -108,14 +124,14 @@
         <div class="mobile-drawer-footer">
             {% if current_user.is_authenticated %}
                 <a href="{{ url_for('dashboards.userIndex') }}" class="btn-hero-primary w-100 justify-content-center">
-                    <i class="bi bi-grid-1x2-fill"></i> Open Dashboard
+                    <i class="bi bi-grid-1x2-fill"></i> {{ _("landing.open_dashboard") }}
                 </a>
             {% else %}
                 <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary w-100 justify-content-center">
-                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    <i class="bi bi-box-arrow-in-right"></i> {{ _("nav.login") }}
                 </a>
                 <a href="{{ url_for('auth.register') }}" class="btn-hero-primary w-100 justify-content-center">
-                    Get Started Free <i class="bi bi-arrow-right"></i>
+                    {{ _("landing.get_started_free") }} <i class="bi bi-arrow-right"></i>
                 </a>
             {% endif %}
         </div>
@@ -125,22 +141,22 @@
     <!-- Hero Section / Overview -->
     <header class="hero-section" id="overview">
         <h1 class="hero-title">
-            Smart Financial Planning & <br>
-            <span class="text-success">Personal Wealth Advisory</span>
+            {{ _("landing.hero_title_1") }} <br>
+            <span class="highlight-gradient">{{ _("landing.hero_title_highlight") }}</span>
         </h1>
 
         <p class="hero-subtitle">
-            Take complete control of your finances. Track cash flow, budget recurring expenses, build custom savings goals, and unlock intelligent financial advice tailored to your life.
+            {{ _("landing.hero_subtitle") }}
         </p>
 
         <div class="hero-cta-group">
             <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
-                <span>Start Free Planning</span>
+                <span>{{ _("landing.start_free_planning") }}</span>
                 <i class="bi bi-arrow-right-short fs-4"></i>
             </a>
             <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary">
                 <i class="bi bi-box-arrow-in-right"></i>
-                <span>Sign In to Account</span>
+                <span>{{ _("landing.sign_in_account") }}</span>
             </a>
         </div>
 
@@ -154,41 +170,41 @@
                         <div class="mockup-dot green"></div>
                     </div>
                     <span style="font-size: 0.8rem; color: var(--text-dim); font-weight: 600; font-family: monospace;">
-                        <i class="bi bi-check-circle-fill text-success me-1"></i> FINANCIAL HEALTH: OPTIMAL // ADVISORY: ACTIVE
+                        <i class="bi bi-check-circle-fill text-success me-1"></i> {{ _("landing.telemetry_badge") }}
                     </span>
                 </div>
 
                 <div class="mockup-stats-grid">
                     <div class="mockup-card">
                         <div class="mockup-card-title">
-                            <span>Total Net Savings</span>
+                            <span>{{ _("landing.total_net_savings") }}</span>
                             <i class="bi bi-wallet2 text-primary"></i>
                         </div>
                         <div class="mockup-card-value text-success">$28,450.00</div>
                         <div class="mockup-trend positive">
-                            <i class="bi bi-arrow-up-right"></i> +18.4% This Month
+                            <i class="bi bi-arrow-up-right"></i> {{ _("landing.savings_month_trend") }}
                         </div>
                     </div>
 
                     <div class="mockup-card">
                         <div class="mockup-card-title">
-                            <span>Savings Goal Pacing</span>
+                            <span>{{ _("landing.goal_pacing") }}</span>
                             <i class="bi bi-bullseye text-info"></i>
                         </div>
                         <div class="mockup-card-value">94.2%</div>
                         <div class="mockup-trend positive">
-                            <i class="bi bi-check-all"></i> On Track to Target
+                            <i class="bi bi-check-all"></i> {{ _("landing.goal_pacing_status") }}
                         </div>
                     </div>
 
                     <div class="mockup-card">
                         <div class="mockup-card-title">
-                            <span>Risk Moderate</span>
+                            <span>{{ _("landing.debt_income_ratio") }}</span>
                             <i class="bi bi-shield-check text-warning"></i>
                         </div>
-                        <div class="mockup-card-value text-primary">Excellent</div>
+                        <div class="mockup-card-value text-primary">12.5%</div>
                         <div class="mockup-trend neutral">
-                            <i class="bi bi-activity"></i> Healthy Low Risk
+                            <i class="bi bi-activity"></i> {{ _("landing.debt_income_status") }}
                         </div>
                     </div>
                 </div>
@@ -199,9 +215,9 @@
     <!-- Features Section -->
     <section class="features-section" id="features">
         <div class="section-header">
-            <div class="section-tag">Core Capabilities</div>
-            <h2 class="section-title">Everything You Need to Master Your Money</h2>
-            <p class="section-subtitle">Comprehensive tools designed to help you track spending, build emergency funds, and reach your goals faster.</p>
+            <div class="section-tag">{{ _("landing.capabilities_tag") }}</div>
+            <h2 class="section-title">{{ _("landing.features_title") }}</h2>
+            <p class="section-subtitle">{{ _("landing.features_subtitle") }}</p>
         </div>
 
         <div class="features-grid">
@@ -209,24 +225,32 @@
                 <div class="feature-icon-wrap blue">
                     <i class="bi bi-lightbulb-fill"></i>
                 </div>
-                <h3 class="feature-title">Intelligent Advisory Engine</h3>
-                <p class="feature-desc">Automated recommendations that evaluate your income, expense ratios, and savings habits to suggest optimal next steps.</p>
+                <h3 class="feature-title">{{ _("landing.feature_advisory_title") }}</h3>
+                <p class="feature-desc">{{ _("landing.feature_advisory_desc") }}</p>
             </div>
 
             <div class="feature-box">
                 <div class="feature-icon-wrap green">
                     <i class="bi bi-bullseye"></i>
                 </div>
-                <h3 class="feature-title">Goal & Milestone Tracking</h3>
-                <p class="feature-desc">Set custom savings targets for home purchases, emergency funds, or retirement with automated daily contribution targets.</p>
+                <h3 class="feature-title">{{ _("landing.feature_goals_title") }}</h3>
+                <p class="feature-desc">{{ _("landing.feature_goals_desc") }}</p>
             </div>
 
             <div class="feature-box">
                 <div class="feature-icon-wrap purple">
                     <i class="bi bi-pie-chart-fill"></i>
                 </div>
-                <h3 class="feature-title">Cashflow & Expense Analytics</h3>
-                <p class="feature-desc">Categorize income and expenses with detailed breakdown charts, recurring frequency tags, and monthly budget pacing.</p>
+                <h3 class="feature-title">{{ _("landing.feature_cashflow_title") }}</h3>
+                <p class="feature-desc">{{ _("landing.feature_cashflow_desc") }}</p>
+            </div>
+
+            <div class="feature-box">
+                <div class="feature-icon-wrap amber">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+                <h3 class="feature-title">{{ _("landing.feature_ledger_title") }}</h3>
+                <p class="feature-desc">{{ _("landing.feature_ledger_desc") }}</p>
             </div>
         </div>
     </section>
@@ -236,10 +260,10 @@
         <div class="showcase-card">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <div class="section-tag mb-2">STRATEGIC WEALTH MANAGEMENT</div>
-                    <h2 class="fw-bold mb-3" style="font-size: clamp(1.75rem, 3vw, 2.25rem); color: var(--text-main);">Built for Confident Financial Decision-Making</h2>
+                    <div class="section-tag mb-2">{{ _("landing.advisory_tag") }}</div>
+                    <h2 class="fw-bold mb-3" style="font-size: clamp(1.75rem, 3vw, 2.25rem); color: var(--text-main);">{{ _("landing.advisory_title") }}</h2>
                     <p class="mb-4 leading-relaxed" style="color: var(--text-muted);">
-                        True financial stability comes from consistency and clear advice. Our system continuously monitors your debt liabilities, emergency fund adequacy, and savings trajectories to deliver actionable guidance.
+                        {{ _("landing.advisory_desc") }}
                     </p>
                     <div class="d-flex flex-column gap-3" id="security">
                         <div class="d-flex align-items-start gap-3">
@@ -247,8 +271,8 @@
                                 <i class="bi bi-shield-lock-fill fs-5"></i>
                             </div>
                             <div>
-                                <div class="fw-bold small" style="color: var(--text-main);">Security & Privacy</div>
-                                <div class="x-small" style="color: var(--text-dim);">Cryptographic session protection for your privacy.</div>
+                                <div class="fw-bold small" style="color: var(--text-main);">{{ _("landing.security_title") }}</div>
+                                <div class="x-small" style="color: var(--text-dim);">{{ _("landing.security_desc") }}</div>
                             </div>
                         </div>
                         <div class="d-flex align-items-start gap-3">
@@ -256,8 +280,8 @@
                                 <i class="bi bi-graph-up-arrow fs-5"></i>
                             </div>
                             <div>
-                                <div class="fw-bold small" style="color: var(--text-main);">Personalized Advisory Insights</div>
-                                <div class="x-small" style="color: var(--text-dim);">Every recommendation is tailored specifically to your real income and expenditure profile.</div>
+                                <div class="fw-bold small" style="color: var(--text-main);">{{ _("landing.insights_title") }}</div>
+                                <div class="x-small" style="color: var(--text-dim);">{{ _("landing.insights_desc") }}</div>
                             </div>
                         </div>
                     </div>
@@ -265,14 +289,14 @@
                 <div class="col-lg-6">
                     <div class="position-relative rounded-4 overflow-hidden shadow-lg border" style="border-color: var(--border-subtle) !important;">
                         <img src="{{url_for('static', filename='images/test.jpg')}}" 
-                             alt="Financial Advisory Strategy Session" 
+                             alt="{{ _('landing.advisory_title') }}" 
                              class="img-fluid w-100 object-fit-cover" 
                              style="height: 380px; filter: brightness(0.92);"
                              loading="lazy">
                         <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(180deg, transparent 0%, rgba(6,9,19,0.92) 100%);">
                             <div class="d-flex justify-content-between align-items-center text-white small">
-                                <span class="fw-semibold"><i class="bi bi-person-check-fill text-success me-1"></i> Certified Advisory Rules</span>
-                                <span class="badge bg-primary rounded-pill">Active Financial Plan</span>
+                                <span class="fw-semibold"><i class="bi bi-person-check-fill text-success me-1"></i> {{ _("landing.certified_rules") }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ _("landing.active_financial_plan") }}</span>
                             </div>
                         </div>
                     </div>
@@ -284,11 +308,11 @@
     <!-- Bottom CTA Banner -->
     <section class="cta-banner-section">
         <div class="cta-banner-card">
-            <h2 class="cta-banner-title">Take Control of Your Financial Future</h2>
-            <p class="cta-banner-desc">Join thousands of users planning smarter budgets, tracking milestone goals, and reaching financial freedom faster.</p>
+            <h2 class="cta-banner-title">{{ _("landing.cta_title") }}</h2>
+            <p class="cta-banner-desc">{{ _("landing.cta_desc") }}</p>
             <div class="hero-cta-group" style="margin-bottom: 0;">
                 <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
-                    <span>Create Free Account</span>
+                    <span>{{ _("landing.create_free_account") }}</span>
                     <i class="bi bi-chevron-right"></i>
                 </a>
             </div>
@@ -308,15 +332,15 @@
                         <div class="brand-title">Financial <span>Consultant</span></div>
                     </a>
                     <p class="footer-desc">
-                        Intelligent personal wealth planning and deterministic financial advisory engine. Helping you budget smarter and reach your goals faster.
+                        {{ _("landing.footer_desc") }}
                     </p>
                     <div class="footer-status-pill">
                         <div class="status-dot-pulse"></div>
-                        <span>System Status: Operational</span>
+                        <span>{{ _("landing.system_status_operational") }}</span>
                     </div>
 
                     <!-- Social Media Links -->
-                    <!-- <div class="footer-social-group mt-2">
+                    <div class="footer-social-group mt-2">
                         <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Facebook" title="Facebook">
                             <i class="bi bi-facebook"></i>
                         </a>
@@ -329,70 +353,69 @@
                         <a href="mailto:support@financialadvisor.ai" class="footer-social-btn" aria-label="Email Us" title="Email Contact">
                             <i class="bi bi-envelope-fill"></i>
                         </a>
-                    </div> -->
+                    </div>
                 </div>
 
                 <!-- Col 2: Platform Links -->
                 <div>
-                    <div class="footer-col-title">Platform</div>
+                    <div class="footer-col-title">{{ _("landing.footer_col_platform") }}</div>
                     <ul class="footer-links">
-                        <li><a href="#overview"><i class="bi bi-chevron-right text-primary"></i> Overview</a></li>
-                        <li><a href="#features"><i class="bi bi-chevron-right text-primary"></i> Core Features</a></li>
-                        <li><a href="#advisory"><i class="bi bi-chevron-right text-primary"></i> Wealth Advisory</a></li>
-                        <li><a href="#security"><i class="bi bi-chevron-right text-primary"></i> Security & Privacy</a></li>
+                        <li><a href="#overview"><i class="bi bi-chevron-right text-primary"></i> {{ _("landing.nav_overview") }}</a></li>
+                        <li><a href="#features"><i class="bi bi-chevron-right text-primary"></i> {{ _("landing.footer_core_features") }}</a></li>
+                        <li><a href="#advisory"><i class="bi bi-chevron-right text-primary"></i> {{ _("landing.drawer_advisory") }}</a></li>
+                        <li><a href="#security"><i class="bi bi-chevron-right text-primary"></i> {{ _("landing.drawer_security") }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 3: Company -->
                 <div>
-                    <div class="footer-col-title">Company</div>
+                    <div class="footer-col-title">{{ _("landing.footer_col_company") }}</div>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('about') }}#purpose">About</a></li>
+                        <li><a href="{{ url_for('about') }}#purpose">{{ _("landing.footer_about") }}</a></li>
                         <li><a href="{{ url_for('about') }}#faq">FAQ</a></li>
                         <li><a href="{{ url_for('about') }}#team">Our Team</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="mailto:support@financialadvisor.ai">{{ _("landing.footer_contact") }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 4: Legal -->
                 <div>
-                    <div class="footer-col-title">Legal</div>
+                    <div class="footer-col-title">{{ _("landing.footer_col_legal") }}</div>
                     <ul class="footer-links">
-                        <li><a href="#security">Privacy</a></li>
-                        <li><a href="#security">Terms of Service</a></li>
-                        <li><a href="#security">Cookies</a></li>
-                        <li><a href="#security">EULA</a></li>
+                        <li><a href="#security">{{ _("landing.footer_privacy") }}</a></li>
+                        <li><a href="#security">{{ _("landing.footer_terms") }}</a></li>
+                        <li><a href="#security">{{ _("landing.footer_cookies") }}</a></li>
+                        <li><a href="#security">{{ _("landing.footer_eula") }}</a></li>
                     </ul>
                 </div>
 
                 <!-- Col 5: Access & Portals -->
                 <div>
-                    <div class="footer-col-title">Access</div>
+                    <div class="footer-col-title">{{ _("landing.footer_col_access") }}</div>
                     <ul class="footer-links">
                         {% if current_user.is_authenticated %}
-                            <li><a href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-grid-1x2-fill text-primary"></i> Open Workspace</a></li>
-                            <li><a href="{{ url_for('settings.empIndex') }}"><i class="bi bi-person-gear text-primary"></i> Account Settings</a></li>
+                            <li><a href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-grid-1x2-fill text-primary"></i> {{ _("landing.footer_open_workspace") }}</a></li>
+                            <li><a href="{{ url_for('settings.userIndex') }}"><i class="bi bi-person-gear text-primary"></i> {{ _("landing.footer_account_settings") }}</a></li>
                         {% else %}
-                            <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right text-primary"></i> Sign In to Terminal</a></li>
-                            <li><a href="{{ url_for('auth.register') }}"><i class="bi bi-stars text-primary"></i> Create Free Account</a></li>
+                            <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right text-primary"></i> {{ _("landing.footer_sign_in_terminal") }}</a></li>
+                            <li><a href="{{ url_for('auth.register') }}"><i class="bi bi-stars text-primary"></i> {{ _("landing.create_free_account") }}</a></li>
                         {% endif %}
                     </ul>
                 </div>
             </div>
 
-            <!-- Financial Disclaimer Banner -->
-            <!-- <div class="footer-disclaimer-box">
-                <p>
-                    <i class="bi bi-info-circle text-primary me-1"></i>
-                    <strong>Advisory Disclaimer:</strong> Financial Advisor is an intelligent financial planning workspace designed to provide deterministic advisory modeling, budgeting heuristics, and milestone goal calculus. All user financial telemetry is isolated with local cryptographic session security.
-                </p>
-            </div> -->
-
             <!-- Footer Bottom Bar -->
             <div class="footer-bottom-bar">
                 <div class="footer-copyright">
-                    <span>&copy; 2026 Financial Consultant App. All rights reserved.</span>
+                    <span>{{ _("landing.footer_copyright") }}</span>
+                    <span class="footer-region-badge">
+                        <i class="bi bi-globe2"></i> {% if current_lang == 'km' %}កម្ពុជា (KM){% else %}Global (EN-US){% endif %}
+                    </span>
                 </div>
+
+                <a href="#overview" class="footer-back-to-top">
+                    <i class="bi bi-arrow-up"></i> {{ _("landing.footer_back_to_top") }}
+                </a>
             </div>
         </div>
     </footer>

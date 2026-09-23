@@ -1,6 +1,6 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %} Edit Expense | Intelli App {% endblock %}
+{% block title %} {{ _('expense.edit_title') }} {% endblock %}
 
 {% block content %}
 
@@ -16,9 +16,19 @@
             </p>
         </div>
         <a href="{{ url_for('expenses.index') }}"
-           class="text-decoration-none text-muted small btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1 btn btn-outline-secondary btn-sm px-3"> Back to Expense</i>
+           class="text-decoration-none text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>
+            {{ _('expense.back_to_expenses') }}
         </a>
+
+        <h2 class="fw-bold mt-3 mb-1">
+            {{ _('expense.edit_expense') }}
+        </h2>
+
+        <p class="text-muted mb-0">
+            {{ _('expense.edit_subtitle') }}
+        </p>
+
     </div>
 
 
@@ -45,19 +55,19 @@
 
                         <div>
                             <h5 class="fw-bold mb-1">
-                                Expense Information
+                                {{ _('expense.card_header') }}
                             </h5>
 
                             <p class="text-muted small mb-0">
-                                Enter the details of your expense.
+                                {{ _('expense.card_subtitle') }}
                             </p>
                         </div>
 
                     </div>
                     
                     <form method="post" novalidate class="row g-4">
+                        {% set submit_label = _('expense.update_expense') %}
                         {% include "expenses/_form.html" %}
-
                     </form>
                 </div>
 

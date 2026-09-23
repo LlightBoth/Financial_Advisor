@@ -1,5 +1,5 @@
 {% extends "layouts/authBase.html" %}
-{% block title %}Verify Code{% endblock %}
+{% block title %}{{ _('auth.verify_code') }}{% endblock %}
 
 {% block auth_content %}
 <style>
@@ -37,8 +37,8 @@
             <i class="bi bi-shield-lock-fill"></i>
         </span>
     </div>
-    <h3>Security Verification</h3>
-    <p>Enter the 6-digit verification code sent to your email</p>
+    <h3>{{ _('auth.security_verification') }}</h3>
+    <p>{{ _('auth.enter_otp_subtitle') }}</p>
 </div>
 
 <!-- Main OTP Submission Form -->
@@ -65,7 +65,7 @@
     <!-- Submit Button -->
     <div class="mb-3">
         <button type="submit" class="btn-auth-submit">
-            <span>Verify & Continue</span>
+            <span>{{ _('auth.verify_continue') | safe }}</span>
             <i class="bi bi-arrow-right"></i>
         </button>
     </div>
@@ -74,7 +74,7 @@
 <!-- Resend & Back Navigation -->
 <div class="text-center pt-2">
     <div class="d-flex align-items-center justify-content-center gap-1 text-white-50 small mb-3">
-        <span>Didn't receive code?</span>
+        <span>{{ _('auth.didnt_receive_code') }}</span>
         
         <form id="resendForm" method="POST" action="{{ url_for('auth.resend_otp') }}" class="d-inline">
             {% if form and form.hidden_tag is defined %}
@@ -84,13 +84,13 @@
             {% endif %}
             
             <button type="submit" id="resendBtn" class="btn btn-link auth-link p-0 border-0 opacity-50 pe-none" disabled>
-                Resend <span id="timer">(60s)</span>
+                {{ _('auth.resend') }} <span id="timer">(60s)</span>
             </button>
         </form>
     </div>
     
     <a href="{{ url_for('auth.login') }}" class="auth-link-muted small">
-        <i class="bi bi-arrow-left me-1"></i> Back to Sign In
+        <i class="bi bi-arrow-left me-1"></i> {{ _('auth.back_to_sign_in') }}
     </a>
 </div>
 {% endblock %}

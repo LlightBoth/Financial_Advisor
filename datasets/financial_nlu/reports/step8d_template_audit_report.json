@@ -1,0 +1,29 @@
+{
+  "audit_version": "step8d_v1.0",
+  "kb_version": "financial-kb-v1.0",
+  "language_scope": "en",
+  "templates": {
+    "total_audited": 60,
+    "passed": 60,
+    "failed": 0,
+    "status": "PASS",
+    "errors": []
+  },
+  "dry_run_dataset": {
+    "file": "datasets/financial_nlu/raw/annotation_dry_run.jsonl",
+    "total_records": 22,
+    "passed": 22,
+    "failed": 0,
+    "status": "PASS",
+    "errors": []
+  },
+  "findings": {
+    "null_safety": "PASS",
+    "ambiguity": "PASS",
+    "slot_spans": "PASS",
+    "expected_rule_alignment": "PASS",
+    "out_of_scope_classification": "PASS"
+  },
+  "total_errors": 0,
+  "overall_status": "PASS"
+}

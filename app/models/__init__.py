@@ -10,6 +10,7 @@ from .expense import Expense
 
 # Client-Side
 from .plan import Plan
+from .history import History
 from .audit_log import AuditLog
 from .ai_chat import AIChat, AIMessage
 from .notification import Notification

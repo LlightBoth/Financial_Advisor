@@ -1,0 +1,142 @@
+[
+  {
+    "template_id": "T_DEBT_001",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "I earn {monthly_income} per month, spend {monthly_expense}, and I currently have debt.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_DEBT_002",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "My monthly income is {monthly_income} and my expenses are {monthly_expense}. I am paying off a personal loan.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_DEBT_003",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "I make {monthly_income} monthly and spend about {monthly_expense}. I owe money on credit cards and it is stressing me out.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH7_BEHAVIORAL",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_DEBT_004",
+    "template_family": "TF_DEBT",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn {monthly_income} a month and spend {monthly_expense}. I have no outstanding debt at all.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "no debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_DEBT_005",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "I take home {monthly_income} each month. My expenses run {monthly_expense} and on top of that I am servicing a bank loan.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_DEBT_006",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "With {monthly_income} coming in and {monthly_expense} going out every month, I am struggling to keep up with my debt payments.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_DEBT_007",
+    "template_family": "TF_DEBT",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn {monthly_income} monthly, spend {monthly_expense}, and I am completely debt free.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "no debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  }
+]

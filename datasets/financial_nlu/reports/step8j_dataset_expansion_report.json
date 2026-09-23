@@ -1,0 +1,126 @@
+{
+  "audit_name": "STEP 8J NLU DATASET EXPANSION AUDIT",
+  "kb_version": "financial-kb-v1.0",
+  "language_scope": "en",
+  "dry_run_records_count": 22,
+  "batch02_records_count": 78,
+  "total_corpus_count": 100,
+  "split_distribution": {
+    "train": 53,
+    "val": 22,
+    "test": 25,
+    "unassigned": 0
+  },
+  "intent_distribution": {
+    "financial_consultation": {
+      "dry_run": 9,
+      "batch02": 11,
+      "total": 20
+    },
+    "budget_analysis": {
+      "dry_run": 3,
+      "batch02": 11,
+      "total": 14
+    },
+    "cashflow_question": {
+      "dry_run": 1,
+      "batch02": 9,
+      "total": 10
+    },
+    "savings_question": {
+      "dry_run": 0,
+      "batch02": 10,
+      "total": 10
+    },
+    "debt_management": {
+      "dry_run": 3,
+      "batch02": 11,
+      "total": 14
+    },
+    "financial_goal": {
+      "dry_run": 1,
+      "batch02": 9,
+      "total": 10
+    },
+    "financial_education": {
+      "dry_run": 1,
+      "batch02": 5,
+      "total": 6
+    },
+    "out_of_scope_investment": {
+      "dry_run": 2,
+      "batch02": 6,
+      "total": 8
+    },
+    "out_of_scope_loan": {
+      "dry_run": 2,
+      "batch02": 6,
+      "total": 8
+    }
+  },
+  "slot_coverage": {
+    "monthly_income": {
+      "non_null_count": 72,
+      "null_count": 28,
+      "percentage_non_null": 72.0
+    },
+    "monthly_expense": {
+      "non_null_count": 75,
+      "null_count": 25,
+      "percentage_non_null": 75.0
+    },
+    "employment_status": {
+      "non_null_count": 75,
+      "null_count": 25,
+      "percentage_non_null": 75.0
+    },
+    "debt_status": {
+      "non_null_count": 28,
+      "null_count": 72,
+      "percentage_non_null": 28.0
+    },
+    "spending_habit": {
+      "non_null_count": 16,
+      "null_count": 84,
+      "percentage_non_null": 16.0
+    },
+    "goal_cost": {
+      "non_null_count": 20,
+      "null_count": 80,
+      "percentage_non_null": 20.0
+    },
+    "marital_status": {
+      "non_null_count": 19,
+      "null_count": 81,
+      "percentage_non_null": 19.0
+    }
+  },
+  "enum_coverage": {
+    "employment_status": {
+      "employed": 67,
+      "not employed": 8,
+      "null": 25
+    },
+    "debt_status": {
+      "debt": 20,
+      "no debt": 8,
+      "null": 72
+    },
+    "spending_habit": {
+      "average spend": 8,
+      "big spend": 8,
+      "null": 84
+    },
+    "marital_status": {
+      "Single": 9,
+      "Married": 10,
+      "null": 81
+    }
+  },
+  "leakage_check": "PASS",
+  "duplicate_check": "PASS",
+  "deterministic_engine_alignment": "PASS",
+  "total_errors": 0,
+  "errors": [],
+  "overall_status": "PASS"
+}
