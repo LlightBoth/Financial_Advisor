@@ -225,16 +225,34 @@ function showStep3(){step1.classList.remove("active");step2.classList.remove("ac
 function scrollTop(){window.scrollTo({top:0,behavior:"smooth"});}
 
 function validateStep1(){
-if(!savingType.value){savingType.focus();return false;}
-if(!goal.value.trim()){goal.focus();return false;}
+if(!savingType.value){savingType.focus();alert("Please select a saving method (Daily, Monthly, or Flexible).");return false;}
+if(!goal.value.trim()){goal.focus();alert("Please enter a financial goal.");return false;}
 const goalAmount=parseFloat(goalCost.value);
-if(!Number.isFinite(goalAmount)||goalAmount<=0){goalCost.focus();return false;}
+if(!Number.isFinite(goalAmount)||goalAmount<=0){goalCost.focus();alert("Please enter a valid goal cost greater than 0.");return false;}
 const incomeAmount=parseFloat(income.value);
-if(!Number.isFinite(incomeAmount)||incomeAmount<0){income.focus();return false;}
+if(!Number.isFinite(incomeAmount)||incomeAmount<0){income.focus();alert("Please enter a valid monthly income.");return false;}
 const expenseAmount=parseFloat(expense.value);
-if(!Number.isFinite(expenseAmount)||expenseAmount<0){expense.focus();return false;}
+if(!Number.isFinite(expenseAmount)||expenseAmount<0){expense.focus();alert("Expenses cannot be negative.");return false;}
+const savingAmount=parseFloat(saving.value);
+if(!Number.isFinite(savingAmount)||savingAmount<=0){saving.focus();alert("Please enter a saving amount greater than zero.");return false;}
 return true;
 }
+
+function validateStep2(){
+const maritalStatus=document.querySelector('input[name="marital_status"]:checked');
+const employmentStatus=document.querySelector('input[name="employment_status"]:checked');
+const debtStatus=document.querySelector('input[name="debt_status"]:checked');
+const spendingHabit=document.querySelector('input[name="spending_habit"]:checked');
+const step2Error=document.getElementById("step2-error");
+
+if(!maritalStatus||!employmentStatus||!debtStatus||!spendingHabit){
+    if(step2Error)step2Error.classList.remove("d-none");
+    return false;
+}
+if(step2Error)step2Error.classList.add("d-none");
+return true;
+}
+
 
 // Popup Saving Type
 const savingTypeChoices = document.querySelectorAll(
@@ -587,7 +605,10 @@ return true;
 }
 
 reviewButton.addEventListener("click",function(){
-if(!updateConfirmation())return;
+if(!validateStep2()){
+    return;
+}
+updateConfirmation();
 showStep3();
 scrollTop();
 });
