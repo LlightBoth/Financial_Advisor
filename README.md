@@ -32,12 +32,13 @@ cd Financial_Advisor
 
 ### 4. Install Dependencies
 ```bash
-# Install Web App dependencies
+# 1. Install Web Application dependencies
 pip install -r requirements.txt
 
-# (Recommended) Install Local LLM dependencies
+# 2. Install Local LLM AI dependencies (REQUIRED to run the AI model server)
 pip install -r requirements-llm.txt
 ```
+*(If you do not install `requirements-llm.txt`, you will see `ModuleNotFoundError: No module named 'torch'` when starting the AI server).*
 
 ### 5. Start the Full System (Two Terminals)
 

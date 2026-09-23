@@ -10,9 +10,18 @@ import re
 import time
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from peft import PeftModel
+try:
+    import torch
+    from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+    from peft import PeftModel
+except ImportError as e:
+    print("=" * 65)
+    print(" [ERROR] Missing required AI libraries to run the local LLM server.")
+    print(f" Details: {e}")
+    print("\n Please install the required AI dependencies by running:")
+    print("     pip install -r requirements-llm.txt")
+    print("=" * 65)
+    sys.exit(1)
 
 # Add project root to sys.path
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
