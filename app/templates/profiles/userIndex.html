@@ -448,7 +448,7 @@
                         </div>
 
                         <div class="stat-number">
-                            {{ current_user.ai_chats|length }}
+                            {{ total_user_ai_chat | default(0, true) }}
                         </div>
 
                     </div>
@@ -766,13 +766,13 @@
                         <div class="col-12">
 
                             <label class="form-label small fw-semibold">
-                                About Me
+                                About Me & Motivation
                             </label>
 
                             <textarea
                                 name="description"
                                 class="form-control profile-input"
-                                placeholder="Tell us a little about yourself..."
+                                placeholder="Tell us about yourself and what motivates you..."
                                 rows="4"
                                 maxlength="80">{{ current_user.description or '' }}</textarea>
 

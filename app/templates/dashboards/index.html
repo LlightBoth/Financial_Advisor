@@ -71,9 +71,9 @@
                         Score
                     </span>
                 </div>
-                {% if sum_saving_rate >= 75 %}
+                {% if sum_saving_rate >= 65 %}
                 <div class="metric-value fs-2 fw-bold text-success mb-2">Low Risk</div>
-                {% elif sum_saving_rate >= 25 %}
+                {% elif sum_saving_rate >= 15 %}
                 <div class="metric-value fs-2 fw-bold text-warning mb-2">Moderate Risk</div>
                 {% elif sum_saving_rate == 0 %}
                 <div class="metric-value fs-2 fw-bold text-muted mb-2">Neutral</div>
@@ -110,108 +110,6 @@
         </div>
     </div>
 
-    <!-- Savings Plans & Tasks Row -->
-    <div class="row g-4">
-        <!-- Active Goal Plans -->
-        <div class="col-md-6">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="icon-box-modern green" style="width: 36px; height: 36px; font-size: 1rem;">
-                            <i class="bi bi-piggy-bank-fill"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0">Savings Milestones</h6>
-                            <small class="text-muted">Target Strategy Pacing</small>
-                        </div>
-                    </div>
-                    <a href="{{ url_for('plans.index') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                        View All
-                    </a>
-                </div>
-                
-                <div class="d-flex flex-column gap-3">
-                    {% for plan in user_plans %}
-                    <div class="plan-progress-pill">
-                        <div class="d-flex justify-content-between align-items-end mb-2">
-                            <span class="small fw-bold">{{ plan.name }}</span>
-                            <span class="small fw-bold text-success">${{ "{:,.2f}".format(plan.saved) }} / {{ plan.goal }}</span>
-                        </div>
-                        <div class="progress" style="height: 8px; border-radius: 10px; background: rgba(0,0,0,0.08);">
-                            <div class="progress-bar {{ plan.color }}" style="width: {{ plan.percent }}%; border-radius: 10px;"></div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4 text-muted small">
-                        <i class="bi bi-bullseye fs-3 d-block mb-2 opacity-50"></i>
-                        No active plans yet. <a href="{{ url_for('plans.create') }}" class="text-primary text-decoration-none fw-bold">Create one</a>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Daily Tasks -->
-        <div class="col-md-6">
-            <div class="card stat-card shadow-sm p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="icon-box-modern purple" style="width: 36px; height: 36px; font-size: 1rem;">
-                            <i class="bi bi-check2-square"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-0">Daily Milestones</h6>
-                            <small class="text-muted">Check off today's contributions</small>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="vstack gap-2">
-                    {% for plan in user_plans %}
-                    <form method="POST" action="{{ url_for('dashboards.user_complete_task', plan_id=plan.id, amount=plan.daily) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                        <label class="task-item d-flex align-items-center p-3 rounded-3 shadow-none transition-hover w-100" 
-                               style="cursor: pointer;" 
-                               onclick="this.closest('form').submit();">
-                            
-                            <div class="me-3">
-                                <div class="form-check m-0">
-                                    <input class="form-check-input rounded-circle p-2 shadow-none"
-                                        type="checkbox"
-                                        {% if plan.is_done or plan.percent >= 100 %}checked{% endif %}
-                                        style="cursor: pointer; width: 1.35rem; height: 1.35rem;">
-                                </div>
-                            </div>
-
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold small">{{ plan.name }}</h6>
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill fw-bold" style="font-size: 0.75rem;">
-                                        ${{ "{:,.2f}".format(plan.daily) }} / DAY
-                                    </span>
-                                </div>
-                                <div class="text-muted small mt-1">
-                                    <i class="bi bi-arrow-up-short text-success"></i>
-                                    {{ plan.percent }}% reached
-                                </div>
-                            </div>
-
-                            <div class="ms-2 text-muted opacity-25">
-                                <i class="bi bi-chevron-right"></i>
-                            </div>
-                        </label>
-                    </form>
-                    {% else %}
-                    <div class="text-center py-4 text-muted small">
-                        <i class="bi bi-list-check fs-3 d-block mb-2 opacity-50"></i>
-                        All caught up! No pending daily milestones.
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -224,100 +122,229 @@
     const totalIncome = Number({{ total_income | default(0) | tojson }}) || 0;
     const totalExpense = Number({{ total_expense | default(0) | tojson }}) || 0;
 
-    function drawCharts() {
-        const currentTheme = localStorage.getItem('theme') || document.documentElement.getAttribute('data-bs-theme') || 'light';
-        const isDark = currentTheme === 'dark';
-        
-        const labelColor = isDark ? '#94a3b8' : '#64748b';
-        const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-        
-        const sharedOptions = {
-            backgroundColor: 'transparent',
-            chartArea: { width: '85%', height: '75%' },
-            legend: { 
-                position: 'top', 
-                alignment: 'end',
-                textStyle: { color: labelColor, fontSize: 12, fontName: 'Inter' }
-            },
-            hAxis: { textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' } },
-            vAxis: { 
-                gridlines: { color: gridColor }, 
-                textStyle: { color: labelColor, fontSize: 11, fontName: 'Inter' },
-                format: '$#,##0'
+function drawCharts() {
+    const currentTheme =
+        localStorage.getItem('theme') ||
+        document.documentElement.getAttribute('data-bs-theme') ||
+        'light';
+
+    const isDark = currentTheme === 'dark';
+
+    const labelColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark
+        ? 'rgba(255,255,255,0.06)'
+        : 'rgba(0,0,0,0.06)';
+
+    const sharedOptions = {
+        backgroundColor: 'transparent',
+
+        chartArea: {
+            width: '82%',
+            height: '75%'
+        },
+
+        legend: {
+            position: 'top',
+            alignment: 'end',
+            textStyle: {
+                color: labelColor,
+                fontSize: 12,
+                fontName: 'Inter'
             }
+        },
+
+        hAxis: {
+            textStyle: {
+                color: labelColor,
+                fontSize: 11,
+                fontName: 'Inter'
+            }
+        }
+    };
+
+
+    // ============================================================
+    // 1. MAIN CASHFLOW CHART
+    // ============================================================
+
+    const mainChartEl = document.getElementById('chart_main');
+
+    if (monthlyData && monthlyData.length > 0 && mainChartEl) {
+
+        const dataMain = new google.visualization.DataTable();
+
+        dataMain.addColumn('string', 'Month');
+        dataMain.addColumn('number', 'Income');
+        dataMain.addColumn('number', 'Expenses');
+        dataMain.addColumn('number', 'Net Cash Flow');
+
+        const formattedData = monthlyData.map(row => [
+            String(row[0]),
+            Number(row[1]) || 0,
+            Number(row[2]) || 0,
+            Number(row[3]) || 0
+        ]);
+
+        dataMain.addRows(formattedData);
+
+
+        const comboOptions = {
+            ...sharedOptions,
+
+            seriesType: 'bars',
+
+            // Two different Y axes.
+            vAxes: {
+                // Left axis = Income / Expenses
+                0: {
+                    textStyle: {
+                        color: labelColor,
+                        fontSize: 11,
+                        fontName: 'Inter'
+                    },
+
+                    gridlines: {
+                        color: gridColor
+                    },
+
+                    format: '$#,##0'
+                },
+
+                // Right axis = Net Cash Flow
+                1: {
+                    textStyle: {
+                        color: '#3b82f6',
+                        fontSize: 11,
+                        fontName: 'Inter'
+                    },
+
+                    gridlines: {
+                        color: 'transparent'
+                    },
+
+                    format: '$#,##0'
+                }
+            },
+
+            // Map each series to an axis.
+            series: {
+                // Income
+                0: {
+                    type: 'bars',
+                    color: '#10b981',
+                    targetAxisIndex: 0
+                },
+
+                // Expenses
+                1: {
+                    type: 'bars',
+                    color: '#ef4444',
+                    targetAxisIndex: 0
+                },
+
+                // Net Cash Flow
+                2: {
+                    type: 'line',
+                    color: '#3b82f6',
+                    lineWidth: 3,
+                    pointSize: 6,
+                    targetAxisIndex: 1
+                }
+            },
+
+            // Gives the chart a little breathing room.
+            bar: {
+                groupWidth: '55%'
+            },
+
+            // Keep the line visually clean.
+            curveType: 'function',
+
+            // Makes negative values clearly visible.
+            interpolateNulls: true
         };
 
-        // 1. ComboChart (Main Dashboard Chart)
-        const mainChartEl = document.getElementById('chart_main');
-        if (monthlyData && monthlyData.length > 0 && mainChartEl) {
-            var dataMain = new google.visualization.DataTable();
-            dataMain.addColumn('string', 'Month');
-            dataMain.addColumn('number', 'Income');
-            dataMain.addColumn('number', 'Expenses');
-            dataMain.addColumn('number', 'Net Cash Flow');
 
-            const formattedData = monthlyData.map(row => [
-                String(row[0]),
-                Number(row[1]) || 0,
-                Number(row[2]) || 0,
-                Number(row[3]) || 0
-            ]);
+        new google.visualization.ComboChart(mainChartEl)
+            .draw(dataMain, comboOptions);
 
-            dataMain.addRows(formattedData);
+    } else if (mainChartEl) {
 
-            var comboOptions = {
-                ...sharedOptions,
-                seriesType: 'bars',
-                series: {
-                    0: { color: '#10b981' }, // Income (Green Bar)
-                    1: { color: '#ef4444' }, // Expenses (Red Bar)
-                    2: { 
-                        type: 'line', 
-                        color: '#3b82f6', 
-                        lineWidth: 3, 
-                        pointSize: 6,
-                        curveType: 'function' // Creates smooth, wavy curves between data points
-                    }
-                }
-            };
+        mainChartEl.innerHTML = `
+            <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
+                <i class="bi bi-bar-chart-line fs-1 mb-2 opacity-50 text-primary"></i>
+                <div class="fw-semibold small">
+                    No Monthly Data Available
+                </div>
+            </div>
+        `;
+    }
 
-            new google.visualization.ComboChart(mainChartEl).draw(dataMain, comboOptions);
-        } else if (mainChartEl) {
-            mainChartEl.innerHTML = `
+
+    // ============================================================
+    // 2. INCOME VS EXPENSE DONUT
+    // ============================================================
+
+    const sideChartEl = document.getElementById('chart_side');
+
+    if (sideChartEl) {
+
+        if (totalIncome === 0 && totalExpense === 0) {
+
+            sideChartEl.innerHTML = `
                 <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
-                    <i class="bi bi-bar-chart-line fs-1 mb-2 opacity-50 text-primary"></i>
-                    <div class="fw-semibold small">No Monthly Data Available</div>
+                    <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
+
+                    <div class="fw-semibold small">
+                        No Transaction Data
+                    </div>
+
+                    <small class="text-muted">
+                        Add income or expense to render ratio.
+                    </small>
                 </div>
             `;
+
+            return;
         }
 
-        // 2. Donut Pie Chart (Side Dashboard Chart)
-        const sideChartEl = document.getElementById('chart_side');
-        if (sideChartEl) {
-            if (totalIncome === 0 && totalExpense === 0) {
-                sideChartEl.innerHTML = `
-                    <div class="d-flex flex-column justify-content-center align-items-center h-100 text-body-secondary py-5">
-                        <i class="bi bi-pie-chart fs-1 mb-2 opacity-50 text-primary"></i>
-                        <div class="fw-semibold small">No Transaction Data</div>
-                        <small class="text-muted">Add income or expense to render ratio.</small>
-                    </div>
-                `;
-                return;
-            }
 
-            var dataSide = google.visualization.arrayToDataTable([
-                ['Type', 'Amount'], 
-                ['Expense', totalExpense], 
-                ['Income', totalIncome]
-            ]);
+        const dataSide = google.visualization.arrayToDataTable([
+            ['Type', 'Amount'],
+            ['Expense', totalExpense],
+            ['Income', totalIncome]
+        ]);
 
-            new google.visualization.PieChart(sideChartEl).draw(dataSide, { 
-                ...sharedOptions, 
-                pieHole: 0.65, 
-                colors: ['#ef4444', '#10b981'] 
+
+        new google.visualization.PieChart(sideChartEl)
+            .draw(dataSide, {
+                ...sharedOptions,
+
+                pieHole: 0.65,
+
+                colors: [
+                    '#ef4444',
+                    '#10b981'
+                ],
+
+                legend: {
+                    position: 'bottom',
+                    alignment: 'center',
+                    textStyle: {
+                        color: labelColor,
+                        fontSize: 12,
+                        fontName: 'Inter'
+                    }
+                },
+
+                chartArea: {
+                    width: '90%',
+                    height: '75%'
+                }
             });
-        }
     }
+}
+
 
     window.addEventListener('resize', drawCharts);
 </script>

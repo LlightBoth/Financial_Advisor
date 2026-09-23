@@ -1,8 +1,9 @@
+from datetime import date, timedelta
 from app.models.plan import Plan
 from app.models.rule import Rule
 from extension import db
 from sqlalchemy import func
-
+import math
 
 class PlanServices:
     @staticmethod
@@ -14,25 +15,30 @@ class PlanServices:
         return Plan.query.filter(Plan.users.any(id=current_user.id)).all()
     
     @staticmethod
-    def get_filter_plan(current_user, status_value=None, sort_value=None):
+    def get_filter_plan(current_user, status_value=None, sort_value=None, saving_type=None):
         query = Plan.query.filter(Plan.users.any(id=current_user.id))
-        
-        # Filter by status if provided (and ignore 'general' if it means "all")
-        if status_value and status_value != "general":
-            # Convert string parameter to boolean if plan.value is a Boolean field
-            is_complete = True if status_value == "complete" else False
-            query = query.filter(Plan.value == is_complete)
 
-        # Filter by day/price if provided
+        # Filter by status
+        if status_value and status_value != "general":
+            if status_value == "complete":
+                query = query.filter(Plan.value.is_(True))
+            elif status_value == "incomplete":
+                query = query.filter(Plan.value.is_(False))
+
+        # Filter by saving type
+        if saving_type and saving_type != "general":
+            query = query.filter(Plan.saving_type == saving_type)
+
+        # Sort
         if sort_value == "price":
             query = query.order_by(Plan.goal_cost.desc())
         elif sort_value == "day":
             query = query.order_by(Plan.created_at.desc())
         else:
-            # Default sort by date ascending ('day')
             query = query.order_by(Plan.created_at.asc())
-            
+
         return query.all()
+
     
     @staticmethod
     def get_user_all_plan_count(current_user):
@@ -49,37 +55,75 @@ class PlanServices:
         if user_id is not None:
             query = query.filter(Plan.users.any(id=user_id))
         return query.first()
+
+
+    @staticmethod
+    def add_saving(plan: Plan, amount: float):
+        if amount <= 0:
+            raise ValueError("Saving amount must be greater than zero.")
+
+        current_saved = float(plan.saving or 0)
+        goal_cost = float(plan.goal_cost or 0)
+
+        plan.saving = current_saved + amount
+
+        if plan.saving >= goal_cost:
+            plan.saving = goal_cost
+            plan.value = True
+
+        db.session.commit()
+        return plan
     
+    
+    @staticmethod
+    def calculate_target_date(goal_cost, saving_amount, saving_type):
+        if goal_cost <= 0:
+            raise ValueError("Goal cost must be greater than zero.")
+
+        if saving_amount <= 0:
+            raise ValueError("Saving amount must be greater than zero.")
+
+        if saving_type == "daily":
+            days = math.ceil(goal_cost / saving_amount)
+        elif saving_type in ("monthly", "manual"):
+            months = goal_cost / saving_amount
+            days = math.ceil(months * 30.4375)
+        else:
+            raise ValueError("Invalid saving type.")
+
+        return date.today() + timedelta(days=days)
+
+
     @staticmethod
     def create_plan(data: dict, user):
         try:
+            target_date = PlanServices.calculate_target_date(
+                goal_cost=data["goal_cost"],
+                saving_amount=data.get("saving_amount", 0),
+                saving_type=data["saving_type"]
+            )
+
             plan = Plan(
-                # Step 1
                 goal=data["goal"],
                 goal_cost=data["goal_cost"],
-                in_between=data["in_between"],
+                in_between=target_date,
                 description=data.get("description", ""),
                 value=data.get("value", False),
-
-                # Financial information
-                income=data.get("income"),
-                expense=data.get("expense"),
-                debt_amount=data.get("debt_amount"),
+                income=data.get("income", 0),
+                expense=data.get("expense", 0),
+                debt_amount=data.get("debt_amount", 0),
                 has_budget=data.get("has_budget", False),
-
-
-                # Step 2
-                martial_status=data.get("martial_status", "Single"),
+                saving_amount=data.get("saving_amount", 0),
+                saving_type=data["saving_type"],
+                marital_status=data.get("marital_status", "single"),
                 employment_status=data.get("employment_status"),
                 debt_status=data.get("debt_status"),
                 spending_habit=data.get("spending_habit"),
             )
 
             plan.users.append(user)
-
             db.session.add(plan)
             db.session.commit()
-
             return plan
 
         except Exception:
@@ -90,70 +134,44 @@ class PlanServices:
     @staticmethod
     def update_plan(plan: Plan, data: dict):
         try:
-            # Step 1
+            target_date = PlanServices.calculate_target_date(
+                goal_cost=data["goal_cost"],
+                saving_amount=data.get("saving_amount", 0),
+                saving_type=data["saving_type"]
+            )
+
+            # =========================
+            # Goal
+            # =========================
             plan.goal = data["goal"]
             plan.goal_cost = data["goal_cost"]
-            plan.in_between = data["in_between"]
-
-            plan.description = data.get(
-                "description",
-                plan.description
-            )
-
-            plan.value = data.get(
-                "value",
-                plan.value
-            )
-
+            plan.in_between = target_date
+            plan.description = data.get("description", plan.description)
+            plan.value = data.get("value", plan.value)
+            # =========================
             # Financial information
-            plan.income = data.get(
-                "income",
-                plan.income
-            )
+            # =========================
+            plan.income = data.get("income", plan.income)
+            plan.expense = data.get("expense", plan.expense)
+            plan.debt_amount = data.get("debt_amount", plan.debt_amount)
+            plan.saving_amount = data.get("saving_amount", plan.saving_amount)
+            plan.saving_type = data["saving_type"]
+            plan.has_budget = data.get("has_budget", plan.has_budget)
 
-            plan.expense = data.get(
-                "expense",
-                plan.expense
-            )
-            plan.debt_amount = data.get(
-                "debt_amount",
-                plan.debt_amount
-            )
-            plan.has_budget = data.get(
-                "has_budget",
-                plan.has_budget
-            )
-
-            # Step 2
-            plan.martial_status = data.get(
-                "martial_status",
-                plan.martial_status
-            )
-
-            plan.employment_status = data.get(
-                "employment_status",
-                plan.employment_status
-            )
-
-            plan.debt_status = data.get(
-                "debt_status",
-                plan.debt_status
-            )
-
-            plan.spending_habit = data.get(
-                "spending_habit",
-                plan.spending_habit
-            )
+            # =========================
+            # Personal information
+            # =========================
+            plan.marital_status = data.get("marital_status", plan.marital_status)
+            plan.employment_status = data.get("employment_status", plan.employment_status)
+            plan.debt_status = data.get("debt_status", plan.debt_status)
+            plan.spending_habit = data.get("spending_habit", plan.spending_habit)
 
             db.session.commit()
-
             return plan
 
         except Exception:
             db.session.rollback()
             raise
-
-
     @staticmethod
     def delete_plan(plan: Plan):
         try:
@@ -164,6 +182,8 @@ class PlanServices:
             db.session.rollback()
             raise
 
+
+    
 
 class PlanAnalysisService:
 
@@ -199,19 +219,10 @@ class PlanAnalysisService:
             if income > 0
             else 0
         )
+        high_spending = (income > 0 and spending_ratio >= 0.80)
+        low_spending = (income > 0 and spending_ratio <= 0.50)
 
-        high_spending = (
-            income > 0 and spending_ratio >= 0.80
-        )
-
-        low_spending = (
-            income > 0 and spending_ratio <= 0.50
-        )
-
-        # -----------------------------------------
         # Employment
-        # -----------------------------------------
-
         employment_status = str(
             getattr(plan, "employment_status", "") or ""
         ).strip().lower()
@@ -221,11 +232,7 @@ class PlanAnalysisService:
             "self-employed",
             "self_employed",
         }
-
-        # -----------------------------------------
         # Debt
-        # -----------------------------------------
-
         debt_status = str(
             getattr(plan, "debt_status", "") or ""
         ).strip().lower()
@@ -237,37 +244,19 @@ class PlanAnalysisService:
             "no debt",
             "no_debt",
         }
-
-        debt_amount = float(
-            getattr(plan, "debt_amount", 0) or 0
-        )
-
-        # -----------------------------------------
+        debt_amount = float(getattr(plan, "debt_amount", 0) or 0)
         # Savings
-        # -----------------------------------------
-
         savings_amount = float(
             getattr(plan, "saving", 0) or 0
         )
-
         has_savings = savings_amount > 0
 
-        # -----------------------------------------
         # Financial Goal
-        # -----------------------------------------
-
         has_financial_goal = bool(
             getattr(plan, "goal", None)
             and plan.goal.strip()
         )
-
-        # -----------------------------------------
-        # Budget
-        # -----------------------------------------
-
-        has_budget = bool(
-            getattr(plan, "has_budget", False)
-        )
+        has_budget = bool(getattr(plan, "has_budget", False))
 
         return {
             "has_income": has_income,
@@ -290,73 +279,52 @@ class PlanAnalysisService:
             "has_budget": has_budget,
         }
 
-    # =====================================================
     # CONDITION EVALUATION
-    # =====================================================
-
     @staticmethod
-    def evaluate_condition(condition, fact_values):
-        """
-        Evaluate one RuleCondition.
+    def evaluate_condition(condition, facts):
+        left_value = facts.get(condition.fact)
 
-        Supports:
-
-            fact OPERATOR literal
-
-        Example:
-            has_debt == True
-
-        And:
-
-            fact OPERATOR another_fact
-
-        Example:
-            monthly_income > monthly_expense
-        """
-
-        left_value = fact_values.get(condition.fact)
-
-        # -----------------------------------------
-        # Determine right-hand value
-        # -----------------------------------------
-
+        # Get the expected/right-hand value
         if condition.value_fact:
-            right_value = fact_values.get(
-                condition.value_fact
-            )
+            right_value = facts.get(condition.value_fact)
         else:
             right_value = condition.value
 
-        operator = condition.operator
+        # Missing fact/value means this condition does not match.
+        if left_value is None or right_value is None:
+            return False
 
-        # -----------------------------------------
-        # Operators
-        # -----------------------------------------
+        try:
+            if condition.operator in ("greater_than", ">"):
+                return left_value > right_value
 
-        if operator == "equals":
-            return left_value == right_value
+            if condition.operator in ("greater_than_or_equal", ">="):
+                return left_value >= right_value
 
-        if operator == "not_equals":
-            return left_value != right_value
+            if condition.operator in ("less_than", "<"):
+                return left_value < right_value
 
-        if operator == "greater_than":
-            return left_value > right_value
+            if condition.operator in ("less_than_or_equal", "<="):
+                return left_value <= right_value
 
-        if operator == "less_than":
-            return left_value < right_value
+            if condition.operator in ("equal", "equals", "=="):
+                return left_value == right_value
 
-        if operator == "greater_than_or_equal":
-            return left_value >= right_value
+            if condition.operator in ("not_equal", "!="):
+                return left_value != right_value
 
-        if operator == "less_than_or_equal":
-            return left_value <= right_value
+            if condition.operator == "contains":
+                return right_value in left_value
 
-        # Unknown operator
+            if condition.operator == "in":
+                return left_value in right_value
+
+        except (TypeError, ValueError):
+            return False
+
         return False
 
-    # =====================================================
     # RULE EVALUATION
-    # =====================================================
 
     @staticmethod
     def rule_matches(rule, fact_values):
@@ -376,10 +344,7 @@ class PlanAnalysisService:
             for condition in rule.conditions
         )
 
-    # =====================================================
     # ANALYZE PLAN
-    # =====================================================
-
     @staticmethod
     def analyze_plan(plan):
         """
