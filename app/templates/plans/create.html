@@ -225,31 +225,14 @@ function showStep3(){step1.classList.remove("active");step2.classList.remove("ac
 function scrollTop(){window.scrollTo({top:0,behavior:"smooth"});}
 
 function validateStep1(){
-if(!savingType.value){savingType.focus();alert("Please select a saving method (Daily, Monthly, or Flexible).");return false;}
-if(!goal.value.trim()){goal.focus();alert("Please enter a financial goal.");return false;}
+if(!savingType.value){savingType.focus();return false;}
+if(!goal.value.trim()){goal.focus();return false;}
 const goalAmount=parseFloat(goalCost.value);
-if(!Number.isFinite(goalAmount)||goalAmount<=0){goalCost.focus();alert("Please enter a valid goal cost greater than 0.");return false;}
-const incomeAmount=parseFloat(income.value);
-if(!Number.isFinite(incomeAmount)||incomeAmount<0){income.focus();alert("Please enter a valid monthly income.");return false;}
-const expenseAmount=parseFloat(expense.value);
-if(!Number.isFinite(expenseAmount)||expenseAmount<0){expense.focus();alert("Expenses cannot be negative.");return false;}
-const savingAmount=parseFloat(saving.value);
-if(!Number.isFinite(savingAmount)||savingAmount<=0){saving.focus();alert("Please enter a saving amount greater than zero.");return false;}
+if(!Number.isFinite(goalAmount)||goalAmount<=0){goalCost.focus();return false;}
 return true;
 }
 
 function validateStep2(){
-const maritalStatus=document.querySelector('input[name="marital_status"]:checked');
-const employmentStatus=document.querySelector('input[name="employment_status"]:checked');
-const debtStatus=document.querySelector('input[name="debt_status"]:checked');
-const spendingHabit=document.querySelector('input[name="spending_habit"]:checked');
-const step2Error=document.getElementById("step2-error");
-
-if(!maritalStatus||!employmentStatus||!debtStatus||!spendingHabit){
-    if(step2Error)step2Error.classList.remove("d-none");
-    return false;
-}
-if(step2Error)step2Error.classList.add("d-none");
 return true;
 }
 
@@ -550,64 +533,65 @@ function calculateTargetDate(){
 clearCalculationWarning();
 
 const goalAmount=parseFloat(goalCost.value);
-const monthlyIncome=parseFloat(income.value);
-const monthlyExpense=parseFloat(expense.value);
-const savingAmount=parseFloat(saving.value);
+const monthlyIncome=parseFloat(income.value) || 0;
+const monthlyExpense=parseFloat(expense.value) || 0;
+const savingAmount=parseFloat(saving.value) || 0;
 
 if(!Number.isFinite(goalAmount)||goalAmount<=0){showCalculationWarning("Please enter a valid goal cost.");return null;}
-if(!Number.isFinite(monthlyIncome)||monthlyIncome<0){showCalculationWarning("Please enter a valid monthly income.");return null;}
-if(!Number.isFinite(monthlyExpense)||monthlyExpense<0){showCalculationWarning("Expenses cannot be negative.");return null;}
-if(!Number.isFinite(savingAmount)||savingAmount<=0){showCalculationWarning("Please enter a saving amount greater than zero.");return null;}
-if(!["daily","monthly","manual"].includes(savingType.value)){showCalculationWarning("Please select a valid saving method.");return null;}
 
-const availableMonthly=monthlyIncome-monthlyExpense;
-
-if(availableMonthly<=0){showCalculationWarning("Your expenses are equal to or greater than your income.");return null;}
-
-if((savingType.value==="monthly"||savingType.value==="manual")&&savingAmount>availableMonthly){showCalculationWarning("Your monthly saving cannot be greater than the amount available after expenses.");return null;}
-
-if(savingType.value==="daily"&&savingAmount*30.4375>availableMonthly){showCalculationWarning("Your daily saving amount is greater than the amount available after expenses.");return null;}
+if(!Number.isFinite(savingAmount)||savingAmount<=0){
+    const days=365;
+    const targetDate=new Date();
+    targetDate.setHours(0,0,0,0);
+    targetDate.setDate(targetDate.getDate()+days);
+    return{targetDate,days,isFlexible:true};
+}
 
 const days=savingType.value==="daily"?Math.ceil(goalAmount/savingAmount):Math.ceil((goalAmount/savingAmount)*30.4375);
 
-if(!Number.isFinite(days)||days<=0){showCalculationWarning("Unable to calculate a valid target date.");return null;}
-
 const targetDate=new Date();
 targetDate.setHours(0,0,0,0);
-targetDate.setDate(targetDate.getDate()+days);
+targetDate.setDate(targetDate.getDate()+(Number.isFinite(days)&&days>0?days:365));
 
-return{targetDate,days};
+return{targetDate,days:days||365,isFlexible:false};
 }
 
 function updateConfirmation(){
 const result=calculateTargetDate();
 const goalCostValue=parseFloat(goalCost.value);
-const incomeValue=parseFloat(income.value);
-const expenseValue=parseFloat(expense.value);
-const savingValue=parseFloat(saving.value);
+const incomeValue=parseFloat(income.value) || 0;
+const expenseValue=parseFloat(expense.value) || 0;
+const savingValue=parseFloat(saving.value) || 0;
 
 confirmGoal.textContent=goal.value.trim()||"—";
 confirmGoalCost.textContent=Number.isFinite(goalCostValue)?"$"+formatMoney(goalCostValue):"—";
-confirmIncome.textContent=Number.isFinite(incomeValue)?"$"+formatMoney(incomeValue):"—";
-confirmExpense.textContent=Number.isFinite(expenseValue)?"$"+formatMoney(expenseValue):"—";
+confirmIncome.textContent="$"+formatMoney(incomeValue);
+confirmExpense.textContent="$"+formatMoney(expenseValue);
 
 const savingTypeLabels={daily:"Daily Saving",monthly:"Monthly Saving",manual:"Flexible Saving"};
 confirmSavingType.textContent=savingTypeLabels[savingType.value]||"—";
 
-if(Number.isFinite(savingValue)){const savingLabel=savingType.value==="daily"?" / day":" / month";confirmSaving.textContent="$"+formatMoney(savingValue)+savingLabel;}else{confirmSaving.textContent="—";}
+if(savingValue > 0){
+    const savingLabel=savingType.value==="daily"?" / day":" / month";
+    confirmSaving.textContent="$"+formatMoney(savingValue)+savingLabel;
+}else{
+    confirmSaving.textContent="$0.00 (Self-paced)";
+}
 
-if(!result){confirmTargetDate.textContent="Unable to calculate";confirmDuration.textContent="Please review your financial information.";return false;}
+if(!result){confirmTargetDate.textContent="Open-ended";confirmDuration.textContent="Self-paced plan";return true;}
 
-confirmTargetDate.textContent=formatDate(result.targetDate);
-confirmDuration.textContent=savingType.value==="daily"?result.days+" days of daily saving":Math.ceil(result.days/30.4375)+" months of saving";
+if(result.isFlexible){
+    confirmTargetDate.textContent="Open-ended (Self-paced)";
+    confirmDuration.textContent="Contribute as you go";
+}else{
+    confirmTargetDate.textContent=formatDate(result.targetDate);
+    confirmDuration.textContent=savingType.value==="daily"?result.days+" days of daily saving":Math.ceil(result.days/30.4375)+" months of saving";
+}
 
 return true;
 }
 
 reviewButton.addEventListener("click",function(){
-if(!validateStep2()){
-    return;
-}
 updateConfirmation();
 showStep3();
 scrollTop();
@@ -615,7 +599,6 @@ scrollTop();
 
 form.addEventListener("submit",function(event){
 if(!savingType.value){event.preventDefault();showStep1();savingType.focus();alert("Please select a saving type.");return;}
-if(!calculateTargetDate()){event.preventDefault();showStep3();return;}
 });
 });
 </script>

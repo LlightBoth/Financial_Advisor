@@ -90,11 +90,11 @@ class PlanServices:
     
     @staticmethod
     def calculate_target_date(goal_cost, saving_amount, saving_type):
-        if goal_cost <= 0:
-            raise ValueError("Goal cost must be greater than zero.")
+        if not goal_cost or goal_cost <= 0:
+            return date.today() + timedelta(days=365)
 
-        if saving_amount <= 0:
-            raise ValueError("Saving amount must be greater than zero.")
+        if not saving_amount or saving_amount <= 0:
+            return date.today() + timedelta(days=365)
 
         if saving_type == "daily":
             days = math.ceil(goal_cost / saving_amount)
@@ -102,7 +102,7 @@ class PlanServices:
             months = goal_cost / saving_amount
             days = math.ceil(months * 30.4375)
         else:
-            raise ValueError("Invalid saving type.")
+            days = 365
 
         return date.today() + timedelta(days=days)
 
