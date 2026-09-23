@@ -86,6 +86,11 @@
                 </a>
             </li>
             <li class="nav-item mb-1">
+                <a href="{{ url_for('currencies.converter') }}" class="nav-link {% if 'currencies' in request.endpoint %}active{% endif %}">
+                    <i class="bi bi-currency-exchange me-2"></i> <span>{{ _('nav.currency') }}</span>
+                </a>
+            </li>
+            <li class="nav-item mb-1">
                 <a href="{{ url_for('advisors.index') }}" class="nav-link {% if 'advisors' in request.endpoint %}active{% endif %}">
                     <i class="bi bi-cpu me-2"></i> <span>{{ _('nav.advisor') }}</span>
                 </a>

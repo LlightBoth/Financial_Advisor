@@ -6,6 +6,7 @@
   "nav.expenses": "ចំណាយ",
   "nav.plans": "ផែនការ",
   "nav.my_plans": "ផែនការរបស់ខ្ញុំ",
+  "nav.currency": "ប្តូរប្រាក់",
   "nav.analysis": "ការវិភាគ",
   "nav.analyse": "វិភាគ",
   "nav.advisor": "ទីប្រឹក្សា AI",
@@ -538,6 +539,7 @@
   "advisor.rule_eval_audit_title": "វិធានមូលដ្ឋានចំណេះដឹងដែលត្រូវបានវាយតម្លៃ",
   "advisor.ratio_zero_income_notice": "មិនមានទេ ព្រោះចំណូលប្រចាំខែស្មើនឹងសូន្យ។",
   "advisor.evaluating_notice": "កំពុងវាយតម្លៃទម្រង់តាមវិធានទីប្រឹក្សាហិរញ្ញវត្ថុ...",
+  "advisor.caveats_title": "ការបញ្ជាក់ និងការសន្មត់នៃការប្រឹក្សា",
 
   "history.page_title": "ប្រវត្តិវិភាគ — ទីប្រឹក្សាហិរញ្ញវត្ថុ",
   "history.index_title": "ប័ណ្ណសារប្រវត្តិវិភាគ",

@@ -6,6 +6,7 @@
   "nav.expenses": "Expenses",
   "nav.plans": "Plans",
   "nav.my_plans": "My Plans",
+  "nav.currency": "Currency",
   "nav.analysis": "Analysis",
   "nav.analyse": "Analyse",
   "nav.advisor": "AI Advisor",
@@ -538,6 +539,7 @@
   "advisor.rule_eval_audit_title": "Canonical Knowledge Base Rules Evaluated",
   "advisor.ratio_zero_income_notice": "Not available because monthly income is zero.",
   "advisor.evaluating_notice": "Evaluating profile through deterministic consultant rules...",
+  "advisor.caveats_title": "Advisory Disclosures & Assumptions",
 
   "history.page_title": "Inference History — Financial Advisor",
   "history.index_title": "Inference History Archive",

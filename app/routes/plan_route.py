@@ -76,10 +76,12 @@ def create():
 
                 "in_between": form.in_between.data,
             }
-            plan = PlanServices.create_plan(data, current_user)
-
-            flash(f"Plan '{plan.goal}' created successfully!", "success")
-            return redirect(url_for("plans.index"))
+            try:
+                plan = PlanServices.create_plan(data, current_user)
+                flash(f"Plan '{plan.goal}' created successfully!", "success")
+                return redirect(url_for("plans.index"))
+            except Exception as e:
+                flash(f"Error creating plan: {str(e)}", "danger")
 
     return render_template(
         "plans/create.html",
@@ -116,11 +118,14 @@ def edit(plan_id):
             "spending_habit": form.spending_habit.data,
             "is_active": form.is_active.data,
         }
-        # Update plan
-        PlanServices.update_plan(plan, data)
+        try:
+            # Update plan
+            PlanServices.update_plan(plan, data)
 
-        flash(f"Plan '{plan.goal}' updated successfully!","success")
-        return redirect(url_for("plans.index"))
+            flash(f"Plan '{plan.goal}' updated successfully!","success")
+            return redirect(url_for("plans.index"))
+        except Exception as e:
+            flash(f"Error updating plan: {str(e)}", "danger")
 
     return render_template(
         "plans/edit.html",
