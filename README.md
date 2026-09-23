@@ -19,16 +19,32 @@ cd Financial_Advisor
 ```
 
 ### 3. Create & Activate Virtual Environment
-* **On Windows (Command Prompt / PowerShell):**
-  ```cmd
-  python -m venv .venv
-  .venv\Scripts\activate
-  ```
-* **On Windows (Git Bash) or macOS/Linux:**
-  ```bash
-  python -m venv .venv
-  source .venv/Scripts/activate
-  ```
+
+1. **Create the environment**:
+   ```bash
+   python -m venv .venv
+   ```
+
+2. **Activate the environment**:
+   * **Windows (Git Bash):**
+     ```bash
+     source .venv/Scripts/activate
+     ```
+   * **Windows (PowerShell):**
+     ```powershell
+     # If script execution is blocked on your system, allow it for this session:
+     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+     .\.venv\Scripts\Activate.ps1
+     ```
+   * **Windows (Command Prompt):**
+     ```cmd
+     .venv\Scripts\activate
+     ```
+   * **macOS / Linux:**
+     ```bash
+     source .venv/bin/activate
+     ```
+   > *(You should see `(.venv)` appear at the beginning of your terminal prompt when activated).*
 
 ### 4. Install Dependencies
 ```bash
