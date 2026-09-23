@@ -15,3 +15,6 @@ google-auth-oauthlib
 redis
 python-dotenv
 requests
+
+# Google login & oauth
+google-auth

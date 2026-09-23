@@ -18,7 +18,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
+    # ⬇️ ADD THIS FIELD FOR GOOGLE AUTH:    
     google_id = db.Column(db.String(100), unique=True, nullable=True)
+    
     refresh_token = db.Column(db.Text, unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

@@ -47,6 +47,7 @@
             <a href="#features" class="nav-menu-link">{{ _("landing.nav_features") }}</a>
             <a href="#advisory" class="nav-menu-link">{{ _("landing.nav_advisory") }}</a>
             <a href="#security" class="nav-menu-link">{{ _("landing.nav_security") }}</a>
+            <a href="{{ url_for('about') }}" class="nav-menu-link">About & FAQ</a>
         </div>
 
         <div class="nav-actions">
@@ -114,6 +115,9 @@
             </a>
             <a href="#security" class="mobile-drawer-link">
                 <i class="bi bi-shield-check text-success"></i> {{ _("landing.drawer_security") }}
+            </a>
+            <a href="{{ url_for('about') }}" class="mobile-drawer-link">
+                <i class="bi bi-patch-question-fill text-primary"></i> About & FAQ
             </a>
         </div>
 
@@ -367,10 +371,17 @@
                 <div>
                     <div class="footer-col-title">{{ _("landing.footer_col_company") }}</div>
                     <ul class="footer-links">
+<<<<<<< HEAD
                         <li><a href="#overview">{{ _("landing.footer_about") }}</a></li>
                         <li><a href="mailto:support@financialadvisor.ai">{{ _("landing.footer_contact") }}</a></li>
                         <li><a href="#advisory">{{ _("landing.footer_blog") }} <i class="bi bi-arrow-up-right small ms-1" style="font-size: 0.75rem;"></i></a></li>
                         <li><a href="#overview">{{ _("landing.footer_careers") }} <span class="careers-pill">{{ _("landing.footer_hiring") }}</span></a></li>
+=======
+                        <li><a href="{{ url_for('about') }}#purpose">About</a></li>
+                        <li><a href="{{ url_for('about') }}#faq">FAQ</a></li>
+                        <li><a href="{{ url_for('about') }}#team">Our Team</a></li>
+                        <li><a href="mailto:support@financialadvisor.ai">Contact</a></li>
+>>>>>>> origin/main
                     </ul>
                 </div>
 
