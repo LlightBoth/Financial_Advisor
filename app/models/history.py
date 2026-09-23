@@ -19,6 +19,7 @@ class History(db.Model):
     get_advice = db.Column(db.Text, nullable=True)
     get_conclusion = db.Column(db.Text, nullable=True)
     get_certainty = db.Column(db.Float, default=0.0)
+    kb_version = db.Column(db.String(50), nullable=True)  # e.g., "financial-kb-v1.0"
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships

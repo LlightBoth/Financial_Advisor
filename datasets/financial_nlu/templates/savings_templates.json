@@ -1,0 +1,135 @@
+[
+  {
+    "template_id": "T_SAVINGS_001",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "I earn {monthly_income} per month and spend {monthly_expense}. I want to save up {goal_cost} for a new motorcycle.",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH6_GOALS",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_SAVINGS_002",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "My monthly income is {monthly_income} and I spend about {monthly_expense}. Can I realistically save {goal_cost} for a house deposit?",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH6_GOALS",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_SAVINGS_003",
+    "template_family": "TF_SAVINGS",
+    "intent": "savings_question",
+    "text_pattern": "I make {monthly_income} a month and my expenses are {monthly_expense}. How long will it take me to save {goal_cost}?",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "CFA_LM2_TVM",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_SAVINGS_004",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "I bring in {monthly_income} monthly and spend {monthly_expense}. My goal is to put together {goal_cost} for my wedding.",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_SAVINGS_005",
+    "template_family": "TF_SAVINGS",
+    "intent": "savings_question",
+    "text_pattern": "With a monthly salary of {monthly_income} and costs of {monthly_expense}, is it possible for me to build an emergency fund of {goal_cost}?",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH15_BUFFER",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_SAVINGS_006",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "I take home {monthly_income} each month, spend {monthly_expense}, and I need to reach {goal_cost} for a laptop purchase.",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_SAVINGS_007",
+    "template_family": "TF_SAVINGS",
+    "intent": "savings_question",
+    "text_pattern": "I earn {monthly_income} per month with expenses of {monthly_expense}. I want to set aside {goal_cost} for future education costs.",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "CFA_LM2_TVM",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "marital_status": null
+    }
+  }
+]

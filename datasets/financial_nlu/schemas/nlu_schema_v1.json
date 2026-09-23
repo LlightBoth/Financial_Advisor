@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "financial-nlu-schema-v1",
+  "title": "Financial Advisor NLU Dataset Record Schema",
+  "description": "Authoritative machine-readable contract for every record in the Financial Advisor NLU training dataset. Enforces the canonical slot taxonomy, intent taxonomy, null-safety invariants, and enum constraints established in Step 8A/8B. Language scope: English only (Phase 1).",
+  "type": "object",
+  "required": [
+    "example_id",
+    "template_id",
+    "template_family",
+    "language",
+    "split",
+    "input_text",
+    "intent",
+    "slots",
+    "expected_rule_id",
+    "validation_status",
+    "source_type",
+    "concept_source",
+    "metadata"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "example_id": {
+      "type": "string",
+      "description": "Globally unique identifier for this dataset example. Format: EN_<FAMILY>_<NNNN>.",
+      "pattern": "^[A-Z0-9_]+$"
+    },
+    "template_id": {
+      "type": "string",
+      "description": "Identifier of the controlled template that generated this example. All examples sharing the same template_id must reside in the same train/val/test split to prevent data leakage.",
+      "pattern": "^T_[A-Z0-9_]+$"
+    },
+    "template_family": {
+      "type": "string",
+      "description": "The template family category (one of the 8 canonical families).",
+      "enum": [
+        "TF_BUDGET",
+        "TF_CASHFLOW",
+        "TF_DEBT",
+        "TF_SAVINGS",
+        "TF_EMPLOYMENT",
+        "TF_HOUSEHOLD",
+        "TF_MISSING_INFO",
+        "TF_OUT_OF_SCOPE"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "description": "Language of the input text. Phase 1 is English only.",
+      "enum": ["en"]
+    },
+    "split": {
+      "type": "string",
+      "description": "Dataset partition. Must be assigned at the template_id level, not the example level.",
+      "enum": ["train", "val", "test", "unassigned"]
+    },
+    "input_text": {
+      "type": "string",
+      "description": "The raw natural-language English utterance from the user.",
+      "minLength": 1
+    },
+    "intent": {
+      "type": "string",
+      "description": "The canonical intent classification label for this utterance.",
+      "enum": [
+        "financial_consultation",
+        "budget_analysis",
+        "cashflow_question",
+        "savings_question",
+        "debt_management",
+        "financial_goal",
+        "financial_education",
+        "out_of_scope_investment",
+        "out_of_scope_loan"
+      ]
+    },
+    "slots": {
+      "type": "object",
+      "description": "Canonical slot dictionary. All 7 keys MUST be present. Missing information MUST be null, never omitted.",
+      "required": [
+        "monthly_income",
+        "monthly_expense",
+        "employment_status",
+        "debt_status",
+        "spending_habit",
+        "goal_cost",
+        "marital_status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "monthly_income": {
+          "description": "Monthly income in USD as a non-negative number, or null if not stated. Unknown != 0.",
+          "oneOf": [
+            { "type": "number", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "monthly_expense": {
+          "description": "Monthly expense in USD as a non-negative number, or null if not stated. Unknown != 0.",
+          "oneOf": [
+            { "type": "number", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "employment_status": {
+          "description": "Employment status. Must match ConsultantValidator canonical values.",
+          "oneOf": [
+            { "type": "string", "enum": ["employed", "not employed"] },
+            { "type": "null" }
+          ]
+        },
+        "debt_status": {
+          "description": "Debt status. Must match ConsultantValidator canonical values.",
+          "oneOf": [
+            { "type": "string", "enum": ["debt", "no debt"] },
+            { "type": "null" }
+          ]
+        },
+        "spending_habit": {
+          "description": "Spending habit tier. Must match ConsultantValidator canonical values.",
+          "oneOf": [
+            { "type": "string", "enum": ["average spend", "big spend"] },
+            { "type": "null" }
+          ]
+        },
+        "goal_cost": {
+          "description": "Financial goal cost in USD as a non-negative number, or null if not stated.",
+          "oneOf": [
+            { "type": "number", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "marital_status": {
+          "description": "Marital status. Must match ConsultantValidator canonical values (capitalized).",
+          "oneOf": [
+            { "type": "string", "enum": ["Single", "Married"] },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "slot_spans": {
+      "description": "Character-level span annotations for slots that have explicit textual evidence. Python-style: start=inclusive, end=exclusive. Not required for null slots.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slot", "start", "end", "value", "raw_text"],
+        "additionalProperties": false,
+        "properties": {
+          "slot": {
+            "type": "string",
+            "enum": [
+              "monthly_income",
+              "monthly_expense",
+              "employment_status",
+              "debt_status",
+              "spending_habit",
+              "goal_cost",
+              "marital_status"
+            ]
+          },
+          "start": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Inclusive start character offset in input_text."
+          },
+          "end": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Exclusive end character offset in input_text."
+          },
+          "value": {
+            "description": "The canonically extracted value for this span.",
+            "oneOf": [
+              { "type": "number" },
+              { "type": "string" },
+              { "type": "null" }
+            ]
+          },
+          "raw_text": {
+            "type": "string",
+            "description": "The exact substring of input_text[start:end]."
+          }
+        }
+      }
+    },
+    "expected_rule_id": {
+      "description": "The canonical rule ID that ConsultantEngine would select given these slots, or null if slots are insufficient or intent is out-of-scope. Must be computed by the engine, never manually invented.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "DEFICIT_WITH_DEBT",
+            "DEFICIT_NO_DEBT",
+            "INCOME_ZERO_UNEMPLOYED",
+            "BREAK_EVEN_ZERO_MARGIN",
+            "TIGHT_MARGIN_HIGH_EXPENSE",
+            "SURPLUS_WITH_DEBT_SERVICING",
+            "BALANCED_BUDGET_BUFFER_BUILDING",
+            "FLEXIBLE_BUDGET_CAPITAL_GROWTH"
+          ]
+        },
+        { "type": "null" }
+      ]
+    },
+    "validation_status": {
+      "type": "string",
+      "description": "Result of automated validation checks against this record.",
+      "enum": ["PASS", "FAIL", "PENDING", "REVIEW"]
+    },
+    "source_type": {
+      "type": "string",
+      "description": "Provenance of how this example was generated.",
+      "enum": [
+        "synthetic_controlled_template",
+        "synthetic_paraphrase",
+        "human_authored",
+        "human_reviewed"
+      ]
+    },
+    "concept_source": {
+      "type": "string",
+      "description": "Conceptual provenance tag. Use 'original' for examples not derived from any PDF reference. Use CFA_* or WILEY_* tags for concept-inspired examples. No verbatim text is ever copied.",
+      "pattern": "^(original|CFA_[A-Z0-9_]+|WILEY_[A-Z0-9_]+)$"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata for auditing and analysis.",
+      "properties": {
+        "has_debt": { "type": "boolean" },
+        "has_goal": { "type": "boolean" },
+        "has_missing_critical": { "type": "boolean" },
+        "numerical_format": { "type": "string" },
+        "ambiguity_type": { "type": ["string", "null"] },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

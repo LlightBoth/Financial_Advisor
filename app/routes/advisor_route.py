@@ -6,14 +6,104 @@ from app.services.advisor_services import AdvisorServices
 from app.services.plan_services import PlanServices
 from app.security.limiter import limiter
 from app.security.cookie import check_cookie_token
+from extension import csrf
 
 advisor_bp = Blueprint("advisors", __name__, url_prefix="/advisors")
+consult_api_bp = Blueprint("consult_api", __name__)
+csrf.exempt(consult_api_bp)
 
 # Middleware route
 @advisor_bp.before_request
 def check_token():
     # check_cookie_token(current_user)
     pass
+
+
+@consult_api_bp.route("/api/consult/extract", methods=["POST"])
+@advisor_bp.route("/api/consult/extract", methods=["POST"])
+@csrf.exempt
+def extract_api():
+    """
+    Extracts 7 canonical financial facts from natural language text
+    using Trained Financial Advisor AI + llm_output_normalizer.
+    """
+    data = request.get_json(silent=True) or (request.form.to_dict() if request.form else {})
+    text = data.get("text") or data.get("message") or data.get("statement") or ""
+    if not text:
+        return jsonify({"success": False, "error": {"message": "Text is required."}}), 400
+
+    from app.services.llm_service import LLMService
+    slots = LLMService.extract_financial_profile(text)
+    return jsonify({"success": True, "slots": slots}), 200
+
+
+@consult_api_bp.route("/api/consult", methods=["POST"])
+@consult_api_bp.route("/evaluate", methods=["POST"])
+@advisor_bp.route("/api/consult", methods=["POST"])
+@advisor_bp.route("/evaluate", methods=["POST"])
+@csrf.exempt
+def evaluate_api():
+    """
+    Structured Financial Consultant API Endpoint (Step 7H).
+    
+    Accepts JSON or form payload, validates strictly against schema,
+    and returns a structured JSON response without calculating any metrics
+    in the route.
+    """
+    if request.content_type and "application/json" in request.content_type:
+        raw_data = request.get_json(silent=True)
+        if raw_data is None and request.data:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "code": "MALFORMED_REQUEST",
+                    "message": "Malformed JSON request payload."
+                }
+            }), 400
+        raw_data = raw_data if raw_data is not None else {}
+    elif request.is_json:
+        raw_data = request.get_json(silent=True)
+        if raw_data is None and request.data:
+            return jsonify({
+                "success": False,
+                "error": {
+                    "code": "MALFORMED_REQUEST",
+                    "message": "Malformed JSON request payload."
+                }
+            }), 400
+        raw_data = raw_data if raw_data is not None else {}
+    elif request.form:
+        raw_data = request.form.to_dict()
+    else:
+        raw_data = request.get_json(silent=True)
+        if raw_data is None:
+            if request.data:
+                return jsonify({
+                    "success": False,
+                    "error": {
+                        "code": "MALFORMED_REQUEST",
+                        "message": "Malformed JSON request payload."
+                    }
+                }), 400
+            raw_data = {}
+
+    try:
+        result_dto, error_dto = AdvisorServices.consult(raw_data)
+        if error_dto:
+            return jsonify({
+                "success": False,
+                "error": error_dto
+            }), 400
+
+        return jsonify(result_dto), 200
+    except Exception:
+        return jsonify({
+            "success": False,
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "An error occurred while evaluating financial consultation."
+            }
+        }), 500
 
 
 @advisor_bp.route("/", methods=["GET", "POST"])

@@ -1,0 +1,121 @@
+[
+  {
+    "template_id": "T_HOUSEHOLD_001",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I am single and earn {monthly_income} per month. My expenses are about {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH15_PRIVATE_WEALTH",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": "Single"
+    }
+  },
+  {
+    "template_id": "T_HOUSEHOLD_002",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I am married and together we earn {monthly_income} monthly. Our household expenses total {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH15_PRIVATE_WEALTH",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": "Married"
+    }
+  },
+  {
+    "template_id": "T_HOUSEHOLD_003",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "As a single person, I bring home {monthly_income} and spend {monthly_expense}. I have no debt and want to save {goal_cost}.",
+    "required_slots": ["monthly_income", "monthly_expense", "goal_cost"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "no debt",
+      "spending_habit": null,
+      "marital_status": "Single"
+    }
+  },
+  {
+    "template_id": "T_HOUSEHOLD_004",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "My spouse and I are married. I make {monthly_income} a month, our spending is {monthly_expense}, and we have some active debt.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": "debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": "Married"
+    }
+  },
+  {
+    "template_id": "T_HOUSEHOLD_005",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I am not married. My income is {monthly_income} per month, expenses are {monthly_expense}, and I tend to spend a lot.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "WILEY_CH7_BEHAVIORAL",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": "big spend",
+      "goal_cost": null,
+      "marital_status": "Single"
+    }
+  },
+  {
+    "template_id": "T_HOUSEHOLD_006",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I recently got married. I earn {monthly_income} monthly, we spend {monthly_expense}, and we keep our spending average.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": "average spend",
+      "goal_cost": null,
+      "marital_status": "Married"
+    }
+  }
+]

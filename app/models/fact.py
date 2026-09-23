@@ -9,9 +9,17 @@ class Fact(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
+    # Core identification & metadata (Step 7D architecture)
+    fact_key = db.Column(db.String(80), unique=True, nullable=True)
+    category = db.Column(db.String(80), nullable=True)    # e.g., INFLOW, CASHFLOW, EXPENDITURE, LIABILITY, MILESTONE
+    data_type = db.Column(db.String(30), nullable=True)   # e.g., boolean, numeric, string
+    origin = db.Column(db.String(30), nullable=True)      # e.g., input, derived
+    kb_version = db.Column(db.String(50), nullable=True)  # e.g., "financial-kb-v1.0"
+
+    # Legacy attributes preserved for full backward compatibility
     tags = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
-    type = db.Column(db.String(20), nullable=False)
+    type = db.Column(db.String(20), nullable=False, default="boolean")
     value = db.Column(db.JSON, nullable=True)
 
     created_at = db.Column(
@@ -33,5 +41,10 @@ class Fact(db.Model):
         back_populates="facts"
     )
 
+    @property
+    def key(self) -> str:
+        """Returns fact_key or legacy tags."""
+        return self.fact_key or self.tags
+
     def __repr__(self):
-        return f"<Fact {self.tags}>"
+        return f"<Fact {self.key}>"

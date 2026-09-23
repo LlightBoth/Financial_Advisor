@@ -1,0 +1,162 @@
+[
+  {
+    "template_id": "T_BUDGET_001",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "I earn {monthly_income} each month and spend {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_002",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "My monthly take-home pay is {monthly_income} and my regular expenses come to about {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_003",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "Every month I bring home {monthly_income} after taxes, and my bills and living costs total {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_004",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "I make {monthly_income} a month. Between rent, food, and utilities, I spend {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_005",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "Right now my monthly income sits at {monthly_income} and I spend roughly {monthly_expense} on everything.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_006",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "My paycheck each month is {monthly_income}. My total monthly spending runs about {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_007",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "I pull in around {monthly_income} per month but my outgoings are {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_BUDGET_008",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "On a monthly basis I receive {monthly_income} in income. My expenses are approximately {monthly_expense}.",
+    "required_slots": ["monthly_income", "monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  }
+]

@@ -1,0 +1,482 @@
+[
+  {
+    "template_id": "T_BUDGET_001",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "I earn {monthly_income} each month and spend {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_002",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "My monthly take-home pay is {monthly_income} and my regular expenses come to about {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_003",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "Every month I bring home {monthly_income} after taxes, and my bills and living costs total {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_004",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "I make {monthly_income} a month. Between rent, food, and utilities, I spend {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_005",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "Right now my monthly income sits at {monthly_income} and I spend roughly {monthly_expense} on everything.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_006",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "My paycheck each month is {monthly_income}. My total monthly spending runs about {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_007",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "I pull in around {monthly_income} per month but my outgoings are {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_BUDGET_008",
+    "template_family": "TF_BUDGET",
+    "intent": "budget_analysis",
+    "text_pattern": "On a monthly basis I receive {monthly_income} in income. My expenses are approximately {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_CASHFLOW_001",
+    "template_family": "TF_CASHFLOW",
+    "intent": "cashflow_question",
+    "text_pattern": "I earn {monthly_income} monthly and spend {monthly_expense}. How much do I have left over?",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_CASHFLOW_002",
+    "template_family": "TF_CASHFLOW",
+    "intent": "cashflow_question",
+    "text_pattern": "My income is {monthly_income} per month and my expenses are {monthly_expense}. Am I running a deficit?",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_CASHFLOW_003",
+    "template_family": "TF_CASHFLOW",
+    "intent": "cashflow_question",
+    "text_pattern": "I bring home {monthly_income} each month but my costs are {monthly_expense}. I feel like I am running out of money before the month ends.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_CASHFLOW_004",
+    "template_family": "TF_CASHFLOW",
+    "intent": "cashflow_question",
+    "text_pattern": "After all my bills, I spend {monthly_expense} a month from my {monthly_income} salary. Is my cash flow healthy?",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_CASHFLOW_005",
+    "template_family": "TF_CASHFLOW",
+    "intent": "cashflow_question",
+    "text_pattern": "I make {monthly_income} monthly and spend {monthly_expense}. Can I cover an emergency expense?",
+    "concept_source": "WILEY_CH15_BUFFER",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_CASHFLOW_006",
+    "template_family": "TF_CASHFLOW",
+    "intent": "cashflow_question",
+    "text_pattern": "My monthly earnings are {monthly_income} and I typically spend about {monthly_expense}. What is my surplus or deficit?",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_001",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "I earn {monthly_income} per month, spend {monthly_expense}, and I currently have debt.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_002",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "My monthly income is {monthly_income} and my expenses are {monthly_expense}. I am paying off a personal loan.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_003",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "I make {monthly_income} monthly and spend about {monthly_expense}. I owe money on credit cards and it is stressing me out.",
+    "concept_source": "WILEY_CH7_BEHAVIORAL",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_004",
+    "template_family": "TF_DEBT",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn {monthly_income} a month and spend {monthly_expense}. I have no outstanding debt at all.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_005",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "I take home {monthly_income} each month. My expenses run {monthly_expense} and on top of that I am servicing a bank loan.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_006",
+    "template_family": "TF_DEBT",
+    "intent": "debt_management",
+    "text_pattern": "With {monthly_income} coming in and {monthly_expense} going out every month, I am struggling to keep up with my debt payments.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_DEBT_007",
+    "template_family": "TF_DEBT",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn {monthly_income} monthly, spend {monthly_expense}, and I am completely debt free.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_EMPLOYMENT_001",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I am currently employed and earn {monthly_income} per month. My expenses are {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_EMPLOYMENT_002",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I lost my job recently and have no income. My monthly expenses are still {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_EMPLOYMENT_003",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I am unemployed and do not have any income right now. I still spend about {monthly_expense} each month on basic needs.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_EMPLOYMENT_004",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I have a full-time job earning {monthly_income} monthly. I spend {monthly_expense} and I am a big spender.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_EMPLOYMENT_005",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I work and bring home {monthly_income} a month. My spending is moderate at {monthly_expense}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_EMPLOYMENT_006",
+    "template_family": "TF_EMPLOYMENT",
+    "intent": "financial_consultation",
+    "text_pattern": "I do not have a job and have zero income coming in. My expenses are around {monthly_expense} and I have debt.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_HOUSEHOLD_001",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I am single and earn {monthly_income} per month. My expenses are about {monthly_expense}.",
+    "concept_source": "WILEY_CH15_PRIVATE_WEALTH",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_HOUSEHOLD_002",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I am married and together we earn {monthly_income} monthly. Our household expenses total {monthly_expense}.",
+    "concept_source": "WILEY_CH15_PRIVATE_WEALTH",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_HOUSEHOLD_003",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "As a single person, I bring home {monthly_income} and spend {monthly_expense}. I have no debt and want to save {goal_cost}.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_HOUSEHOLD_004",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "My spouse and I are married. I make {monthly_income} a month, our spending is {monthly_expense}, and we have some active debt.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_HOUSEHOLD_005",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I am not married. My income is {monthly_income} per month, expenses are {monthly_expense}, and I tend to spend a lot.",
+    "concept_source": "WILEY_CH7_BEHAVIORAL",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_HOUSEHOLD_006",
+    "template_family": "TF_HOUSEHOLD",
+    "intent": "financial_consultation",
+    "text_pattern": "I recently got married. I earn {monthly_income} monthly, we spend {monthly_expense}, and we keep our spending average.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_MISSING_001",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I want help managing my money better.",
+    "concept_source": "original",
+    "ambiguity_policy": "all_null"
+  },
+  {
+    "template_id": "T_MISSING_002",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "savings_question",
+    "text_pattern": "I want to start saving but I do not know how much I spend each month.",
+    "concept_source": "original",
+    "ambiguity_policy": "expense_unknown"
+  },
+  {
+    "template_id": "T_MISSING_003",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn {monthly_income} a month but I honestly have no idea what my total expenses are.",
+    "concept_source": "original",
+    "ambiguity_policy": "expense_unknown"
+  },
+  {
+    "template_id": "T_MISSING_004",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I have some financial commitments but I am not sure about the exact numbers.",
+    "concept_source": "original",
+    "ambiguity_policy": "vague_commitment"
+  },
+  {
+    "template_id": "T_MISSING_005",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I currently have no income at all.",
+    "concept_source": "original",
+    "ambiguity_policy": "explicit_zero"
+  },
+  {
+    "template_id": "T_MISSING_006",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn either {monthly_income} or maybe more depending on overtime hours.",
+    "concept_source": "original",
+    "ambiguity_policy": "range_ambiguity"
+  },
+  {
+    "template_id": "T_MISSING_007",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "My brother earns {monthly_income} and I spend {monthly_expense} every month.",
+    "concept_source": "original",
+    "ambiguity_policy": "third_party_income"
+  },
+  {
+    "template_id": "T_MISSING_008",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I received {monthly_income} last week from a freelance job.",
+    "concept_source": "original",
+    "ambiguity_policy": "non_monthly_cadence"
+  },
+  {
+    "template_id": "T_MISSING_009",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I have no debt whatsoever.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_MISSING_010",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_education",
+    "text_pattern": "What is compound interest and how does it affect my savings?",
+    "concept_source": "CFA_LM2_TVM",
+    "ambiguity_policy": "education_only"
+  },
+  {
+    "template_id": "T_OOS_INVEST_001",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Which tech stock should I buy before earnings season?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_INVEST_002",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Is Bitcoin going to break one hundred thousand dollars this month or should I sell now?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_INVEST_003",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "What forex leverage should I use for trading the dollar against the yen?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_INVEST_004",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Give me a list of ten penny stocks that will go up this week.",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_INVEST_005",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Should I put all my savings into Ethereum or wait for a dip?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_INVEST_006",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "Tell me the best day-trading strategy for small-cap stocks.",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_INVEST_007",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_investment",
+    "text_pattern": "What call options should I buy on the S and P 500 index right now?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_LOAN_001",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_loan",
+    "text_pattern": "Can you approve my mortgage application for two hundred and fifty thousand dollars?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_LOAN_002",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_loan",
+    "text_pattern": "Which bank has the lowest interest rate so I can apply for a personal loan today?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_OOS_LOAN_003",
+    "template_family": "TF_OUT_OF_SCOPE",
+    "intent": "out_of_scope_loan",
+    "text_pattern": "Can you increase my credit card limit to ten thousand dollars?",
+    "concept_source": "original",
+    "ambiguity_policy": "out_of_scope"
+  },
+  {
+    "template_id": "T_SAVINGS_001",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "I earn {monthly_income} per month and spend {monthly_expense}. I want to save up {goal_cost} for a new motorcycle.",
+    "concept_source": "WILEY_CH6_GOALS",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_SAVINGS_002",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "My monthly income is {monthly_income} and I spend about {monthly_expense}. Can I realistically save {goal_cost} for a house deposit?",
+    "concept_source": "WILEY_CH6_GOALS",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_SAVINGS_003",
+    "template_family": "TF_SAVINGS",
+    "intent": "savings_question",
+    "text_pattern": "I make {monthly_income} a month and my expenses are {monthly_expense}. How long will it take me to save {goal_cost}?",
+    "concept_source": "CFA_LM2_TVM",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_SAVINGS_004",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "I bring in {monthly_income} monthly and spend {monthly_expense}. My goal is to put together {goal_cost} for my wedding.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_SAVINGS_005",
+    "template_family": "TF_SAVINGS",
+    "intent": "savings_question",
+    "text_pattern": "With a monthly salary of {monthly_income} and costs of {monthly_expense}, is it possible for me to build an emergency fund of {goal_cost}?",
+    "concept_source": "WILEY_CH15_BUFFER",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_SAVINGS_006",
+    "template_family": "TF_SAVINGS",
+    "intent": "financial_goal",
+    "text_pattern": "I take home {monthly_income} each month, spend {monthly_expense}, and I need to reach {goal_cost} for a laptop purchase.",
+    "concept_source": "original",
+    "ambiguity_policy": "none"
+  },
+  {
+    "template_id": "T_SAVINGS_007",
+    "template_family": "TF_SAVINGS",
+    "intent": "savings_question",
+    "text_pattern": "I earn {monthly_income} per month with expenses of {monthly_expense}. I want to set aside {goal_cost} for future education costs.",
+    "concept_source": "CFA_LM2_TVM",
+    "ambiguity_policy": "none"
+  }
+]

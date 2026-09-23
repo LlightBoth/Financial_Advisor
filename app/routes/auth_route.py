@@ -356,28 +356,43 @@ os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 
 def get_google_flow():
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     client_config = {
         "web": {
-            "client_id": os.getenv("GOOGLE_CLIENT_ID"),
-            "client_secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+            "client_id": client_id,
+            "client_secret": client_secret,
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
         }
     }
+    # Standard identity scopes for Google Sign-In
+    scopes = [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "openid"
+    ]
+    redirect_uri = os.getenv("GOOGLE_REDIRECT_URI") or url_for("auth.google_callback", _external=True)
     return Flow.from_client_config(
         client_config=client_config,
-        scopes=[
-            "https://www.googleapis.com/auth/userinfo.profile",
-            "https://www.googleapis.com/auth/userinfo.email",
-            "https://www.googleapis.com/auth/gmail.send",
-            "openid"
-        ],
-        redirect_uri=url_for("auth.google_callback", _external=True)
+        scopes=scopes,
+        redirect_uri=redirect_uri
     )
 
 
+@auth_bp.route("/google")
 @auth_bp.route("/auth/google")
 def google_login():
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+
+    if not client_id or not client_secret:
+        flash(
+            "Google Sign-In is not configured yet. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to your .env file.",
+            "warning"
+        )
+        return redirect(url_for("auth.login"))
+
     flow = get_google_flow()
     
     authorization_url, state = flow.authorization_url(
@@ -393,11 +408,18 @@ def google_login():
     return redirect(authorization_url)
 
 
+@auth_bp.route("/google/callback")
 @auth_bp.route("/auth/google/callback")
 def google_callback():
     state = session.get("oauth_state")
     if not state or state != request.args.get("state"):
         flash("Invalid state parameter during authentication.", "danger")
+        return redirect(url_for("auth.login"))
+
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        flash("Google Sign-In is not configured yet.", "danger")
         return redirect(url_for("auth.login"))
 
     flow = get_google_flow()

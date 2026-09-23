@@ -402,3 +402,34 @@ input:checked + .pill-design {
   .confidence-progress-bg {
     background-color: rgba(125, 125, 125, 0.2);
   }
+
+  /* Step 7I Competition Demo & Explainability Styles */
+  .demo-presets-banner {
+    border-color: var(--bs-border-color) !important;
+    transition: box-shadow 0.2s ease;
+  }
+  .demo-presets-banner:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  .demo-preset-btn {
+    transition: all 0.2s ease;
+    font-size: 0.825rem;
+  }
+  .demo-preset-btn:hover {
+    transform: translateY(-1px);
+  }
+  .explainability-section {
+    transition: all 0.3s ease;
+  }
+  .explainability-section .card {
+    border-color: var(--bs-border-color-translucent);
+  }
+  .toggle-icon {
+    transition: transform 0.25s ease;
+  }
+  button[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+  }
+  .x-small {
+    font-size: 0.75rem;
+  }

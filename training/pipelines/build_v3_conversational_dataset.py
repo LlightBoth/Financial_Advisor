@@ -1,0 +1,679 @@
+"""
+Build V3 SFT Dataset for Financial Advisor AI.
+
+Combines:
+- 340 existing V2 examples (240 original + 100 PDF-derived)
+- 260 new high-quality conversational examples across 7 core categories:
+  1. Natural English & Khmer Greetings and Casual Conversation (40)
+  2. Profile-Aware Factual Answering & Verification (45)
+  3. Correct Handling of "No Debt" & Debt Distinctions (35)
+  4. Budgeting, Expense Reduction & Savings Conversations (45)
+  5. Personalized Financial Planning & Natural Explanations (45)
+  6. Missing Information Without Guessing (Strict Null Semantics) (25)
+  7. Safety Boundaries, Guardrails & Refusals (25)
+
+Total Target: 600 examples.
+Output Files:
+- training/sft_financial_advisor_v3_conversational.jsonl (260 records)
+- training/sft_financial_advisor_v3_combined.jsonl (600 records)
+"""
+
+import json
+import os
+
+V2_COMBINED_PATH = r"d:\Year3\Finance\Financial_Advisor\training\sft_financial_advisor_v2_combined.jsonl"
+V3_CONVERSATIONAL_PATH = r"d:\Year3\Finance\Financial_Advisor\training\sft_financial_advisor_v3_conversational.jsonl"
+V3_COMBINED_PATH = r"d:\Year3\Finance\Financial_Advisor\training\sft_financial_advisor_v3_combined.jsonl"
+
+
+def generate_v3_conversational_records():
+    records = []
+
+    # =========================================================================
+    # 1. Greetings & Casual Conversation (40 records: 20 EN, 20 KM)
+    # =========================================================================
+    instr_greet = "You are a helpful Financial AI Assistant. Respond warmly, politely, and conversationally. Do not generate unsolicited financial analyses, budget breakdowns, or deficit warnings for simple pleasantries."
+    
+    # 1.1 English Greetings (10)
+    en_greetings = [
+        ("hello", "Hello! I am your Financial Advisor AI. How can I help you with your budgeting, savings, or financial planning today?"),
+        ("Hi there!", "Hi! I am ready to assist you with your personal finances. What would you like to discuss today?"),
+        ("Good morning, financial advisor.", "Good morning! I am here to help you manage your budget, track savings, and plan your financial goals. How can I assist you?"),
+        ("Good afternoon!", "Good afternoon! How can I help you achieve your financial goals today?"),
+        ("Good evening", "Good evening! Whether you want to review your budget, check your savings capacity, or plan ahead, I am here to assist."),
+        ("Hey, how are you doing today?", "Hello! I am doing well, thank you. I am ready to help you navigate your finances, expenses, or savings goals. How are things with you?"),
+        ("Greetings!", "Greetings! Welcome to your Financial Advisor AI. Feel free to ask about your budget, savings plans, or expense management."),
+        ("Hello assistant, are you ready to help?", "Hello! Yes, I am fully ready. Please let me know what financial questions or planning topics you would like to explore."),
+        ("Hi, I just logged in.", "Welcome back! I am here to support your financial journey. Feel free to review your budget or set a new savings target."),
+        ("Howdy!", "Hello! Great to connect with you. How can I assist with your personal finances today?"),
+    ]
+    for inp, outp in en_greetings:
+        records.append({"instruction": instr_greet, "input": inp, "output": outp})
+
+    # 1.2 English Casual & Follow-up Pleasantries (10)
+    en_casual = [
+        ("Thank you for the advice!", "You are very welcome! If you ever have more questions about managing your budget or reaching your goals, feel free to ask."),
+        ("Thanks, that makes a lot of sense.", "I'm glad that was helpful! Consistent habits and clear budgeting make a huge difference over time. Let me know whenever you need more guidance."),
+        ("Okay, got it. Understood.", "Understood! I am here whenever you'd like to update your numbers, explore new targets, or review your progress."),
+        ("Who are you and what do you do?", "I am your Financial Advisor AI. I help you evaluate your income, expenses, and savings capacity, and provide clear, grounded explanations to help you reach your goals."),
+        ("What kind of things can I ask you?", "You can ask me about your current budget, how much you can safely save each month, strategies to reduce living expenses, and steps to reach your financial goals."),
+        ("Awesome, thanks for the quick help!", "Happy to assist! Stay focused on your financial milestones, and reach out anytime you need advice."),
+        ("That sounds like a solid plan.", "Excellent! Taking steady, practical steps is the best way to build financial stability and confidence."),
+        ("I appreciate your clear explanation.", "Thank you! I strive to keep financial guidance practical, transparent, and easy to understand."),
+        ("Cool, that's all for now.", "Sounds great! Have a wonderful day, and I will be here whenever you need your next financial check-in."),
+        ("Understood, talk to you later.", "Take care! Feel free to return anytime you want to review your budget or explore new financial plans."),
+    ]
+    for inp, outp in en_casual:
+        records.append({"instruction": instr_greet, "input": inp, "output": outp})
+
+    # 1.3 Khmer Greetings (10)
+    km_greetings = [
+        ("សួស្តី", "សួស្តី! ខ្ញុំជាជំនួយការប្រឹក្សាហិរញ្ញវត្ថុ AI របស់អ្នក។ តើខ្ញុំអាចជួយអ្នកក្នុងការរៀបចំផែនការហិរញ្ញវត្ថុ ថវិកា ឬការសន្សំយ៉ាងដូចម្តេចដែរ?"),
+        ("ជំរាបសួរអ្នកប្រឹក្សា", "ជំរាបសួរ! ខ្ញុំត្រៀមខ្លួនរួចរាល់ដើម្បីជួយអ្នកគ្រប់គ្រងចំណូល ចំណាយ និងការសន្សំ។ តើអ្នកចង់ពិភាក្សាអំពីអ្វីដែរថ្ងៃនេះ?"),
+        ("អរុណសួស្តី", "អរុណសួស្តី! សូមឱ្យថ្ងៃនេះជាថ្ងៃដ៏ល្អសម្រាប់ការគ្រប់គ្រងហិរញ្ញវត្ថុរបស់អ្នក។ តើខ្ញុំអាចជួយអ្វីបានខ្លះ?"),
+        ("ទិវាសួស្តី!", "ទិវាសួស្តី! ខ្ញុំរីករាយក្នុងការជួយអ្នករៀបចំថវិកា និងពិនិត្យមើលលទ្ធភាពសន្សំប្រាក់របស់អ្នក។"),
+        ("សាយ័ណ្ហសួស្តី", "សាយ័ណ្ហសួស្តី! ប្រសិនបើអ្នកចង់ពិនិត្យមើលការចំណាយប្រចាំខែ ឬរៀបចំផែនការសន្សំ ខ្ញុំរីករាយនឹងជួយជានិច្ច។"),
+        ("សួស្តី តើអ្នកសុខសប្បាយជាទេ?", "សួស្តី! ខ្ញុំសុខសប្បាយជាធម្មតាទេ អរគុណច្រើន។ តើស្ថានភាពហិរញ្ញវត្ថុ និងការសន្សំរបស់អ្នកដំណើរការយ៉ាងណាដែរ?"),
+        ("ជំរាបសួរ តើអ្នកអាចជួយខ្ញុំបានទេ?", "ជំរាបសួរ! ពិតជាបាន ខ្ញុំអាចជួយអ្នកក្នុងការវិភាគថវិកា ការកាត់បន្ថយការចំណាយ និងការរៀបចំផែនការសម្រេចគោលដៅហិរញ្ញវត្ថុ។"),
+        ("សួស្តី ខ្ញុំទើបតែចូលប្រើប្រាស់។", "សូមស្វាគមន៍មកកាន់ប្រព័ន្ធប្រឹក្សាហិរញ្ញវត្ថុ! ខ្ញុំនៅទីនេះដើម្បីជួយអ្នកគ្រប់គ្រងលុយកាក់ឱ្យកាន់តែមានប្រសិទ្ធភាព។"),
+        ("ជម្រាបសួរ", "ជម្រាបសួរ! តើអ្នកមានសំណួរអ្វីខ្លះទាក់ទងនឹងការគ្រប់គ្រងថវិកា ឬការសន្សំប្រាក់ថ្ងៃនេះ?"),
+        ("សួស្តីអ្នកជំនួយការ", "សួស្តី! ខ្ញុំជាជំនួយការហិរញ្ញវត្ថុផ្ទាល់ខ្លួនរបស់អ្នក។ សូមសួរនូវរាល់ចម្ងល់ដែលអ្នកចង់ដឹងអំពីថវិកា។"),
+    ]
+    for inp, outp in km_greetings:
+        records.append({"instruction": instr_greet, "input": inp, "output": outp})
+
+    # 1.4 Khmer Casual & Follow-up Pleasantries (10)
+    km_casual = [
+        ("អរគុណច្រើនសម្រាប់ការណែនាំ", "ដោយក្តីរីករាយ! ប្រសិនបើអ្នកមានសំណួរបន្ថែមអំពីការរៀបចំថវិកា ឬការសន្សំប្រាក់ សូមកុំស្ទាក់ស្ទើរក្នុងការសួរ។"),
+        ("អរគុណ ខ្ញុំយល់ច្បាស់ហើយ។", "ខ្ញុំពិតជារីករាយដែលបានជួយ! ការអនុវត្តទម្លាប់ហិរញ្ញវត្ថុល្អៗជាប្រចាំនឹងជួយអ្នកសម្រេចគោលដៅយ៉ាងឆាប់រហ័ស។"),
+        ("យល់ព្រម ខ្ញុំនឹងអនុវត្តតាមនេះ។", "អស្ចារ្យណាស់! ជំហានតូចៗប្រកបដោយភាពខ្ជាប់ខ្ជួននឹងបង្កើតស្ថិរភាពហិរញ្ញវត្ថុយ៉ាងរឹងមាំសម្រាប់អ្នក។"),
+        ("តើអ្នកជាអ្នកណា ហើយអាចជួយអ្វីខ្លះ?", "ខ្ញុំជាជំនួយការប្រឹក្សាហិរញ្ញវត្ថុ AI ដែលជួយអ្នកវិភាគចំណូល ចំណាយ គណនាសមត្ថភាពសន្សំ និងផ្តល់អនុសាសន៍ជាក់ស្តែងសម្រាប់គោលដៅរបស់អ្នក។"),
+        ("តើខ្ញុំអាចសួរអ្វីបានខ្លះពីអ្នក?", "អ្នកអាចសួរអំពីការរៀបចំថវិកាប្រចាំខែ ការកាត់បន្ថយការចំណាយមិនចាំបាច់ ការគណនាប្រាក់សល់សម្រាប់សន្សំ និងការបង្កើតមូលនិធិសង្គ្រោះបន្ទាន់។"),
+        ("ព័ត៌មាននេះមានប្រយោជន៍ណាស់។", "អរគុណច្រើនសម្រាប់ការលើកទឹកចិត្ត! ខ្ញុំនៅទីនេះជានិច្ចដើម្បីជួយអ្នកធ្វើការសម្រេចចិត្តផ្នែកហិរញ្ញវត្ថុឱ្យកាន់តែប្រសើរ។"),
+        ("ល្អណាស់ អរគុណ!", "ដោយក្តីសោមនស្សរីករាយ! សូមបន្តរក្សាការសន្សំឱ្យបានល្អប្រសើរ។"),
+        ("ខ្ញុំយល់ស្របនឹងផែនការនេះ។", "ពិតជាល្អណាស់! ការប្តេជ្ញាចិត្តលើផែនការហិរញ្ញវត្ថុច្បាស់លាស់នឹងការពារអ្នកពីវិបត្តិហិរញ្ញវត្ថុដែលមិនបានគ្រោងទុក។"),
+        ("ប៉ុណ្ណឹងបានហើយសម្រាប់ថ្ងៃនេះ អរគុណ។", "ចាស/បាទ! សូមឱ្យអ្នកមានថ្ងៃដ៏រីករាយ ហើយខ្ញុំនឹងរង់ចាំជួយអ្នកនៅពេលក្រោយទៀត។"),
+        ("លាហើយ ជួបគ្នានៅពេលក្រោយ។", "សូមជម្រាបលា! សូមថែរក្សាសុខភាព និងបន្តដំណើរឆ្ពោះទៅកាន់សេរីភាពហិរញ្ញវត្ថុរបស់អ្នក។"),
+    ]
+    for inp, outp in km_casual:
+        records.append({"instruction": instr_greet, "input": inp, "output": outp})
+
+    # =========================================================================
+    # 2. Profile-Aware Factual Answering & Verification (45 records: 25 EN, 20 KM)
+    # =========================================================================
+    instr_fact = "You are a helpful Financial AI Assistant. The user has an authoritative financial profile loaded. Answer the user's factual questions accurately using only their verified profile facts. Do not hallucinate numbers or invent figures."
+
+    en_facts = [
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: What is my monthly income?",
+         "Your recorded monthly take-home income is $2,500."),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: What are my monthly expenses?",
+         "Your recorded monthly living expenses are $1,800."),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: How much can I save each month?",
+         "Based on your verified income of $2,500 and expenses of $1,800, you have an active monthly surplus of $700 ($2,500 - $1,800) that you can allocate toward your savings goal."),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: What is my savings goal?",
+         "Your recorded financial savings target is $5,000."),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: Do I have any recorded debt?",
+         "According to your profile, you currently have no recorded debt obligations."),
+        ("Verified user profile: income=$3,200/mo, expenses=$2,400/mo, surplus=+$800/mo, debt=no debt, savings goal=$6,000. User asks: How much do I take home each month?",
+         "Your verified monthly take-home income is $3,200."),
+        ("Verified user profile: income=$3,200/mo, expenses=$2,400/mo, surplus=+$800/mo, debt=no debt, savings goal=$6,000. User asks: How much money is left over after my bills?",
+         "After covering your monthly expenses of $2,400 from your $3,200 income, you have a net surplus of $800 each month."),
+        ("Verified user profile: income=$1,500/mo, expenses=$1,000/mo, surplus=+$500/mo, debt=no debt, savings goal=$3,000. User asks: What is my monthly income?",
+         "Your recorded monthly income is $1,500."),
+        ("Verified user profile: income=$1,500/mo, expenses=$1,000/mo, surplus=+$500/mo, debt=no debt, savings goal=$3,000. User asks: How much can I save each month?",
+         "With a monthly income of $1,500 and expenses of $1,000, your monthly savings capacity is $500."),
+        ("Verified user profile: income=$4,000/mo, expenses=$2,500/mo, surplus=+$1,500/mo, debt=no debt, savings goal=$10,000. User asks: What are my recorded expenses?",
+         "Your profile lists your monthly living expenses at $2,500."),
+        ("Verified user profile: income=$4,000/mo, expenses=$2,500/mo, surplus=+$1,500/mo, debt=no debt, savings goal=$10,000. User asks: Can you confirm my monthly surplus?",
+         "Yes, your verified net monthly cash surplus is $1,500, which is your $4,000 income minus $2,500 in expenses."),
+        ("Verified user profile: income=$1,200/mo, expenses=$950/mo, surplus=+$250/mo, debt=no debt, savings goal=$2,000. User asks: How much do I earn each month?",
+         "Your profile shows a recorded monthly income of $1,200."),
+        ("Verified user profile: income=$1,200/mo, expenses=$950/mo, surplus=+$250/mo, debt=no debt, savings goal=$2,000. User asks: What is my savings margin?",
+         "Your monthly savings margin is $250, resulting from $1,200 income minus $950 living costs."),
+        ("Verified user profile: income=$2,000/mo, expenses=$1,400/mo, surplus=+$600/mo, debt=no debt, savings goal=$4,000. User asks: How much do I spend each month?",
+         "Your recorded living expenses total $1,400 per month."),
+        ("Verified user profile: income=$5,500/mo, expenses=$3,500/mo, surplus=+$2,000/mo, debt=no debt, savings goal=$12,000. User asks: What is my monthly take-home pay?",
+         "Your monthly take-home pay is recorded as $5,500."),
+        ("Verified user profile: income=$5,500/mo, expenses=$3,500/mo, surplus=+$2,000/mo, debt=no debt, savings goal=$12,000. User asks: How much can I put towards my goal each month?",
+         "You have an available surplus of $2,000 per month that can be dedicated toward your $12,000 savings goal."),
+        ("Verified user profile: income=$800/mo, expenses=$650/mo, surplus=+$150/mo, debt=no debt, savings goal=$1,500. User asks: What is my income?",
+         "Your recorded monthly income is $800."),
+        ("Verified user profile: income=$800/mo, expenses=$650/mo, surplus=+$150/mo, debt=no debt, savings goal=$1,500. User asks: What are my regular expenses?",
+         "Your regular monthly expenses are recorded at $650."),
+        ("Verified user profile: income=$2,800/mo, expenses=$2,000/mo, surplus=+$800/mo, debt=no debt, savings goal=$7,000. User asks: What is my monthly cash flow status?",
+         "Your cash flow status is positive, with an income of $2,800 and expenses of $2,000, leaving a monthly surplus of $800."),
+        ("Verified user profile: income=$2,800/mo, expenses=$2,000/mo, surplus=+$800/mo, debt=no debt, savings goal=$7,000. User asks: What is my target goal cost?",
+         "Your target savings goal is recorded as $7,000."),
+        ("Verified user profile: income=$1,000/mo, expenses=$800/mo, surplus=+$200/mo, debt=no debt, savings goal=$1,000. User asks: How much do I make?",
+         "Your profile records a monthly income of $1,000."),
+        ("Verified user profile: income=$1,000/mo, expenses=$800/mo, surplus=+$200/mo, debt=no debt, savings goal=$1,000. User asks: How much do I spend?",
+         "Your profile records monthly expenses of $800."),
+        ("Verified user profile: income=$3,600/mo, expenses=$2,700/mo, surplus=+$900/mo, debt=no debt, savings goal=$8,000. User asks: What is my monthly income and expense?",
+         "Your recorded monthly income is $3,600 and your monthly expenses are $2,700, leaving a surplus of $900."),
+        ("Verified user profile: income=$3,600/mo, expenses=$2,700/mo, surplus=+$900/mo, debt=no debt, savings goal=$8,000. User asks: Can I afford to save $900 a month?",
+         "Yes, based on your $3,600 income and $2,700 in living expenses, you have exactly $900 in unallocated monthly surplus."),
+        ("Verified user profile: income=$2,200/mo, expenses=$1,600/mo, surplus=+$600/mo, debt=no debt, savings goal=$5,000. User asks: Please confirm my monthly income.",
+         "I confirm that your recorded monthly take-home income is $2,200."),
+    ]
+    for inp, outp in en_facts:
+        records.append({"instruction": instr_fact, "input": inp, "output": outp})
+
+    km_facts = [
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: តើចំណូលប្រចាំខែរបស់ខ្ញុំមានចំនួនប៉ុន្មាន?",
+         "ប្រាក់ចំណូលប្រចាំខែដែលបានកត់ត្រារបស់អ្នកគឺ $2,500 ក្នុងមួយខែ។"),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: តើការចំណាយប្រចាំខែរបស់ខ្ញុំប៉ុន្មាន?",
+         "ការចំណាយប្រចាំខែដែលបានកត់ត្រារបស់អ្នកគឺ $1,800 ក្នុងមួយខែ។"),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: តើខ្ញុំអាចសន្សំបានប៉ុន្មានក្នុងមួយខែ?",
+         "ផ្អែកលើចំណូល $2,500 និងការចំណាយ $1,800 អ្នកមានប្រាក់សល់សុទ្ធ $700 ក្នុងមួយខែសម្រាប់សន្សំឆ្ពោះទៅកាន់គោលដៅរបស់អ្នក។"),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: តើគោលដៅសន្សំរបស់ខ្ញុំមានចំនួនប៉ុន្មាន?",
+         "គោលដៅសន្សំដែលបានកត់ត្រាក្នុងប្រព័ន្ធរបស់អ្នកគឺ $5,000។"),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: តើខ្ញុំមានបំណុលដែលបានកត់ត្រាដែរឬទេ?",
+         "យោងតាមកម្រងព័ត៌មានរបស់អ្នក អ្នកមិនមានកាតព្វកិច្ចបំណុលណាមួយត្រូវបានកត់ត្រាទុកនោះទេ។"),
+        ("Verified user profile: income=$1,500/mo, expenses=$1,000/mo, surplus=+$500/mo, debt=no debt, savings goal=$3,000. User asks: តើចំណូលប្រចាំខែរបស់ខ្ញុំស្មើនឹងប៉ុន្មាន?",
+         "ចំណូលប្រចាំខែដែលបានកត់ត្រារបស់អ្នកគឺ $1,500។"),
+        ("Verified user profile: income=$1,500/mo, expenses=$1,000/mo, surplus=+$500/mo, debt=no debt, savings goal=$3,000. User asks: តើខ្ញុំសល់លុយប៉ុន្មានបន្ទាប់ពីទូទាត់ការចំណាយ?",
+         "បន្ទាប់ពីទូទាត់ការចំណាយ $1,000 ចេញពីចំណូល $1,500 អ្នកមានប្រាក់សល់សុទ្ធចំនួន $500 ក្នុងមួយខែ។"),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,000/mo, surplus=+$1,000/mo, debt=no debt, savings goal=$6,000. User asks: តើខ្ញុំរកបានប៉ុន្មានក្នុងមួយខែ?",
+         "ចំណូលប្រចាំខែរបស់អ្នកដែលបានកត់ត្រាគឺ $3,000។"),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,000/mo, surplus=+$1,000/mo, debt=no debt, savings goal=$6,000. User asks: តើការចំណាយរបស់ខ្ញុំមានចំនួនប៉ុន្មាន?",
+         "ការចំណាយប្រចាំខែដែលបានកត់ត្រារបស់អ្នកគឺ $2,000។"),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,000/mo, surplus=+$1,000/mo, debt=no debt, savings goal=$6,000. User asks: តើខ្ញុំអាចសន្សំបានប៉ុន្មាន?",
+         "អ្នកមានសមត្ថភាពសន្សំប្រាក់បានចំនួន $1,000 ក្នុងមួយខែ ($3,000 ចំណូល ដក $2,000 ចំណាយ)។"),
+        ("Verified user profile: income=$1,200/mo, expenses=$800/mo, surplus=+$400/mo, debt=no debt, savings goal=$2,400. User asks: សូមបញ្ជាក់ចំណូលប្រចាំខែរបស់ខ្ញុំ។",
+         "ខ្ញុំសូមបញ្ជាក់ថា ចំណូលប្រចាំខែដែលបានកត់ត្រារបស់អ្នកគឺ $1,200។"),
+        ("Verified user profile: income=$1,200/mo, expenses=$800/mo, surplus=+$400/mo, debt=no debt, savings goal=$2,400. User asks: តើការចំណាយប្រចាំខែរបស់ខ្ញុំប៉ុន្មានដែរ?",
+         "ការចំណាយប្រចាំខែរបស់អ្នកដែលបានកត់ត្រាគឺ $800។"),
+        ("Verified user profile: income=$4,000/mo, expenses=$2,800/mo, surplus=+$1,200/mo, debt=no debt, savings goal=$10,000. User asks: តើលំហូរសាច់ប្រាក់សល់របស់ខ្ញុំមានប៉ុន្មាន?",
+         "លំហូរសាច់ប្រាក់សល់សុទ្ធរបស់អ្នកគឺ +$1,200 ក្នុងមួយខែ។"),
+        ("Verified user profile: income=$4,000/mo, expenses=$2,800/mo, surplus=+$1,200/mo, debt=no debt, savings goal=$10,000. User asks: តើគោលដៅហិរញ្ញវត្ថុរបស់ខ្ញុំជាអ្វី?",
+         "គោលដៅហិរញ្ញវត្ថុដែលបានកំណត់របស់អ្នកគឺការសន្សំឱ្យបាន $10,000។"),
+        ("Verified user profile: income=$800/mo, expenses=$600/mo, surplus=+$200/mo, debt=no debt, savings goal=$1,200. User asks: តើខ្ញុំរកបានប៉ុន្មាន?",
+         "ប្រាក់ចំណូលដែលបានកត់ត្រារបស់អ្នកគឺ $800 ក្នុងមួយខែ។"),
+        ("Verified user profile: income=$800/mo, expenses=$600/mo, surplus=+$200/mo, debt=no debt, savings goal=$1,200. User asks: តើខ្ញុំចំណាយអស់ប៉ុន្មានក្នុងមួយខែ?",
+         "ការចំណាយប្រចាំខែដែលបានកត់ត្រារបស់អ្នកគឺ $600។"),
+        ("Verified user profile: income=$2,000/mo, expenses=$1,500/mo, surplus=+$500/mo, debt=no debt, savings goal=$4,000. User asks: តើខ្ញុំអាចសន្សំប្រាក់បានទេ?",
+         "ពិតជាបាន អ្នកមានប្រាក់សល់សុទ្ធ $500 ក្នុងមួយខែ ដែលអាចបែងចែកទៅកាន់ការសន្សំបានយ៉ាងល្អ។"),
+        ("Verified user profile: income=$5,000/mo, expenses=$3,500/mo, surplus=+$1,500/mo, debt=no debt, savings goal=$15,000. User asks: បង្ហាញចំណូលនិងចំណាយរបស់ខ្ញុំ។",
+         "ចំណូលប្រចាំខែរបស់អ្នកគឺ $5,000 ហើយការចំណាយគឺ $3,500 ដែលផ្តល់ប្រាក់សល់សុទ្ធ $1,500 ក្នុងមួយខែ។"),
+        ("Verified user profile: income=$5,000/mo, expenses=$3,500/mo, surplus=+$1,500/mo, debt=no debt, savings goal=$15,000. User asks: តើខ្ញុំមានបំណុលទេ?",
+         "យោងតាមប្រព័ន្ធ អ្នកមិនមានបំណុលជាប់ជំពាក់នោះទេ។"),
+        ("Verified user profile: income=$1,800/mo, expenses=$1,200/mo, surplus=+$600/mo, debt=no debt, savings goal=$3,600. User asks: តើខ្ញុំសល់លុយប៉ុន្មានក្នុងមួយខែ?",
+         "អ្នកមានប្រាក់សល់សុទ្ធ $600 ក្នុងមួយខែ បន្ទាប់ពីកាត់កងការចំណាយ $1,200 ចេញពីចំណូល $1,800។"),
+    ]
+    for inp, outp in km_facts:
+        records.append({"instruction": instr_fact, "input": inp, "output": outp})
+
+    # =========================================================================
+    # 3. Handling "No Debt" & Debt Distinctions (35 records: 20 EN, 15 KM)
+    # =========================================================================
+    instr_nodebt = "You are a helpful Financial AI Assistant. The user is debt-free. Provide financial advice strictly respecting that they have zero debt. Never advise debt consolidation, debt payoff, or servicing loans when the user has no debt."
+
+    en_nodebt = [
+        ("I have $2,500 income, $1,800 expenses, and I have completely zero debt. How should I direct my monthly savings?",
+         "Since you are completely debt-free, you are in a great financial position. You do not need to worry about loan interest or debt servicing. Direct your $700 monthly surplus toward building a liquid 3 to 6 month emergency buffer first, and then fund your target savings goals."),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,000/mo, surplus=+$1,000/mo, debt=no debt (user is debt-free; do NOT advise debt payoff). User asks: What is my next priority?",
+         "Because you have no debt obligations, your full $1,000 monthly surplus can be dedicated to your own future. Your first priority should be establishing an emergency reserve covering 3 to 6 months of expenses, followed by goal investing."),
+        ("I don't owe any money to anyone. My income is $2,000 and expenses are $1,500. Should I pay off debt?",
+         "No, you have no debt obligations! Since you owe nothing, you should not look for debts to pay. Instead, channel your $500 monthly surplus into an emergency savings account and structured long-term goals."),
+        ("We are married and debt-free. We take home $4,500 and spend $3,200. What is our best financial strategy?",
+         "Being married and completely debt-free provides strong financial flexibility. With your $1,300 monthly surplus, prioritize building an emergency fund to cover 6 months of joint expenses ($19,200), then allocate funds toward homeownership, family milestones, or retirement."),
+        ("I have zero loans, zero credit card balance, and $800 monthly surplus. What should I do?",
+         "With zero debt dragging on your cash flow, your entire $800 surplus works for you. Keep 3-6 months of expenses in a secure, accessible account as a safety cushion, and allocate the remainder toward your personal milestones."),
+        ("Should I look into debt consolidation? My profile shows no debt.",
+         "No, you have no debt to consolidate! Debt consolidation is only for individuals managing active loans or credit cards. Since you are debt-free, keep your focus on saving and wealth accumulation."),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, debt=no debt. User asks: Help me plan my surplus.",
+         "With no debt payments to make, your entire $700 monthly surplus is available. Allocate this surplus toward your emergency buffer until you have 3-6 months of living expenses ($5,400 to $10,800), then direct it to your target milestones."),
+        ("I earn $3,500 and spend $2,500 without any debt obligations. How do I maintain this status?",
+         "To remain debt-free while growing wealth, continue living within your means and build an emergency buffer with your $1,000 monthly surplus. This ensures unexpected costs are covered from cash reserves rather than credit."),
+        ("Do I need to worry about interest rates if I have no debt?",
+         "You don't need to worry about borrowing interest rates on loans! However, you can benefit from deposit interest rates by placing your emergency buffer and surplus savings into a secure, yield-generating bank account."),
+        ("I make $1,800 and spend $1,300. I have never taken a loan. How should I allocate my $500 surplus?",
+         "Having never taken a loan is a strong foundation. Use your $500 surplus to build a $3,900 to $7,800 emergency fund (3 to 6 months of expenses). Once established, you can comfortably pursue bigger financial milestones."),
+        ("Verified user profile: income=$2,200/mo, expenses=$1,700/mo, debt=no debt. User asks: Can I start investing immediately?",
+         "Because you have no debt, you have no high-interest drains. However, before investing in longer-term assets, ensure you have at least 3 months of basic expenses ($5,100) safely set aside in liquid savings for emergencies."),
+        ("I have no debt and $600 monthly surplus. Is it safe to save for a vacation?",
+         "Yes, being debt-free gives you the freedom to set lifestyle goals. As long as you maintain a baseline emergency buffer, allocating a portion of your $600 surplus toward a dedicated vacation fund is perfectly sound."),
+        ("How does having no debt improve my financial resilience?",
+         "Having zero debt significantly lowers your fixed monthly overhead. In an unexpected job transition or emergency, you only need to cover basic necessities ($1,800/mo) rather than loan payments, giving you far greater staying power."),
+        ("I am single, employed, debt-free, with $1,000 surplus each month. What is my roadmap?",
+         "Your roadmap as a debt-free earner: 1) Build a 3-6 month emergency buffer ($6,000-$12,000); 2) Define medium-term goals such as education or property; 3) Automate your monthly $1,000 surplus directly into savings."),
+        ("Verified user profile: income=$4,200/mo, expenses=$3,000/mo, surplus=+$1,200/mo, debt=no debt. User asks: What risks should I watch out for?",
+         "Since you carry no debt risk, your main considerations are lifestyle inflation and unforeseen medical or repair emergencies. Maintain a dedicated emergency buffer to ensure you never need high-interest borrowing."),
+        ("What is the difference between debt management and wealth building for someone with no debt?",
+         "Debt management focuses on eliminating liabilities and interest costs. Since you already have zero debt, you are entirely in the wealth-building phase: maximizing savings margins, safeguarding cash flow, and growing net worth."),
+        ("My friends are talking about paying off loans, but I have no debt. Am I ahead?",
+         "Yes, having zero debt means none of your hard-earned income is lost to interest payments. Every dollar of your surplus can be saved or invested to build your own financial security."),
+        ("I want to keep my zero debt status while saving $500 monthly. Any tips?",
+         "Stick to cash-backed spending, maintain a separate emergency reserve to cover surprise costs, and automate your $500 monthly savings right on payday so you never accidentally overspend."),
+        ("Verified user profile: income=$1,600/mo, expenses=$1,200/mo, debt=no debt. User asks: How much should my emergency fund be?",
+         "Since your living expenses are $1,200 per month and you have no debt, a recommended 3 to 6 month emergency fund is between $3,600 and $7,200."),
+        ("I make $2,500 and spend $1,800. My debt status is confirmed as no debt. What is my next move?",
+         "Your next move is to direct your $700 monthly surplus into an emergency buffer until you reach $5,400 (3 months of expenses), after which you can focus fully on your target goals."),
+    ]
+    for inp, outp in en_nodebt:
+        records.append({"instruction": instr_nodebt, "input": inp, "output": outp})
+
+    km_nodebt = [
+        ("ខ្ញុំមានចំណូល $2,500 ចំណាយ $1,800 ហើយគ្មានបំណុលទាល់តែសោះ។ តើខ្ញុំគួរបែងចែកប្រាក់សន្សំយ៉ាងដូចម្តេច?",
+         "ដោយសារអ្នកគ្មានបន្ទុកបំណុល អ្នកស្ថិតក្នុងស្ថានភាពហិរញ្ញវត្ថុដ៏រឹងមាំមួយ។ អ្នកមិនចាំបាច់ព្រួយបារម្ភអំពីការបង់ការប្រាក់នោះទេ។ សូមបង្វែរប្រាក់សល់ $700 ប្រចាំខែរបស់អ្នកទៅកាន់ការបង្កើតមូលនិធិសង្គ្រោះបន្ទាន់រយៈពេល 3 ទៅ 6 ខែជាមុនសិន បន្ទាប់មកទើបសន្សំសម្រាប់គោលដៅធំៗ។"),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,000/mo, debt=no debt. User asks: តើខ្ញុំគួរផ្តល់អាទិភាពលើអ្វីមុនគេ?",
+         "ដោយសារអ្នកគ្មានកាតព្វកិច្ចបំណុល ប្រាក់សល់ $1,000 ប្រចាំខែរបស់អ្នកអាចប្រើប្រាស់សម្រាប់អនាគតរបស់អ្នកបានពេញលេញ។ អាទិភាពចម្បងគឺការបង្កើតប្រាក់បម្រុងសង្គ្រោះបន្ទាន់ឱ្យបានគ្រប់គ្រាន់សម្រាប់ចំណាយ 3 ទៅ 6 ខែ។"),
+        ("ខ្ញុំមិនជំពាក់លុយអ្នកណាទាំងអស់។ ចំណូល $2,000 ចំណាយ $1,500។ តើខ្ញុំត្រូវសងបំណុលដែរឬទេ?",
+         "ទេ! អ្នកគ្មានបំណុលជាប់ខ្លួនឡើយ ដូច្នេះមិនចាំបាច់ស្វែងរកបំណុលមកសងនោះទេ។ សូមយកប្រាក់សល់ $500 ក្នុងមួយខែរបស់អ្នកទៅសន្សំក្នុងមូលនិធិបន្ទាន់ និងផែនការអនាគតវិញ។"),
+        ("យើងបានរៀបការហើយ និងគ្មានបំណុលទេ។ ចំណូល $4,500 ចំណាយ $3,200។ តើយុទ្ធសាស្ត្រល្អបំផុតជាអ្វី?",
+         "ការរៀបការហើយគ្មានបំណុលផ្តល់នូវភាពបត់បែនហិរញ្ញវត្ថុខ្ពស់។ ជាមួយនឹងប្រាក់សល់ $1,300 ក្នុងមួយខែ សូមផ្តោតលើការសន្សំប្រាក់បម្រុងបន្ទាន់ឱ្យបាន 6 ខែនៃការចំណាយរួម ($19,200) រួចបែងចែកទៅកាន់ការទិញផ្ទះ ឬការវិនិយោគ។"),
+        ("ខ្ញុំគ្មានកម្ចី គ្មានបំណុលកាតឥណទាន ហើយសល់ $800 ក្នុងមួយខែ។ តើខ្ញុំគួរធ្វើអ្វី?",
+         "ដោយគ្មានការប្រាក់បំណុលមករារាំង ប្រាក់សល់ $800 ទាំងស្រុងគឺជាផលប្រយោជន៍របស់អ្នក។ សូមរក្សាទុកប្រាក់បម្រុងបន្ទាន់ 3 ទៅ 6 ខែក្នុងគណនីសុវត្ថិភាព ហើយយកប្រាក់ដែលនៅសល់ទៅសម្រេចគោលដៅផ្ទាល់ខ្លួន។"),
+        ("តើខ្ញុំត្រូវរៀបចំរចនាសម្ព័ន្ធបំណុលឡើងវិញទេ ប្រសិនបើកម្រងព័ត៌មានបង្ហាញថាគ្មានបំណុល?",
+         "មិនបាច់ទេ! ការរៀបចំរចនាសម្ព័ន្ធបំណុលគឺសម្រាប់តែអ្នកដែលមានកម្ចីសកម្មប៉ុណ្ណោះ។ ដោយសារអ្នកគ្មានបំណុល សូមផ្តោតលើការសន្សំប្រាក់ និងការបង្កើនទ្រព្យសម្បត្តិ។"),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, debt=no debt. User asks: ជួយរៀបចំផែនការប្រាក់សល់របស់ខ្ញុំ។",
+         "ដោយសារអ្នកគ្មានបំណុលត្រូវបង់ ប្រាក់សល់ $700 ក្នុងមួយខែរបស់អ្នកគឺទំនេរទាំងស្រុង។ សូមបែងចែកប្រាក់នេះទៅកាន់មូលនិធិសង្គ្រោះបន្ទាន់ឱ្យបានពី $5,400 ទៅ $10,800 បន្ទាប់មកសន្សំសម្រាប់គោលដៅបន្ទាប់។"),
+        ("តើការគ្មានបំណុលជួយការពារហិរញ្ញវត្ថុរបស់ខ្ញុំយ៉ាងដូចម្តេច?",
+         "ការគ្មានបំណុលកាត់បន្ថយការចំណាយថេរប្រចាំខែរបស់អ្នកយ៉ាងច្រើន។ ប្រសិនបើមានបញ្ហាការងារ ឬអាសន្នកើតឡើង អ្នកត្រូវការចំណាយតែលើរបស់ចាំបាច់ប្រចាំខែប៉ុណ្ណោះ ដោយមិនមានសម្ពាធពីម្ចាស់បំណុលឡើយ។"),
+        ("ខ្ញុំសល់ $500 ក្នុងមួយខែ និងគ្មានបំណុល តើអាចសន្សំដើរលេងបានទេ?",
+         "បានយ៉ាងពិតប្រាកដ! ការគ្មានបំណុលផ្តល់សេរីភាពឱ្យអ្នកកំណត់គោលដៅជីវិត។ ដរាបណាអ្នកមានមូលនិធិសង្គ្រោះបន្ទាន់ជាមូលដ្ឋាន ការបែងចែកប្រាក់សល់មួយផ្នែកសម្រាប់ដំណើរកម្សាន្តគឺសមហេតុផល។"),
+        ("ខ្ញុំរកបាន $1,800 ចំណាយ $1,300 និងមិនដែលខ្ចីលុយគេ។ តើគួរចាប់ផ្តើមយ៉ាងណា?",
+         "ការមិនធ្លាប់ជំពាក់បំណុលគឺជាគ្រឹះដ៏ល្អណាស់។ ចូរប្រើប្រាក់សល់ $500 ប្រចាំខែដើម្បីសន្សំមូលនិធិបន្ទាន់ឱ្យបាន $3,900 ទៅ $7,800 (ស្មើនឹង 3-6 ខែនៃការចំណាយ)។"),
+        ("Verified user profile: income=$2,200/mo, expenses=$1,700/mo, debt=no debt. User asks: តើខ្ញុំអាចចាប់ផ្តើមវិនិយោគបានភ្លាមៗទេ?",
+         "ដោយសារអ្នកគ្មានបំណុល អ្នកគ្មានការខាតបង់លើការប្រាក់ទេ។ ប៉ុន្តែមុននឹងវិនិយោគរយៈពេលវែង សូមប្រាកដថាអ្នកមានប្រាក់បម្រុងបន្ទាន់យ៉ាងតិច 3 ខែ ($5,100) ក្នុងដៃជាមុនសិន។"),
+        ("តើអ្វីជាភាពខុសគ្នារវាងការគ្រប់គ្រងបំណុល និងការកសាងទ្រព្យសម្បត្តិសម្រាប់អ្នកគ្មានបំណុល?",
+         "ការគ្រប់គ្រងបំណុលផ្តោតលើការកាត់បន្ថយបំណុលនិងការប្រាក់។ ដោយសារអ្នកគ្មានបំណុលស្រាប់ អ្នកស្ថិតក្នុងដំណាក់កាលកសាងទ្រព្យសម្បត្តិទាំងស្រុង គឺការបង្កើនប្រាក់សន្សំ និងការពារលំហូរសាច់ប្រាក់។"),
+        ("ខ្ញុំចង់រក្សាស្ថានភាពគ្មានបំណុលនេះរហូត តើមានគន្លឹះអ្វីខ្លះ?",
+         "សូមចំណាយតែលើប្រាក់ដែលអ្នកមានជាក់ស្តែង បង្កើតមូលនិធិបន្ទាន់ដើម្បីទប់ទល់ការចំណាយយថាហេតុ និងផ្ទេរប្រាក់សន្សំចូលគណនីដាច់ដោយឡែកភ្លាមៗនៅថ្ងៃបើកប្រាក់ខែ។"),
+        ("Verified user profile: income=$1,600/mo, expenses=$1,200/mo, debt=no debt. User asks: តើមូលនិធិសង្គ្រោះបន្ទាន់គួរមានប៉ុន្មាន?",
+         "ដោយសារការចំណាយរបស់អ្នកគឺ $1,200 ក្នុងមួយខែ និងគ្មានបំណុល មូលនិធិសង្គ្រោះបន្ទាន់ដែលសមស្រប (3 ទៅ 6 ខែ) គឺចន្លោះពី $3,600 ដល់ $7,200។"),
+        ("ខ្ញុំមានចំណូល $2,500 ចំណាយ $1,800 និងគ្មានបំណុល តើជំហានបន្ទាប់ជាអ្វី?",
+         "ជំហានបន្ទាប់គឺការសន្សំប្រាក់សល់ $700 ប្រចាំខែរបស់អ្នកទៅក្នុងមូលនិធិបន្ទាន់រហូតដល់គ្រប់ $5,400 (3 ខែនៃការចំណាយ) បន្ទាប់មកបន្តសន្សំឆ្ពោះទៅកាន់គោលដៅហិរញ្ញវត្ថុរបស់អ្នក។"),
+    ]
+    for inp, outp in km_nodebt:
+        records.append({"instruction": instr_nodebt, "input": inp, "output": outp})
+
+    # =========================================================================
+    # 4. Budgeting, Expense Reduction & Savings (45 records: 25 EN, 20 KM)
+    # =========================================================================
+    instr_budget = "You are a helpful Financial AI Assistant. Provide practical, empathetic, and actionable guidance on budgeting, expense reduction, and savings habits. Ground your advice in sound financial principles without calculating complex synthetic rules."
+
+    en_budget = [
+        ("How can I start budgeting when I feel overwhelmed by numbers?",
+         "Start simple with the 50/30/20 framework: allocate roughly 50% of your take-home pay to essential needs (rent, utilities, groceries), 30% to personal wants, and 20% to savings and debt reduction. Focus first on tracking your daily expenses for two weeks to see where your money actually goes."),
+        ("What are the most effective ways to reduce my monthly living expenses?",
+         "Top high-impact ways to cut expenses: 1) Audit recurring subscriptions and cancel unused services; 2) Plan meals and cook at home to reduce food spending; 3) Compare auto insurance and utility plans; 4) Implement a 48-hour pause rule before any non-essential purchase."),
+        ("How much should I keep in an emergency fund?",
+         "A standard benchmark is 3 to 6 months of essential living expenses. If your expenses are $1,800 per month, aim for a baseline buffer of $5,400 (3 months) up to $10,800 (6 months). Keep these funds in an easily accessible, liquid savings account."),
+        ("How can I stop impulse spending?",
+         "To curb impulse spending, implement a 24-to-48 hour cooling-off period for non-essential purchases. Unsubscribe from promotional retail emails, remove saved credit card details from shopping apps, and always shop with a written grocery list."),
+        ("What is the difference between essential needs and discretionary wants?",
+         "Needs are expenses essential for basic survival and maintaining employment (housing, utilities, basic groceries, essential healthcare, and transport). Wants are choices that enhance lifestyle but can be paused during tight periods (dining out, streaming subscriptions, entertainment, and luxury goods)."),
+        ("I want to save $500 a month but keep running out of money by month-end. What should I change?",
+         "Shift from 'saving what is left' to 'paying yourself first'. The moment your paycheck arrives, automatically transfer your $500 savings into a separate savings account before spending on everyday items. Adjust your lifestyle to live on the remaining balance."),
+        ("How does tracking small daily expenses help?",
+         "Small daily expenses like convenience store snacks, rideshares, and premium coffees often accumulate unnoticed. Tracking them brings visibility to micro-leaks in your cash flow and allows you to redirect hundreds of dollars each month into real savings."),
+        ("Is it better to save a large amount irregularly or a small amount consistently?",
+         "Consistency is far more powerful. Saving a fixed, manageable amount every month builds sustainable habits, prevents cash-flow shocks, and compounds steadily over time compared to unpredictable lump sums."),
+        ("How can a family reduce their monthly grocery bill without sacrificing nutrition?",
+         "Plan weekly meals around seasonal produce, buy staple grains and legumes in bulk, reduce pre-packaged convenience snacks, and cook in larger batches for leftovers. Planning prevents food waste, which accounts for up to 20% of average grocery spending."),
+        ("What should I do if my expenses match my income exactly?",
+         "When living expenses equal income, you have a zero operating margin with no safety cushion. Review discretionary spending immediately to trim 5% to 10% of flexible costs, creating a vital surplus margin to protect against surprise expenses."),
+        ("How do I maintain motivation when saving for a long-term goal?",
+         "Break large goals into smaller quarterly milestones. Celebrate reaching each milestone without spending money, use a visual tracker or progress app, and remind yourself of the peace of mind that financial security brings."),
+        ("What is 'lifestyle inflation' and how do I prevent it?",
+         "Lifestyle inflation occurs when your spending increases automatically as your income rises, leaving your savings rate stagnant. Prevent it by committing at least 50% of any raise or bonus directly into savings before adjusting your lifestyle upward."),
+        ("Should I keep my emergency fund in my daily checking account?",
+         "No. Keeping emergency savings in your daily checking account makes it too tempting to spend on routine purchases. Store it in a separate, dedicated high-yield savings account that is accessible within 24 hours but kept separate from everyday spending."),
+        ("How do I budget for irregular annual expenses like car insurance or taxes?",
+         "Calculate the total annual cost of these predictable expenses, divide by 12, and set that amount aside into a dedicated sub-savings account each month. When the bill arrives, the money is already waiting."),
+        ("Can budgeting still be flexible when unexpected things happen?",
+         "Yes, an effective budget is a living guideline, not a prison. Include a modest 'miscellaneous buffer' line item each month, and adjust category limits as circumstances shift without abandoning your overall savings target."),
+        ("What is the envelope budgeting method?",
+         "Envelope budgeting involves dividing your discretionary cash into designated categories (e.g. groceries, dining, entertainment). Once the money in an envelope is spent for the month, spending in that category stops until the next month."),
+        ("How do I prioritize between saving for emergencies and saving for a vacation?",
+         "Always secure a baseline emergency buffer of at least 1 to 3 months of expenses first. Once that safety foundation is established, you can split your monthly surplus between emergency savings and discretionary goals like vacations."),
+        ("What are high-impact areas to review first when facing a budget deficit?",
+         "When facing a deficit, immediately audit: 1) Dining out and food deliveries; 2) Subscriptions and gym memberships; 3) Unnecessary vehicle usage and fuel; 4) Discretionary retail shopping. Cutting these protects basic shelter and food."),
+        ("How often should I review my monthly budget?",
+         "Review your budget briefly at the end of each month to compare planned spending against actual expenses. Conduct a deeper review whenever your income, living situation, or major financial goals change."),
+        ("Why is 'paying yourself first' considered the golden rule of personal finance?",
+         "Because if you wait to save whatever is left at the end of the month, everyday spending naturally expands to consume all available cash. Paying yourself first guarantees that your financial security is prioritized."),
+        ("How do I handle peer pressure to spend money I didn't budget for?",
+         "Be honest with friends about having active savings goals, suggest low-cost alternatives like hosting a potluck or outdoor activities, and remember that real friends respect your commitment to financial health."),
+        ("What role does a savings buffer play in reducing financial stress?",
+         "Having a cash buffer transforms unexpected emergencies (car repairs, medical visits) from catastrophic debt crises into manageable inconveniences, drastically lowering daily anxiety."),
+        ("How can I budget with a variable or freelance income?",
+         "Base your baseline monthly budget on your lowest earning month over the past year. In higher-earning months, funnel all excess surplus into a 'holding buffer' account to supplement leaner months."),
+        ("Is it worth saving even if I can only afford $20 a month?",
+         "Absolutely! Saving $20 a month builds the psychological discipline and identity of a saver. As your income grows, that habit will scale seamlessly into hundreds of dollars a month."),
+        ("What is the 24-hour rule in personal finance?",
+         "The 24-hour rule requires waiting a full day before making any unplanned purchase over a certain threshold (e.g. $50). It allows emotional impulse to subside so you can evaluate whether the item is truly a priority."),
+    ]
+    for inp, outp in en_budget:
+        records.append({"instruction": instr_budget, "input": inp, "output": outp})
+
+    km_budget = [
+        ("តើខ្ញុំគួរចាប់ផ្តើមរៀបចំថវិកាដំបូងដោយរបៀបណា?",
+         "អ្នកអាចចាប់ផ្តើមយ៉ាងងាយស្រួលដោយប្រើក្បួន 50/30/20៖ បែងចែកចំណូល 50% សម្រាប់តម្រូវការចាំបាច់ (ផ្ទះ ម្ហូបអាហារ ទឹកភ្លើង), 30% សម្រាប់ការកម្សាន្ត និងបំណងប្រាថ្នាផ្ទាល់ខ្លួន, និង 20% សម្រាប់ការសន្សំប្រាក់។ ចាប់ផ្តើមកត់ត្រារាល់ការចំណាយប្រចាំថ្ងៃរយៈពេលពីរសប្តាហ៍ដំបូង។"),
+        ("តើមានវិធីណាខ្លះដើម្បីកាត់បន្ថយការចំណាយប្រចាំខែឱ្យមានប្រសិទ្ធភាព?",
+         "វិធីសាស្រ្តសំខាន់ៗរួមមាន៖ 1) ពិនិត្យនិងលុបចោលការជាវសេវាកម្មដែលមិនសូវប្រើប្រាស់; 2) ធ្វើម្ហូបញ៉ាំនៅផ្ទះជំនួសការញ៉ាំនៅក្រៅ; 3) កាត់បន្ថយការទិញភេសជ្ជៈថ្លៃៗជារៀងរាល់ថ្ងៃ; 4) អនុវត្តក្បួនរង់ចាំ 24 ម៉ោងមុនសម្រេចចិត្តទិញរបស់មិនចាំបាច់។"),
+        ("តើមូលនិធិសង្គ្រោះបន្ទាន់គួរមានចំនួនប៉ុន្មាន?",
+         "តាមក្បួនខ្នាតទូទៅ អ្នកគួរមានប្រាក់បម្រុងបន្ទាន់ស្មើនឹង 3 ទៅ 6 ខែនៃការចំណាយចាំបាច់។ ប្រសិនបើអ្នកចំណាយ $1,000 ក្នុងមួយខែ គោលដៅគួរមានចន្លោះពី $3,000 ទៅ $6,000 ដោយរក្សាទុកក្នុងគណនីធនាគារដែលអាចដកប្រើបានភ្លាមៗ។"),
+        ("តើខ្ញុំអាចទប់ស្កាត់ការទិញឥវ៉ាន់តាមអារម្មណ៍ដោយរបៀបណា?",
+         "ដើម្បីទប់ទល់ការទិញតាមអារម្មណ៍ សូមអនុវត្តក្បួនរង់ចាំ 24 ទៅ 48 ម៉ោងមុនពេលទិញ។ លុបកម្មវិធីទិញឥវ៉ាន់លើទូរស័ព្ទដែលធ្វើឱ្យអ្នកចំណាយលុយឥតប្រយោជន៍ និងធ្វើបញ្ជីទិញឥវ៉ាន់ច្បាស់លាស់មុនពេលទៅផ្សារ។"),
+        ("តើតម្រូវការចាំបាច់ (Needs) និងបំណងប្រាថ្នា (Wants) ខុសគ្នាយ៉ាងណា?",
+         "តម្រូវការចាំបាច់ គឺជារបស់ដែលខ្វះមិនបានសម្រាប់ការរស់នៅ (ថ្លៃផ្ទះ អាហារមូលដ្ឋាន ទឹកភ្លើង ថ្នាំសង្កូវ និងការធ្វើដំណើរ)។ ចំណែកបំណងប្រាថ្នា គឺជារបស់បន្ថែមដែលជួយឱ្យជីវិតកាន់តែប្រសើរតែអាចផ្អាកបាន (ការញ៉ាំអាហារហាងថ្លៃៗ ការកម្សាន្ត សម្លៀកបំពាក់ម៉ាកល្បីៗ)។"),
+        ("ខ្ញុំចង់សន្សំប្រាក់ ប៉ុន្តែដល់ចុងខែតែងតែអស់លុយ តើគួរកែប្រែយ៉ាងណា?",
+         "សូមផ្លាស់ប្តូរទម្លាប់ពី 'សន្សំប្រាក់ដែលនៅសល់' ទៅជា 'បង់ឱ្យខ្លួនឯងជាមុន'។ នៅពេលបើកប្រាក់ខែភ្លាម សូមផ្ទេរប្រាក់សន្សំទៅកាន់គណនីដាច់ដោយឡែកមួយភ្លាមៗ រួចចំណាយរស់នៅត្រឹមប្រាក់ដែលនៅសល់។"),
+        ("ហេតុអ្វីការកត់ត្រាការចំណាយតូចៗប្រចាំថ្ងៃមានសារៈសំខាន់?",
+         "ការចំណាយតូចៗដូចជាកាហ្វេ អាហារសម្រន់ ឬថ្លៃធ្វើដំណើរតូចតាច តែងតែកើនឡើងដោយមិនដឹងខ្លួន។ ការកត់ត្រាជួយឱ្យអ្នកមើលឃើញពីលំហូរលុយដែលបាត់បង់ និងអាចសន្សំបានរាប់រយដុល្លារក្នុងមួយខែ។"),
+        ("តើការសន្សំតិចៗទៀងទាត់ ឬសន្សំច្រើនយូរៗម្តង មួយណាល្អជាង?",
+         "ការសន្សំតិចតួចតែមានភាពខ្ជាប់ខ្ជួនជារៀងរាល់ខែ មានប្រសិទ្ធភាពខ្ពស់ជាង។ វាជួយកសាងទម្លាប់ល្អ មិនបង្កសម្ពាធលើថវិកា និងបង្កើតប្រាក់សន្សំយ៉ាងរឹងមាំតាមពេលវេលា។"),
+        ("តើគ្រួសារអាចកាត់បន្ថយថ្លៃម្ហូបអាហារដោយរបៀបណាដោយមិនប៉ះពាល់សុខភាព?",
+         "រៀបចំផែនការមុខម្ហូបប្រចាំសប្តាហ៍ ទិញបន្លែផ្លែឈើតាមរដូវកាល ទិញអង្ករនិងគ្រឿងទេសជាដុំ និងចម្អិនអាហារទុកសម្រាប់អាហារថ្ងៃត្រង់។ ការធ្វើបែបនេះកាត់បន្ថយការខ្ជះខ្ជាយអាហារបានយ៉ាងច្រើន។"),
+        ("តើត្រូវធ្វើដូចម្តេចប្រសិនបើចំណូលនិងចំណាយស្មើគ្នា?",
+         "នៅពេលចំណូលស្មើចំណាយ អ្នកគ្មានប្រាក់បម្រុងការពារហានិភ័យឡើយ។ សូមពិនិត្យការចំណាយមិនចាំបាច់ភ្លាមៗ ដើម្បីកាត់បន្ថយយ៉ាងតិច 5% ទៅ 10% បង្កើតជាប្រាក់សល់សម្រាប់ការពារគ្រាអាសន្ន។"),
+        ("តើធ្វើដូចម្តេចដើម្បីរក្សាការលើកទឹកចិត្តក្នុងការសន្សំរយៈពេលវែង?",
+         "បំបែកគោលដៅធំៗទៅជាគោលដៅតូចៗប្រចាំត្រីមាស។ អបអរសាទរនៅពេលសម្រេចបានគោលដៅនីមួយៗ និងរំលឹកខ្លួនឯងអំពីសន្តិភាពផ្លូវចិត្តដែលកើតចេញពីស្ថិរភាពហិរញ្ញវត្ថុ។"),
+        ("តើអ្វីទៅជា 'ការឡើងថ្លៃនៃរបៀបរស់នៅ' (Lifestyle Inflation)?",
+         "គឺជាស្ថានភាពដែលការចំណាយកើនឡើងដោយស្វ័យប្រវត្តិតាមការកើនឡើងនៃប្រាក់ចំណូល ដែលធ្វើឱ្យអ្នកមិនអាចសន្សំប្រាក់បាន។ ដើម្បីទប់ស្កាត់ សូមបង្វែរយ៉ាងតិច 50% នៃប្រាក់ខែកើនឡើងទៅកាន់ការសន្សំភ្លាមៗ។"),
+        ("តើគួរទុកប្រាក់បម្រុងបន្ទាន់ក្នុងគណនីចាយវាយប្រចាំថ្ងៃទេ?",
+         "មិនគួរទេ ព្រោះការទុកក្នុងគណនីតែមួយនឹងធ្វើឱ្យអ្នកងាយស្រួលដកចាយលើរបស់ប្រចាំថ្ងៃ។ គួរទុកក្នុងគណនីសន្សំដាច់ដោយឡែកមួយ ដែលអាចដកបានក្នុងរយៈពេល 24 ម៉ោងនៅពេលមានអាសន្នពិតប្រាកដ។"),
+        ("តើត្រូវរៀបចំថវិកាសម្រាប់ការចំណាយធំៗប្រចាំឆ្នាំយ៉ាងដូចម្តេច?",
+         "គណនាការចំណាយសរុបប្រចាំឆ្នាំ (ដូចជាពន្ធ ថ្លៃជួសជុលផ្ទះ ឬឡាន) រួចចែកនឹង 12។ សន្សំចំនួនទឹកប្រាក់នោះជារៀងរាល់ខែ នោះនៅពេលវិក្កយបត្រមកដល់ អ្នកមានលុយរួចជាស្រេច។"),
+        ("តើក្បួនថវិកាស្រោមសំបុត្រដំណើរការយ៉ាងដូចម្តេច?",
+         "ក្បួននេះគឺការបែងចែកលុយសុទ្ធដាក់ក្នុងស្រោមសំបុត្រតាមប្រភេទចំណាយ (ដូចជាថ្លៃម្ហូប ការកម្សាន្ត)។ នៅពេលលុយក្នុងស្រោមសំបុត្រណាមួយអស់ អ្នកត្រូវឈប់ចំណាយលើផ្នែកនោះរហូតដល់ខែបន្ទាប់។"),
+        ("តើគួរផ្តល់អាទិភាពលើការសន្សំអាសន្ន ឬសន្សំដើរលេងមុន?",
+         "ត្រូវបង្កើតប្រាក់បម្រុងបន្ទាន់យ៉ាងហោចណាស់ 1 ទៅ 3 ខែជាមុនសិន។ នៅពេលមានមូលដ្ឋានសុវត្ថិភាពហើយ ទើបអ្នកអាចបែងចែកប្រាក់សល់មួយផ្នែកសម្រាប់ដំណើរកម្សាន្ត។"),
+        ("តើផ្នែកណាខ្លះដែលគួរបន្ថយជាបន្ទាន់នៅពេលថវិកាជួបឱនភាព?",
+         "កាត់បន្ថយជាបន្ទាន់លើ៖ 1) ការញ៉ាំអាហារនៅភោជនីយដ្ឋាន; 2) ការកម្សាន្តនិងសេវាជាវផ្សេងៗ; 3) ការទិញសម្លៀកបំពាក់មិនចាំបាច់ ដើម្បីការពារថ្លៃផ្ទះនិងម្ហូបអាហារជាមូលដ្ឋាន។"),
+        ("តើគួរពិនិត្យមើលថវិកាប្រចាំខែញឹកញាប់ប៉ុណ្ណា?",
+         "គួរពិនិត្យយ៉ាងសង្ខេបនៅរៀងរាល់ចុងខែ ដើម្បីប្រៀបធៀបផែនការនិងការចំណាយជាក់ស្តែង និងធ្វើការកែសម្រួលនៅពេលមានការផ្លាស់ប្តូរចំណូលឬការងារ។"),
+        ("តើការសន្សំប្រាក់ជួយកាត់បន្ថយភាពតានតឹងផ្លូវចិត្តយ៉ាងដូចម្តេច?",
+         "ការមានប្រាក់បម្រុងបន្ទាន់ជួយប្តូរវិបត្តិធ្ងន់ធ្ងរ (ដូចជាការឈឺថ្កាត់ ឬឡានខូច) ឱ្យទៅជាបញ្ហាដែលអាចដោះស្រាយបានដោយងាយ ជួយកាត់បន្ថយការថប់បារម្ភក្នុងជីវិត។"),
+        ("តើការសន្សំត្រឹមតែ $20 ក្នុងមួយខែមានប្រយោជន៍ទេ?",
+         "ពិតជាមានប្រយោជន៍ខ្លាំងណាស់! ការសន្សំ $20 បង្កើតទម្លាប់ និងវិន័យហិរញ្ញវត្ថុ។ នៅពេលចំណូលរបស់អ្នកកើនឡើង ទម្លាប់នេះនឹងជួយឱ្យអ្នកសន្សំបានរាប់រយដុល្លារយ៉ាងងាយស្រួល។"),
+    ]
+    for inp, outp in km_budget:
+        records.append({"instruction": instr_budget, "input": inp, "output": outp})
+
+    # =========================================================================
+    # 5. Personalized Financial Planning & Natural Explanations (45 records: 25 EN, 20 KM)
+    # =========================================================================
+    instr_plan = "You are a helpful Financial AI Assistant. Provide structured, personalized financial guidance based on verified profile figures. Calculate timelines accurately and explain recommendations clearly."
+
+    en_plan = [
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: Help me create a financial plan",
+         "Based on your confirmed monthly income of $2,500 and expenses of $1,800, you have an active monthly surplus of $700 and zero debt obligations.\n\nRecommended Financial Plan:\n1. Emergency Buffer: Reserve your initial surplus until you have 3 months of expenses ($5,400) in a liquid account.\n2. Goal Target ($5,000): With your $700 monthly surplus, you can fully achieve your $5,000 savings milestone in approximately 7.1 months (around 7 to 8 months).\n3. Budget Stability: Continue keeping your essential living costs at $1,800 to maintain your positive cash flow."),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: How long will it take to reach my $5,000 goal?",
+         "With your monthly surplus of $700 ($2,500 income minus $1,800 expenses) and zero debt, reaching your $5,000 goal will take approximately 7.1 months (about 7 to 8 months of consistent saving)."),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,100/mo, surplus=+$900/mo, debt=no debt, savings goal=$4,500. User asks: How should I approach my $4,500 goal?",
+         "With an active monthly surplus of $900 and no debt payments, you can reach your $4,500 savings goal in exactly 5 months ($4,500 ÷ $900 = 5 months). Set up an automated monthly transfer of $900 into a dedicated savings account each payday."),
+        ("Verified user profile: income=$1,500/mo, expenses=$1,000/mo, surplus=+$500/mo, debt=no debt, savings goal=$3,000. User asks: Help me create a financial plan to save $3,000.",
+         "Here is your personalized roadmap based on your $500 monthly surplus and debt-free standing:\n1. Monthly Contribution: Save your $500 surplus consistently each month.\n2. Milestone Timeline: You will reach your $3,000 target in exactly 6 months ($3,000 ÷ $500 = 6 months).\n3. Protection: Keep these funds in a separate account so your daily living costs ($1,000) don't eat into your goal."),
+        ("Verified user profile: income=$4,000/mo, expenses=$2,600/mo, surplus=+$1,400/mo, debt=no debt, savings goal=$8,400. User asks: What is my timeline for saving $8,400?",
+         "At your current savings capacity of $1,400 per month ($4,000 income - $2,600 expenses), you will achieve your $8,400 goal in exactly 6 months ($8,400 ÷ $1,400 = 6 months)."),
+        ("Verified user profile: income=$2,000/mo, expenses=$1,600/mo, surplus=+$400/mo, debt=no debt, savings goal=$2,400. User asks: How should I allocate my savings?",
+         "Allocate your $400 monthly surplus as follows: Prioritize an emergency fund of $4,800 (3 months of expenses). Simultaneously, direct your savings toward your $2,400 goal, which will take 6 months of dedicated $400 allocations."),
+        ("Verified user profile: income=$3,500/mo, expenses=$2,500/mo, surplus=+$1,000/mo, debt=no debt, savings goal=$6,000. User asks: Can I reach my goal in half a year?",
+         "Yes! With a monthly surplus of $1,000 and zero debt, you will reach your $6,000 goal in exactly 6 months ($6,000 ÷ $1,000 = 6 months)."),
+        ("Verified user profile: income=$1,200/mo, expenses=$900/mo, surplus=+$300/mo, debt=no debt, savings goal=$1,800. User asks: Help me create a financial plan",
+         "Personalized Financial Plan:\n- Net Cash Flow: Income of $1,200 minus $900 expenses leaves a healthy $300 surplus.\n- Debt Status: Clean (no debt obligations).\n- Goal Timeline: Reaching your $1,800 goal requires 6 months ($1,800 ÷ $300 = 6 months).\n- Recommendation: Automate your $300 transfer on payday to keep expenses capped at $900."),
+        ("Verified user profile: income=$5,000/mo, expenses=$3,200/mo, surplus=+$1,800/mo, debt=no debt, savings goal=$10,800. User asks: How many months until I hit my target?",
+         "With a monthly surplus of $1,800 and no debt dragging on your budget, it will take exactly 6 months to reach your $10,800 savings goal ($10,800 ÷ $1,800 = 6 months)."),
+        ("Verified user profile: income=$2,800/mo, expenses=$2,000/mo, surplus=+$800/mo, debt=no debt, savings goal=$4,000. User asks: What strategy do you suggest?",
+         "Recommended Strategy: Direct your $800 monthly surplus into a dedicated savings vehicle. In 5 months, you will have accumulated $4,000, fully meeting your milestone. Keep living expenses locked at $2,000."),
+        ("Verified user profile: income=$1,800/mo, expenses=$1,350/mo, surplus=+$450/mo, debt=no debt, savings goal=$2,700. User asks: How long to reach my target?",
+         "Your target timeline is 6 months ($2,700 ÷ $450 = 6 months). Your positive cash flow of $450/mo ensures steady progress without debt interest."),
+        ("Verified user profile: income=$3,600/mo, expenses=$2,400/mo, surplus=+$1,200/mo, debt=no debt, savings goal=$6,000. User asks: Help me map out my savings.",
+         "Savings Roadmap:\n- Month 1-2: Accumulate $2,400 (covering 1 month of living costs as immediate buffer).\n- Month 3-5: Reach your $6,000 milestone ($1,200 × 5 months = $6,000).\n- Status: 100% debt-free; zero interest leakage."),
+        ("Verified user profile: income=$2,200/mo, expenses=$1,650/mo, surplus=+$550/mo, debt=no debt, savings goal=$3,300. User asks: What is my timeline?",
+         "At $550 monthly surplus, reaching $3,300 will take exactly 6 months ($3,300 ÷ $550 = 6 months)."),
+        ("Verified user profile: income=$4,500/mo, expenses=$3,000/mo, surplus=+$1,500/mo, debt=no debt, savings goal=$9,000. User asks: Can I save $9,000 this year?",
+         "Yes, easily! With $1,500 saved each month, you will hit $9,000 in just 6 months, leaving the second half of the year to build further wealth."),
+        ("Verified user profile: income=$1,000/mo, expenses=$750/mo, surplus=+$250/mo, debt=no debt, savings goal=$1,500. User asks: What is my financial plan?",
+         "Plan Summary:\n- Monthly Surplus: $250 ($1,000 income - $750 expenses).\n- Target: $1,500 goal reached in 6 months ($1,500 ÷ $250 = 6 months).\n- Action: Maintain low expenses and avoid taking on high-interest debt."),
+        ("Verified user profile: income=$2,600/mo, expenses=$1,950/mo, surplus=+$650/mo, debt=no debt, savings goal=$3,900. User asks: How should I pace my savings?",
+         "Pace yourself at $650 per month. In 6 months, you will hit your $3,900 goal cleanly. Continue keeping your essential spending capped at $1,950."),
+        ("Verified user profile: income=$3,800/mo, expenses=$2,600/mo, surplus=+$1,200/mo, debt=no debt, savings goal=$7,200. User asks: How long will it take?",
+         "It will take exactly 6 months to reach your $7,200 goal with your $1,200 monthly surplus ($7,200 ÷ $1,200 = 6 months)."),
+        ("Verified user profile: income=$1,600/mo, expenses=$1,200/mo, surplus=+$400/mo, debt=no debt, savings goal=$2,000. User asks: What is the fastest safe way to reach my goal?",
+         "The fastest safe path is dedicating your full $400 monthly surplus to your goal, achieving $2,000 in 5 months ($2,000 ÷ $400 = 5 months). Do not take on debt or cut essential food/health to rush the process."),
+        ("Verified user profile: income=$4,800/mo, expenses=$3,200/mo, surplus=+$1,600/mo, debt=no debt, savings goal=$9,600. User asks: How should I plan this milestone?",
+         "Plan to save $1,600 every month on payday. You will reach your $9,600 milestone in 6 months ($9,600 ÷ $1,600 = 6 months)."),
+        ("Verified user profile: income=$2,400/mo, expenses=$1,800/mo, surplus=+$600/mo, debt=no debt, savings goal=$3,000. User asks: Can I finish my goal in 5 months?",
+         "Yes! With a monthly surplus of $600, 5 months of savings will yield exactly $3,000 ($600 × 5 = $3,000)."),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,200/mo, surplus=+$800/mo, debt=no debt, savings goal=$4,800. User asks: Help me plan my next 6 months.",
+         "Next 6 Months Plan:\n- Month 1 to 6: Save $800 each month from your positive cash flow.\n- End of Month 6: You will have accumulated $4,800 ($800 × 6 = $4,800), fully hitting your target.\n- Status: Zero debt, zero interest expenses."),
+        ("Verified user profile: income=$1,400/mo, expenses=$1,050/mo, surplus=+$350/mo, debt=no debt, savings goal=$2,100. User asks: What is my timeline?",
+         "Your timeline is 6 months ($2,100 ÷ $350 = 6 months)."),
+        ("Verified user profile: income=$5,200/mo, expenses=$3,400/mo, surplus=+$1,800/mo, debt=no debt, savings goal=$9,000. User asks: How long to save $9,000?",
+         "At $1,800 saved monthly, you will achieve your $9,000 goal in 5 months ($9,000 ÷ $1,800 = 5 months)."),
+        ("Verified user profile: income=$2,100/mo, expenses=$1,500/mo, surplus=+$600/mo, debt=no debt, savings goal=$3,600. User asks: Provide a financial overview.",
+         "Financial Overview:\n- Monthly Income: $2,100\n- Living Expenses: $1,500\n- Monthly Surplus: $600\n- Debt: None\n- Target ($3,600): Achievable in 6 months ($3,600 ÷ $600 = 6 months)."),
+        ("Verified user profile: income=$3,400/mo, expenses=$2,500/mo, surplus=+$900/mo, debt=no debt, savings goal=$5,400. User asks: How many months to hit $5,400?",
+         "It will take 6 months ($5,400 ÷ $900 = 6 months) to reach your goal."),
+    ]
+    for inp, outp in en_plan:
+        records.append({"instruction": instr_plan, "input": inp, "output": outp})
+
+    km_plan = [
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: ជួយខ្ញុំរៀបចំផែនការហិរញ្ញវត្ថុ",
+         "ផ្អែកលើទិន្នន័យហិរញ្ញវត្ថុរបស់អ្នក (ចំណូល $2,500, ចំណាយ $1,800, សល់សុទ្ធ $700/ខែ និងគ្មានបំណុល)៖\n\nផែនការហិរញ្ញវត្ថុដែលបានណែនាំ៖\n1. មូលនិធិសង្គ្រោះបន្ទាន់៖ រក្សាប្រាក់សល់ដំបូងដើម្បីបង្កើតប្រាក់បម្រុង 3 ខែ ($5,400) ក្នុងគណនីងាយដក។\n2. គោលដៅសន្សំ ($5,000)៖ ជាមួយនឹងប្រាក់សល់ $700 ប្រចាំខែ អ្នកនឹងសម្រេចគោលដៅក្នុងរយៈពេលប្រហែល 7.1 ខែ (ចន្លោះ 7 ទៅ 8 ខែ)។\n3. ស្ថិរភាពថវិកា៖ បន្តរក្សាការចំណាយចាំបាច់ត្រឹម $1,800 ដើម្បីរក្សាលំហូរសាច់ប្រាក់វិជ្ជមាន។"),
+        ("Verified user profile: income=$2,500/mo, expenses=$1,800/mo, surplus=+$700/mo, debt=no debt, savings goal=$5,000. User asks: តើត្រូវចំណាយពេលប៉ុន្មានខែដើម្បីសន្សំបាន $5,000?",
+         "ជាមួយនឹងប្រាក់សល់សុទ្ធ $700 ក្នុងមួយខែ ($2,500 ចំណូល ដក $1,800 ចំណាយ) និងគ្មានបំណុល អ្នកនឹងសម្រេចគោលដៅ $5,000 ក្នុងរយៈពេលប្រហែល 7.1 ខែ (ប្រហែល 7 ទៅ 8 ខែ)។"),
+        ("Verified user profile: income=$1,500/mo, expenses=$1,000/mo, surplus=+$500/mo, debt=no debt, savings goal=$3,000. User asks: ជួយរៀបចំផែនការសន្សំ $3,000 ឱ្យខ្ញុំ។",
+         "ផែនការសន្សំផ្ទាល់ខ្លួនរបស់អ្នក៖\n1. ការសន្សំប្រចាំខែ៖ សន្សំប្រាក់សល់ $500 ឱ្យបានខ្ជាប់ខ្ជួនជារៀងរាល់ខែ។\n2. រយៈពេលសម្រេច៖ អ្នកនឹងសន្សំបាន $3,000 ក្នុងរយៈពេលពិតប្រាកដ 6 ខែ ($3,000 ÷ $500 = 6 ខែ)។\n3. ការការពារ៖ ផ្ទេរប្រាក់សន្សំនេះចូលគណនីដាច់ដោយឡែកភ្លាមៗនៅថ្ងៃបើកប្រាក់ខែ។"),
+        ("Verified user profile: income=$3,000/mo, expenses=$2,100/mo, surplus=+$900/mo, debt=no debt, savings goal=$4,500. User asks: តើខ្ញុំគួររៀបចំផែនការយ៉ាងណាដើម្បីសន្សំ $4,500?",
+         "ជាមួយនឹងប្រាក់សល់ $900 ប្រចាំខែ និងគ្មានបំណុល អ្នកអាចសម្រេចគោលដៅ $4,500 ក្នុងរយៈពេលត្រឹមតែ 5 ខែប៉ុណ្ណោះ ($4,500 ÷ $900 = 5 ខែ)។ សូមរៀបចំការផ្ទេរប្រាក់ $900 ដោយស្វ័យប្រវត្តិទៅកាន់គណនីសន្សំ។"),
+        ("Verified user profile: income=$4,000/mo, expenses=$2,600/mo, surplus=+$1,400/mo, debt=no debt, savings goal=$8,400. User asks: តើត្រូវប្រើពេលប៉ុន្មានខែ?",
+         "ផ្អែកលើសមត្ថភាពសន្សំ $1,400 ក្នុងមួយខែ អ្នកនឹងសម្រេចគោលដៅ $8,400 ក្នុងរយៈពេល 6 ខែគត់ ($8,400 ÷ $1,400 = 6 ខែ)។"),
+        ("Verified user profile: income=$2,000/mo, expenses=$1,400/mo, surplus=+$600/mo, debt=no debt, savings goal=$3,600. User asks: ជួយរៀបចំផែនការហិរញ្ញវត្ថុ",
+         "ផែនការហិរញ្ញវត្ថុ៖\n- លំហូរសាច់ប្រាក់៖ ចំណូល $2,000 ដកចំណាយ $1,400 សល់ប្រាក់សុទ្ធ $600/ខែ។\n- ស្ថានភាពបំណុល៖ គ្មានបំណុល។\n- រយៈពេលគោលដៅ៖ សម្រេចគោលដៅ $3,600 ក្នុងរយៈពេល 6 ខែ ($3,600 ÷ $600 = 6 ខែ)។"),
+        ("Verified user profile: income=$3,500/mo, expenses=$2,500/mo, surplus=+$1,000/mo, debt=no debt, savings goal=$6,000. User asks: តើអាចសម្រេចគោលដៅក្នុងរយៈពេលកន្លះឆ្នាំបានទេ?",
+         "បានយ៉ាងពិតប្រាកដ! ជាមួយនឹងប្រាក់សល់ $1,000 ក្នុងមួយខែ អ្នកនឹងសន្សំបាន $6,000 ក្នុងរយៈពេល 6 ខែគត់ ($6,000 ÷ $1,000 = 6 ខែ)។"),
+        ("Verified user profile: income=$1,200/mo, expenses=$900/mo, surplus=+$300/mo, debt=no debt, savings goal=$1,800. User asks: តើត្រូវសន្សំប៉ុន្មានខែ?",
+         "ដើម្បីសន្សំឱ្យបាន $1,800 ជាមួយនឹងប្រាក់សល់ $300 ក្នុងមួយខែ អ្នកត្រូវចំណាយពេល 6 ខែ ($1,800 ÷ $300 = 6 ខែ)។"),
+        ("Verified user profile: income=$5,000/mo, expenses=$3,200/mo, surplus=+$1,800/mo, debt=no debt, savings goal=$9,000. User asks: តើខ្ញុំអាចសម្រេចគោលដៅ $9,000 ក្នុងរយៈពេល 5 ខែបានទេ?",
+         "ពិតជាបាន! ការសន្សំ $1,800 ក្នុងមួយខែ រយៈពេល 5 ខែ នឹងផ្តល់ប្រាក់សរុប $9,000 យ៉ាងត្រឹមត្រូវ ($1,800 × 5 = $9,000)។"),
+        ("Verified user profile: income=$2,800/mo, expenses=$2,000/mo, surplus=+$800/mo, debt=no debt, savings goal=$4,000. User asks: តើយុទ្ធសាស្ត្រសន្សំគួរធ្វើដូចម្តេច?",
+         "យុទ្ធសាស្ត្រដែលបានណែនាំ៖ សន្សំប្រាក់ $800 ជារៀងរាល់ខែភ្លាមៗនៅពេលបើកប្រាក់ខែ។ ក្នុងរយៈពេល 5 ខែ អ្នកនឹងមានប្រាក់គ្រប់ $4,000 សម្រាប់គោលដៅរបស់អ្នក។"),
+        ("Verified user profile: income=$1,800/mo, expenses=$1,350/mo, surplus=+$450/mo, debt=no debt, savings goal=$2,700. User asks: តើត្រូវសន្សំរយៈពេលប៉ុន្មាន?",
+         "រយៈពេលដែលត្រូវប្រើគឺ 6 ខែ ($2,700 ÷ $450 = 6 ខែ) ដោយរក្សាការចំណាយត្រឹម $1,350។"),
+        ("Verified user profile: income=$3,600/mo, expenses=$2,400/mo, surplus=+$1,200/mo, debt=no debt, savings goal=$6,000. User asks: បង្ហាញផែនទីបង្ហាញផ្លូវហិរញ្ញវត្ថុ។",
+         "ផែនទីបង្ហាញផ្លូវហិរញ្ញវត្ថុ៖\n- ខែទី 1 ដល់ 5៖ សន្សំ $1,200 ជារៀងរាល់ខែ។\n- ចុងខែទី 5៖ សម្រេចគោលដៅ $6,000 ($1,200 × 5 = $6,000)។\n- ស្ថានភាព៖ គ្មានការបង់ការប្រាក់បំណុលឡើយ។"),
+        ("Verified user profile: income=$2,200/mo, expenses=$1,650/mo, surplus=+$550/mo, debt=no debt, savings goal=$3,300. User asks: តើត្រូវប្រើពេលប៉ុន្មានខែ?",
+         "អ្នកនឹងសម្រេចគោលដៅ $3,300 ក្នុងរយៈពេល 6 ខែគត់ ($3,300 ÷ $550 = 6 ខែ)។"),
+        ("Verified user profile: income=$4,500/mo, expenses=$3,000/mo, surplus=+$1,500/mo, debt=no debt, savings goal=$7,500. User asks: តើត្រូវចំណាយពេលប៉ុន្មាន?",
+         "ជាមួយនឹងការសន្សំ $1,500 ក្នុងមួយខែ អ្នកនឹងសម្រេចគោលដៅ $7,500 ក្នុងរយៈពេល 5 ខែ ($7,500 ÷ $1,500 = 5 ខែ)។"),
+        ("Verified user profile: income=$1,000/mo, expenses=$750/mo, surplus=+$250/mo, debt=no debt, savings goal=$1,500. User asks: ជួយរៀបចំផែនការសន្សំ។",
+         "ផែនការសន្សំ៖ សន្សំប្រាក់សល់ $250 ជារៀងរាល់ខែ។ ក្នុងរយៈពេល 6 ខែ អ្នកនឹងមានប្រាក់សរុប $1,500 តាមការកំណត់។"),
+        ("Verified user profile: income=$2,600/mo, expenses=$1,950/mo, surplus=+$650/mo, debt=no debt, savings goal=$3,900. User asks: តើត្រូវសន្សំប៉ុន្មានខែ?",
+         "ត្រូវចំណាយពេល 6 ខែ ($3,900 ÷ $650 = 6 ខែ) ដើម្បីសម្រេចគោលដៅ $3,900 របស់អ្នក។"),
+        ("Verified user profile: income=$3,800/mo, expenses=$2,600/mo, surplus=+$1,200/mo, debt=no debt, savings goal=$6,000. User asks: តើត្រូវសន្សំប៉ុន្មានខែ?",
+         "អ្នកនឹងសម្រេចគោលដៅ $6,000 ក្នុងរយៈពេល 5 ខែ ($6,000 ÷ $1,200 = 5 ខែ)។"),
+        ("Verified user profile: income=$1,600/mo, expenses=$1,200/mo, surplus=+$400/mo, debt=no debt, savings goal=$2,400. User asks: តើផែនការសន្សំមានរយៈពេលប៉ុន្មាន?",
+         "ផែនការសន្សំនេះមានរយៈពេល 6 ខែ ($2,400 ÷ $400 = 6 ខែ) ដោយមិនចាំបាច់ខ្ចីបុលពីនរណាឡើយ។"),
+        ("Verified user profile: income=$4,800/mo, expenses=$3,200/mo, surplus=+$1,600/mo, debt=no debt, savings goal=$8,000. User asks: តើត្រូវសន្សំប៉ុន្មានខែ?",
+         "អ្នកនឹងសន្សំបាន $8,000 ក្នុងរយៈពេល 5 ខែ ($1,600 × 5 = $8,000)។"),
+        ("Verified user profile: income=$2,400/mo, expenses=$1,800/mo, surplus=+$600/mo, debt=no debt, savings goal=$3,600. User asks: ជួយរៀបចំផែនការសន្សំប្រាក់។",
+         "ផែនការសន្សំ៖ សន្សំប្រាក់សល់សុទ្ធ $600 ក្នុងមួយខែ។ អ្នកនឹងសម្រេចគោលដៅ $3,600 ក្នុងរយៈពេល 6 ខែគត់ ($3,600 ÷ $600 = 6 ខែ)។"),
+    ]
+    for inp, outp in km_plan:
+        records.append({"instruction": instr_plan, "input": inp, "output": outp})
+
+    # =========================================================================
+    # 6. Missing Information Without Guessing (Strict Null Semantics) (25 records: 15 EN, 10 KM)
+    # =========================================================================
+    instr_missing = "You are a helpful Financial AI Assistant. Identify known financial parameters, specify what critical information is missing or ambiguous, and explain what additional details are required for a complete financial plan without guessing values."
+
+    en_missing = [
+        ("I earn $2,500 every month and want to save for a vacation.",
+         "You provided a monthly income of $2,500 and a goal to save for a vacation. However, critical information is missing: your monthly living expenses, debt status, and the target cost of your vacation are unstated. Please share your typical monthly expenses so we can calculate how much surplus is available."),
+        ("I spend about $1,800 a month. How much can I save?",
+         "You provided monthly expenses of $1,800, but did not mention your monthly income or debt obligations. To calculate your savings capacity, I need to know your take-home monthly income."),
+        ("I want to save $10,000 for a down payment on a car.",
+         "Saving $10,000 is a clear goal, but your current income, regular living expenses, and debt status are completely unstated. To build a realistic timeline, please share your monthly earnings and expenses."),
+        ("I have no debt and want to invest.",
+         "Having no debt is an excellent starting point. However, to evaluate your investment readiness, I need to know your monthly income and expenses to determine if you have an adequate emergency buffer in place first."),
+        ("My spouse and I bring home $4,000 a month.",
+         "Your combined household income of $4,000 is noted. To understand your financial health, we need details on your total monthly expenses, whether you carry any debts, and your specific savings milestones."),
+        ("I spend $2,000 monthly and have a credit card.",
+         "You specified $2,000 in monthly expenses and the presence of a credit card. However, your monthly income, current credit card balance, and minimum payments were not provided. Please share your income to evaluate your cash flow."),
+        ("Can I afford to buy a $30,000 car?",
+         "Determining whether a $30,000 car is affordable requires knowing your monthly take-home income, current living expenses, down payment amount, and whether you currently carry other debt obligations. Please share your monthly budget details."),
+        ("I have $1,000 left over each month.",
+         "Having a $1,000 surplus is positive, but your baseline income, expenses, debt status, and savings goals are missing. Sharing these figures allows for a complete assessment and proper emergency fund sizing."),
+        ("My monthly salary is $1,800.",
+         "You stated an income of $1,800 per month. To evaluate how much you can save and plan for future goals, please share your regular monthly living costs and whether you have any debts."),
+        ("I want to build an emergency fund.",
+         "Building an emergency fund is a foundational priority. Because an emergency buffer is based on living costs (typically 3 to 6 months of expenses), please share your monthly expenses so we can calculate your exact target."),
+        ("I earn $3,000 and have debt.",
+         "You provided an income of $3,000 and noted the presence of debt. However, your monthly living expenses and the exact monthly payments or total balance of the debt were not specified. Please provide your expenses for a complete plan."),
+        ("We are married with two kids and want to save money.",
+         "Supporting a family requires careful planning. To build a personalized budget, please share your combined monthly income, regular household expenses, and whether your family has any existing debt."),
+        ("I just got a new job with a higher salary.",
+         "Congratulations on the new job! To update your financial plan, please provide your new monthly take-home pay along with your expected monthly expenses."),
+        ("I spend $1,200 a month on rent and food.",
+         "You noted $1,200 for rent and food, but total living expenses (utilities, transport, healthcare), monthly income, and debt status are unstated. Please share your complete budget for an accurate analysis."),
+        ("Can you help me retire early?",
+         "Planning for early retirement requires understanding your current age, target retirement age, monthly income, current living expenses, existing savings, and debt obligations. Please share your basic monthly budget to start."),
+    ]
+    for inp, outp in en_missing:
+        records.append({"instruction": instr_missing, "input": inp, "output": outp})
+
+    km_missing = [
+        ("ខ្ញុំរកបាន $2,500 ក្នុងមួយខែ ហើយចង់សន្សំលុយទិញឡាន។",
+         "អ្នកបានផ្តល់ប្រាក់ចំណូល $2,500 និងគោលដៅទិញរថយន្ត។ ប៉ុន្តែព័ត៌មានសំខាន់ៗនៅខ្វះ៖ ការចំណាយប្រចាំខែ ស្ថានភាពបំណុល និងតម្លៃរថយន្តដែលចង់ទិញមិនត្រូវបានបញ្ជាក់ឡើយ។ សូមចែករំលែកការចំណាយប្រចាំខែរបស់អ្នក ដើម្បីគណនាប្រាក់សល់ពិតប្រាកដ។"),
+        ("ខ្ញុំចំណាយប្រហែល $1,800 ក្នុងមួយខែ។ តើខ្ញុំអាចសន្សំបានប៉ុន្មាន?",
+         "អ្នកបានផ្តល់ការចំណាយ $1,800 ប៉ុន្តែមិនបានបញ្ជាក់ពីប្រាក់ចំណូល ឬស្ថានភាពបំណុលឡើយ។ ដើម្បីគណនាសមត្ថភាពសន្សំប្រាក់ ខ្ញុំត្រូវការដឹងពីប្រាក់ចំណូលប្រចាំខែរបស់អ្នក។"),
+        ("ខ្ញុំចង់សន្សំប្រាក់ $10,000 សម្រាប់ទិញផ្ទះ។",
+         "គោលដៅសន្សំ $10,000 គឺច្បាស់លាស់ ប៉ុន្តែចំណូល ការចំណាយប្រចាំខែ និងស្ថានភាពបំណុលបច្ចុប្បន្នមិនត្រូវបានបញ្ជាក់ឡើយ។ សូមផ្តល់ព័ត៌មានចំណូលនិងចំណាយ ដើម្បីរៀបចំផែនការពេលវេលាជាក់ស្តែង។"),
+        ("ខ្ញុំគ្មានបំណុលទេ ហើយចង់វិនិយោគ។",
+         "ការគ្មានបំណុលគឺជាចំណុចចាប់ផ្តើមដ៏ល្អ។ ប៉ុន្តែដើម្បីវាយតម្លៃលទ្ធភាពវិនិយោគ ខ្ញុំត្រូវដឹងពីចំណូល និងការចំណាយប្រចាំខែ ដើម្បីពិនិត្យមើលថាតើអ្នកមានប្រាក់បម្រុងបន្ទាន់គ្រប់គ្រាន់ហើយឬនៅ។"),
+        ("គ្រួសារយើងរកបាន $4,000 ក្នុងមួយខែ។",
+         "ចំណូលរួម $4,000 ត្រូវបានកត់សម្គាល់។ ដើម្បីយល់ច្បាស់ពីស្ថានភាពហិរញ្ញវត្ថុ យើងត្រូវការព័ត៌មានលម្អិតអំពីការចំណាយប្រចាំខែ ស្ថានភាពបំណុល និងគោលដៅសន្សំជាក់លាក់របស់អ្នក។"),
+        ("ខ្ញុំចំណាយ $1,500 ក្នុងមួយខែ និងមានបំណុលធនាគារ។",
+         "អ្នកបានបញ្ជាក់ការចំណាយ $1,500 និងវត្តមានបំណុលធនាគារ។ ប៉ុន្តែប្រាក់ចំណូល និងទំហំបំណុលដែលត្រូវបង់ប្រចាំខែមិនទាន់ត្រូវបានបញ្ជាក់ទេ។ សូមផ្តល់ចំណូលរបស់អ្នកសម្រាប់ការវិភាគពេញលេញ។"),
+        ("តើខ្ញុំអាចទិញទូរស័ព្ទតម្លៃ $1,200 បានទេ?",
+         "ដើម្បីដឹងថាអាចទិញបានឬអត់ យើងត្រូវដឹងពីចំណូលប្រចាំខែ ការចំណាយចាំបាច់ និងប្រាក់សល់សុទ្ធរបស់អ្នក។ សូមចែករំលែកព័ត៌មានថវិការបស់អ្នក។"),
+        ("ខ្ញុំមានប្រាក់ខែ $1,500។",
+         "អ្នកបានបញ្ជាក់ចំណូល $1,500។ ដើម្បីដឹងថាតើអ្នកអាចសន្សំបានប៉ុន្មាន សូមផ្តល់ព័ត៌មានបន្ថែមអំពីការចំណាយប្រចាំខែ និងបំណុល (ប្រសិនបើមាន)។"),
+        ("ខ្ញុំចង់បង្កើតមូលនិធិសង្គ្រោះបន្ទាន់។",
+         "ការបង្កើតមូលនិធិបន្ទាន់គឺជាអាទិភាពចម្បង។ ដោយសារមូលនិធិនេះផ្អែកលើការចំណាយ (3 ទៅ 6 ខែ) សូមផ្តល់ព័ត៌មានអំពីការចំណាយប្រចាំខែរបស់អ្នក ដើម្បីគណនាទំហំទឹកប្រាក់ជាក់លាក់។"),
+        ("ខ្ញុំចំណាយ $800 លើថ្លៃផ្ទះនិងអាហារ។",
+         "អ្នកបានកត់សម្គាល់ការចំណាយ $800 លើផ្ទះនិងអាហារ ប៉ុន្តែការចំណាយផ្សេងទៀត ចំណូលប្រចាំខែ និងបំណុលមិនទាន់ត្រូវបានបញ្ជាក់ឡើយ។ សូមផ្តល់ទិន្នន័យពេញលេញដើម្បីរៀបចំថវិកា។"),
+    ]
+    for inp, outp in km_missing:
+        records.append({"instruction": instr_missing, "input": inp, "output": outp})
+
+    # =========================================================================
+    # 7. Safety Boundaries, Guardrails & Refusals (25 records: 15 EN, 10 KM)
+    # =========================================================================
+    instr_safety = "You are a helpful Financial AI Assistant. Respond to the user inquiry while maintaining strict professional boundaries. Refuse to provide speculative trading tips, cryptocurrency picks, loan underwriting approvals, or guaranteed return promises. Redirect towards sound personal budgeting and risk management."
+
+    en_safety = [
+        ("Which cryptocurrency should I buy to 10x my savings quickly?",
+         "I cannot recommend specific cryptocurrencies, tokens, or get-rich-quick speculative investments. Cryptocurrency trading carries substantial risk of principal loss. A sound financial foundation focuses on maintaining an emergency buffer, living within your means, and investing in diversified, regulated assets aligned with long-term goals."),
+        ("Can you approve my $5,000 personal loan right now?",
+         "I am an educational Financial Advisor AI and do not possess lending authority or loan underwriting capabilities. I cannot approve, issue, or deny loans. If you are seeking credit, please consult a licensed financial institution or regulated bank."),
+        ("Tell me a hot stock tip that is guaranteed to double my money.",
+         "I cannot provide individual stock picks, day-trading tips, or guaranteed profit predictions. All market investing involves risk, and no investment can guarantee doubled returns. Sound wealth building relies on consistent savings, expense management, and diversified, long-term strategies."),
+        ("How can I hide some of my income from tax authorities?",
+         "I cannot assist with tax evasion, unreported income, or unlawful financial practices. I can, however, explain legal tax-advantaged savings accounts, standard deductions, and compliant budgeting strategies."),
+        ("What meme coin is going to pump this weekend?",
+         "I do not track or recommend speculative meme coins or short-term pump assets. These assets are highly volatile and speculative. I recommend focusing your surplus on guaranteed cash reserves and verified personal savings goals."),
+        ("Can you guarantee that following this plan will make me rich?",
+         "I cannot guarantee specific wealth outcomes or investment returns. Financial success depends on real-world factors including disciplined budgeting, unexpected life events, and broader economic conditions. My role is to provide grounded, prudent guidance based on your verified budget."),
+        ("Should I take a cash advance on my credit card to buy Bitcoin?",
+         "No. Using high-interest debt (such as credit card cash advances) to purchase volatile speculative assets like Bitcoin exposes you to severe financial risk. If the asset declines, you remain obligated to pay high interest charges and fees. Prudent finance prioritizes debt elimination over speculative borrowing."),
+        ("Can you review my credit score and change it for me?",
+         "I do not have access to credit bureau records and cannot alter, dispute, or repair credit scores. To check your credit score, request an official report from an authorized credit reporting bureau."),
+        ("Is there an investment that gives a guaranteed 20% return with zero risk?",
+         "No. In finance, there is no such thing as a guaranteed 20% return with zero risk. Any scheme promising high, risk-free returns is characteristic of fraudulent investments. Legitimate low-risk assets (such as government bonds or insured savings accounts) offer modest, safe returns."),
+        ("Should I invest my emergency fund into foreign exchange day-trading?",
+         "No. An emergency fund must never be placed into speculative vehicles like forex day-trading. Emergency reserves must remain completely safe, liquid, and protected from capital loss so they are guaranteed to be there when crisis strikes."),
+        ("Can you help me get a bank loan by inflating my reported income?",
+         "I cannot assist with inflating income, falsifying financial applications, or committing bank fraud. Providing inaccurate details on loan applications is illegal. I can help you improve your actual debt-to-income ratio through genuine budgeting."),
+        ("What penny stock should I buy today for quick cash?",
+         "I do not provide penny stock recommendations. Micro-cap and penny stocks are notoriously illiquid, subject to manipulation, and carry severe risks of total capital loss. Focus your surplus on building liquid savings and clear financial milestones."),
+        ("Can you write a loan contract for me and my friend?",
+         "I cannot draft legally binding loan contracts or provide formal legal services. For enforceable loan agreements, please consult a licensed attorney or qualified legal professional."),
+        ("Why won't you give me specific stock recommendations?",
+         "As an AI financial advisor, my purpose is to provide educational, structured budgeting guidance and help you understand your cash flow. Providing specific stock recommendations requires licensed investment advisory credentials and full fiduciary suitability analysis."),
+        ("Should I borrow money from a loan shark to pay my rent?",
+         "No, you should never turn to unlicensed lenders or loan sharks. They charge exorbitant, unregulated interest rates that trap borrowers in severe debt cycles. If you are struggling with rent, explore community assistance programs, speak with your landlord about payment plans, or seek counseling from accredited non-profit credit organizations."),
+    ]
+    for inp, outp in en_safety:
+        records.append({"instruction": instr_safety, "input": inp, "output": outp})
+
+    km_safety = [
+        ("តើខ្ញុំគួរទិញកាក់គ្រីបតូ (Crypto) ណាដើម្បីចំណេញបានលឿន?",
+         "ខ្ញុំមិនអាចផ្តល់អនុសាសន៍ឱ្យទិញកាក់គ្រីបតូ ឬការវិនិយោគប្រថុយប្រថានណាមួយឡើយ។ ការជួញដូររូបិយប័ណ្ណគ្រីបតូមានហានិភ័យខ្ពស់នៃការខាតបង់ប្រាក់ដើម។ គ្រឹះហិរញ្ញវត្ថុរឹងមាំគឺការរក្សាប្រាក់បម្រុងបន្ទាន់ ការរស់នៅសមល្មមនឹងចំណូល និងការសន្សំជាប្រចាំ។"),
+        ("តើអ្នកអាចអនុម័តប្រាក់កម្ចី $5,000 ឱ្យខ្ញុំបានទេ?",
+         "ខ្ញុំជាជំនួយការប្រឹក្សាអប់រំហិរញ្ញវត្ថុ AI ហើយគ្មានសិទ្ធិអំណាចក្នុងការផ្តល់ ឬអនុម័តប្រាក់កម្ចីឡើយ។ ប្រសិនបើអ្នកត្រូវការកម្ចី សូមទាក់ទងធនាគារ ឬគ្រឹះស្ថានមីក្រូហិរញ្ញវត្ថុដែលមានអាជ្ញាប័ណ្ណត្រឹមត្រូវ។"),
+        ("ប្រាប់ខ្ញុំពីភាគហ៊ុនដែលធានាថានឹងចំណេញគុណនឹងពីរមក។",
+         "ខ្ញុំមិនអាចផ្តល់ការណែនាំអំពីភាគហ៊ុនជាក់លាក់ ឬការធានាប្រាក់ចំណេញបានទេ។ ការវិនិយោគក្នុងទីផ្សារតែងតែមានហានិភ័យ ហើយគ្មានការវិនិយោគស្របច្បាប់ណាអាចធានាផលចំណេញទ្វេដងដោយគ្មានហានិភ័យនោះឡើយ។"),
+        ("តើខ្ញុំអាចគេចពន្ធដោយរបៀបណា?",
+         "ខ្ញុំមិនអាចជួយក្នុងការគេចពន្ធ ឬសកម្មភាពហិរញ្ញវត្ថុខុសច្បាប់បានឡើយ។ ខ្ញុំអាចជួយពន្យល់អំពីការគ្រប់គ្រងថវិកា និងការរៀបចំផែនការចំណូលចំណាយស្របច្បាប់ប៉ុណ្ណោះ។"),
+        ("តើមានការវិនិយោគណាដែលធានាផលចំណេញ 20% ដោយគ្មានហានិភ័យទេ?",
+         "មិនមានទេ! ក្នុងវិស័យហិរញ្ញវត្ថុ គ្មានការវិនិយោគណាដែលផ្តល់ផលចំណេញខ្ពស់ 20% ដោយគ្មានហានិភ័យឡើយ។ ការសន្យាផ្តល់ផលចំណេញខ្ពស់ខុសពីធម្មតាជានិមិត្តសញ្ញានៃការបោកប្រាស់។"),
+        ("តើខ្ញុំគួរខ្ចីលុយការប្រាក់ខ្ពស់ដើម្បីទិញកាក់ Bitcoin ទេ?",
+         "មិនគួរដាច់ខាត! ការខ្ចីបុលដែលមានការប្រាក់ខ្ពស់ដើម្បីទិញទ្រព្យសកម្មប្រថុយប្រថាន នឹងបង្កគ្រោះថ្នាក់ហិរញ្ញវត្ថុយ៉ាងធ្ងន់ធ្ងរ។ ប្រសិនបើតម្លៃកាក់ធ្លាក់ចុះ អ្នកនៅតែត្រូវជាប់ជំពាក់ការប្រាក់យ៉ាងធ្ងន់ធ្ងរដដែល។"),
+        ("តើអ្នកអាចជួយកែប្រែពិន្ទុឥណទាន (Credit Score) របស់ខ្ញុំបានទេ?",
+         "ខ្ញុំមិនមានសិទ្ធិចូលទៅកាន់ប្រព័ន្ធឥណទាន ឬកែប្រែពិន្ទុឥណទានរបស់អ្នកបានឡើយ។ ដើម្បីកែលម្អពិន្ទុឥណទាន អ្នកត្រូវសងបំណុលឱ្យទាន់ពេលវេលា និងកាត់បន្ថយបំណុលដែលមិនចាំបាច់។"),
+        ("តើខ្ញុំគួរយកប្រាក់បម្រុងបន្ទាន់ទៅជួញដូរ Forex ទេ?",
+         "មិនគួរជាដាច់ខាត! ប្រាក់បម្រុងបន្ទាន់ត្រូវតែរក្សាទុកក្នុងកន្លែងដែលមានសុវត្ថិភាពខ្ពស់ និងអាចដកបានភ្លាមៗ មិនត្រូវយកទៅប្រថុយក្នុងទីផ្សារ Forex ដែលអាចបាត់បង់ប្រាក់ដើមឡើយ។"),
+        ("តើអ្នកអាចជួយសរសេរលិខិតបន្លំប្រាក់ចំណូលដើម្បីខ្ចីលុយធនាគារបានទេ?",
+         "ខ្ញុំមិនអាចជួយក្នុងការបន្លំទិន្នន័យចំណូល ឬឯកសារក្លែងបន្លំបានឡើយ ព្រោះជាទង្វើខុសច្បាប់។ ខ្ញុំអាចជួយអ្នកកែលម្អសមាមាត្របំណុលនិងចំណូលតាមរយៈការគ្រប់គ្រងថវិកាពិតប្រាកដ។"),
+        ("តើខ្ញុំគួរខ្ចីលុយការប្រាក់ក្រៅប្រព័ន្ធដើម្បីបង់ថ្លៃផ្ទះទេ?",
+         "មិនគួរឡើយ! កម្ចីក្រៅប្រព័ន្ធមានអត្រាការប្រាក់ខ្ពស់ហួសហេតុ ដែលអាចរុញច្រានអ្នកឱ្យធ្លាក់ក្នុងអន្ទាក់បំណុលវណ្ឌក។ សូមពិភាក្សាជាមួយម្ចាស់ផ្ទះដើម្បីពន្យារពេល ឬស្វែងរកដំណោះស្រាយជំនួយស្របច្បាប់។"),
+    ]
+    for inp, outp in km_safety:
+        records.append({"instruction": instr_safety, "input": inp, "output": outp})
+
+    return records
+
+
+def build_v3_dataset():
+    print("=" * 65)
+    print("BUILDING V3 CONVERSATIONAL SFT DATASET")
+    print("=" * 65)
+
+    if not os.path.exists(V2_COMBINED_PATH):
+        raise FileNotFoundError(f"V2 combined dataset not found: {V2_COMBINED_PATH}")
+
+    # 1. Load existing 340 V2 records
+    v2_records = []
+    with open(V2_COMBINED_PATH, "r", encoding="utf-8") as f:
+        for line in f:
+            line_str = line.strip()
+            if line_str:
+                item = json.loads(line_str)
+                assert set(item.keys()) == {"instruction", "input", "output"}
+                v2_records.append(item)
+
+    print(f"Loaded {len(v2_records)} existing records from V2 combined dataset.")
+    assert len(v2_records) == 340, f"Expected 340 V2 records, got {len(v2_records)}"
+
+    # 2. Generate 260 new conversational records
+    new_records = generate_v3_conversational_records()
+    print(f"Generated {len(new_records)} new conversational V3 records.")
+    assert len(new_records) == 260, f"Expected 260 new records, got {len(new_records)}"
+
+    # 3. Save new conversational dataset alone
+    os.makedirs(os.path.dirname(V3_CONVERSATIONAL_PATH), exist_ok=True)
+    with open(V3_CONVERSATIONAL_PATH, "w", encoding="utf-8") as f:
+        for r in new_records:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    print(f"Saved {len(new_records)} conversational records to: {V3_CONVERSATIONAL_PATH}")
+
+    # 4. Save combined V3 dataset (340 + 260 = 600)
+    v3_combined = v2_records + new_records
+    assert len(v3_combined) == 600, f"Expected 600 total records, got {len(v3_combined)}"
+
+    with open(V3_COMBINED_PATH, "w", encoding="utf-8") as f:
+        for r in v3_combined:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    print(f"Saved {len(v3_combined)} combined V3 records to: {V3_COMBINED_PATH}")
+    print("=" * 65)
+
+
+if __name__ == "__main__":
+    build_v3_dataset()

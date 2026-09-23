@@ -1,0 +1,145 @@
+{
+  "report_metadata": {
+    "report_id": "STEP_8E_QUALITY_REVIEW",
+    "date": "2026-09-22T08:06:00Z",
+    "kb_version": "financial-kb-v1.0",
+    "language_scope": "en",
+    "status": "COMPLETE"
+  },
+  "records_reviewed": {
+    "total_records": 22,
+    "file": "datasets/financial_nlu/raw/annotation_dry_run.jsonl",
+    "passed_checks": 22,
+    "failed_checks": 0,
+    "quality_status": "PASS"
+  },
+  "intent_coverage_summary": {
+    "total_canonical_intents": 9,
+    "intents_represented": 8,
+    "intents_missing": ["savings_question"],
+    "distribution": {
+      "financial_consultation": 9,
+      "budget_analysis": 3,
+      "debt_management": 3,
+      "out_of_scope_investment": 2,
+      "out_of_scope_loan": 2,
+      "cashflow_question": 1,
+      "financial_goal": 1,
+      "financial_education": 1,
+      "savings_question": 0
+    }
+  },
+  "slot_coverage_summary": {
+    "monthly_income": {
+      "non_null_count": 11,
+      "null_count": 11,
+      "non_null_percentage": 50.0
+    },
+    "monthly_expense": {
+      "non_null_count": 17,
+      "null_count": 5,
+      "non_null_percentage": 77.27
+    },
+    "employment_status": {
+      "employed_count": 11,
+      "not_employed_count": 2,
+      "null_count": 9,
+      "non_null_percentage": 59.09
+    },
+    "debt_status": {
+      "debt_count": 4,
+      "no_debt_count": 1,
+      "null_count": 17,
+      "non_null_percentage": 22.73
+    },
+    "spending_habit": {
+      "average_spend_count": 0,
+      "big_spend_count": 0,
+      "null_count": 22,
+      "non_null_percentage": 0.0
+    },
+    "goal_cost": {
+      "non_null_count": 1,
+      "null_count": 21,
+      "non_null_percentage": 4.55
+    },
+    "marital_status": {
+      "Single_count": 0,
+      "Married_count": 1,
+      "null_count": 21,
+      "non_null_percentage": 4.55
+    }
+  },
+  "null_safety_findings": {
+    "status": "PASS",
+    "details": "Strict adherence to Null Invariant: unknown != 0.0. Omitted or unmentioned fields map strictly to null, never 0.0. Explicit zero is preserved as 0.0. Unmentioned debt is correctly mapped to null rather than hallucinating 'no debt'."
+  },
+  "split_leakage_findings": {
+    "status": "PASS",
+    "train_template_count": 9,
+    "val_template_count": 4,
+    "test_template_count": 8,
+    "cross_split_leakage_detected": false,
+    "details": "All examples sharing the same template_id reside exclusively within a single partition (train, val, or test). Zero template contamination exists between train and evaluation sets."
+  },
+  "corrections_made": [
+    {
+      "change_id": "CORR_001_NULL_DEBT_ALIGNMENT",
+      "target_records": [
+        "EN_BUDGET_0001",
+        "EN_BUDGET_0002",
+        "EN_BUDGET_0003",
+        "EN_CASHFLOW_0001",
+        "EN_EMPLOYMENT_0001",
+        "EN_SAVINGS_0001",
+        "EN_HOUSEHOLD_0001"
+      ],
+      "rationale": "Aligned debt_status from 'no debt' to null where input text contained no mention of debt. Matches controlled template expected_slot_behavior, preserves the Null Invariant (unmentioned != default enum), avoids training the NLU to hallucinate debt absence, and retains identical ConsultantEngine rule outcomes."
+    }
+  ],
+  "warnings": [
+    "Intent 'savings_question' is defined in templates (T_SAVINGS_003, T_SAVINGS_005, T_SAVINGS_007) but has 0 records in the dry run.",
+    "Slot 'spending_habit' has 0% non-null annotations in the dry run.",
+    "Marital status 'Single' is not represented in the dry run (only 'Married' is present in 1 record)."
+  ],
+  "identified_risks": [
+    {
+      "risk_id": "RISK_INFERENCE_OVER_PERCEPTION",
+      "description": "Risk that synthetic pipelines or annotators fill missing slots with default engine assumptions rather than extracting verbatim evidence.",
+      "severity": "HIGH",
+      "mitigation": "Automated validation enforces that slots unmentioned in input_text evaluate strictly to null in NLU labels."
+    },
+    {
+      "risk_id": "RISK_MISSING_INTENT_BLINDSPOT",
+      "description": "Zero examples for savings_question could cause the future model to misclassify savings inquiries into generic financial_consultation.",
+      "severity": "MEDIUM",
+      "mitigation": "Allocate 8-10 records to savings_question in the controlled expansion batch."
+    },
+    {
+      "risk_id": "RISK_SPENDING_HABIT_NEGLECT",
+      "description": "Zero non-null examples for spending_habit prevents perception of discretionary spending intensity.",
+      "severity": "MEDIUM",
+      "mitigation": "Mandate at least 15 examples featuring 'average spend' and 'big spend' statements in the expansion batch."
+    },
+    {
+      "risk_id": "RISK_CADENCE_CONVERSION",
+      "description": "Risk that annual salaries or hourly wages are mistakenly converted into monthly figures.",
+      "severity": "HIGH",
+      "mitigation": "Automated audit checks reject any dataset record attempting arithmetic cadence conversion."
+    },
+    {
+      "risk_id": "RISK_THIRD_PARTY_ATTRIBUTION",
+      "description": "Risk that third-party financial figures (e.g. brother's salary) are extracted as user income.",
+      "severity": "HIGH",
+      "mitigation": "Strict span and slot checks prevent non-user financial amounts from populating user slots."
+    }
+  ],
+  "recommended_improvements": [
+    "Execute Controlled Expansion Batch 1 to reach a target of 100 high-quality records (78 new records).",
+    "Allocate balanced records across all 9 canonical intents, ensuring 'savings_question' receives proportional representation.",
+    "Introduce explicit examples for discretionary spending tiers ('big spend' and 'average spend').",
+    "Introduce explicit 'Single' marital status examples.",
+    "Maintain strict template-grouped split partitioning to guarantee zero train-to-test leakage."
+  ],
+  "whether_ready_for_controlled_expansion": true
+}

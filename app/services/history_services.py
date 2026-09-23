@@ -26,6 +26,7 @@ class HistoryServices:
             advice_text = getattr(advice_obj, "advice", str(advice_obj)) if advice_obj else ""
             conclusion_text = getattr(advice_obj, "conclusion", "") if advice_obj else ""
             certainty_val = getattr(advice_obj, "certainty", 0.0) if advice_obj else 0.0
+            kb_version_val = data.get("kb_version") or getattr(advice_obj, "kb_version", "financial-kb-v1.0")
 
             history = History(
                 goal_cost=data.get("goal_cost", 0.0),
@@ -40,6 +41,7 @@ class HistoryServices:
                 get_advice=advice_text,
                 get_conclusion=conclusion_text,
                 get_certainty=certainty_val,
+                kb_version=kb_version_val,
             )
 
             history.users.append(current_user)

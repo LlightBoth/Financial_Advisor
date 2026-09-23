@@ -1,5 +1,9 @@
 import os
-import redis
+try:
+    import redis
+except ImportError:
+    redis = None
+
 from flask import has_request_context
 from flask_login import current_user
 from flask_limiter import Limiter
@@ -15,13 +19,13 @@ REDIS_URL = os.getenv("REDIS_URL")
 STORAGE_URI = "memory://"
 
 # Safely test Redis connection before handing it to Flask-Limiter
-if REDIS_URL:
+if REDIS_URL and redis is not None:
     try:
         r = redis.from_url(REDIS_URL, socket_timeout=2)
         r.ping()  # Test connection
         STORAGE_URI = REDIS_URL
         print("--- [Flask-Limiter]: Successfully connected to Redis ---")
-    except (redis.exceptions.ConnectionError, Exception) as e:
+    except Exception as e:
         print(f"--- [Flask-Limiter Warning]: Could not connect to Redis ({e}). Falling back to memory:// ---")
 else:
     print("--- [Flask-Limiter]: No REDIS_URL found. Using memory:// ---")

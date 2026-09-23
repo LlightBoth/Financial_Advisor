@@ -1,0 +1,15 @@
+{
+  "source_file": "d:\\Year3\\Finance\\Financial_Advisor\\pdf_data\\Portfolio_Management_in_Practice_Volume_1_-_John_Wiley.pdf",
+  "pages_processed": 1976,
+  "total_sections": 16,
+  "fine_tuning_sections": 6,
+  "reference_sections": 5,
+  "excluded_sections": 5,
+  "recommendation": "Selectively extract client-advising concepts from Chapter 15 (Private Wealth Management) and Chapter 1 (Ethics) for fine-tuning. These sections provide authoritative principles for client data discovery, distinguishing planned goals from emergency reserves, understanding cash-flow surplus vs. deficit, and professional, empathetic communication. Mathematical simulation, actuarial tables, and tax details should be reserved for reference/RAG. All active equity stock picking, hedge fund leverage, derivatives, and market forecasting chapters MUST BE EXCLUDED to uphold strict financial advisory safety boundaries.",
+  "important_warnings": [
+    "The textbook contains extensive chapters on active equity trading, hedge fund strategies, and derivatives that must NEVER be used in the training pipeline.",
+    "Do NOT allow the model to provide specific investment return projections or stock recommendations based on curriculum forecasting models.",
+    "The model must remain a language understanding and communication assistant; authoritative financial metrics and rules remain strictly inside ConsultantEngine.",
+    "Tax regulations and account location rules vary by jurisdiction and should not be hard-coded into model weights."
+  ]
+}

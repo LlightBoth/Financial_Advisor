@@ -1,0 +1,196 @@
+{
+  "step": "STEP 8K",
+  "dataset_size": 100,
+  "sanity_check": {
+    "intent_accuracy": 1.0,
+    "intent_macro_f1": 1.0,
+    "slot_micro_f1": 1.0,
+    "full_structured_exact_match_rate": 1.0,
+    "null_preservation_accuracy": 1.0,
+    "zero_preservation_accuracy": 1.0,
+    "third_party_isolation_accuracy": 1.0,
+    "non_monthly_cadence_safety": 1.0
+  },
+  "baseline_evaluation": {
+    "evaluation_name": "Majority-Null Deterministic Baseline",
+    "total_records": 100,
+    "summary": {
+      "intent_accuracy": 0.2,
+      "intent_macro_f1": 0.037,
+      "slot_micro_f1": 0.0,
+      "full_structured_exact_match_rate": 0.01,
+      "null_preservation_accuracy": 1.0,
+      "zero_preservation_accuracy": 0.0,
+      "third_party_isolation_accuracy": 1.0,
+      "non_monthly_cadence_safety": 1.0
+    },
+    "intent_metrics": {
+      "accuracy": 0.2,
+      "macro_f1": 0.037,
+      "correct_count": 20,
+      "total_count": 100,
+      "per_intent": {
+        "financial_consultation": {
+          "precision": 0.2,
+          "recall": 1.0,
+          "f1": 0.3333,
+          "support": 20
+        },
+        "budget_analysis": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 14
+        },
+        "cashflow_question": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 10
+        },
+        "savings_question": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 10
+        },
+        "debt_management": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 14
+        },
+        "financial_goal": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 10
+        },
+        "financial_education": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 6
+        },
+        "out_of_scope_investment": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 8
+        },
+        "out_of_scope_loan": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 8
+        }
+      }
+    },
+    "slot_metrics": {
+      "per_slot_accuracy": {
+        "monthly_income": 0.28,
+        "monthly_expense": 0.25,
+        "employment_status": 0.25,
+        "debt_status": 0.72,
+        "spending_habit": 0.84,
+        "goal_cost": 0.8,
+        "marital_status": 0.81
+      },
+      "micro_precision": 0.0,
+      "micro_recall": 0.0,
+      "micro_f1": 0.0,
+      "micro_tp": 0,
+      "micro_fp": 0,
+      "micro_fn": 305
+    },
+    "exact_match": {
+      "exact_match_count": 1,
+      "total": 100,
+      "exact_match_rate": 0.01
+    },
+    "invariants": {
+      "null_preservation_accuracy": 1.0,
+      "null_preservation_count": "395/395",
+      "zero_preservation_accuracy": 0.0,
+      "zero_preservation_count": "0/9",
+      "third_party_isolation_accuracy": 1.0,
+      "third_party_isolation_count": "1/1",
+      "non_monthly_cadence_safety": 1.0,
+      "non_monthly_cadence_count": "2/2",
+      "oos_investment_accuracy": 0.0,
+      "oos_loan_accuracy": 0.0
+    },
+    "slices": {
+      "1_simple_direct_requests": {
+        "count": 33,
+        "intent_accuracy": 0.303,
+        "full_exact_match": 0.0
+      },
+      "2_missing_information": {
+        "count": 29,
+        "intent_accuracy": 0.2069,
+        "full_exact_match": 0.0345
+      },
+      "3_explicit_zero": {
+        "count": 8,
+        "intent_accuracy": 0.5,
+        "full_exact_match": 0.0
+      },
+      "4_ambiguous_numbers": {
+        "count": 5,
+        "intent_accuracy": 0.8,
+        "full_exact_match": 0.0
+      },
+      "5_non_monthly_cadence": {
+        "count": 2,
+        "intent_accuracy": 1.0,
+        "full_exact_match": 0.0
+      },
+      "6_debt_explicit": {
+        "count": 28,
+        "intent_accuracy": 0.1429,
+        "full_exact_match": 0.0
+      },
+      "7_employment_explicit": {
+        "count": 75,
+        "intent_accuracy": 0.24,
+        "full_exact_match": 0.0
+      },
+      "8_spending_habit_explicit": {
+        "count": 16,
+        "intent_accuracy": 0.25,
+        "full_exact_match": 0.0
+      },
+      "9_marital_status_explicit": {
+        "count": 19,
+        "intent_accuracy": 0.3684,
+        "full_exact_match": 0.0
+      },
+      "10_third_party_finances": {
+        "count": 1,
+        "intent_accuracy": 1.0,
+        "full_exact_match": 0.0
+      },
+      "11_conflicting_information": {
+        "count": 1,
+        "intent_accuracy": 1.0,
+        "full_exact_match": 0.0
+      },
+      "12_investment_out_of_scope": {
+        "count": 8,
+        "intent_accuracy": 0.0,
+        "full_exact_match": 0.0
+      },
+      "13_loan_out_of_scope": {
+        "count": 8,
+        "intent_accuracy": 0.0,
+        "full_exact_match": 0.0
+      },
+      "14_financial_education": {
+        "count": 6,
+        "intent_accuracy": 0.0,
+        "full_exact_match": 0.0
+      }
+    }
+  }
+}

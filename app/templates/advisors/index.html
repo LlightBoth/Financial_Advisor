@@ -14,9 +14,27 @@
         </div>
     </div>
 
-    {% if not advice %}
-    <!-- 2-Stage Diagnostics Wizard -->
-    <div class="stepper-wrapper">
+    <!-- Error Alert Box -->
+    <div id="advisor-error-alert"
+        class="alert alert-danger rounded-4 d-none mb-4 shadow-sm animate__animated animate__headShake">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <span id="advisor-error-message" class="fw-semibold"></span>
+        </div>
+        <ul id="advisor-error-fields" class="mb-0 mt-2 small ps-3"></ul>
+    </div>
+
+    <!-- Loading State Overlay -->
+    <div id="advisor-loading-state" class="text-center py-5 d-none">
+        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5 class="fw-bold text-body">{{ _("advisor.evaluating_notice") }}</h5>
+        <p class="text-muted small font-monospace">KB Version: financial-kb-v1.0 // Deterministic Forward-Chaining</p>
+    </div>
+
+    <!-- Stepper Navigation (Visible when filling input) -->
+    <div class="stepper-wrapper {% if advice %}d-none{% endif %}" id="stepper-wrapper">
         <div class="step-item active" id="step-1-indicator">
             <div class="step-counter">01</div>
             <div class="step-name">{{ _("advisor.step_1_title") }}</div>
@@ -27,95 +45,184 @@
             <div class="step-name">{{ _("advisor.step_2_title") }}</div>
         </div>
     </div>
-    {% endif %}
 
-    {% if advice %}
-    <!-- Inference Results Report -->
-    <div class="results-report animate__animated animate__fadeIn">
-        <div class="report-header-banner">
-            <div>
-                <h4 class="fw-bold mb-1">{{ _("advisor.analysis_report_title") }}</h4>
-                <p class="mb-0 small opacity-75">{{ _("advisor.analysis_report_subtitle") }}</p>
-            </div>
-            <div class="status-badge-white">
-                <i class="bi bi-cpu-fill text-info"></i>
-                <span>{{ _("advisor.facts_verified") }}</span>
-            </div>
-        </div>
-
-        <div class="p-4 p-md-5">
-            <!-- Metric Triad -->
-            <div class="row g-4 mb-5">
-                <div class="col-md-4">
-                    <div class="metric-mini-card">
-                        <span class="label">{{ _("advisor.savings_potential") }}</span>
-                        <span class="value text-success d-block">{{ advice.remain_percentage|round(1) }}%</span>
-                    </div>
+    <!-- Dynamic / Server-Rendered Results Container -->
+    <div id="advisor-results-container" class="{% if not advice %}d-none{% endif %}">
+        {% if advice %}
+        <div class="results-report animate__animated animate__fadeIn">
+            <div class="report-header-banner">
+                <div>
+                    <h4 class="fw-bold mb-1">{{ _("advisor.analysis_report_title") }}</h4>
+                    <p class="mb-0 small opacity-75">{{ _("advisor.analysis_report_subtitle") }}</p>
                 </div>
-                <div class="col-md-4">
-                    <div class="metric-mini-card">
-                        <span class="label">{{ _("advisor.expense_load") }}</span>
-                        <span class="value text-warning d-block">{{ advice.expense_percentage|round(1) }}%</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="metric-mini-card">
-                        <span class="label">{{ _("advisor.projected_horizon") }}</span>
-                        <span class="value text-primary d-block">
-                            {{ advice.months_to_goal or 'N/A' }} <small class="fs-6 fw-normal text-muted">{{ _("advisor.months") }}</small>
-                        </span>
-                    </div>
+                <div class="status-badge-white">
+                    <i class="bi bi-cpu-fill text-info"></i>
+                    <span>{{ advice.kb_version or 'financial-kb-v1.0' }}</span>
                 </div>
             </div>
 
-            <!-- Conclusion & Strategic Roadmap -->
-            <div class="report-content">
-                <div class="mb-4 text-center">
-                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 font-monospace small">
-                        {{ _("advisor.primary_conclusion_badge") }}
-                    </span>
-                    <h4 class="fw-bold text-body-emphasis">{{ advice.get_advice.conclusion }}</h4>
-                </div>
-
-                <div class="advice-box mb-4">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="bi bi-diagram-3-fill text-primary"></i>
-                        <span class="fw-bold small text-uppercase letter-spacing text-muted">{{ _("advisor.prescribed_protocol") }}</span>
-                    </div>
-                    <p class="advice-text mb-0">{{ advice.get_advice.advice }}</p>
-                </div>
-
-                <!-- Certainty Factor Rating -->
-                <div class="confidence-section">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-shield-check text-primary fs-5"></i>
-                            <span class="small fw-bold text-uppercase text-muted">{{ _("advisor.certainty_factor") }}</span>
+            <div class="p-4 p-md-5">
+                <!-- Financial Snapshot Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="metric-mini-card">
+                            <span class="label">{{ _("advisor.monthly_income") }}</span>
+                            <span class="value text-body d-block">${{
+                                "%.2f"|format(advice.metrics.monthly_income|default(0.0)) }}</span>
                         </div>
-                        <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold font-monospace">
-                            {{ _("advisor.cf_match", percent=(advice.get_advice.certainty * 100)|round|int) }}
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="metric-mini-card">
+                            <span class="label">{{ _("advisor.monthly_expense") }}</span>
+                            <span class="value text-body d-block">${{
+                                "%.2f"|format(advice.metrics.monthly_expense|default(0.0)) }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="metric-mini-card">
+                            <span class="label">{{ _("advisor.monthly_net_cash_flow") }}</span>
+                            {% if advice.metrics.net_cashflow > 0 %}
+                            <span class="value text-success d-block">+${{ "%.2f"|format(advice.metrics.net_cashflow)
+                                }}</span>
+                            {% elif advice.metrics.net_cashflow < 0 %} <span class="value text-danger d-block">-${{
+                                "%.2f"|format(advice.metrics.net_cashflow|abs) }}</span>
+                                {% else %}
+                                <span class="value text-secondary d-block">$0.00</span>
+                                {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="metric-mini-card">
+                            <span class="label">{{ _("advisor.projected_horizon") }}</span>
+                            {% if advice.metrics.natural_goal_months is not none %}
+                            <span class="value text-primary d-block">
+                                {{ advice.metrics.natural_goal_months|round(1) }} <small
+                                    class="fs-6 fw-normal text-muted">{{ _("advisor.months") }}</small>
+                            </span>
+                            {% else %}
+                            <span class="value text-muted d-block small fs-6 fst-italic">
+                                {% if advice.metrics.net_cashflow <= 0 %} Unavailable (Deficit) {% else %} N/A {% endif
+                                    %} </span>
+                                    {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operating Ratios Strip -->
+                <div class="row g-3 mb-5">
+                    <div class="col-md-6">
+                        <div class="metric-mini-card">
+                            <span class="label">{{ _("advisor.expense_load") }}</span>
+                            {% if advice.metrics.expense_ratio is not none %}
+                            <span class="value text-warning d-block">{{ (advice.metrics.expense_ratio * 100)|round(1)
+                                }}%</span>
+                            {% else %}
+                            <span class="value text-muted d-block small fs-6 fst-italic">{{
+                                _("advisor.ratio_zero_income_notice") }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="metric-mini-card">
+                            <span class="label">{{ _("advisor.savings_potential") }}</span>
+                            {% if advice.metrics.surplus_ratio is not none %}
+                            <span class="value text-success d-block">{{ (advice.metrics.surplus_ratio * 100)|round(1)
+                                }}%</span>
+                            {% else %}
+                            <span class="value text-muted d-block small fs-6 fst-italic">{{
+                                _("advisor.ratio_zero_income_notice") }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusion & Strategic Recommendation -->
+                <div class="report-content">
+                    <div class="mb-4 text-center">
+                        <span
+                            class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 font-monospace small">
+                            {{ advice.get_advice.category or _("advisor.primary_conclusion_badge") }}
                         </span>
+                        <h4 class="fw-bold text-body-emphasis" id="result-conclusion-heading">{{
+                            advice.get_advice.conclusion }}</h4>
                     </div>
-                    <div class="progress" style="height: 8px; border-radius: 20px; background: rgba(0,0,0,0.08);">
-                        <div class="progress-bar confidence-progress-bar" 
-                             style="width: {{ advice.get_advice.certainty * 100 }}%"></div>
+
+                    {% if advice.advisory_caveats %}
+                    <div class="alert alert-warning border rounded-3 p-3 mb-4 small" id="advisory-caveats-box">
+                        <div class="d-flex align-items-center gap-2 fw-semibold mb-1">
+                            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                            <span>{{ _("advisor.caveats_title") if _("advisor.caveats_title") != "advisor.caveats_title" else "Advisory Disclosures & Assumptions" }}</span>
+                        </div>
+                        <ul class="mb-0 ps-3">
+                            {% for caveat in advice.advisory_caveats %}
+                            <li>{{ caveat }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                    <small class="text-muted d-block text-center mt-2 italic">
-                        {{ _("advisor.cf_explanation") }}
-                    </small>
+                    {% endif %}
+
+                    <div class="advice-box mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-diagram-3-fill text-primary"></i>
+                            <span class="fw-bold small text-uppercase letter-spacing text-muted">{{
+                                _("advisor.prescribed_protocol") }}</span>
+                        </div>
+                        <p class="advice-text mb-0" id="result-advice-paragraph">{{ advice.get_advice.advice }}</p>
+                    </div>
+
+                    <!-- Certainty Factor Rating -->
+                    <div class="confidence-section mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-check text-primary fs-5"></i>
+                                <span class="small fw-bold text-uppercase text-muted">{{ _("advisor.certainty_factor")
+                                    }}</span>
+                            </div>
+                            <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold font-monospace">
+                                {{ _("advisor.cf_match", percent=((advice.get_advice.certainty or 0.85) *
+                                100)|round|int) }}
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 20px; background: rgba(0,0,0,0.08);">
+                            <div class="progress-bar confidence-progress-bar"
+                                style="width: {{ (advice.get_advice.certainty or 0.85) * 100 }}%"></div>
+                        </div>
+                        <small class="text-muted d-block text-center mt-2 italic">
+                            {{ _("advisor.cf_explanation") }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Understanding Your Recommendation -->
+                {% if advice.explanation or (advice.decision_trace and advice.decision_trace.selection_reason) %}
+                <div class="explainability-section mt-4">
+                    <div class="card border rounded-4 shadow-sm overflow-hidden">
+                        <div class="card-header bg-body-tertiary p-3 border-0 d-flex align-items-center gap-2">
+                            <i class="bi bi-lightbulb-fill text-primary"></i>
+                            <h6 class="fw-bold text-primary mb-0">{{ _("advisor.understanding_recommendation_title") }}</h6>
+                        </div>
+                        <div class="card-body p-4 bg-body border-top">
+                            <p class="mb-0 text-body fs-6" style="line-height: 1.6;">
+                                {{ advice.explanation or advice.decision_trace.selection_reason }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Recalibrate Button -->
+                <div class="text-center mt-5">
+                    <button id="btn-close" type="button"
+                        class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">
+                        <i class="bi bi-arrow-repeat me-2"></i>{{ _("advisor.recalibrate_scan") }}
+                    </button>
                 </div>
             </div>
-
-            <div class="text-center mt-5">
-                <button id="btn-close" class="btn-refresh-expert">
-                    <i class="bi bi-arrow-repeat me-2"></i> {{ _("advisor.recalibrate_scan") }}
-                </button>
-            </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 
-    <!-- Input Form -->
+    <!-- Input Form (Wizard) -->
     <form method="POST" id="advisor-form" class="advisor-form-box {% if advice %}d-none{% endif %}">
         {{ form.hidden_tag() }}
 
@@ -126,25 +233,30 @@
                 <p class="text-muted small">{{ _("advisor.financial_standing_subtitle") }}</p>
             </div>
 
+
+
             <div class="mb-4">
-                <label class="custom-label">{{ _("advisor.goal_cost_label") }}</label>
-                {{ form.goal_cost(class="custom-input", type="number", placeholder=_("advisor.goal_placeholder"), required=true) }}
+                <label class="custom-label" for="goal_cost">{{ _("advisor.goal_cost_label") }}</label>
+                {{ form.goal_cost(class="custom-input", type="number", id="goal_cost",
+                placeholder=_("advisor.goal_placeholder"), required=true, min="0", step="any") }}
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-6">
-                    <label class="custom-label">{{ _("advisor.income_label") }}</label>
-                    {{ form.income(class="custom-input", type="number", placeholder=_("advisor.income_placeholder"), required=true) }}
+                    <label class="custom-label" for="income">{{ _("advisor.income_label") }}</label>
+                    {{ form.income(class="custom-input", type="number", id="income",
+                    placeholder=_("advisor.income_placeholder"), required=true, min="0", step="any") }}
                 </div>
                 <div class="col-6">
-                    <label class="custom-label">{{ _("advisor.expense_label") }}</label>
-                    {{ form.expense(class="custom-input", type="number", placeholder=_("advisor.expense_placeholder"), required=true) }}
+                    <label class="custom-label" for="expense">{{ _("advisor.expense_label") }}</label>
+                    {{ form.expense(class="custom-input", type="number", id="expense",
+                    placeholder=_("advisor.expense_placeholder"), required=true, min="0", step="any") }}
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="custom-label">{{ _("advisor.marital_status_label") }}</label>
-                {{ form.martial_status(class="custom-select") }}
+                <label class="custom-label" for="martial_status">{{ _("advisor.marital_status_label") }}</label>
+                {{ form.martial_status(class="custom-select", id="martial_status") }}
             </div>
 
             <div class="pt-3">
@@ -175,12 +287,13 @@
                 </div>
             </div>
             {% endfor %}
-            
+
             <div class="d-flex gap-3 pt-3">
-                <button id="btn-back" type="button" class="btn btn-outline-secondary flex-fill rounded-3 py-3 fw-semibold">
+                <button id="btn-back" type="button"
+                    class="btn btn-outline-secondary flex-fill rounded-3 py-3 fw-semibold">
                     <i class="bi bi-arrow-left me-1"></i> {{ _("common.back") }}
                 </button>
-                <button type="submit" class="btn-ai-primary flex-fill py-3">
+                <button type="submit" id="btn-submit-advisor" class="btn-ai-primary flex-fill py-3">
                     <i class="bi bi-lightning-charge-fill me-1"></i>
                     <span>{{ _("advisor.execute_analysis_btn") }}</span>
                 </button>
@@ -191,7 +304,8 @@
     <!-- Trust Badges -->
     <div class="row g-4 mt-4 pt-2">
         <div class="col-md-6">
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100"
+                style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
                 <i class="bi bi-shield-check text-primary fs-3 flex-shrink-0"></i>
                 <div>
                     <div class="fw-bold small">{{ _("advisor.trust_deterministic_title") }}</div>
@@ -200,7 +314,8 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3 h-100"
+                style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color);">
                 <i class="bi bi-sliders text-info fs-3 flex-shrink-0"></i>
                 <div>
                     <div class="fw-bold small">{{ _("advisor.trust_dynamic_title") }}</div>
@@ -211,41 +326,6 @@
     </div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const s1 = document.getElementById("advisor-step-1");
-    const s2 = document.getElementById("advisor-step-2");
-    const l1 = document.getElementById("step-1-indicator");
-    const l2 = document.getElementById("step-2-indicator");
-
-    document.getElementById("btn-next")?.addEventListener("click", () => {
-        const inputs = s1.querySelectorAll('input, select');
-        let valid = true;
-        inputs.forEach(input => {
-            if (!input.checkValidity()) {
-                input.reportValidity();
-                valid = false;
-            }
-        });
-
-        if (valid) {
-            s1.classList.add("d-none");
-            s2.classList.remove("d-none");
-            l1.classList.remove("active");
-            l2.classList.add("active");
-        }
-    });
-
-    document.getElementById("btn-back")?.addEventListener("click", () => {
-        s2.classList.add("d-none");
-        s1.classList.remove("d-none");
-        l2.classList.remove("active");
-        l1.classList.add("active");
-    });
-
-    document.getElementById("btn-close")?.addEventListener('click', () => {
-        window.location.href = window.location.pathname;
-    });
-});
-</script>
+<!-- Load Dedicated Advisor JavaScript Controller -->
+<script src="{{ url_for('static', filename='js/advisor.js') }}"></script>
 {% endblock %}

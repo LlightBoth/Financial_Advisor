@@ -1,0 +1,220 @@
+[
+  {
+    "template_id": "T_MISSING_001",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I want help managing my money better.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "all_null",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_002",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "savings_question",
+    "text_pattern": "I want to start saving but I do not know how much I spend each month.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "expense_unknown",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_003",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn {monthly_income} a month but I honestly have no idea what my total expenses are.",
+    "required_slots": ["monthly_income"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "expense_unknown",
+    "expected_slot_behavior": {
+      "monthly_expense": null,
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_004",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I have some financial commitments but I am not sure about the exact numbers.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "vague_commitment",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_005",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I currently have no income at all.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "explicit_zero",
+    "expected_slot_behavior": {
+      "monthly_income": 0,
+      "monthly_expense": null,
+      "employment_status": "not employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_006",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I earn either {monthly_income} or maybe more depending on overtime hours.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "range_ambiguity",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": "employed",
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_007",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "My brother earns {monthly_income} and I spend {monthly_expense} every month.",
+    "required_slots": ["monthly_expense"],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "third_party_income",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_008",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I received {monthly_income} last week from a freelance job.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "non_monthly_cadence",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_009",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_consultation",
+    "text_pattern": "I have no debt whatsoever.",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "original",
+    "ambiguity_policy": "none",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": "no debt",
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  },
+  {
+    "template_id": "T_MISSING_010",
+    "template_family": "TF_MISSING_INFO",
+    "intent": "financial_education",
+    "text_pattern": "What is compound interest and how does it affect my savings?",
+    "required_slots": [],
+    "optional_slots": [],
+    "allowed_slot_values": {},
+    "language": "en",
+    "source_type": "synthetic_controlled_template",
+    "concept_source": "CFA_LM2_TVM",
+    "ambiguity_policy": "education_only",
+    "expected_slot_behavior": {
+      "monthly_income": null,
+      "monthly_expense": null,
+      "employment_status": null,
+      "debt_status": null,
+      "spending_habit": null,
+      "goal_cost": null,
+      "marital_status": null
+    }
+  }
+]
