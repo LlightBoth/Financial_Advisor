@@ -11,6 +11,7 @@ from app.models.user import User
 from app.models.notification import Notification
 from app.services.notification_services import NotificationServices
 from flask_login import current_user
+from flask_wtf.csrf import CSRFError
 
 
 
@@ -46,6 +47,10 @@ def create_app(config_class: type[Config] = Config):
     from app.utils.i18n import translate
     login_manager.localize_callback = translate
 
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return f"CSRF ERROR: {e.description}", 400
+
     # This function tells Flask-login how to load a user from a session
     @login_manager.user_loader
     def load_user(user_id):
@@ -59,7 +64,7 @@ def create_app(config_class: type[Config] = Config):
             return {
                 "notifications": NotificationServices.get_user_notifications(
                     current_user.id,
-                    limit=3
+                    limit=5
                 ),
                 "notification_count": NotificationServices.get_unread_count(
                     current_user.id

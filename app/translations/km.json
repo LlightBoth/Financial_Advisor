@@ -674,5 +674,12 @@
   "currency.usd_to_khr": "USD ទៅ KHR",
   "currency.usd_to_cny": "USD ទៅ CNY",
   "currency.note_title": "ចំណាំ៖",
-  "currency.note_desc": "អត្រាប្តូរប្រាក់គឺជាតម្លៃយោង ហើយអាចខុសគ្នាពីអត្រារបស់ធនាគារ កាត ឬកន្លែងប្តូរប្រាក់ជាក់ស្តែង។"
+  "currency.note_desc": "អត្រាប្តូរប្រាក់គឺជាតម្លៃយោង ហើយអាចខុសគ្នាពីអត្រារបស់ធនាគារ កាត ឬកន្លែងប្តូរប្រាក់ជាក់ស្តែង។",
+
+  "notification.title": "ការជូនដំណឹង",
+  "notification.subtitle": "បច្ចុប្បន្នភាពហិរញ្ញវត្ថុថ្មីៗរបស់អ្នក",
+  "notification.new": "ថ្មី",
+  "notification.no_notifications": "គ្មានការជូនដំណឹង",
+  "notification.all_caught_up": "អ្នកបានអានរួចរាល់ទាំងអស់ហើយ។",
+  "notification.mark_all_read": "កំណត់ថាបានអានទាំងអស់"
 }

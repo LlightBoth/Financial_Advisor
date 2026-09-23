@@ -674,5 +674,12 @@
   "currency.usd_to_khr": "USD to KHR",
   "currency.usd_to_cny": "USD to CNY",
   "currency.note_title": "Note:",
-  "currency.note_desc": "Exchange rates are reference values and may differ from bank, card, or cash-exchange rates."
+  "currency.note_desc": "Exchange rates are reference values and may differ from bank, card, or cash-exchange rates.",
+
+  "notification.title": "Notifications",
+  "notification.subtitle": "Your recent financial updates",
+  "notification.new": "New",
+  "notification.no_notifications": "No notifications",
+  "notification.all_caught_up": "You're all caught up.",
+  "notification.mark_all_read": "Mark all as read"
 }
