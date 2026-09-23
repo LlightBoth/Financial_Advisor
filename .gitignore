@@ -27,11 +27,7 @@ scratch/
 training/huggingface/
 *_merged/*.safetensors
 
-# Flask instance folder (keep folder via .gitkeep, ignore local databases so friends keep their own data)
-instance/*
-!instance/.gitkeep
-instance/*.backup
-
+# Flask instance folder (contains database and secrets)
 # Environment variables & secrets
 credentials.json
 token.json
