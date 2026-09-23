@@ -10,7 +10,11 @@ from google.genai import types
 from app.security.limiter import limiter
 
 bot_bp = Blueprint("bots", __name__, url_prefix="/bots")
-client = genai.Client()
+try:
+    client = genai.Client()
+except Exception as _e:
+    client = None
+
 
 FINANCIAL_SYSTEM_INSTRUCTION = """
 You are a Financial AI Assistant. Your purpose is to provide short, high-value financial advice and analysis.
