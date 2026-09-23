@@ -54,21 +54,8 @@ def userIndex():
         total_income=total_income,
         total_expense=total_expense,
         # weekly_saving=weekly_saving,
-        monthly_cashflow=monthly_cashflow,
-        user_plans=user_plans
+        monthly_cashflow=monthly_cashflow
     )
-
-
-@dashboard_bp.route("/complete_task/<int:plan_id>/<float:amount>", methods=["POST"])
-@login_required
-def user_complete_task(plan_id, amount):
-    try:
-        DashboardServices.complete_daily_task(current_user.id, plan_id, amount)
-        flash(f"Task completed!", "success")
-    except ValueError as e:
-        flash(str(e), "warning")
-    
-    return redirect(url_for("dashboards.userIndex"))
 
 
 @dashboard_bp.route("/test/<int:plan_id>/<int:amount>", methods=["POST"])

@@ -1,0 +1,802 @@
+<link href="{{ url_for('static', filename='css/components/calculator.css') }}" rel="stylesheet">
+
+<button type="button"
+        id="calculatorLauncher"
+        class="calculator-launcher"
+        aria-label="Open calculator">
+    <i class="bi bi-calculator"></i>
+</button>
+
+
+<!-- Floating Mini Calculator -->
+<div id="miniCalculator" class="mini-calculator">
+
+    <!-- Header / Drag Handle -->
+    <div id="calculatorHeader" class="calculator-header">
+        <span>
+            <i class="bi bi-calculator"></i>
+            Calculator
+        </span>
+
+        <div class="calculator-actions">
+            <button type="button" id="calculatorMinimize"
+                    class="calculator-action"
+                    aria-label="Minimize calculator">
+                -
+            </button>
+
+            <button type="button" id="calculatorClose"
+                    class="calculator-action"
+                    aria-label="Close calculator">
+                x
+            </button>
+        </div>
+    </div>
+
+    <!-- Calculator Body -->
+    <div id="calculatorBody" class="calculator-body">
+
+        <!-- Display -->
+        <div class="calculator-display">
+            <div id="calculatorExpression" class="calculator-expression"></div>
+            <div id="calculatorResult" class="calculator-result">0</div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="calculator-buttons">
+
+            <button type="button" class="calculator-btn clear" data-action="clear">
+                C
+            </button>
+
+            <button type="button" class="calculator-btn operator" data-value="/">
+                ÷
+            </button>
+
+            <button type="button" class="calculator-btn operator" data-value="*">
+                ×
+            </button>
+
+            <button type="button" class="calculator-btn delete" data-action="delete">
+                ←
+            </button>
+
+
+            <button type="button" class="calculator-btn" data-value="7">7</button>
+            <button type="button" class="calculator-btn" data-value="8">8</button>
+            <button type="button" class="calculator-btn" data-value="9">9</button>
+            <button type="button" class="calculator-btn operator" data-value="-">−</button>
+
+
+            <button type="button" class="calculator-btn" data-value="4">4</button>
+            <button type="button" class="calculator-btn" data-value="5">5</button>
+            <button type="button" class="calculator-btn" data-value="6">6</button>
+            <button type="button" class="calculator-btn operator" data-value="+">+</button>
+
+
+            <button type="button" class="calculator-btn" data-value="1">1</button>
+            <button type="button" class="calculator-btn" data-value="2">2</button>
+            <button type="button" class="calculator-btn" data-value="3">3</button>
+            <button type="button" class="calculator-btn equals" data-action="calculate">=</button>
+
+
+            <button type="button"
+                    class="calculator-btn zero"
+                    data-value="0">
+                0
+            </button>
+
+            <button type="button" class="calculator-btn" data-value=".">
+                .
+            </button>
+
+            <!-- <button type="button" class="calculator-btn operator" data-value="%">
+                %
+            </button> -->
+
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+
+    "use strict";
+
+
+    /* ==========================================
+       Elements
+    ========================================== */
+    const calculatorLauncher = document.getElementById("calculatorLauncher");
+    const calculator = document.getElementById("miniCalculator");
+    const header = document.getElementById("calculatorHeader");
+
+    const body = document.getElementById("calculatorBody");
+
+    const expressionDisplay =
+        document.getElementById("calculatorExpression");
+
+    const resultDisplay =
+        document.getElementById("calculatorResult");
+
+    const minimizeButton =
+        document.getElementById("calculatorMinimize");
+
+    const closeButton =
+        document.getElementById("calculatorClose");
+
+    const buttons =
+        calculator.querySelectorAll(".calculator-btn");
+
+
+    /* ==========================================
+       Calculator State
+    ========================================== */
+
+    let expression = "";
+
+    let lastResult = "";
+
+    let justCalculated = false;
+
+
+    /* ==========================================
+       Display
+    ========================================== */
+
+    function updateDisplay() {
+
+        expressionDisplay.textContent = expression;
+
+        if (expression === "") {
+            resultDisplay.textContent = "0";
+        } else {
+            resultDisplay.textContent = expression;
+        }
+    }
+
+
+    /* ==========================================
+       Add Value
+    ========================================== */
+
+    function addValue(value) {
+
+        /*
+         * If the previous action was "="
+         * and user enters a number,
+         * start a new calculation.
+         */
+
+        if (justCalculated && /[0-9.]/.test(value)) {
+
+            expression = "";
+
+            justCalculated = false;
+        }
+
+
+        /*
+         * Prevent multiple decimal points
+         */
+
+        if (value === ".") {
+
+            const currentNumber =
+                expression.split(/[+\-*/%]/).pop();
+
+            if (currentNumber.includes(".")) {
+                return;
+            }
+        }
+
+
+        /*
+         * Prevent two operators together
+         */
+
+        if (/[\+\-\*\/%]/.test(value)) {
+
+            if (expression === "") {
+
+                if (value !== "-") {
+                    return;
+                }
+
+            } else if (/[\+\-\*\/%]$/.test(expression)) {
+
+                expression =
+                    expression.slice(0, -1);
+            }
+
+            justCalculated = false;
+        }
+
+
+        expression += value;
+
+        updateDisplay();
+    }
+
+
+    /* ==========================================
+       Clear
+    ========================================== */
+
+    function clearCalculator() {
+
+        expression = "";
+
+        lastResult = "";
+
+        justCalculated = false;
+
+        expressionDisplay.textContent = "";
+
+        resultDisplay.textContent = "0";
+    }
+
+
+    /* ==========================================
+       Delete
+    ========================================== */
+
+    function deleteLast() {
+
+        if (justCalculated) {
+
+            clearCalculator();
+
+            return;
+        }
+
+        expression =
+            expression.slice(0, -1);
+
+        updateDisplay();
+    }
+
+    /* ==========================================
+       Calculate
+    ========================================== */
+
+    function calculate() {
+
+        if (!expression) {
+            return;
+        }
+
+
+        /*
+         * Remove trailing operator
+         */
+
+        expression =
+            expression.replace(/[\+\-\*\/%]+$/, "");
+
+
+        if (!expression) {
+            return;
+        }
+
+
+        try {
+
+            /*
+             * Convert percentage.
+             *
+             * Example:
+             * 100 + 10%
+             *
+             * becomes:
+             * 100 + (10 / 100)
+             */
+
+            let calculation =
+                expression.replace(
+                    /(\d+(?:\.\d+)?)%/g,
+                    "($1/100)"
+                );
+
+
+            /*
+             * Only allow calculator characters.
+             *
+             * This prevents arbitrary JavaScript
+             * from being evaluated.
+             */
+
+            if (!/^[0-9+\-*/().%\s]+$/.test(calculation)) {
+
+                throw new Error("Invalid expression");
+            }
+
+
+            /*
+             * Evaluate the mathematical expression.
+             *
+             * The expression has already been
+             * restricted to calculator characters.
+             */
+
+            const result =
+                Function(
+                    '"use strict"; return (' +
+                    calculation +
+                    ')'
+                )();
+
+
+            if (!Number.isFinite(result)) {
+
+                throw new Error("Invalid result");
+            }
+
+
+            lastResult = result;
+
+            expressionDisplay.textContent =
+                expression + " =";
+
+            resultDisplay.textContent =
+                formatNumber(result);
+
+            expression =
+                String(result);
+
+            justCalculated = true;
+
+        } catch (error) {
+
+            expressionDisplay.textContent =
+                "Error";
+
+            resultDisplay.textContent =
+                "Invalid";
+
+            expression = "";
+
+            justCalculated = false;
+        }
+    }
+
+
+    /* ==========================================
+       Format Number
+    ========================================== */
+
+    function formatNumber(number) {
+
+        if (!Number.isFinite(number)) {
+            return "Error";
+        }
+
+
+        /*
+         * Avoid extremely long decimals.
+         */
+
+        const rounded =
+            Number(number.toFixed(10));
+
+
+        return rounded.toLocaleString(
+            "en-US",
+            {
+                maximumFractionDigits: 10
+            }
+        );
+    }
+
+
+    /* ==========================================
+       Button Events
+    ========================================== */
+
+    buttons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const value =
+                button.dataset.value;
+
+            const action =
+                button.dataset.action;
+
+
+            if (action === "clear") {
+
+                clearCalculator();
+
+                return;
+            }
+
+
+            if (action === "delete") {
+
+                deleteLast();
+
+                return;
+            }
+
+
+            if (action === "calculate") {
+
+                calculate();
+
+                return;
+            }
+
+
+            if (value) {
+
+                addValue(value);
+            }
+
+        });
+
+    });
+
+
+    /* ==========================================
+       Keyboard Support
+    ========================================== */
+
+    document.addEventListener("keydown", function (event) {
+
+        /*
+         * Only process keyboard input if the
+         * calculator is visible and focused
+         * through normal page interaction.
+         */
+
+        if (calculator.style.display === "none") {
+            return;
+        }
+
+
+        const key = event.key;
+
+
+        if (
+            /^[0-9.]$/.test(key) ||
+            ["+", "-", "*", "/", "%"].includes(key)
+        ) {
+
+            addValue(key);
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        if (key === "Enter" || key === "=") {
+
+            calculate();
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        if (key === "Backspace") {
+
+            deleteLast();
+
+            event.preventDefault();
+
+            return;
+        }
+
+
+        if (key === "Escape") {
+
+            clearCalculator();
+
+            event.preventDefault();
+        }
+
+    });
+
+
+    /* ==========================================
+       Minimize
+    ========================================== */
+
+    minimizeButton.addEventListener("click", function () {
+
+        calculator.style.display = "none";
+
+        calculatorLauncher.style.display = "flex";
+
+    });
+
+
+
+    /* ==========================================
+    Open Calculator
+    ========================================== */
+
+    calculatorLauncher.addEventListener("click", function () {
+
+        calculator.style.display = "block";
+
+        // Always open at bottom-right
+        calculator.style.right = "30px";
+        calculator.style.bottom = "80px";
+
+        calculator.style.left = "auto";
+        calculator.style.top = "auto";
+
+        calculatorLauncher.style.display = "none";
+    });
+
+
+    /* ==========================================
+    Close Calculator
+    ========================================== */
+
+    closeButton.addEventListener("click", function (event) {
+
+        event.stopPropagation();
+
+        calculator.style.display = "none";
+
+        calculatorLauncher.style.display = "flex";
+    });
+
+
+
+    /* ==========================================
+    Dragging
+    ========================================== */
+
+    let isDragging = false;
+
+    let startX = 0;
+    let startY = 0;
+
+    let startLeft = 0;
+    let startTop = 0;
+
+
+    header.addEventListener("pointerdown", function (event) {
+
+        // Don't drag when clicking minimize or close
+        if (event.target.closest(".calculator-action")) {
+            return;
+        }
+
+        isDragging = true;
+
+        header.setPointerCapture(event.pointerId);
+
+        const rect = calculator.getBoundingClientRect();
+
+        startX = event.clientX;
+        startY = event.clientY;
+
+        startLeft = rect.left;
+        startTop = rect.top;
+
+        // Switch completely to left/top positioning
+        calculator.style.left = startLeft + "px";
+        calculator.style.top = startTop + "px";
+
+        calculator.style.right = "auto";
+        calculator.style.bottom = "auto";
+    });
+
+
+    header.addEventListener("pointermove", function (event) {
+
+        if (!isDragging) {
+            return;
+        }
+
+        const deltaX = event.clientX - startX;
+        const deltaY = event.clientY - startY;
+
+        const rect = calculator.getBoundingClientRect();
+
+        const maxLeft =
+            window.innerWidth - rect.width;
+
+        const maxTop =
+            window.innerHeight - rect.height;
+
+        let newLeft = startLeft + deltaX;
+        let newTop = startTop + deltaY;
+
+        // Keep inside viewport
+        newLeft = Math.max(
+            0,
+            Math.min(newLeft, maxLeft)
+        );
+
+        newTop = Math.max(
+            0,
+            Math.min(newTop, maxTop)
+        );
+
+        calculator.style.left = newLeft + "px";
+        calculator.style.top = newTop + "px";
+    });
+
+
+    header.addEventListener("pointerup", function (event) {
+
+        if (!isDragging) {
+            return;
+        }
+
+        isDragging = false;
+
+        try {
+            header.releasePointerCapture(event.pointerId);
+        } catch (error) {
+            // Already released
+        }
+
+        // savePosition();
+    });
+
+
+    header.addEventListener("pointercancel", function () {
+
+        isDragging = false;
+
+        // savePosition();
+    });
+
+
+
+    /* ==========================================
+       Save Position
+    ========================================== */
+
+    // function savePosition() {
+
+    //     const rect =
+    //         calculator.getBoundingClientRect();
+
+
+    //     localStorage.setItem(
+    //         "financialCalculatorPosition",
+    //         JSON.stringify({
+    //             left: rect.left,
+    //             top: rect.top
+    //         })
+    //     );
+    // }
+
+
+    /* ==========================================
+       Restore Position
+    ========================================== */
+
+    function restorePosition() {
+
+        const saved =
+            localStorage.getItem(
+                "financialCalculatorPosition"
+            );
+
+
+        if (!saved) {
+            return;
+        }
+
+
+        try {
+
+            const position =
+                JSON.parse(saved);
+
+
+            const rect =
+                calculator.getBoundingClientRect();
+
+
+            const maxLeft =
+                window.innerWidth - rect.width;
+
+            const maxTop =
+                window.innerHeight - rect.height;
+
+
+            const left =
+                Math.max(
+                    0,
+                    Math.min(
+                        Number(position.left),
+                        maxLeft
+                    )
+                );
+
+
+            const top =
+                Math.max(
+                    0,
+                    Math.min(
+                        Number(position.top),
+                        maxTop
+                    )
+                );
+
+
+            calculator.style.left =
+                left + "px";
+
+            calculator.style.top =
+                top + "px";
+
+            calculator.style.right =
+                "auto";
+
+        } catch (error) {
+
+            localStorage.removeItem(
+                "financialCalculatorPosition"
+            );
+        }
+    }
+
+
+    /* ==========================================
+       Window Resize
+    ========================================== */
+
+    window.addEventListener(
+        "resize",
+        function () {
+
+            const rect =
+                calculator.getBoundingClientRect();
+
+
+            if (
+                rect.right >
+                window.innerWidth
+            ) {
+
+                calculator.style.left =
+                    Math.max(
+                        0,
+                        window.innerWidth -
+                        rect.width
+                    ) + "px";
+            }
+
+
+            if (
+                rect.bottom >
+                window.innerHeight
+            ) {
+
+                calculator.style.top =
+                    Math.max(
+                        0,
+                        window.innerHeight -
+                        rect.height
+                    ) + "px";
+            }
+
+
+            // savePosition();
+        }
+    );
+
+
+    /* ==========================================
+       Initialize
+    ========================================== */
+
+    // restorePosition();
+    calculator.style.display = "none";
+    calculatorLauncher.style.display = "flex";
+
+})();
+</script>

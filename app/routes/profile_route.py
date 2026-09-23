@@ -9,6 +9,7 @@ from app.services.user_services import UserServices
 from app.services.plan_services import PlanServices
 from app.services.income_services import IncomeServices
 from app.services.expense_services import ExpenseServices
+from app.services.bot_services import AIChatBotServices
 
 profile_bp = Blueprint("profiles", __name__, url_prefix="/profiles")
 
@@ -146,6 +147,7 @@ def userIndex():
     user_plan_count = PlanServices.get_user_all_plan_count(current_user)
     total_income = IncomeServices.get_income_total(current_user)
     total_expense = ExpenseServices.get_expense_total(current_user)
+    total_user_ai_chat = AIChatBotServices.get_user_ai_chat_count(current_user.id)
 
     # Calculate savings
     sum_saving = total_income - total_expense
@@ -179,6 +181,7 @@ def userIndex():
         user_plan_count=user_plan_count,
         total_income=total_income,
         total_expenses=total_expense,
+        total_user_ai_chat=total_user_ai_chat,
         net_savings=sum_saving,
         sum_saving_rate=sum_saving_rate,
         profile_completion=profile_completion,

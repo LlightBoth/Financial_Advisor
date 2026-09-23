@@ -13,7 +13,7 @@ class Plan(db.Model):
     description = db.Column(db.String(120), nullable=False)
     income = db.Column(db.Float, nullable=False)
     expense = db.Column(db.Float, nullable=False)
-    martial_status = db.Column(db.String(20), nullable=False)
+    marital_status = db.Column(db.String(20), nullable=False)
     employment_status = db.Column(db.String(40), nullable=False)
     debt_status = db.Column(db.String(40), nullable=False)
     spending_habit = db.Column(db.String(40), nullable=False)
@@ -21,7 +21,11 @@ class Plan(db.Model):
 
     debt_amount = db.Column(db.Numeric(12, 2), nullable=True)
     has_budget = db.Column(db.Boolean, default=False, nullable=False)
+    # Real Saving Amount
     saving = db.Column(db.Float, nullable=True)
+    # Want Saving daily/monthly/manuelly  
+    saving_amount = db.Column(db.Float, default=0, nullable=True)
+    saving_type = db.Column(db.String(12), nullable=True)
 
     last_completed = db.Column(db.DateTime, nullable=True)
 

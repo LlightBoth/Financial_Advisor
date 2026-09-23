@@ -10,7 +10,9 @@ from wtforms import (
     TextAreaField,
     RadioField,
     SelectField,
+    HiddenField,
 )
+
 from wtforms.validators import (
     DataRequired,
     Optional,
@@ -48,14 +50,11 @@ class PlanForm(FlaskForm):
             "placeholder": "e.g. 5000"
         }
     )
-
     in_between = DateField(
         "Target Date",
-        format="%Y-%m-%d",
-        default=date.today,
-        validators=[DataRequired()]
+        validators=[Optional()],
+        format="%Y-%m-%d"
     )
-
     description = TextAreaField(
         "Description",
         validators=[Optional()],
@@ -70,7 +69,7 @@ class PlanForm(FlaskForm):
     # =========================
 
     income = FloatField(
-        "Monthly Income",
+        "Monthly Income/Fund",
         validators=[
             InputRequired(),
             NumberRange(
@@ -108,25 +107,12 @@ class PlanForm(FlaskForm):
         ],
         render_kw={
             "placeholder": "e.g. 10000"
-        }
-    )
-
-    debt_amount = FloatField(
-        "Debt Amount",
-        validators=[
-            Optional(), 
-            NumberRange(
-                min=0,
-                message="Savings amount cannot be negative."
-            )
-        ],
-        render_kw={
-            "placeholder": "e.g. 1000"
         },
         default=0
     )
-    savings_amount = FloatField(
-        "Savings Amount",
+
+    saving = FloatField(
+        "Saving Amount",
         validators=[
             Optional(),
             NumberRange(
@@ -134,13 +120,27 @@ class PlanForm(FlaskForm):
                 message="Savings amount cannot be negative."
             )
         ],
+        default=0,
         render_kw={
-            "placeholder": "e.g. 3000"
+            "placeholder": "e.g. 100"
         }
     )
-    has_budget = BooleanField(
-        "I have a budget"
+
+
+    saving_type = SelectField(
+        "Saving Type",
+        choices=[
+            ("daily", "Daily"),
+            ("monthly", "Monthly"),
+            ("manual", "Flexible"),
+        ],
+        validators=[DataRequired()]
     )
+
+
+
+    has_budget = BooleanField("I have a budget/Fund")
+
 
     # =========================
     # Personal information
@@ -207,7 +207,9 @@ class PlanForm(FlaskForm):
         default=True
     )
 
-    submit = SubmitField("Launch Strategy")
+    submit = SubmitField(
+        "Launch Strategy"
+    )
 
 
 # ==========================================
@@ -237,13 +239,11 @@ class EditPlanForm(FlaskForm):
             "placeholder": "e.g. 5000"
         }
     )
-
     in_between = DateField(
         "Target Date",
-        format="%Y-%m-%d",
-        validators=[DataRequired()]
+        validators=[Optional()],
+        format="%Y-%m-%d"
     )
-
     description = TextAreaField(
         "Description",
         validators=[Optional()],
@@ -253,7 +253,7 @@ class EditPlanForm(FlaskForm):
     )
 
     income = FloatField(
-        "Monthly Income",
+        "Monthly Income/Fund",
         validators=[
             InputRequired(),
             NumberRange(
@@ -291,10 +291,11 @@ class EditPlanForm(FlaskForm):
         ],
         render_kw={
             "placeholder": "e.g. 10000"
-        }
+        },
+        default=0
     )
 
-    savings_amount = FloatField(
+    saving = FloatField(
         "Savings Amount",
         validators=[
             Optional(),
@@ -305,11 +306,27 @@ class EditPlanForm(FlaskForm):
         ],
         render_kw={
             "placeholder": "e.g. 3000"
-        }
+        },
+        default=0
     )
-    has_budget = BooleanField(
-        "I have a budget"
+
+    saving_type = SelectField(
+        "Saving Type",
+        choices=[
+            ("daily", "Daily"),
+            ("monthly", "Monthly"),
+            ("manual", "Flexible"),
+        ],
+        validators=[DataRequired()]
     )
+
+
+    has_budget = BooleanField("I have a budget/Fund")
+
+
+    # =========================
+    # Personal information
+    # =========================
 
     marital_status = SelectField(
         "Marital Status",
@@ -331,6 +348,11 @@ class EditPlanForm(FlaskForm):
         validators=[InputRequired()]
     )
 
+
+    # =========================
+    # Debt information
+    # =========================
+
     debt_status = RadioField(
         "Do you have any outstanding debt?",
         choices=[
@@ -340,6 +362,11 @@ class EditPlanForm(FlaskForm):
         ],
         validators=[InputRequired()]
     )
+
+
+    # =========================
+    # Spending information
+    # =========================
 
     spending_habit = RadioField(
         "How would you describe your spending habits?",
@@ -352,14 +379,24 @@ class EditPlanForm(FlaskForm):
         validators=[InputRequired()]
     )
 
+
     is_active = BooleanField(
         "Active"
     )
 
-    submit = SubmitField("Update")
+    submit = SubmitField(
+        "Update"
+    )
 
-    def __init__(self, original_plan: Plan, *args, **kwargs):
+
+    def __init__(
+        self,
+        original_plan: Plan,
+        *args,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
+
         self.original_plan = original_plan
 
 
@@ -369,4 +406,6 @@ class EditPlanForm(FlaskForm):
 
 class ConfirmDeleteForm(FlaskForm):
 
-    submit = SubmitField("Confirm Delete")
+    submit = SubmitField(
+        "Confirm Delete"
+    )
