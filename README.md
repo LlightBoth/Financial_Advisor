@@ -9,7 +9,7 @@ It helps users manage their finances by analyzing income and expenses, tracking 
 ## 🚀 Quick Start Guide (For Friends & Evaluators)
 
 ### 1. Prerequisites
-- **Python**: Version 3.10, 3.11, or 3.12
+- **Python**: Version 3.10, 3.11, or 3.12 *(Recommended: Python 3.11 or 3.10; PyTorch does not support 3.14 yet)*
 - **Git**: Installed on your system
 
 ### 2. Clone the Repository
@@ -57,6 +57,7 @@ pip install -r requirements-llm.txt
 *(If you do not install `requirements-llm.txt`, you will see `ModuleNotFoundError: No module named 'torch'` when starting the AI server).*
 
 ### 5. Start the Full System (Two Terminals)
+> **Important**: Activate your virtual environment (`.venv`) in **both** terminal tabs before running!
 
 #### 🔹 Terminal 1: Run the Local LLM AI Server
 ```bash
