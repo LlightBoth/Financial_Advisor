@@ -167,7 +167,7 @@ def add_saving(plan_id):
         return redirect(url_for("plans.detail", plan_id=plan.id))
 
     try:
-        PlanServices.add_saving(plan, amount)
+        PlanServices.add_saving(plan, amount, current_user)
         flash(f"${amount:,.2f} added to your savings.", "success")
     except ValueError as e:
         flash(str(e), "danger")

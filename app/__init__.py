@@ -8,6 +8,10 @@ from sqlalchemy import text
 import sys
 from sqlalchemy.exc import OperationalError
 from app.models.user import User
+from app.models.notification import Notification
+from app.services.notification_services import NotificationServices
+from flask_login import current_user
+
 
 
 # Initail App
@@ -45,6 +49,25 @@ def create_app(config_class: type[Config] = Config):
     def load_user(user_id):
         user = User.query.get(int(user_id))
         return user
+
+    # Global Notification
+    @app.context_processor
+    def inject_notifications():
+        if current_user.is_authenticated:
+            return {
+                "notifications": NotificationServices.get_user_notifications(
+                    current_user.id,
+                    limit=3
+                ),
+                "notification_count": NotificationServices.get_unread_count(
+                    current_user.id
+                )
+            }
+
+        return {
+            "notifications": [],
+            "notification_count": 0
+        }
     
 
     # Register blueprints Server-Side
@@ -65,6 +88,8 @@ def create_app(config_class: type[Config] = Config):
     from app.routes.expense_route import expense_bp
     from app.routes.bot_route import bot_bp
     from app.routes.audit_log_route import audit_log_bp
+    from app.routes.notification_route import notification_bp
+    from app.routes.currency_converter_routes import currency_bp
 
     app.register_blueprint(user_bp)
     app.register_blueprint(auth_bp)
@@ -81,6 +106,8 @@ def create_app(config_class: type[Config] = Config):
     app.register_blueprint(expense_bp)
     app.register_blueprint(bot_bp)
     app.register_blueprint(audit_log_bp)
+    app.register_blueprint(notification_bp)
+    app.register_blueprint(currency_bp)
 
     # Root landing page for visitors
     @app.route("/")

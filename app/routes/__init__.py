@@ -16,3 +16,5 @@ from .income_route import income_bp
 from .expense_route import expense_bp
 from .bot_route import bot_bp
 from .audit_log_route import audit_log_bp
+from .notification_route import notification_bp
+from .currency_converter_routes import currency_bp

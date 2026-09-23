@@ -1,6 +1,10 @@
 from app.models.expense import Expense
+from flask import url_for
+from app.services.notification_services import NotificationServices
+
 from extension import db
 from sqlalchemy import func
+
 
 
 class ExpenseServices:
@@ -59,6 +63,16 @@ class ExpenseServices:
             )
             expense.users.append(user)
             db.session.add(expense)
+
+            # Add record norification to expense
+            NotificationServices.create_notification(
+                user_id=user.id,
+                title="Expense recorded",
+                message=f"Your expense of ${expense.amount:,.2f} was added.",
+                notification_type="expense",
+                link=url_for("expenses.index")
+            )
+
             db.session.commit()
             return expense
         except Exception:
@@ -73,6 +87,7 @@ class ExpenseServices:
             expense.category = data["category"]
             expense.expense_date = data["expense_date"]
             expense.recurring_period = data.get("recurring_period") or None
+
             db.session.commit()
             return expense
         except Exception:

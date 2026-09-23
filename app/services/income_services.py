@@ -1,4 +1,7 @@
 from app.models.income import Income
+from flask import url_for
+from app.services.notification_services import NotificationServices
+
 from extension import db
 from sqlalchemy import func
 
@@ -59,6 +62,15 @@ class IncomeServices:
             )
             income.users.append(user)
             db.session.add(income)
+
+            # Add record norification to income
+            NotificationServices.create_notification(
+                user_id=user.id,
+                title="Income recorded",
+                message=f"Your income of ${income.amount:,.2f} was added.",
+                notification_type="expense",
+                link=url_for("incomes.index")
+            )
             db.session.commit()
             return income
         except Exception:

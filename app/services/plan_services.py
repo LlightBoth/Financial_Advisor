@@ -1,6 +1,9 @@
 from datetime import date, timedelta
 from app.models.plan import Plan
 from app.models.rule import Rule
+from flask import url_for
+from app.services.notification_services import NotificationServices
+
 from extension import db
 from sqlalchemy import func
 import math
@@ -58,7 +61,7 @@ class PlanServices:
 
 
     @staticmethod
-    def add_saving(plan: Plan, amount: float):
+    def add_saving(plan: Plan, amount: float, user: None):
         if amount <= 0:
             raise ValueError("Saving amount must be greater than zero.")
 
@@ -70,6 +73,16 @@ class PlanServices:
         if plan.saving >= goal_cost:
             plan.saving = goal_cost
             plan.value = True
+
+            # Add notification record
+            NotificationServices.create_notification(
+                user_id=user.id,
+                title="Savings goal completed",
+                message=f"You completed your savings goal: {plan.goal}.",
+                notification_type="plan",
+                link=url_for("plans.index")
+            )
+
 
         db.session.commit()
         return plan
@@ -123,7 +136,18 @@ class PlanServices:
 
             plan.users.append(user)
             db.session.add(plan)
+
+            # Add record to notification
+            NotificationServices.create_notification(
+                user_id=user.id,
+                title="create new plan/goal",
+                message=f"You make new savings goal: {plan.goal}.",
+                notification_type="plan",
+                link=url_for("plans.index")
+            )
+
             db.session.commit()
+
             return plan
 
         except Exception:
@@ -132,7 +156,7 @@ class PlanServices:
 
 
     @staticmethod
-    def update_plan(plan: Plan, data: dict):
+    def update_plan(plan: Plan, data: dict, user: None):
         try:
             target_date = PlanServices.calculate_target_date(
                 goal_cost=data["goal_cost"],

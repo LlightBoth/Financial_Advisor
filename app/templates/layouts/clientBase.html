@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>{% block title %}Financial Advisor{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -85,6 +86,14 @@
             </li>
             {% endif %}
             
+            <li class="nav-item mb-1">
+                <a href="{{ url_for('currencies.converter') }}"
+                class="nav-link {% if request.endpoint == 'currencies.converter' %}active{% endif %}">
+                    <i class="bi bi-currency-exchange me-2"></i>
+                    <span>Currency</span>
+                </a>
+            </li>
+
             {% if is_management_user(current_user) %}
                 <li class="nav-section-title mt-3">ADMINISTRATION</li>
                 <li class="nav-item">
@@ -92,7 +101,7 @@
                         <i class="bi bi-shield-lock me-2"></i> <span>Management</span>
                     </a>
                 </li>
-            {% endif %}
+                {% endif %}
         </ul>
 
         <div class="sidebar-footer mt-auto">
@@ -135,15 +144,155 @@
 
             <!-- Notifications -->
             <div class="dropdown">
-                <button class="btn btn-sm btn-icon-round" data-bs-toggle="dropdown" aria-label="Notifications">
+                <button
+                    class="btn btn-sm btn-icon-round position-relative"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label="Notifications">
+
                     <i class="bi bi-bell"></i>
+
+                    {% if notification_count > 0 %}
+                        <span class="notification-badge" id="notificationBadge">
+                            {{ notification_count }}
+                        </span>
+                    {% endif %}
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
-                    <li class="dropdown-header small fw-bold">Recent Alerts</li>
-                    <li><a class="dropdown-item small" href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-check2-circle text-success me-2"></i>Complete Daily Tasks</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                </ul>
+
+
+                <div class="dropdown-menu dropdown-menu-end notification-menu shadow border-0 rounded-4 p-0">
+
+                    <!-- Header -->
+                    <div class="notification-header px-3 py-3 border-bottom">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+                                <div class="fw-semibold">
+                                    Notifications
+                                </div>
+
+                                <div class="text-muted small">
+                                    Your recent financial updates
+                                </div>
+                            </div>
+
+                            {% if notification_count > 0 %}
+                                <span
+                                    class="badge rounded-pill text-bg-primary"
+                                    id="notificationCount">
+                                    {{ notification_count }} New
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Notification list -->
+                    <div class="notification-list">
+
+                        {% if notifications %}
+
+                            {% for notification in notifications %}
+
+                                <a
+                                    href="{{ notification.link or '#' }}"
+                                    class="notification-item {% if not notification.is_read %}unread{% endif %}"
+                                    data-notification-id="{{ notification.id }}"
+                                    data-read-url="{{ url_for('notifications.mark_as_read', notification_id=notification.id) }}">
+
+                                    <div class="notification-icon {{ notification.type }}">
+
+                                        {% if notification.type == "income" %}
+                                            <i class="bi bi-arrow-down-left"></i>
+
+                                        {% elif notification.type == "expense" %}
+                                            <i class="bi bi-arrow-up-right"></i>
+
+                                        {% elif notification.type == "plan" %}
+                                            <i class="bi bi-bullseye"></i>
+
+                                        {% elif notification.type == "ai" %}
+                                            <i class="bi bi-robot"></i>
+
+                                        {% elif notification.type == "warning" %}
+                                            <i class="bi bi-exclamation-triangle"></i>
+
+                                        {% else %}
+                                            <i class="bi bi-info-circle"></i>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div class="notification-content">
+
+                                        <div class="notification-title">
+                                            {{ notification.title }}
+                                        </div>
+
+                                        <div class="notification-text">
+                                            {{ notification.message }}
+                                        </div>
+
+                                        <div class="notification-time">
+                                            <i class="bi bi-clock me-1"></i>
+                                            {{ notification.created_at.strftime('%b %d, %Y %H:%M') }}
+                                        </div>
+
+                                    </div>
+
+                                    {% if not notification.is_read %}
+                                        <span class="notification-unread-dot"></span>
+                                    {% endif %}
+
+                                </a>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <div class="text-center py-5 px-3">
+
+                                <i class="bi bi-bell-slash fs-2 text-muted"></i>
+
+                                <div class="fw-semibold mt-2">
+                                    No notifications
+                                </div>
+
+                                <div class="text-muted small">
+                                    You're all caught up.
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Footer -->
+                    <div class="notification-footer border-top p-2">
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-link text-decoration-none w-100"
+                            id="markAllNotificationsRead">
+
+                            <i class="bi bi-check2-all me-1"></i>
+                            Mark all as read
+
+                        </button>
+
+                    </div>
+
+                </div>
             </div>
+
+
 
             <!-- User Menu -->
             <div class="dropdown">
@@ -205,6 +354,9 @@
     const sidebarNav = document.querySelector(".sidebar-nav");
     const sidebarFooter = document.querySelector(".sidebar-footer");
     const themeIcon = document.getElementById("themeIcon");
+    const csrfToken = document.querySelector(
+        'meta[name="csrf-token"]'
+    ).getAttribute("content");
 
     function applyTheme(theme) {
         html.setAttribute('data-bs-theme', theme);
@@ -244,6 +396,251 @@
             sidebarFooter.classList.toggle("active");
         });
     }
+
+    // Mark Notification button
+    document.querySelectorAll(".notification-item").forEach(item => {
+        item.addEventListener("click", async function (event) {
+
+            const notificationId = this.dataset.notificationId;
+            const readUrl = this.dataset.readUrl;
+            const link = this.getAttribute("href");
+
+            // Already read
+            if (!this.classList.contains("unread")) {
+                return;
+            }
+
+            event.preventDefault();
+
+            try {
+
+                const response = await fetch(readUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({})
+                });
+
+
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+
+                console.log("Mark read response:", data);
+
+                if (data.success) {
+
+                    // Remove unread class
+                    this.classList.remove("unread");
+
+                    // Remove unread dot
+                    const dot = this.querySelector(
+                        ".notification-unread-dot"
+                    );
+
+                    if (dot) {
+                        dot.remove();
+                    }
+
+                    // IMPORTANT
+                    updateNotificationBadge(
+                        Number(data.unread_count)
+                    );
+
+                    // Navigate after marking as read
+                    if (link && link !== "#") {
+                        window.location.href = link;
+                    }
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to mark notification as read:",
+                    error
+                );
+
+                // Navigate anyway
+                if (link && link !== "#") {
+                    window.location.href = link;
+                }
+            }
+        });
+    });
+
+
+    /*
+     * Mark ALL notifications as read
+     */
+    const markAllButton = document.getElementById("markAllNotificationsRead");
+
+    if (markAllButton) {
+        markAllButton.addEventListener("click", async function (event) {
+
+            event.preventDefault();
+
+            const markAllUrl = "{{ url_for('notifications.mark_all_as_read') }}";
+
+            try {
+                const response = await fetch(markAllUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const contentType = response.headers.get("content-type") || "";
+
+                if (!contentType.includes("application/json")) {
+                    const text = await response.text();
+
+                    console.error(
+                        "Server did not return JSON:",
+                        response.status,
+                        text
+                    );
+
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+
+                    // Remove unread state from every notification
+                    document
+                        .querySelectorAll(".notification-item.unread")
+                        .forEach(item => {
+
+                            item.classList.remove("unread");
+
+                            const dot =
+                                item.querySelector(".notification-unread-dot");
+
+                            if (dot) {
+                                dot.remove();
+                            }
+                        });
+
+                    // Update notification count
+                    updateNotificationBadge(data.unread_count ?? 0);
+
+                } else {
+                    console.error(
+                        "Failed to mark all as read:",
+                        data.message
+                    );
+                }
+
+            } catch (error) {
+                console.error(
+                    "Failed to mark all notifications as read:",
+                    error
+                );
+            }
+        });
+    }
+
+
+    /*
+     * Update notification badge
+     */
+    function updateNotificationBadge(count) {
+
+        count = Number(count) || 0;
+
+        const bellButton = document.querySelector(
+            '[aria-label="Notifications"]'
+        );
+
+        let badge = document.getElementById(
+            "notificationBadge"
+        );
+
+        let countBadge = document.getElementById(
+            "notificationCount"
+        );
+
+
+        // =========================
+        // Bell badge
+        // =========================
+
+        if (count > 0) {
+
+            if (!badge && bellButton) {
+
+                badge = document.createElement("span");
+
+                badge.id = "notificationBadge";
+                badge.className = "notification-badge";
+
+                bellButton.appendChild(badge);
+            }
+
+            if (badge) {
+                badge.textContent = count;
+            }
+
+        } else {
+
+            if (badge) {
+                badge.remove();
+            }
+        }
+
+
+        // =========================
+        // Dropdown "X New"
+        // =========================
+
+        const notificationHeader =
+            document.querySelector(".notification-header");
+
+        if (count > 0) {
+
+            if (!countBadge && notificationHeader) {
+
+                countBadge = document.createElement("span");
+
+                countBadge.id = "notificationCount";
+                countBadge.className =
+                    "badge rounded-pill text-bg-primary";
+
+                const headerRow =
+                    notificationHeader.querySelector(
+                        ".d-flex.justify-content-between"
+                    );
+
+                if (headerRow) {
+                    headerRow.appendChild(countBadge);
+                }
+            }
+
+            if (countBadge) {
+                countBadge.textContent = `${count} New`;
+            }
+
+        } else {
+
+            if (countBadge) {
+                countBadge.remove();
+            }
+        }
+    }
+
+
+
 </script>
 </body>
 </html>
