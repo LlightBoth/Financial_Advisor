@@ -46,6 +46,7 @@
             <a href="#features" class="nav-menu-link">Features</a>
             <a href="#advisory" class="nav-menu-link">Advisory</a>
             <a href="#security" class="nav-menu-link">Security</a>
+            <a href="{{ url_for('about') }}" class="nav-menu-link">About & FAQ</a>
         </div>
 
         <div class="nav-actions">
@@ -98,6 +99,9 @@
             </a>
             <a href="#security" class="mobile-drawer-link">
                 <i class="bi bi-shield-check text-success"></i> Security & Privacy
+            </a>
+            <a href="{{ url_for('about') }}" class="mobile-drawer-link">
+                <i class="bi bi-patch-question-fill text-primary"></i> About & FAQ
             </a>
         </div>
 
@@ -343,9 +347,10 @@
                 <div>
                     <div class="footer-col-title">Company</div>
                     <ul class="footer-links">
-                        <li><a href="#overview">About</a></li>
+                        <li><a href="{{ url_for('about') }}#purpose">About</a></li>
+                        <li><a href="{{ url_for('about') }}#faq">FAQ</a></li>
+                        <li><a href="{{ url_for('about') }}#team">Our Team</a></li>
                         <li><a href="mailto:support@financialadvisor.ai">Contact</a></li>
-                        <li><a href="#advisory">Blog <i class="bi bi-arrow-up-right small ms-1" style="font-size: 0.75rem;"></i></a></li>
                     </ul>
                 </div>
 

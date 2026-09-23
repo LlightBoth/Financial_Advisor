@@ -21,3 +21,6 @@ integrate.txt
 # IDE files
 .vscode/
 .idea/
+
+# myown files
+myRun-commands.md
