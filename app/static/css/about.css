@@ -351,9 +351,12 @@
     justify-content: center;
     color: #fff;
     font-size: 0.95rem;
-    background: var(--primary-gradient);
-    border: 3px solid var(--bg-main);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    /* background: var(--primary-gradient); */
+    background-color: rgba(255, 85, 0, 0.828);
+    /* background-color: rgba(0, 30, 255, 0.66); */
+    /* border: 3px solid var(--bg-main); */
+    border: 3px solid rgb(249, 249, 249);
+    box-shadow: 0 4px 12px rgba(246, 137, 59, 0.4);
     animation: badgeFloat 3s ease-in-out infinite;
 }
 
