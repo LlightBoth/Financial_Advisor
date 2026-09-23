@@ -27,9 +27,8 @@ scratch/
 training/huggingface/
 *_merged/*.safetensors
 
-# Flask instance folder (keep pre-seeded database and gitkeep for friends, ignore backups)
+# Flask instance folder (keep folder via .gitkeep, ignore local databases so friends keep their own data)
 instance/*
-!instance/financial.db
 !instance/.gitkeep
 instance/*.backup
 
