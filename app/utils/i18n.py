@@ -10,19 +10,26 @@ SUPPORTED_LANGUAGES = {
 DEFAULT_LANGUAGE = "en"
 
 _TRANSLATIONS_CACHE = {}
+_TRANSLATIONS_MTIMES = {}
 _TRANSLATIONS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "translations")
 
 
 def _load_translation_file(lang: str) -> dict:
     """Safely loads translation file for a given language code.
     Guarantees no KeyError, FileNotFoundError, or JSONDecodeError is raised.
+    Auto-refreshes if translation file is modified on disk.
     """
-    if lang in _TRANSLATIONS_CACHE and _TRANSLATIONS_CACHE[lang]:
-        return _TRANSLATIONS_CACHE[lang]
-
     file_path = os.path.join(_TRANSLATIONS_DIR, f"{lang}.json")
     if not os.path.isfile(file_path):
         _TRANSLATIONS_CACHE[lang] = {}
+        return _TRANSLATIONS_CACHE[lang]
+
+    try:
+        mtime = os.path.getmtime(file_path)
+    except OSError:
+        mtime = 0
+
+    if lang in _TRANSLATIONS_CACHE and _TRANSLATIONS_CACHE[lang] and _TRANSLATIONS_MTIMES.get(lang) == mtime:
         return _TRANSLATIONS_CACHE[lang]
 
     try:
@@ -30,10 +37,12 @@ def _load_translation_file(lang: str) -> dict:
             data = json.load(f)
             if isinstance(data, dict):
                 _TRANSLATIONS_CACHE[lang] = data
+                _TRANSLATIONS_MTIMES[lang] = mtime
             else:
                 _TRANSLATIONS_CACHE[lang] = {}
     except (FileNotFoundError, json.JSONDecodeError, OSError, Exception):
-        _TRANSLATIONS_CACHE[lang] = {}
+        if lang not in _TRANSLATIONS_CACHE:
+            _TRANSLATIONS_CACHE[lang] = {}
 
     return _TRANSLATIONS_CACHE[lang]
 
