@@ -703,6 +703,543 @@
         "Step 7: Increase debt repayment as the balance decreases.",
         "Step 8: Reallocate the freed debt-payment amount toward savings or financial goals after debt is reduced."
       ]
+    },
+    {
+      "id": 27,
+      "name": "Balanced Cash Flow",
+      "conditions": [
+        {
+          "fact": "monthly_income",
+          "operator": "equals",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "Your income and expenses are equal, leaving no monthly surplus.",
+      "advice": [
+        "Review your recurring expenses.",
+        "Look for small expenses that can be reduced.",
+        "Try to create even a small monthly surplus.",
+        "Set an initial savings target."
+      ]
+    },
+
+    {
+      "id": 28,
+      "name": "Very Low Expense Rate",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.30
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Your expenses consume less than 30% of your income.",
+      "advice": [
+        "Maintain your current spending discipline.",
+        "Use part of the remaining income for savings.",
+        "Consider setting long-term financial goals.",
+        "Avoid increasing expenses unnecessarily."
+      ]
+    },
+
+    {
+      "id": 29,
+      "name": "Low Expense Rate",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.30
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.50
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Your expenses use between 30% and 50% of your income.",
+      "advice": [
+        "Continue monitoring your spending.",
+        "Maintain a regular savings contribution.",
+        "Use part of your remaining income for financial goals.",
+        "Review your budget monthly."
+      ]
+    },
+
+    {
+      "id": 30,
+      "name": "Moderate Expense Rate",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.50
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.70
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Your expenses consume between 50% and 70% of your income.",
+      "advice": [
+        "Review your monthly expense categories.",
+        "Identify unnecessary variable expenses.",
+        "Protect your remaining monthly surplus.",
+        "Set a consistent savings target."
+      ]
+    },
+
+    {
+      "id": 31,
+      "name": "High Expense Rate",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.70
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.90
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "Your expenses consume between 70% and 90% of your income, leaving a relatively small portion available for savings or other goals.",
+      "advice": [
+        "Review your largest monthly expenses.",
+        "Separate essential expenses from discretionary spending.",
+        "Reduce expenses where practical.",
+        "Protect the remaining portion of your income for savings."
+      ]
+    },
+
+    {
+      "id": 32,
+      "name": "Very High Expense Rate",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.90
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "Your expenses consume at least 90% of your income.",
+      "advice": [
+        "Review your expenses carefully.",
+        "Identify non-essential spending that can be reduced.",
+        "Review recurring payments and subscriptions.",
+        "Try to create a positive monthly surplus.",
+        "Recalculate your budget after reducing expenses."
+      ]
+    },
+
+    {
+      "id": 33,
+      "name": "Strong Remaining Income",
+      "conditions": [
+        {
+          "fact": "savings_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.50
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "At least 50% of your income remains after expenses.",
+      "advice": [
+        "Maintain your current expense level if sustainable.",
+        "Direct part of the remaining income toward savings.",
+        "Consider setting short-term and long-term financial goals.",
+        "Avoid unnecessary lifestyle increases."
+      ]
+    },
+
+    {
+      "id": 34,
+      "name": "Healthy Remaining Income",
+      "conditions": [
+        {
+          "fact": "savings_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.30
+        },
+        {
+          "fact": "savings_rate",
+          "operator": "less_than",
+          "value": 0.50
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Between 30% and 50% of your income remains after expenses.",
+      "advice": [
+        "Maintain a consistent savings contribution.",
+        "Build an emergency fund.",
+        "Allocate some surplus toward financial goals.",
+        "Continue monitoring expenses."
+      ]
+    },
+
+    {
+      "id": 35,
+      "name": "Limited Remaining Income",
+      "conditions": [
+        {
+          "fact": "savings_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.10
+        },
+        {
+          "fact": "savings_rate",
+          "operator": "less_than",
+          "value": 0.30
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Less than 30% of your income remains after expenses.",
+      "advice": [
+        "Review your monthly expenses.",
+        "Identify areas where spending can be reduced.",
+        "Set a realistic savings target.",
+        "Try to gradually increase your monthly surplus."
+      ]
+    },
+
+    {
+      "id": 36,
+      "name": "Very Limited Remaining Income",
+      "conditions": [
+        {
+          "fact": "savings_rate",
+          "operator": "greater_than",
+          "value": 0
+        },
+        {
+          "fact": "savings_rate",
+          "operator": "less_than",
+          "value": 0.10
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "Less than 10% of your income remains after expenses.",
+      "advice": [
+        "Review your largest expenses first.",
+        "Reduce unnecessary spending where possible.",
+        "Avoid adding new recurring expenses.",
+        "Set a small initial savings target.",
+        "Work toward increasing your monthly surplus."
+      ]
+    },
+
+    {
+      "id": 37,
+      "name": "Small Monthly Surplus",
+      "conditions": [
+        {
+          "fact": "monthly_surplus",
+          "operator": "greater_than",
+          "value": 0
+        },
+        {
+          "fact": "monthly_surplus",
+          "operator": "less_than",
+          "value": 50
+        }
+      ],
+      "certainty": 0.80,
+      "conclusion": "You have a positive but relatively small monthly surplus.",
+      "advice": [
+        "Protect the existing surplus.",
+        "Review expenses for small savings opportunities.",
+        "Set aside a portion of the surplus each month.",
+        "Avoid unnecessary new recurring expenses."
+      ]
+    },
+
+    {
+      "id": 38,
+      "name": "Moderate Monthly Surplus",
+      "conditions": [
+        {
+          "fact": "monthly_surplus",
+          "operator": "greater_than_or_equal",
+          "value": 50
+        },
+        {
+          "fact": "monthly_surplus",
+          "operator": "less_than",
+          "value": 200
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "You have a moderate monthly surplus after covering your expenses.",
+      "advice": [
+        "Set a fixed monthly savings amount.",
+        "Build an emergency reserve.",
+        "Allocate part of the surplus toward financial goals.",
+        "Review your surplus each month."
+      ]
+    },
+
+    {
+      "id": 39,
+      "name": "Large Monthly Surplus",
+      "conditions": [
+        {
+          "fact": "monthly_surplus",
+          "operator": "greater_than_or_equal",
+          "value": 200
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "You have a relatively large monthly surplus after expenses.",
+      "advice": [
+        "Allocate part of the surplus to savings.",
+        "Consider creating or increasing an emergency fund.",
+        "Set specific financial goals.",
+        "Automate regular contributions toward those goals."
+      ]
+    },
+
+    {
+      "id": 40,
+      "name": "Expense Almost Equals Income",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.90
+        },
+        {
+          "fact": "monthly_income",
+          "operator": "greater_than",
+          "value_fact": "monthly_expense"
+        }
+      ],
+      "certainty": 0.92,
+      "conclusion": "Your expenses are close to your income even though you currently have a positive cash flow.",
+      "advice": [
+        "Review discretionary spending.",
+        "Create a buffer between income and expenses.",
+        "Avoid relying on your entire monthly income.",
+        "Build a small emergency reserve."
+      ]
+    },
+
+    {
+      "id": 41,
+      "name": "Expenses Exceed Income Significantly",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than",
+          "value": 1.20
+        }
+      ],
+      "certainty": 0.95,
+      "conclusion": "Your expenses are more than 20% higher than your income.",
+      "advice": [
+        "Calculate the monthly deficit.",
+        "Identify the largest expense categories.",
+        "Prioritize essential expenses.",
+        "Reduce discretionary spending.",
+        "Review your financial position again after making adjustments."
+      ]
+    },
+
+    {
+      "id": 42,
+      "name": "Expenses Slightly Above Income",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than",
+          "value": 1.00
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "less_than_or_equal",
+          "value": 1.20
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "Your expenses are slightly higher than your income.",
+      "advice": [
+        "Identify the expenses causing the deficit.",
+        "Reduce non-essential spending.",
+        "Review recurring expenses.",
+        "Try to bring expenses below monthly income."
+      ]
+    },
+
+    {
+      "id": 43,
+      "name": "Very Small Savings Rate",
+      "conditions": [
+        {
+          "fact": "savings_rate",
+          "operator": "greater_than",
+          "value": 0
+        },
+        {
+          "fact": "savings_rate",
+          "operator": "less_than",
+          "value": 0.05
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Less than 5% of your income remains after expenses.",
+      "advice": [
+        "Review recurring expenses.",
+        "Look for small reductions in discretionary spending.",
+        "Set aside a small fixed amount each month.",
+        "Gradually work toward a larger monthly surplus."
+      ]
+    },
+
+    {
+      "id": 44,
+      "name": "Balanced Spending",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.50
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.70
+        },
+        {
+          "fact": "monthly_surplus",
+          "operator": "greater_than",
+          "value": 0
+        }
+      ],
+      "certainty": 0.82,
+      "conclusion": "Your spending is moderate relative to your income and you still maintain a positive monthly surplus.",
+      "advice": [
+        "Continue tracking your expenses.",
+        "Maintain a regular savings contribution.",
+        "Review your spending categories monthly.",
+        "Increase savings when your income increases."
+      ]
+    },
+
+    {
+      "id": 45,
+      "name": "Positive Cash Flow With Low Expenses",
+      "conditions": [
+        {
+          "fact": "monthly_surplus",
+          "operator": "greater_than",
+          "value": 0
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.50
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "You maintain positive cash flow while keeping expenses below half of your income.",
+      "advice": [
+        "Maintain your current expense discipline.",
+        "Build an emergency fund.",
+        "Allocate surplus toward financial goals.",
+        "Review your financial progress regularly."
+      ]
+    },
+
+    {
+      "id": 46,
+      "name": "Positive Cash Flow With High Expenses",
+      "conditions": [
+        {
+          "fact": "monthly_surplus",
+          "operator": "greater_than",
+          "value": 0
+        },
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.70
+        }
+      ],
+      "certainty": 0.90,
+      "conclusion": "You currently have positive cash flow, but most of your income is being used by expenses.",
+      "advice": [
+        "Protect your existing monthly surplus.",
+        "Review your largest expenses.",
+        "Reduce unnecessary spending where possible.",
+        "Increase your savings rate gradually."
+      ]
+    },
+
+    {
+      "id": 47,
+      "name": "Expense Rate Above 80 Percent",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "greater_than_or_equal",
+          "value": 0.80
+        }
+      ],
+      "certainty": 0.88,
+      "conclusion": "At least 80% of your income is being used for expenses.",
+      "advice": [
+        "Review your largest expense categories.",
+        "Separate essential and discretionary spending.",
+        "Look for recurring costs that can be reduced.",
+        "Try to increase the amount remaining after expenses."
+      ]
+    },
+
+    {
+      "id": 48,
+      "name": "Expense Rate Below 20 Percent",
+      "conditions": [
+        {
+          "fact": "expense_rate",
+          "operator": "less_than",
+          "value": 0.20
+        }
+      ],
+      "certainty": 0.85,
+      "conclusion": "Your expenses are below 20% of your income.",
+      "advice": [
+        "Continue monitoring your spending.",
+        "Maintain sufficient funds for essential needs.",
+        "Use part of the remaining income for savings.",
+        "Consider setting long-term financial goals."
+      ]
+    },
+
+    {
+      "id": 49,
+      "name": "No Monthly Surplus",
+      "conditions": [
+        {
+          "fact": "monthly_surplus",
+          "operator": "less_than_or_equal",
+          "value": 0
+        }
+      ],
+      "certainty": 0.92,
+      "conclusion": "Your current income does not leave a positive amount after monthly expenses.",
+      "advice": [
+        "Review your monthly spending.",
+        "Identify expenses that can be reduced.",
+        "Prioritize essential expenses.",
+        "Create a target for achieving positive monthly cash flow."
+      ]
     }
   ]
 }

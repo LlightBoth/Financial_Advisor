@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     expenses = db.relationship("Expense", secondary=user_expenses, back_populates="users")
     histories = db.relationship("History", secondary=user_histories, back_populates="users")
     ai_chats = db.relationship("AIChat", secondary=user_ai, back_populates="users")
+    notifications = db.relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
 
     # Methods To Help
