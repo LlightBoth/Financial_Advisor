@@ -11,17 +11,21 @@ class Plan(db.Model):
     in_between = db.Column(db.Date, nullable=False)
     goal_cost = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(120), nullable=False)
-    income = db.Column(db.Float, nullable=True, default=0.0)
-    expense = db.Column(db.Float, nullable=True, default=0.0)
-    martial_status = db.Column(db.String(20), nullable=True)
-    employment_status = db.Column(db.String(40), nullable=True)
-    debt_status = db.Column(db.String(40), nullable=True)
-    spending_habit = db.Column(db.String(40), nullable=True)
+    income = db.Column(db.Float, nullable=False)
+    expense = db.Column(db.Float, nullable=False)
+    marital_status = db.Column(db.String(20), nullable=False)
+    employment_status = db.Column(db.String(40), nullable=False)
+    debt_status = db.Column(db.String(40), nullable=False)
+    spending_habit = db.Column(db.String(40), nullable=False)
     value = db.Column(db.Boolean, default=False, nullable=False)
 
     debt_amount = db.Column(db.Numeric(12, 2), nullable=True)
     has_budget = db.Column(db.Boolean, default=False, nullable=False)
+    # Real Saving Amount
     saving = db.Column(db.Float, nullable=True)
+    # Want Saving daily/monthly/manuelly  
+    saving_amount = db.Column(db.Float, default=0, nullable=True)
+    saving_type = db.Column(db.String(12), nullable=True)
 
     last_completed = db.Column(db.DateTime, nullable=True)
 

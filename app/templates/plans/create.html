@@ -1,264 +1,601 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %}{{ _("plan.create_title") }}{% endblock %}
+{% block title %}Create Plan | Intelli App{% endblock %}
 
 {% block content %}
+{% import "macros/form_macros.html" as f %}
 
-<style>
-    .workspace-wrapper {
-        max-width: 850px;
-        margin: 0 auto;
-    }
+<style> .workspace-wrapper{max-width:850px;margin:0 auto}.form-card-modern{background-color:var(--bs-card-bg);border:1px solid var(--bs-border-color-translucent)!important;border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.04)!important}.breadcrumb-custom{font-size:.8rem;text-transform:uppercase;letter-spacing:.1rem;font-weight:700;color:var(--bs-secondary-color)}.step-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:12px;background-color:rgba(var(--bs-primary-rgb),.1);color:var(--bs-primary);font-size:1.2rem;flex-shrink:0}.step-section{display:none}.step-section.active{display:block}
+.choice-grid{display:grid;gap:.75rem}.choice-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.choice-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.choice-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}.choice-card{position:relative;display:block;cursor:pointer;margin:0}.choice-input{position:absolute;opacity:0;pointer-events:none}.choice-content{position:relative;min-height:82px;display:flex;align-items:center;gap:.85rem;padding:.9rem 1rem;background:var(--bs-body-bg);border:1px solid var(--bs-border-color);border-radius:.85rem;transition:border-color .18s ease,background-color .18s ease,box-shadow .18s ease,transform .18s ease}.choice-card:hover .choice-content{border-color:rgba(var(--bs-primary-rgb),.45);background:rgba(var(--bs-primary-rgb),.025);transform:translateY(-1px)}.choice-input:checked+.choice-content{border-color:var(--bs-primary);background:rgba(var(--bs-primary-rgb),.07);box-shadow:0 0 0 2px rgba(var(--bs-primary-rgb),.1),0 5px 15px rgba(0,0,0,.04)}.choice-input:checked+.choice-content .choice-icon{background:var(--bs-primary);color:#fff}.choice-input:checked+.choice-content .choice-check{opacity:1;transform:scale(1);color:var(--bs-primary)}.choice-icon{width:42px;height:42px;flex:0 0 42px;display:flex;align-items:center;justify-content:center;border-radius:.7rem;background:var(--bs-tertiary-bg);color:var(--bs-secondary-color);font-size:1.05rem;transition:background-color .18s ease,color .18s ease}.choice-text{min-width:0;display:flex;flex-direction:column;gap:.15rem}.choice-title{font-size:.9rem;font-weight:600;color:var(--bs-body-color)}.choice-description{font-size:.74rem;line-height:1.25;color:var(--bs-secondary-color)}.choice-check{margin-left:auto;flex:0 0 auto;opacity:0;transform:scale(.7);font-size:1.1rem;transition:opacity .18s ease,transform .18s ease}.choice-input:focus-visible+.choice-content{outline:2px solid var(--bs-primary);outline-offset:2px}
 
-    .form-card-modern {
-        background-color: var(--bs-card-bg);
-        border: 1px solid var(--bs-border-color-translucent) !important;
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
-    }
-
-    .step-icon {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
-        color: var(--bs-primary);
-        font-size: 1.2rem;
-    }
-
-    .breadcrumb-custom {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1rem;
-        font-weight: 700;
-        color: var(--bs-secondary-color);
-    }
-
-    .step-section {
-        display: none;
-    }
-
-    .step-section.active {
-        display: block;
-    }
+@media(max-width:991.98px){.choice-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:767.98px){.choice-grid-3,.choice-grid-2,.choice-grid-4{grid-template-columns:1fr}.choice-content{min-height:72px}}
+@media(max-width:576px){.workspace-wrapper{padding-top:2rem!important}.form-card-modern{border-radius:18px}}
 </style>
 
-<div class="container-fluid pt-0 px-4">
+<div class="container-fluid pt-0 px-4"> 
+    <div class="workspace-wrapper py-5"> 
+        <div class="mb-5 text-center"> 
+            <span class="breadcrumb-custom mb-2 d-block">Planning / New Strategy</span> 
+            <h1 class="display-6 fw-bold mb-2">Create Your Strategy</h1> 
+            <p class="text-muted mx-auto" style="max-width:500px;">Define your financial milestones. We'll calculate a target date based on your saving plan.</p> 
+        </div> 
+        <div class="card form-card-modern border-0"> 
+            <div class="card-body p-4 p-md-5"> 
+                <div class="d-flex align-items-center mb-5"> 
+                    <div class="step-icon me-3"><i id="step-icon" class="bi bi-bullseye"></i>
+                    </div> 
+                    <div> 
+                        <h5 id="step-title" class="fw-bold mb-0">Strategy Framework</h5> 
+                        <small id="step-description" class="text-muted">Choose your saving method and enter your financial goal</small> 
+                    </div> 
+                </div> 
+                <form id="create-plan-form" method="POST" action="{{ url_for('plans.create') }}" novalidate> 
+                    {{ form.hidden_tag() }} 
+                    <div id="step-1" class="step-section active"> 
 
-    <div class="workspace-wrapper py-5">
+<div class="mb-4">
 
-        <!-- Header -->
-        <div class="mb-5 text-center">
-            <span class="breadcrumb-custom mb-2 d-block">
-                {{ _("plan.breadcrumb_planning") }} / {{ _("plan.breadcrumb_new") }}
-            </span>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <label class="form-label fw-semibold mb-0">
+            How do you want to save?
+        </label>
 
-            <h1 class="display-6 fw-bold mb-2">
-                {{ _("plan.create_heading") }}
-            </h1>
+        <button
+            type="button"
+            class="btn btn-sm btn-link text-primary text-decoration-none p-0"
+            id="change-saving-type"
+        >
+            Change
+        </button>
+    </div>
 
-            <p class="text-muted mx-auto" style="max-width: 500px;">
-                {{ _("plan.create_subtitle") }}
-            </p>
-        </div>
+    <!-- Hidden WTForms field -->
+    <div class="d-none">
+        {{ form.saving_type() }}
+    </div>
 
-        <!-- Main Card -->
-        <div class="card form-card-modern border-0">
+    <div class="choice-grid choice-grid-3" id="saving-type-options">
 
-            <div class="card-body p-4 p-md-5">
+        <label class="choice-card saving-type-card">
+            <input
+                type="radio"
+                name="saving_type_choice"
+                value="daily"
+                class="choice-input"
+            >
 
-                <!-- Step Header -->
-                <div class="d-flex align-items-center mb-5">
+            <div class="choice-content">
 
-                    <div class="step-icon me-3">
-                        <i id="step-icon" class="bi bi-bullseye"></i>
-                    </div>
-
-                    <div>
-                        <h5 id="step-title" class="fw-bold mb-0">
-                            {{ _("plan.framework_title") }}
-                        </h5>
-
-                        <small id="step-description" class="text-muted">
-                            {{ _("plan.framework_subtitle") }}
-                        </small>
-                    </div>
-
+                <div class="choice-icon">
+                    <i class="bi bi-calendar-day"></i>
                 </div>
 
-                <!-- ONE FORM -->
-                <form method="POST" novalidate>
+                <div class="choice-text">
+                    <span class="choice-title">
+                        Daily
+                    </span>
 
-                    {{ form.hidden_tag() }}
+                    <span class="choice-description">
+                        Save a small amount every day
+                    </span>
+                </div>
 
-                    <!-- ===================== -->
-                    <!-- STEP 1 -->
-                    <!-- ===================== -->
+                <div class="choice-check">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
 
-                    <div id="step-1" class="step-section active">
+            </div>
+        </label>
 
-                        {% include "plans/_form1.html" %}
 
-                        <div class="d-flex justify-content-end mt-4">
+        <label class="choice-card saving-type-card">
+            <input
+                type="radio"
+                name="saving_type_choice"
+                value="monthly"
+                class="choice-input"
+            >
 
-                            <button
-                                type="button"
-                                class="btn btn-primary px-4"
-                                id="next-step"
-                            >
-                                Next
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </button>
+            <div class="choice-content">
 
-                        </div>
+                <div class="choice-icon">
+                    <i class="bi bi-calendar-month"></i>
+                </div>
 
-                    </div>
+                <div class="choice-text">
+                    <span class="choice-title">
+                        Monthly
+                    </span>
 
-                    <!-- ===================== -->
-                    <!-- STEP 2 -->
-                    <!-- ===================== -->
+                    <span class="choice-description">
+                        Save a fixed amount each month
+                    </span>
+                </div>
 
-                    <div id="step-2" class="step-section">
+                <div class="choice-check">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
 
-                        {% include "plans/_form2.html" %}
+            </div>
+        </label>
 
-                        <div class="d-flex justify-content-between mt-4">
 
-                            <button
-                                type="button"
-                                class="btn btn-outline-secondary px-4"
-                                id="previous-step"
-                            >
-                                <i class="bi bi-arrow-left me-2"></i>
-                                Back
-                            </button>
+        <label class="choice-card saving-type-card">
+            <input
+                type="radio"
+                name="saving_type_choice"
+                value="manual"
+                class="choice-input"
+            >
 
-                            <button
-                                type="submit"
-                                class="btn btn-primary px-4"
-                            >
-                                <i class="bi bi-check-circle me-2"></i>
-                                {{ _("plan.save_plan") }}
-                            </button>
+            <div class="choice-content">
 
-                        </div>
+                <div class="choice-icon">
+                    <i class="bi bi-sliders"></i>
+                </div>
 
-                    </div>
+                <div class="choice-text">
+                    <span class="choice-title">
+                        Flexible
+                    </span>
 
-                </form>
+                    <span class="choice-description">
+                        Change your saving amount when needed
+                    </span>
+                </div>
 
+                <div class="choice-check">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+
+            </div>
+        </label>
+
+    </div>
+
+    <div
+        id="saving-type-summary"
+        class="alert alert-primary-subtle border-0 rounded-3 mt-3 mb-0 d-none"
+    >
+        <div class="d-flex align-items-center">
+            <i id="saving-type-summary-icon" class="bi bi-piggy-bank fs-4 me-3"></i>
+
+            <div>
+                <div
+                    id="saving-type-summary-title"
+                    class="fw-semibold"
+                >
+                    —
+                </div>
+
+                <small
+                    id="saving-type-summary-description"
+                    class="text-body-secondary"
+                >
+                    —
+                </small>
             </div>
         </div>
-
-
-        <!-- Information -->
-        <div class="row g-3 mt-4">
-
-            <div class="col-md-4">
-                <div class="d-flex align-items-start p-3">
-                    <i class="bi bi-check2-circle text-success fs-4 me-3"></i>
-
-                    <div>
-                        <h6 class="fw-bold mb-1 small">
-                            {{ _("plan.feature_tracking_title") }}
-                        </h6>
-
-                        <p class="text-muted x-small mb-0">
-                            {{ _("plan.feature_tracking_desc") }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="d-flex align-items-start p-3">
-                    <i class="bi bi-shield-lock text-primary fs-4 me-3"></i>
-
-                    <div>
-                        <h6 class="fw-bold mb-1 small">
-                            {{ _("plan.feature_security_title") }}
-                        </h6>
-
-                        <p class="text-muted x-small mb-0">
-                            {{ _("plan.feature_security_desc") }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="d-flex align-items-start p-3">
-                    <i class="bi bi-lightbulb text-warning fs-4 me-3"></i>
-
-                    <div>
-                        <h6 class="fw-bold mb-1 small">
-                            {{ _("plan.feature_flexibility_title") }}
-                        </h6>
-
-                        <p class="text-muted x-small mb-0">
-                            {{ _("plan.feature_flexibility_desc") }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
     </div>
 
 </div>
 
+{{ f.render_field(form.goal, placeholder="e.g. Buy a new car", icon="bi bi-bullseye") }}
+{{ f.render_field(form.goal_cost, placeholder="e.g. 5000", icon="bi bi-cash") }}
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+<div class="row"> <div class="col-md-6">{{ f.render_field(form.income, placeholder="e.g. 3000", icon="bi bi-cash-stack") }}</div> <div class="col-md-6">{{ f.render_field(form.expense, placeholder="e.g. 1800", icon="bi bi-wallet2") }}</div> </div> <div class="row"> <div class="col-md-6">{{ f.render_field(form.debt_amount, placeholder="e.g. 3000", icon="bi bi-credit-card") }}</div> <div class="col-md-6">{{ f.render_switch(form.has_budget) }}</div> </div>
+{{ f.render_field(form.saving, placeholder="e.g. 500", icon="bi bi-piggy-bank") }}
+{{ f.render_field(form.description, placeholder="Describe your financial goal...", icon="bi bi-card-text") }}
 
-    const step1 = document.getElementById("step-1");
-    const step2 = document.getElementById("step-2");
+<div class="d-flex justify-content-end mt-4"> 
+    <button type="button" id="next-step" class="btn btn-primary px-4">
+        Next <i class="bi bi-arrow-right ms-2"></i>
+    </button> 
+</div> 
+</div> 
+<div id="step-2" class="step-section"> 
+    <div class="mb-4"> <label class="form-label fw-semibold small text-body-secondary">{{ form.marital_status.label.text }}</label> <div class="choice-grid choice-grid-2"> {% for value,label in form.marital_status.choices %} <label class="choice-card"> <input type="radio" name="{{ form.marital_status.name }}" value="{{ value }}" class="choice-input" {% if form.marital_status.data == value %}checked{% endif %}> <div class="choice-content"> <div class="choice-icon"><i class="bi {% if value == 'single' %}bi-person{% else %}bi-people{% endif %}"></i></div> <div class="choice-text"> <span class="choice-title">{{ label }}</span> <span class="choice-description">{% if value == "single" %}Currently unmarried{% else %}Currently married{% endif %}</span> </div> <div class="choice-check"><i class="bi bi-check-circle-fill"></i></div> </div> </label> {% endfor %} </div> {% for error in form.marital_status.errors %}<div class="text-danger small mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>{% endfor %} </div> <div class="mb-4"> <label class="form-label fw-semibold small text-body-secondary">{{ form.employment_status.label.text }}</label> <div class="choice-grid choice-grid-3"> {% for value,label in form.employment_status.choices %} <label class="choice-card"> <input type="radio" name="{{ form.employment_status.name }}" value="{{ value }}" class="choice-input" {% if form.employment_status.data == value %}checked{% endif %}> <div class="choice-content"> <div class="choice-icon"> <i class="bi {% if value == 'employed' %}bi-briefcase-fill{% elif value == 'not_employed' %}bi-person-dash-fill{% else %}bi-question-circle-fill{% endif %}"></i> </div> <div class="choice-text"> <span class="choice-title">{% if value == "employed" %}Employed{% elif value == "not_employed" %}Not employed{% else %}Prefer not to say{% endif %}</span> <span class="choice-description">{{ label }}</span> </div> <div class="choice-check"><i class="bi bi-check-circle-fill"></i></div> </div> </label> {% endfor %} </div> {% for error in form.employment_status.errors %}<div class="text-danger small mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>{% endfor %} </div> <div class="mb-4"> <label class="form-label fw-semibold small text-body-secondary">{{ form.debt_status.label.text }}</label> <div class="choice-grid choice-grid-3"> {% for value,label in form.debt_status.choices %} <label class="choice-card"> <input type="radio" name="{{ form.debt_status.name }}" value="{{ value }}" class="choice-input" {% if form.debt_status.data == value %}checked{% endif %}> <div class="choice-content"> <div class="choice-icon"> <i class="bi {% if value == 'debt' %}bi-credit-card-2-front-fill{% elif value == 'no_debt' %}bi-shield-check{% else %}bi-question-circle-fill{% endif %}"></i> </div> <div class="choice-text"> <span class="choice-title">{% if value == "debt" %}I have debt{% elif value == "no_debt" %}No debt{% else %}Prefer not to say{% endif %}</span> <span class="choice-description">{% if value == "debt" %}Outstanding financial obligations{% elif value == "no_debt" %}No outstanding debt{% else %}Skip this question{% endif %}</span> </div> <div class="choice-check"><i class="bi bi-check-circle-fill"></i></div> </div> </label> {% endfor %} </div> {% for error in form.debt_status.errors %}<div class="text-danger small mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>{% endfor %} </div> <div class="mb-3"> <label class="form-label fw-semibold small text-body-secondary">{{ form.spending_habit.label.text }}</label> <div class="choice-grid choice-grid-3"> {% for value,label in form.spending_habit.choices %} <label class="choice-card"> <input type="radio" name="{{ form.spending_habit.name }}" value="{{ value }}" class="choice-input" {% if form.spending_habit.data == value %}checked{% endif %}> <div class="choice-content"> <div class="choice-icon"> <i class="bi {% if value == 'big_spend' %}bi-cart-plus-fill{% elif value == 'average_spend' %}bi-cart-check-fill{% elif value == 'low_spend' %}bi-piggy-bank-fill{% else %}bi-question-circle-fill{% endif %}"></i> </div> <div class="choice-text"> <span class="choice-title">{% if value == "big_spend" %}Spend a lot{% elif value == "average_spend" %}Moderate{% elif value == "low_spend" %}Spend very little{% else %}Prefer not to say{% endif %}</span> <span class="choice-description">{{ label }}</span> </div> <div class="choice-check"><i class="bi bi-check-circle-fill"></i></div> </div> </label> {% endfor %} </div> {% for error in form.spending_habit.errors %}<div class="text-danger small mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>{% endfor %} </div> <div id="step2-error" class="alert alert-danger d-none mt-3" role="alert">Please complete all required fields before reviewing the plan.</div> <div class="d-flex justify-content-between mt-4"> <button type="button" id="previous-step" class="btn btn-outline-secondary px-4"><i class="bi bi-arrow-left me-2"></i>Back</button> <button type="button" id="review-plan" class="btn btn-primary px-4">Review Plan <i class="bi bi-arrow-right ms-2"></i></button> </div> </div> <div id="step-3" class="step-section"> <div class="card border-0 bg-body-tertiary rounded-4 mb-3"> <div class="card-body"> <div class="d-flex justify-content-between mb-3"><span class="text-muted">Financial Goal</span><strong id="confirm-goal">—</strong></div> <div class="d-flex justify-content-between mb-3"><span class="text-muted">Goal Cost</span><strong id="confirm-goal-cost">—</strong></div> <div class="d-flex justify-content-between mb-3"><span class="text-muted">Monthly Income</span><strong id="confirm-income">—</strong></div> <div class="d-flex justify-content-between mb-3"><span class="text-muted">Monthly Expenses</span><strong id="confirm-expense">—</strong></div> <div class="d-flex justify-content-between mb-3"><span class="text-muted">Saving Method</span><strong id="confirm-saving-type">—</strong></div> <div class="d-flex justify-content-between mb-3"><span class="text-muted">Saving Amount</span><strong id="confirm-saving">—</strong></div> <hr> <div class="text-center pt-2"> <small class="text-muted text-uppercase fw-bold">Recommended Target Date</small> <div id="confirm-target-date" class="fs-3 fw-bold text-primary mt-2">—</div> <small id="confirm-duration" class="text-muted">—</small> </div> </div> </div> <div id="calculation-warning" class="alert alert-warning d-none" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span id="calculation-warning-text"></span></div> <div class="d-flex justify-content-between mt-4"> <button type="button" id="previous-step-2" class="btn btn-outline-secondary px-4"><i class="bi bi-arrow-left me-2"></i>Back</button> <button type="submit" id="save-plan" class="btn btn-primary px-4"><i class="bi bi-check-circle me-2"></i>Create Plan</button> </div> </div> </form> </div> </div> <div class="row g-3 mt-4"> <div class="col-md-4"><div class="d-flex align-items-start p-3"><i class="bi bi-check2-circle text-success fs-4 me-3"></i><div><h6 class="fw-bold mb-1 small">Real-time Tracking</h6><p class="text-muted small mb-0">Monitor days remaining automatically.</p></div></div></div> <div class="col-md-4"><div class="d-flex align-items-start p-3"><i class="bi bi-shield-lock text-primary fs-4 me-3"></i><div><h6 class="fw-bold mb-1 small">Secure Data</h6><p class="text-muted small mb-0">Your financial goals are private.</p></div></div></div> <div class="col-md-4"><div class="d-flex align-items-start p-3"><i class="bi bi-lightbulb text-warning fs-4 me-3"></i><div><h6 class="fw-bold mb-1 small">Flexible Edits</h6><p class="text-muted small mb-0">Adjust your targets as your situation changes.</p></div></div></div> </div> </div> </div>
+<script> document.addEventListener("DOMContentLoaded",function(){ const form=document.getElementById("create-plan-form"); const step1=document.getElementById("step-1"); const step2=document.getElementById("step-2"); const step3=document.getElementById("step-3"); const nextButton=document.getElementById("next-step"); const previousButton=document.getElementById("previous-step"); const reviewButton=document.getElementById("review-plan"); const previousStep2Button=document.getElementById("previous-step-2"); const savePlanButton=document.getElementById("save-plan"); const stepTitle=document.getElementById("step-title"); const stepDescription=document.getElementById("step-description"); const stepIcon=document.getElementById("step-icon");
+const savingType=document.getElementById("saving_type");
+const goal=document.getElementById("goal");
+const goalCost=document.getElementById("goal_cost");
+const income=document.getElementById("income");
+const expense=document.getElementById("expense");
+const debtAmount=document.getElementById("debt_amount");
+const saving=document.getElementById("saving");
 
-    const nextButton = document.getElementById("next-step");
-    const previousButton = document.getElementById("previous-step");
+const confirmGoal=document.getElementById("confirm-goal");
+const confirmGoalCost=document.getElementById("confirm-goal-cost");
+const confirmIncome=document.getElementById("confirm-income");
+const confirmExpense=document.getElementById("confirm-expense");
+const confirmSavingType=document.getElementById("confirm-saving-type");
+const confirmSaving=document.getElementById("confirm-saving");
+const confirmTargetDate=document.getElementById("confirm-target-date");
+const confirmDuration=document.getElementById("confirm-duration");
 
-    const stepTitle = document.getElementById("step-title");
-    const stepDescription = document.getElementById("step-description");
-    const stepIcon = document.getElementById("step-icon");
+const calculationWarning=document.getElementById("calculation-warning");
+const calculationWarningText=document.getElementById("calculation-warning-text");
+
+if(!form||!step1||!step2||!step3||!nextButton||!previousButton||!reviewButton||!previousStep2Button||!savePlanButton||!savingType||!goal||!goalCost||!income||!expense||!debtAmount||!saving){console.error("Create Plan JavaScript initialization failed.");return;}
+
+function showStep1(){step1.classList.add("active");step2.classList.remove("active");step3.classList.remove("active");stepTitle.textContent="Strategy Framework";stepDescription.textContent="Choose your saving method and enter your financial goal";stepIcon.className="bi bi-bullseye";}
+function showStep2(){step1.classList.remove("active");step2.classList.add("active");step3.classList.remove("active");stepTitle.textContent="Financial Situation";stepDescription.textContent="Tell us about your current financial situation";stepIcon.className="bi bi-bar-chart-line";}
+function showStep3(){step1.classList.remove("active");step2.classList.remove("active");step3.classList.add("active");stepTitle.textContent="Review Strategy";stepDescription.textContent="Review your calculated plan before creating it";stepIcon.className="bi bi-check2-circle";}
+function scrollTop(){window.scrollTo({top:0,behavior:"smooth"});}
+
+function validateStep1(){
+if(!savingType.value){savingType.focus();return false;}
+if(!goal.value.trim()){goal.focus();return false;}
+const goalAmount=parseFloat(goalCost.value);
+if(!Number.isFinite(goalAmount)||goalAmount<=0){goalCost.focus();return false;}
+const incomeAmount=parseFloat(income.value);
+if(!Number.isFinite(incomeAmount)||incomeAmount<0){income.focus();return false;}
+const expenseAmount=parseFloat(expense.value);
+if(!Number.isFinite(expenseAmount)||expenseAmount<0){expense.focus();return false;}
+return true;
+}
+
+// Popup Saving Type
+const savingTypeChoices = document.querySelectorAll(
+    'input[name="saving_type_choice"]'
+);
+
+const savingTypeSummary = document.getElementById(
+    "saving-type-summary"
+);
+
+const savingTypeSummaryTitle = document.getElementById(
+    "saving-type-summary-title"
+);
+
+const savingTypeSummaryDescription = document.getElementById(
+    "saving-type-summary-description"
+);
+
+const savingTypeSummaryIcon = document.getElementById(
+    "saving-type-summary-icon"
+);
+
+const savingFieldContainer = saving.closest(".mb-3, .mb-4, .form-group")
+    || saving.parentElement;
 
 
-    if (nextButton && previousButton && step1 && step2) {
-        nextButton.addEventListener("click", function () {
+/*
+ * Information shown for each saving method.
+ */
+const savingTypeInfo = {
 
-            step1.classList.remove("active");
-            step2.classList.add("active");
+    daily: {
+        title: "Daily Saving",
+        description: "Save a fixed amount every day toward your goal.",
+        icon: "bi bi-calendar-day",
+        placeholder: "e.g. 20",
+        suffix: "per day"
+    },
 
-            if (stepTitle) stepTitle.textContent = "Financial Situation";
-            if (stepDescription) stepDescription.textContent = "Tell us about your current financial situation";
-            if (stepIcon) stepIcon.className = "bi bi-bar-chart-line";
+    monthly: {
+        title: "Monthly Saving",
+        description: "Set aside a fixed amount every month.",
+        icon: "bi bi-calendar-month",
+        placeholder: "e.g. 500",
+        suffix: "per month"
+    },
 
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        });
-
-
-        previousButton.addEventListener("click", function () {
-
-            step2.classList.remove("active");
-            step1.classList.add("active");
-
-            if (stepTitle) stepTitle.textContent = "{{ _('plan.framework_title') }}";
-            if (stepDescription) stepDescription.textContent = "{{ _('plan.framework_subtitle') }}";
-            if (stepIcon) stepIcon.className = "bi bi-bullseye";
-
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        });
+    manual: {
+        title: "Flexible Saving",
+        description: "Save different amounts whenever your situation changes.",
+        icon: "bi bi-sliders",
+        placeholder: "e.g. 500",
+        suffix: "per contribution"
     }
 
+};
+
+
+/*
+ * Apply the selected saving type to the
+ * actual WTForms field.
+ */
+function setSavingType(value) {
+
+    if (!["daily", "monthly", "manual"].includes(value)) {
+        return;
+    }
+
+    /*
+     * Update the hidden WTForms select.
+     */
+    savingType.value = value;
+
+    /*
+     * Update visual radio.
+     */
+    const selectedRadio = document.querySelector(
+        `input[name="saving_type_choice"][value="${value}"]`
+    );
+
+    if (selectedRadio) {
+        selectedRadio.checked = true;
+    }
+
+    /*
+     * Update summary.
+     */
+    const info = savingTypeInfo[value];
+
+    savingTypeSummaryTitle.textContent = info.title;
+
+    savingTypeSummaryDescription.textContent =
+        info.description;
+
+    savingTypeSummaryIcon.className =
+        info.icon + " fs-4 me-3";
+
+    savingTypeSummary.classList.remove("d-none");
+
+
+    /*
+     * Update saving field placeholder.
+     */
+    saving.placeholder = info.placeholder;
+
+
+    /*
+     * Update label if the field has a label.
+     */
+    const savingLabel = document.querySelector(
+        `label[for="${saving.id}"]`
+    );
+
+    if (savingLabel) {
+
+        if (value === "daily") {
+            savingLabel.textContent =
+                "Amount to save per day";
+        }
+
+        else if (value === "monthly") {
+            savingLabel.textContent =
+                "Amount to save per month";
+        }
+
+        else {
+            savingLabel.textContent =
+                "Estimated saving amount";
+        }
+    }
+}
+
+
+/*
+ * User clicks one of the three cards.
+ */
+savingTypeChoices.forEach(function (radio) {
+
+    radio.addEventListener("change", function () {
+
+        if (this.checked) {
+            setSavingType(this.value);
+        }
+
+    });
+
+});
+
+
+/*
+ * Restore existing value when editing/reloading.
+ */
+if (
+    savingType.value &&
+    ["daily", "monthly", "manual"].includes(savingType.value)
+) {
+
+    setSavingType(savingType.value);
+
+}
+
+nextButton.addEventListener("click",function(){
+if(!validateStep1()){alert("Please complete the required financial information before continuing.");return;}
+showStep2();
+scrollTop();
+});
+
+previousButton.addEventListener("click",function(){showStep1();scrollTop();});
+previousStep2Button.addEventListener("click",function(){showStep2();scrollTop();});
+
+// Auto-pick radio selections based on the user's financial inputs.
+// Helper: select a radio button and trigger its change event.
+function selectRadio(name, value) {
+    const radio = document.querySelector(
+        `input[type="radio"][name="${name}"][value="${value}"]`
+    );
+
+    if (!radio) return;
+
+    radio.checked = true;
+    radio.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+
+// Default marital status: Single
+function setDefaultMaritalStatus() {
+    selectRadio("marital_status", "single");
+}
+
+
+// Debt status based on debt amount
+function updateDebtStatus() {
+    const value = parseFloat(debtAmount.value);
+
+    if (!Number.isFinite(value)) {
+        selectRadio("debt_status", "no_debt");
+        return;
+    }
+
+    selectRadio(
+        "debt_status",
+        value > 0 ? "debt" : "no_debt"
+    );
+}
+
+
+// Employment status based on income
+function updateEmploymentStatus() {
+    const value = parseFloat(income.value);
+
+    if (!Number.isFinite(value)) {
+        return;
+    }
+
+    selectRadio(
+        "employment_status",
+        value > 0 ? "employed" : "not_employed"
+    );
+}
+
+
+// Spending habit based on income vs expenses.
+//
+// Ratio = expenses / income
+//
+// <= 40%  -> Spend very little
+// <= 70%  -> Moderate
+// > 70%   -> Spend a lot
+//
+// If income is zero/invalid, default to Moderate.
+function updateSpendingHabit() {
+    const incomeValue = parseFloat(income.value);
+    const expenseValue = parseFloat(expense.value);
+
+    if (
+        !Number.isFinite(incomeValue) ||
+        !Number.isFinite(expenseValue) ||
+        incomeValue <= 0 ||
+        expenseValue < 0
+    ) {
+        selectRadio("spending_habit", "average_spend");
+        return;
+    }
+
+    const expenseRatio = expenseValue / incomeValue;
+
+    let spendingHabit;
+
+    if (expenseRatio <= 0.40) {
+        spendingHabit = "low_spend";
+    } else if (expenseRatio <= 0.70) {
+        spendingHabit = "average_spend";
+    } else {
+        spendingHabit = "big_spend";
+    }
+
+    selectRadio("spending_habit", spendingHabit);
+}
+
+
+// Update automatically whenever income changes.
+income.addEventListener("input", function () {
+    updateEmploymentStatus();
+    updateSpendingHabit();
+});
+
+income.addEventListener("change", function () {
+    updateEmploymentStatus();
+    updateSpendingHabit();
+});
+
+
+// Update automatically whenever expenses change.
+expense.addEventListener("input", updateSpendingHabit);
+expense.addEventListener("change", updateSpendingHabit);
+
+
+// Update debt status whenever debt amount changes.
+debtAmount.addEventListener("input", updateDebtStatus);
+debtAmount.addEventListener("change", updateDebtStatus);
+
+
+// Set initial defaults when the page loads.
+setDefaultMaritalStatus();
+updateEmploymentStatus();
+updateDebtStatus();
+updateSpendingHabit();
+
+function showCalculationWarning(message){calculationWarningText.textContent=message;calculationWarning.classList.remove("d-none");savePlanButton.disabled=true;}
+function clearCalculationWarning(){calculationWarning.classList.add("d-none");calculationWarningText.textContent="";savePlanButton.disabled=false;}
+function formatMoney(value){return new Intl.NumberFormat(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}).format(value);}
+function formatDate(date){return date.toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});}
+
+function calculateTargetDate(){
+clearCalculationWarning();
+
+const goalAmount=parseFloat(goalCost.value);
+const monthlyIncome=parseFloat(income.value);
+const monthlyExpense=parseFloat(expense.value);
+const savingAmount=parseFloat(saving.value);
+
+if(!Number.isFinite(goalAmount)||goalAmount<=0){showCalculationWarning("Please enter a valid goal cost.");return null;}
+if(!Number.isFinite(monthlyIncome)||monthlyIncome<0){showCalculationWarning("Please enter a valid monthly income.");return null;}
+if(!Number.isFinite(monthlyExpense)||monthlyExpense<0){showCalculationWarning("Expenses cannot be negative.");return null;}
+if(!Number.isFinite(savingAmount)||savingAmount<=0){showCalculationWarning("Please enter a saving amount greater than zero.");return null;}
+if(!["daily","monthly","manual"].includes(savingType.value)){showCalculationWarning("Please select a valid saving method.");return null;}
+
+const availableMonthly=monthlyIncome-monthlyExpense;
+
+if(availableMonthly<=0){showCalculationWarning("Your expenses are equal to or greater than your income.");return null;}
+
+if((savingType.value==="monthly"||savingType.value==="manual")&&savingAmount>availableMonthly){showCalculationWarning("Your monthly saving cannot be greater than the amount available after expenses.");return null;}
+
+if(savingType.value==="daily"&&savingAmount*30.4375>availableMonthly){showCalculationWarning("Your daily saving amount is greater than the amount available after expenses.");return null;}
+
+const days=savingType.value==="daily"?Math.ceil(goalAmount/savingAmount):Math.ceil((goalAmount/savingAmount)*30.4375);
+
+if(!Number.isFinite(days)||days<=0){showCalculationWarning("Unable to calculate a valid target date.");return null;}
+
+const targetDate=new Date();
+targetDate.setHours(0,0,0,0);
+targetDate.setDate(targetDate.getDate()+days);
+
+return{targetDate,days};
+}
+
+function updateConfirmation(){
+const result=calculateTargetDate();
+const goalCostValue=parseFloat(goalCost.value);
+const incomeValue=parseFloat(income.value);
+const expenseValue=parseFloat(expense.value);
+const savingValue=parseFloat(saving.value);
+
+confirmGoal.textContent=goal.value.trim()||"—";
+confirmGoalCost.textContent=Number.isFinite(goalCostValue)?"$"+formatMoney(goalCostValue):"—";
+confirmIncome.textContent=Number.isFinite(incomeValue)?"$"+formatMoney(incomeValue):"—";
+confirmExpense.textContent=Number.isFinite(expenseValue)?"$"+formatMoney(expenseValue):"—";
+
+const savingTypeLabels={daily:"Daily Saving",monthly:"Monthly Saving",manual:"Flexible Saving"};
+confirmSavingType.textContent=savingTypeLabels[savingType.value]||"—";
+
+if(Number.isFinite(savingValue)){const savingLabel=savingType.value==="daily"?" / day":" / month";confirmSaving.textContent="$"+formatMoney(savingValue)+savingLabel;}else{confirmSaving.textContent="—";}
+
+if(!result){confirmTargetDate.textContent="Unable to calculate";confirmDuration.textContent="Please review your financial information.";return false;}
+
+confirmTargetDate.textContent=formatDate(result.targetDate);
+confirmDuration.textContent=savingType.value==="daily"?result.days+" days of daily saving":Math.ceil(result.days/30.4375)+" months of saving";
+
+return true;
+}
+
+reviewButton.addEventListener("click",function(){
+if(!updateConfirmation())return;
+showStep3();
+scrollTop();
+});
+
+form.addEventListener("submit",function(event){
+if(!savingType.value){event.preventDefault();showStep1();savingType.focus();alert("Please select a saving type.");return;}
+if(!calculateTargetDate()){event.preventDefault();showStep3();return;}
+});
 });
 </script>
 

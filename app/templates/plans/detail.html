@@ -1,6 +1,6 @@
 {% extends "layouts/clientBase.html" %}
 
-{% block title %}{{ plan.goal }} | {{ _("plan.overview") }}{% endblock %}
+{% block title %}{{ plan.goal }} | Plan Overview{% endblock %}
 
 {% block content %}
 
@@ -147,11 +147,11 @@
 
             <div>
                 <div class="text-muted small mb-1">
-                    {{ _("plan.breadcrumb_planning") }} / {{ _("plan.overview") }}
+                    Planning / Plan Overview
                 </div>
 
                 <h1 class="h3 fw-bold mb-0">
-                    {{ _("plan.overview") }}
+                    Plan Overview
                 </h1>
             </div>
 
@@ -162,7 +162,7 @@
                     class="btn btn-outline-secondary rounded-3 px-3"
                 >
                     <i class="bi bi-arrow-left me-1"></i>
-                    {{ _("common.back") }}
+                    Back
                 </a>
 
                 <a
@@ -170,7 +170,7 @@
                     class="btn btn-primary rounded-3 px-3"
                 >
                     <i class="bi bi-pencil me-1"></i>
-                    {{ _("common.edit") }}
+                    Edit Plan
                 </a>
 
             </div>
@@ -203,23 +203,19 @@
                                     {% if plan.value %}
                                         <span class="badge text-bg-success status-badge">
                                             <i class="bi bi-check-circle me-1"></i>
-                                            {{ _("plan.status_completed") }}
+                                            Completed
                                         </span>
                                     {% else %}
                                         <span class="badge text-bg-warning status-badge">
                                             <i class="bi bi-clock me-1"></i>
-                                            {{ _("plan.status_incompleted") }}
+                                            In Progress
                                         </span>
                                     {% endif %}
 
-                                    <span class="text-muted small">
-                                        #{{ plan.id }}
+                                    <span class="badge text-bg-primary text-light small">
+                                        {{ saving_frequency }} Saving
                                     </span>
 
-                                </div>
-
-                                <div class="text-muted small text-uppercase fw-semibold mb-1">
-                                    {{ _("plan.goal_label") }}
                                 </div>
 
                                 <h2 class="display-6 fw-bold mb-2">
@@ -227,7 +223,7 @@
                                 </h2>
 
                                 <p class="text-muted mb-0">
-                                    {{ plan.description if plan.description else _("common.no_description_provided") }}
+                                    Your financial strategy and progress overview.
                                 </p>
 
                             </div>
@@ -242,7 +238,7 @@
                         <div class="text-lg-end">
 
                             <div class="text-muted small text-uppercase fw-semibold mb-1">
-                                {{ _("plan.goal_cost_label") }}
+                                Target Amount
                             </div>
 
                             <div class="display-5 fw-bold text-success amount">
@@ -264,9 +260,26 @@
         <!-- FINANCIAL METRICS -->
         <!-- ================================================= -->
 
+        {% set goal_cost = plan.goal_cost|float %}
+        {% set saving = plan.saving|float if plan.saving else 0 %}
+        {% set progress = (saving / goal_cost * 100) if goal_cost > 0 else 0 %}
+        {% set progress = [progress, 100]|min %}
         {% set income = plan.income|float if plan.income else 0 %}
         {% set expense = plan.expense|float if plan.expense else 0 %}
         {% set surplus = income - expense %}
+        {% set saving_amount = plan.saving_amount|float if plan.saving_amount else 0 %}
+        {% set saving_type = plan.saving_type|lower if plan.saving_type else 'manually' %}
+
+        {% if saving_type == 'daily' %}
+            {% set saving_label = 'Daily Saving' %}
+            {% set saving_frequency = 'Day' %}
+        {% elif saving_type == 'monthly' %}
+            {% set saving_label = 'Monthly Saving' %}
+            {% set saving_frequency = 'Month' %}
+        {% else %}
+            {% set saving_label = 'Manual Saving' %}
+            {% set saving_frequency = 'Manual' %}
+        {% endif %}
 
         <div class="row g-3 mb-4">
             <!-- Income -->
@@ -274,16 +287,18 @@
                 <div class="metric-card p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <div class="text-muted small">
-                                {{ _("income.monthly_income") if false else "Monthly Income" }}
-                            </div>
+                            <div class="text-muted small">Monthly Income</div>
                         </div>
                         <div class="metric-icon bg-primary-subtle text-primary">
                             <i class="bi bi-cash-stack"></i>
                         </div>
                     </div>
-                    <div class="h4 fw-bold mb-0">
+                    <div class="h4 fw-bold mb-1">
                         ${{ "%.2f"|format(income) }}
+                    </div>
+                    <div class="text-muted small">
+                        <i class="bi bi-arrow-up-circle me-1"></i>
+                        Total income per month
                     </div>
                 </div>
             </div>
@@ -293,16 +308,18 @@
                 <div class="metric-card p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <div class="text-muted small">
-                                {{ _("expense.monthly_expense") if false else "Monthly Expenses" }}
-                            </div>
+                            <div class="text-muted small">Monthly Expenses</div>
                         </div>
                         <div class="metric-icon bg-danger-subtle text-danger">
                             <i class="bi bi-wallet2"></i>
                         </div>
                     </div>
-                    <div class="h4 fw-bold mb-0">
+                    <div class="h4 fw-bold mb-1">
                         ${{ "%.2f"|format(expense) }}
+                    </div>
+                    <div class="text-muted small">
+                        <i class="bi bi-arrow-down-circle me-1"></i>
+                        Total expenses per month
                     </div>
                 </div>
             </div>
@@ -312,48 +329,139 @@
                 <div class="metric-card p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <div class="text-muted small">
-                                Monthly Surplus
-                            </div>
+                            <div class="text-muted small">Monthly Surplus</div>
                         </div>
-                        <div class="metric-icon
-                            {% if surplus >= 0 %}
-                                bg-success-subtle text-success
-                            {% else %}
-                                bg-danger-subtle text-danger
-                            {% endif %}
-                        ">
+                        <div class="metric-icon {% if surplus >= 0 %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %}">
                             <i class="bi bi-graph-up-arrow"></i>
                         </div>
                     </div>
-                    <div class="h4 fw-bold mb-0
-                        {% if surplus < 0 %}text-danger{% else %}text-success{% endif %}
-                    ">
+                    <div class="h4 fw-bold mb-1 {% if surplus < 0 %}text-danger{% else %}text-success{% endif %}">
                         ${{ "%.2f"|format(surplus) }}
+                    </div>
+                    <div class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Income available after expenses
                     </div>
                 </div>
             </div>
 
-            <!-- Saving Amount -->
+            <!-- Savings -->
             <div class="col-sm-6 col-xl-3">
                 <div class="metric-card p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <div class="text-muted small">
-                                Saving Amount
-                            </div>
+                            <div class="text-muted small">Savings</div>
                         </div>
                         <div class="metric-icon bg-success-subtle text-success">
-                            <i class="bi bi-bullseye"></i>
+                            <i class="bi bi-piggy-bank"></i>
                         </div>
                     </div>
-                    <div class="h4 fw-bold mb-0 text-primary">
-                        ${{ "%.2f"|format(plan.saving|float) }}
+
+                    <div class="h4 fw-bold mb-1 text-primary">
+                        {% if plan.saving_type == 'manual' %}
+                            Manual
+                        {% elif plan.saving_type == 'daily' %}
+                            ${{ "%.2f"|format(saving) }} <span class="fs-6 text-muted">/per day</span>
+                        {% elif plan.saving_type == 'monthly' %}
+                            ${{ "%.2f"|format(saving) }} <span class="fs-6 text-muted">/per month</span>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="text-muted small">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Currently saved toward your goal
                     </div>
                 </div>
             </div>
-
         </div>
+
+        
+        <!-- Saving Button Prgress -->
+<div class="section-card p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <div class="section-title">Savings Progress</div>
+        </div>
+        <span class="badge text-bg-success rounded-pill">
+            {{ "%.1f"|format(progress) }}%
+        </span>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-end mb-2">
+        <div>
+            <div class="text-muted small">Amount saved</div>
+            <strong class="fs-5">${{ "{:,.2f}".format(saving) }}</strong>
+        </div>
+        <div class="text-end">
+            <div class="text-muted small">Goal</div>
+            <strong class="fs-5">${{ "{:,.2f}".format(goal_cost) }}</strong>
+        </div>
+    </div>
+
+    <div class="progress mb-2" style="height: 10px;">
+        <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress }}%;" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-4">
+        <span class="text-muted small">
+            ${{ "{:,.2f}".format(saving) }} saved
+        </span>
+        <span class="text-muted small">
+            ${{ "{:,.2f}".format([goal_cost - saving, 0]|max) }} remaining
+        </span>
+    </div>
+
+    {% if not plan.value %}
+        <div class="border-top pt-3">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="bi bi-plus-circle text-success"></i>
+                <div>
+                    <strong class="d-block">Add to your savings</strong>
+                    <span class="text-muted small">
+                        Record money you've put toward this goal.
+                    </span>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('plans.add_saving', plan_id=plan.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                {% if plan.saving_type == "daily" %}
+                    <input type="hidden" name="amount" value="{{ saving_amount }}">
+                    <button type="submit" class="btn btn-success w-100 rounded-3">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Add ${{ "%.2f"|format(saving_amount) }} Daily Saving
+                    </button>
+                {% elif plan.saving_type == "monthly" %}
+                    <input type="hidden" name="amount" value="{{ saving_amount }}">
+                    <button type="submit" class="btn btn-success w-100 rounded-3">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Add ${{ "%.2f"|format(saving_amount) }} Monthly Saving
+                    </button>
+                {% else %}
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" name="amount" class="form-control" min="0.01" step="0.01" placeholder="Enter amount saved" required>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Add Saving
+                        </button>
+                    </div>
+                    <div class="form-text mt-2">
+                        Enter the amount you have actually saved toward this goal.
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    {% else %}
+        <div class="alert alert-success mb-0">
+            <i class="bi bi-check-circle me-1"></i>
+            <strong>Goal completed.</strong>
+            You've reached your savings target.
+        </div>
+    {% endif %}
+</div>
 
 
         <!-- ================================================= -->
@@ -368,7 +476,7 @@
             <div class="col-lg-7">
 
                 <!-- =====================================================
-                    TARGET DATE & DETAILS
+                    TARGET DATE
                 ====================================================== -->
                 <div class="section-card p-4 mb-4">
 
@@ -384,7 +492,7 @@
                             </div>
 
                             <h5 class="fw-bold mb-0">
-                                {{ _("plan.target_date") }}
+                                Target Date
                             </h5>
                         </div>
 
@@ -398,7 +506,7 @@
                             <div>
 
                                 <div class="text-muted small mb-1">
-                                    Target Completion Date
+                                    Your target completion date
                                 </div>
 
                                 <div class="h4 fw-bold mb-0">
@@ -435,16 +543,6 @@
 
                         </div>
 
-                    </div>
-
-                    <!-- In-Between Steps / Details -->
-                    <div class="pt-3 border-top mt-3">
-                        <div class="section-title mb-2">
-                            {{ _("plan.in_between_label") }}
-                        </div>
-                        <p class="mb-0 {% if not plan.in_between %}text-muted fst-italic{% else %}text-body{% endif %}">
-                            {{ plan.in_between if plan.in_between else _("plan.no_steps_provided") }}
-                        </p>
                     </div>
 
                 </div>
@@ -768,7 +866,7 @@
                                     </div>
 
                                     <div class="fw-semibold">
-                                        {{ plan.martial_status or "Not specified" }}
+                                        {{ plan.marital_status or "Not specified" }}
                                     </div>
 
                                 </div>
@@ -873,7 +971,7 @@
                     <div class="info-row d-flex justify-content-between gap-3">
 
                         <span class="text-muted">
-                            {{ _("common.record_id") }}:
+                            Plan ID
                         </span>
 
                         <strong>
@@ -882,34 +980,40 @@
 
                     </div>
 
-
                     <div class="info-row d-flex justify-content-between gap-3">
 
                         <span class="text-muted">
-                            {{ _("plan.status") }}
+                            Status
                         </span>
 
                         {% if plan.value %}
 
                             <span class="text-success fw-semibold">
-                                {{ _("plan.status_completed") }}
+                                Completed
                             </span>
 
                         {% else %}
 
                             <span class="text-warning fw-semibold">
-                                {{ _("plan.status_incompleted") }}
+                                In Progress
                             </span>
 
                         {% endif %}
 
                     </div>
 
+                    <div class="info-row d-flex justify-content-between gap-3">
+                        <span class="text-muted">{{ saving_label }}</span>
+                        <strong class="text-primary">
+                            ${{ "{:,.2f}".format(saving) }}
+                        </strong>
+                    </div>
+
 
                     <div class="info-row d-flex justify-content-between gap-3">
 
                         <span class="text-muted">
-                            {{ _("common.created_at") }}:
+                            Created
                         </span>
 
                         <strong class="text-end">
@@ -922,7 +1026,7 @@
                     <div class="info-row d-flex justify-content-between gap-3">
 
                         <span class="text-muted">
-                            {{ _("common.updated_at") }}:
+                            Last updated
                         </span>
 
                         <strong class="text-end">

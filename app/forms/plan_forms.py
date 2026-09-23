@@ -10,7 +10,9 @@ from wtforms import (
     TextAreaField,
     RadioField,
     SelectField,
+    HiddenField,
 )
+
 from wtforms.validators import (
     DataRequired,
     Optional,
@@ -19,309 +21,382 @@ from wtforms.validators import (
 )
 
 from app.models import Plan
-from app.utils.i18n import _l, I18NTranslations
 
 
-class BaseLocalizedForm(FlaskForm):
-    class Meta:
-        def get_translations(self, form):
-            return I18NTranslations()
-
-
-class PlanForm(BaseLocalizedForm):
+class PlanForm(FlaskForm):
 
     # =========================
     # Goal information
     # =========================
 
     goal = StringField(
-        _l("plan.goal"),
-        validators=[DataRequired(message=_l("validation.required"))],
-        render_kw={"placeholder": _l("plan.goal_placeholder")}
+        "Financial Goal",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "e.g. Buy a new car"
+        }
     )
 
     goal_cost = FloatField(
-        _l("plan.goal_cost"),
+        "Goal Cost",
         validators=[
-            DataRequired(message=_l("validation.required")),
-            NumberRange(min=0.01, message=_l("validation.budget_positive"))
+            DataRequired(),
+            NumberRange(
+                min=0.01,
+                message="Goal cost must be greater than 0."
+            )
         ],
-        render_kw={"placeholder": _l("plan.cost_placeholder")}
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
     )
-
     in_between = DateField(
-        _l("plan.target_date"),
-        format="%Y-%m-%d",
-        default=date.today,
-        validators=[DataRequired(message=_l("validation.required"))]
+        "Target Date",
+        validators=[Optional()],
+        format="%Y-%m-%d"
+    )
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()],
+        render_kw={
+            "placeholder": "Describe your financial goal..."
+        }
     )
 
-    description = TextAreaField(
-        _l("common.description"),
-        validators=[Optional()],
-        render_kw={"placeholder": _l("plan.description_placeholder")}
-    )
 
     # =========================
     # Financial information
     # =========================
 
     income = FloatField(
-        _l("advisor.monthly_income"),
+        "Monthly Income/Fund",
         validators=[
-            Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Income cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 5000"}
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
     )
 
     expense = FloatField(
-        _l("advisor.monthly_expense"),
+        "Monthly Expenses",
         validators=[
-            Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Expenses cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 2500"}
+        render_kw={
+            "placeholder": "e.g. 2500"
+        }
     )
 
     debt_amount = FloatField(
-        _l("category.debt"),
+        "Debt Amount",
         validators=[
             Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            NumberRange(
+                min=0,
+                message="Debt amount cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 1000"}
+        render_kw={
+            "placeholder": "e.g. 10000"
+        },
+        default=0
     )
 
-    savings_amount = FloatField(
-        _l("plan.total_saved"),
+    saving = FloatField(
+        "Saving Amount",
         validators=[
             Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            NumberRange(
+                min=0,
+                message="Savings amount cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 3000"}
+        default=0,
+        render_kw={
+            "placeholder": "e.g. 100"
+        }
     )
 
-    has_budget = BooleanField(
-        _l("plan.has_budget"),
-        default=False
+
+    saving_type = SelectField(
+        "Saving Type",
+        choices=[
+            ("daily", "Daily"),
+            ("monthly", "Monthly"),
+            ("manual", "Flexible"),
+        ],
+        validators=[DataRequired()]
     )
+
+
+
+    has_budget = BooleanField("I have a budget/Fund")
+
 
     # =========================
     # Personal information
     # =========================
 
     marital_status = SelectField(
-        _l("advisor.marital_status"),
+        "Marital Status",
         choices=[
-            ("single", _l("advisor.single")),
-            ("married", _l("advisor.married")),
+            ("single", "Single"),
+            ("married", "Married"),
         ],
-        validators=[Optional()],
-        default="single",
+        validators=[InputRequired()],
         coerce=str
     )
 
     employment_status = RadioField(
-        _l("advisor.q_employment"),
+        "Are you currently employed?",
         choices=[
-            ("employed", _l("advisor.employed_yes")),
-            ("not_employed", _l("advisor.employed_no")),
-            ("unspecified", _l("advisor.prefer_not_say")),
+            ("employed", "Yes, I am employed"),
+            ("not_employed", "No, I am not employed"),
+            ("unspecified", "Prefer not to say"),
         ],
-        validators=[Optional()],
-        default="employed"
+        validators=[InputRequired()]
     )
+
 
     # =========================
     # Debt information
     # =========================
 
     debt_status = RadioField(
-        _l("advisor.q_debt"),
+        "Do you have any outstanding debt?",
         choices=[
-            ("debt", _l("advisor.debt_yes")),
-            ("no_debt", _l("advisor.debt_no")),
-            ("unspecified", _l("advisor.prefer_not_say")),
+            ("debt", "Yes, I have debt"),
+            ("no_debt", "No, I do not have debt"),
+            ("unspecified", "Prefer not to say"),
         ],
-        validators=[Optional()],
-        default="no_debt"
+        validators=[InputRequired()]
     )
+
 
     # =========================
     # Spending information
     # =========================
 
     spending_habit = RadioField(
-        _l("advisor.q_spending"),
+        "How would you describe your spending habits?",
         choices=[
-            ("big_spend", _l("advisor.spending_high")),
-            ("average_spend", _l("advisor.spending_moderate")),
-            ("low_spend", _l("advisor.spending_low")),
-            ("unspecified", _l("advisor.prefer_not_say")),
+            ("big_spend", "I tend to spend a lot"),
+            ("average_spend", "I spend moderately"),
+            ("low_spend", "I spend very little"),
+            ("unspecified", "Prefer not to say"),
         ],
-        validators=[Optional()],
-        default="average_spend"
+        validators=[InputRequired()]
     )
+
 
     # =========================
     # Plan status
     # =========================
 
     is_active = BooleanField(
-        _l("plan.status"),
+        "Active",
         default=True
     )
 
-    value = BooleanField(
-        _l("plan.status"),
-        default=True
+    submit = SubmitField(
+        "Launch Strategy"
     )
-
-    submit = SubmitField(_l("plan.launch_strategy"))
 
 
 # ==========================================
 # Edit Plan Form
 # ==========================================
 
-class EditPlanForm(BaseLocalizedForm):
+class EditPlanForm(FlaskForm):
 
     goal = StringField(
-        _l("plan.goal"),
-        validators=[DataRequired(message=_l("validation.required"))],
-        render_kw={"placeholder": _l("plan.goal_placeholder")}
+        "Financial Goal",
+        validators=[DataRequired()],
+        render_kw={
+            "placeholder": "e.g. Buy a new car"
+        }
     )
 
     goal_cost = FloatField(
-        _l("plan.goal_cost"),
+        "Goal Cost",
         validators=[
-            DataRequired(message=_l("validation.required")),
-            NumberRange(min=0.01, message=_l("validation.budget_positive"))
+            DataRequired(),
+            NumberRange(
+                min=0.01,
+                message="Goal cost must be greater than 0."
+            )
         ],
-        render_kw={"placeholder": _l("plan.cost_placeholder")}
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
     )
-
     in_between = DateField(
-        _l("plan.target_date"),
-        format="%Y-%m-%d",
-        validators=[DataRequired(message=_l("validation.required"))]
-    )
-
-    description = TextAreaField(
-        _l("common.description"),
+        "Target Date",
         validators=[Optional()],
-        render_kw={"placeholder": _l("plan.description_placeholder")}
+        format="%Y-%m-%d"
+    )
+    description = TextAreaField(
+        "Description",
+        validators=[Optional()],
+        render_kw={
+            "placeholder": "Describe your financial goal..."
+        }
     )
 
     income = FloatField(
-        _l("advisor.monthly_income"),
+        "Monthly Income/Fund",
         validators=[
-            Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Income cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 5000"}
+        render_kw={
+            "placeholder": "e.g. 5000"
+        }
     )
 
     expense = FloatField(
-        _l("advisor.monthly_expense"),
+        "Monthly Expenses",
         validators=[
-            Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message="Expenses cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 2500"}
+        render_kw={
+            "placeholder": "e.g. 2500"
+        }
     )
 
     debt_amount = FloatField(
-        _l("category.debt"),
+        "Debt Amount",
         validators=[
             Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            NumberRange(
+                min=0,
+                message="Debt amount cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 10000"}
+        render_kw={
+            "placeholder": "e.g. 10000"
+        },
+        default=0
     )
 
-    savings_amount = FloatField(
-        _l("plan.total_saved"),
+    saving = FloatField(
+        "Savings Amount",
         validators=[
             Optional(),
-            NumberRange(min=0, message=_l("validation.amount_positive"))
+            NumberRange(
+                min=0,
+                message="Savings amount cannot be negative."
+            )
         ],
-        default=0.0,
-        render_kw={"placeholder": "e.g. 3000"}
+        render_kw={
+            "placeholder": "e.g. 3000"
+        },
+        default=0
     )
 
-    has_budget = BooleanField(
-        _l("plan.has_budget"),
-        default=False
+    saving_type = SelectField(
+        "Saving Type",
+        choices=[
+            ("daily", "Daily"),
+            ("monthly", "Monthly"),
+            ("manual", "Flexible"),
+        ],
+        validators=[DataRequired()]
     )
+
+
+    has_budget = BooleanField("I have a budget/Fund")
+
+
+    # =========================
+    # Personal information
+    # =========================
 
     marital_status = SelectField(
-        _l("advisor.marital_status"),
+        "Marital Status",
         choices=[
-            ("single", _l("advisor.single")),
-            ("married", _l("advisor.married")),
+            ("single", "Single"),
+            ("married", "Married"),
         ],
-        validators=[Optional()],
-        default="single",
+        validators=[InputRequired()],
         coerce=str
     )
 
     employment_status = RadioField(
-        _l("advisor.q_employment"),
+        "Are you currently employed?",
         choices=[
-            ("employed", _l("advisor.employed_yes")),
-            ("not_employed", _l("advisor.employed_no")),
-            ("unspecified", _l("advisor.prefer_not_say")),
+            ("employed", "Yes, I am employed"),
+            ("not_employed", "No, I am not employed"),
+            ("unspecified", "Prefer not to say"),
         ],
-        validators=[Optional()],
-        default="employed"
+        validators=[InputRequired()]
     )
+
+
+    # =========================
+    # Debt information
+    # =========================
 
     debt_status = RadioField(
-        _l("advisor.q_debt"),
+        "Do you have any outstanding debt?",
         choices=[
-            ("debt", _l("advisor.debt_yes")),
-            ("no_debt", _l("advisor.debt_no")),
-            ("unspecified", _l("advisor.prefer_not_say")),
+            ("debt", "Yes, I have debt"),
+            ("no_debt", "No, I do not have debt"),
+            ("unspecified", "Prefer not to say"),
         ],
-        validators=[Optional()],
-        default="no_debt"
+        validators=[InputRequired()]
     )
+
+
+    # =========================
+    # Spending information
+    # =========================
 
     spending_habit = RadioField(
-        _l("advisor.q_spending"),
+        "How would you describe your spending habits?",
         choices=[
-            ("big_spend", _l("advisor.spending_high")),
-            ("average_spend", _l("advisor.spending_moderate")),
-            ("low_spend", _l("advisor.spending_low")),
-            ("unspecified", _l("advisor.prefer_not_say")),
+            ("big_spend", "I tend to spend a lot"),
+            ("average_spend", "I spend moderately"),
+            ("low_spend", "I spend very little"),
+            ("unspecified", "Prefer not to say"),
         ],
-        validators=[Optional()],
-        default="average_spend"
+        validators=[InputRequired()]
     )
+
 
     is_active = BooleanField(
-        _l("plan.status"),
-        default=True
+        "Active"
     )
 
-    value = BooleanField(
-        _l("plan.status"),
-        default=True
+    submit = SubmitField(
+        "Update"
     )
 
-    submit = SubmitField(_l("common.update"))
 
-    def __init__(self, original_plan: Plan, *args, **kwargs):
+    def __init__(
+        self,
+        original_plan: Plan,
+        *args,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
+
         self.original_plan = original_plan
 
 
@@ -329,6 +404,8 @@ class EditPlanForm(BaseLocalizedForm):
 # Confirm Delete
 # ==========================================
 
-class ConfirmDeleteForm(BaseLocalizedForm):
+class ConfirmDeleteForm(FlaskForm):
 
-    submit = SubmitField(_l("common.confirm_delete"))
+    submit = SubmitField(
+        "Confirm Delete"
+    )

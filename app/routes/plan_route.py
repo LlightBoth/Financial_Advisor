@@ -4,7 +4,6 @@ from app.forms.plan_forms import PlanForm, EditPlanForm, ConfirmDeleteForm
 
 from app.services.plan_services import PlanServices, PlanAnalysisService
 from app.security.cookie import check_cookie_token
-from app.utils.i18n import _
 from app.security.role_check import check_route_permission
 
 from datetime import date
@@ -24,9 +23,11 @@ def index():
     # Reads ?status= value from URL; defaults to 'general' if not provided
     status_value = request.args.get("status", "general")
     sort_value = request.args.get("sort", "day")
+    saving_type = request.args.get("saving_type", "general")
 
-    plans = PlanServices.get_filter_plan(current_user, status_value=status_value, sort_value=sort_value)
+    plans = PlanServices.get_filter_plan(current_user, status_value=status_value, sort_value=sort_value, saving_type=saving_type)
     return render_template("plans/index.html", plans=plans, today=date.today())
+
 
 @plan_bp.route("/<int:plan_id>")
 @login_required
@@ -45,38 +46,40 @@ def detail(plan_id):
         matched_rules=analysis["matched_rules"],
     )
 
-
 @plan_bp.route("/create", methods=["GET", "POST"])
 @login_required
 def create():
     form = PlanForm()
+    if request.method == "POST":
+        valid = form.validate_on_submit()
 
-    if form.validate_on_submit():
-        data = {
-            # Step 1 - Strategy Framework
-            "goal": form.goal.data,
-            "goal_cost": form.goal_cost.data,
-            "in_between": form.in_between.data,
-            "description": form.description.data,
-            "value": bool(form.value.data) if hasattr(form, "value") else False,
+        if not valid:
+            print("VALIDATION FAILED")
 
-            # Financial information
-            "income": form.income.data,
-            "expense": form.expense.data,
-            "debt_amount": form.debt_amount.data or 0,
-            "savings_amount": form.savings_amount.data or 0,
-            "has_budget": form.has_budget.data,
+        else:
+            data = {
+                "goal": form.goal.data,
+                "goal_cost": form.goal_cost.data,
+                "description": form.description.data,
 
-            # Step 2 - Financial Situation
-            "martial_status": form.marital_status.data,
-            "employment_status": form.employment_status.data,
-            "debt_status": form.debt_status.data,
-            "spending_habit": form.spending_habit.data,
-        }
+                "income": form.income.data,
+                "expense": form.expense.data,
+                "debt_amount": form.debt_amount.data or 0,
+                "saving_amount": form.saving.data or 0,
+                "saving_type": form.saving_type.data,
+                "has_budget": form.has_budget.data,
 
-        plan = PlanServices.create_plan(data, current_user)
-        flash(_("message.plan_created_success", goal=plan.goal), "success")
-        return redirect(url_for("plans.index"))
+                "marital_status": form.marital_status.data,
+                "employment_status": form.employment_status.data,
+                "debt_status": form.debt_status.data,
+                "spending_habit": form.spending_habit.data,
+
+                "in_between": form.in_between.data,
+            }
+            plan = PlanServices.create_plan(data, current_user)
+
+            flash(f"Plan '{plan.goal}' created successfully!", "success")
+            return redirect(url_for("plans.index"))
 
     return render_template(
         "plans/create.html",
@@ -87,38 +90,36 @@ def create():
 @plan_bp.route("/<int:plan_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit(plan_id):
-    plan = PlanServices.get_plan_id(plan_id,current_user.id)
+    plan = PlanServices.get_plan_id(plan_id, current_user.id)
 
     if plan is None:
         abort(404)
 
-    form = EditPlanForm(original_plan=plan,obj=plan)
+    form = EditPlanForm(original_plan=plan, obj=plan)
+    if request.method == "GET":
+        form.saving.data = plan.saving_amount
 
     if form.validate_on_submit():
         data = {
-            # Step 1 - Strategy Framework
             "goal": form.goal.data,
             "goal_cost": form.goal_cost.data,
-            "in_between": form.in_between.data,
             "description": form.description.data,
-            "value": bool(form.value.data) if hasattr(form, "value") else False,
-
-            # Financial information
             "income": form.income.data,
             "expense": form.expense.data,
             "debt_amount": form.debt_amount.data or 0,
-            "savings_amount": form.savings_amount.data or 0,
+            "saving_amount": form.saving.data,
+            "saving_type": form.saving_type.data,
             "has_budget": form.has_budget.data,
-
-            # Step 2 - Financial Situation
-            "martial_status": form.marital_status.data,
+            "marital_status": form.marital_status.data,
             "employment_status": form.employment_status.data,
             "debt_status": form.debt_status.data,
             "spending_habit": form.spending_habit.data,
+            "is_active": form.is_active.data,
         }
-
+        # Update plan
         PlanServices.update_plan(plan, data)
-        flash(_("message.plan_updated_success", goal=plan.goal), "success")
+
+        flash(f"Plan '{plan.goal}' updated successfully!","success")
         return redirect(url_for("plans.index"))
 
     return render_template(
@@ -150,5 +151,25 @@ def delete(plan_id):
     form = ConfirmDeleteForm()
     if form.validate_on_submit():
         PlanServices.delete_plan(plan)
-        flash(_("message.plan_deleted_success"), "success")
+        flash("Plan deleted successfully!", "success")
     return redirect(url_for("plans.index"))
+
+
+
+@plan_bp.post("/<int:plan_id>/save")
+@login_required
+def add_saving(plan_id):
+    plan = PlanServices.get_plan_id(plan_id)
+    amount = request.form.get("amount", type=float)
+
+    if not amount or amount <= 0:
+        flash("Please enter a valid saving amount.", "danger")
+        return redirect(url_for("plans.detail", plan_id=plan.id))
+
+    try:
+        PlanServices.add_saving(plan, amount, current_user)
+        flash(f"${amount:,.2f} added to your savings.", "success")
+    except ValueError as e:
+        flash(str(e), "danger")
+
+    return redirect(url_for("plans.detail", plan_id=plan.id))
