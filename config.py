@@ -11,10 +11,7 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "my_secret_key_assignment")
 
-    INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
-    os.makedirs(INSTANCE_DIR, exist_ok=True)
-
-    DB_PATH = os.path.join(INSTANCE_DIR, "financial.db")
+    DB_PATH = os.path.join(BASE_DIR, "instance", "financial.db")
 
     SQLALCHEMY_DATABASE_URI = (
         os.environ.get("DATABASE_URL")
