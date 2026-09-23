@@ -7,9 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from app.models.user import User
 from app.services import UserServices
 
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
+# Google API client packages are imported lazily in get_gmail_service
 
 # from http.cookies import mak
 
@@ -61,6 +59,13 @@ class AuthService:
 
     @staticmethod
     def get_gmail_service():
+        try:
+            from google.oauth2.credentials import Credentials
+            from google.auth.transport.requests import Request
+            from googleapiclient.discovery import build
+        except ImportError:
+            raise RuntimeError("[ERROR] Google client libraries are not installed. Run: pip install -r requirements.txt")
+
         creds = None
 
         # 1. Try reading token.json (Local file OR Render Secret File)

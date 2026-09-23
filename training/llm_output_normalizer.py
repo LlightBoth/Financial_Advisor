@@ -505,9 +505,18 @@ def classify_conversational_intent(message: str, has_profile: bool = False, hist
     if re.search(goal_approach_pattern, msg, re.IGNORECASE):
         return "goal_approach_query"
 
-    # 6. Savings Guidance ("Help me save money", "save money", "ខ្ញុំចង់សន្សំប្រាក់")
-    # Must be checked BEFORE profile/goal updates and financial_plan_request.
-    # Distinct from savings_capacity_query ("how much can I save") — this asks for guidance, not a number.
+    # 6. Specific Suggestion Queries (Buttons on welcome card)
+    # 6a. Financial Overview ("Show my financial overview", "overview", "ទិដ្ឋភាពទូទៅ")
+    overview_pattern = r"(show\s+(my\s+)?financial\s+overview|financial\s+overview|account\s+overview|summary\s+of\s+my\s+finances|^overview$|ទិដ្ឋភាពទូទៅ|សង្ខេបហិរញ្ញវត្ថុ)"
+    if re.search(overview_pattern, msg, re.IGNORECASE):
+        return "financial_overview_query"
+
+    # 6b. Spending Analysis ("Analyze my spending", "analyze spending", "spending breakdown", "វិភាគការចំណាយ")
+    spending_pattern = r"(analyze\s+(my\s+)?spending|spending\s+analysis|break\s*down\s+(my\s+)?spending|spending\s+breakdown|analyze\s+(my\s+)?expenses|manage\s+expenses?|វិភាគការចំណាយ|វិភាគចំណាយ)"
+    if re.search(spending_pattern, msg, re.IGNORECASE):
+        return "spending_analysis_query"
+
+    # 6c. Savings Guidance ("Help me save money", "save money", "ខ្ញុំចង់សន្សំប្រាក់")
     savings_guidance_pattern = r"(help\s+(me\s+)?save\s+money|save\s+money|saving\s+money|help\s+(me\s+)?save$|want\s+to\s+save$|ចង់សន្សំប្រាក់|ចង់សន្សំ|ជួយសន្សំ)"
     if re.search(savings_guidance_pattern, msg, re.IGNORECASE):
         return "savings_guidance"
@@ -527,7 +536,7 @@ def classify_conversational_intent(message: str, has_profile: bool = False, hist
         return "profile_update"
 
     # 8. Financial Plan / Consultation Request (explicit plan creation requests only)
-    plan_pattern = r"(financial\s+plan|create\s+.*plan|make\s+.*plan|budget\s+plan|overview|manage\s+expenses?|consult|ផែនការហិរញ្ញវត្ថុ|ផែនការ|ថវិកា)"
+    plan_pattern = r"(financial\s+plan|create\s+.*plan|make\s+.*plan|budget\s+plan|build\s+.*plan|ផែនការហិរញ្ញវត្ថុ|ផែនការ|ថវិកា)"
     if re.search(plan_pattern, msg, re.IGNORECASE):
         return "financial_plan_request"
 

@@ -10,9 +10,7 @@ from app.services.audit_log_services import AuditLogService
 from app.security.cookie import get_cookie, remove_cookie
 from app.utils.i18n import _
 from app.security.token import Token
-from google_auth_oauthlib.flow import Flow
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
+# Google OAuth packages are imported lazily in get_google_flow and google_callback
 
 # Import your database models and extension
 from app.models import User, Role
@@ -356,6 +354,7 @@ os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 
 
 def get_google_flow():
+    from google_auth_oauthlib.flow import Flow
     client_id = os.getenv("GOOGLE_CLIENT_ID")
     client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
     client_config = {
@@ -437,6 +436,8 @@ def google_callback():
     session.pop("oauth_state", None)
 
     credentials = flow.credentials
+    from google.oauth2 import id_token
+    from google.auth.transport import requests as google_requests
     request_session = requests.Session()
     cached_session = google_requests.Request(session=request_session)
 
@@ -481,7 +482,8 @@ def google_callback():
             user.google_id = google_id
             db.session.commit()
 
-    # 1. Log in user via Flask-Login
+    # 1. Ensure user is active and log in user via Flask-Login
+    UserServices.update_user_online(user)
     session.permanent = True
     login_user(user, remember=True)
 
@@ -510,12 +512,8 @@ def google_callback():
     else:
         redirect_url = url_for("dashboards.userIndex")
 
-    # 5. Build response and set cookies cleanly
-    response = redirect(redirect_url)
-    response.set_cookie("access_token", access_token, httponly=True, path="/", samesite="Lax")
-    response.set_cookie("refresh_token", refresh_token, httponly=True, path="/", samesite="Lax")
-
-    return response
+    # 5. Build response and set cookies cleanly via get_cookie
+    return get_cookie(redirect_url, access_token, refresh_token)
 
 @auth_bp.route("/logout")
 @login_required

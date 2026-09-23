@@ -241,7 +241,7 @@ class AdvisorServices:
         return eval_result.get("decision_trace", {})
 
     @staticmethod
-    def consult(raw_data: Any, lang: Optional[str] = None):
+    def consult(raw_data: Any, lang: Optional[str] = None, persist_history: bool = True):
         """
         Authoritative API boundary for financial consultation (Step 7H).
         
@@ -250,7 +250,7 @@ class AdvisorServices:
         2. Returns (None, error_dict) if validation fails (HTTP 400).
         3. Deterministic Inference Evaluation (ConsultantEngine.evaluate).
         4. Bilingual Response DTO Assembly.
-        5. Optional History Persistence for authenticated users.
+        5. Optional History Persistence for authenticated users (controlled by persist_history).
         6. Returns (response_dto, None) (HTTP 200).
         """
         from app.services.consultant_validator import ConsultantInputValidator
@@ -371,10 +371,10 @@ class AdvisorServices:
             "decision_trace": decision_trace,
         }
 
-        # Persist to history if user is authenticated
+        # Persist to history if user is authenticated and persist_history is enabled
         try:
             from app.services.history_services import HistoryServices
-            if current_user and current_user.is_authenticated:
+            if persist_history and current_user and current_user.is_authenticated:
                 history_data = {
                     "goal_cost": metrics["goal_cost"],
                     "income": metrics["monthly_income"],

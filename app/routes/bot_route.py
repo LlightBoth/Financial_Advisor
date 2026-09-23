@@ -161,16 +161,26 @@ def chat():
                 else f"To achieve your ${goal_v:,.0f} savings goal with your ${surplus_v:,.0f}/month surplus, follow a dedicated monthly allocation strategy over a projected timeline of ~{months} months."
             )
 
-        elif intent in ("financial_plan_request", "savings_guidance") and existing_profile and existing_profile.get("monthly_income") is not None:
-            # Run ConsultantEngine for authoritative assessment
+        elif intent in ("financial_plan_request", "savings_guidance", "financial_overview_query", "spending_analysis_query") and existing_profile and existing_profile.get("monthly_income") is not None:
+            # Run ConsultantEngine for authoritative assessment without polluting user history table
             t_eng_start = time.perf_counter()
-            result_dto, error_dto = AdvisorServices.consult(existing_profile, lang=lang)
+            result_dto, error_dto = AdvisorServices.consult(existing_profile, lang=lang, persist_history=False)
             consultant_engine_ms = round((time.perf_counter() - t_eng_start) * 1000.0, 2)
 
             if result_dto and result_dto.get("success"):
                 inc_val = existing_profile.get("monthly_income", 0.0) or 0.0
                 exp_val = existing_profile.get("monthly_expense", 0.0) or 0.0
+                goal_val = existing_profile.get("goal_cost", 0.0) or 0.0
+                debt_status = existing_profile.get("debt_status") or "no debt"
+                emp_status = existing_profile.get("employment_status") or "employed"
                 surplus_val = inc_val - exp_val
+                exp_ratio = (exp_val / inc_val * 100.0) if inc_val > 0 else 0.0
+                has_active_debt = "debt" in debt_status.lower() and "no debt" not in debt_status.lower()
+
+                needs_target = round(inc_val * 0.50)
+                wants_target = round(inc_val * 0.30)
+                savings_target = round(inc_val * 0.20)
+
                 plan_advice = result_dto.get("advice", {}).get(lang) or result_dto.get("advice", {}).get("en", "")
                 plan_explanation = result_dto.get("explanation", "")
 
@@ -182,22 +192,34 @@ def chat():
                     )
                 )
 
-                if intent == "financial_plan_request":
-                    needs_target = round(inc_val * 0.50)
-                    wants_target = round(inc_val * 0.30)
-                    savings_target = round(inc_val * 0.20)
+                # Formulate surplus vs deficit labels & actions
+                if surplus_val >= 0:
+                    surplus_label_en = f"Net Surplus: +${surplus_val:,.0f}/mo"
+                    surplus_label_km = f"ប្រាក់សល់សុទ្ធ: +${surplus_val:,.0f}/ខែ"
+                    action_surplus_en = f"Allocate your verified surplus of ${surplus_val:,.0f}/mo toward your emergency buffer and financial goals."
+                    action_surplus_km = f"បែងចែកប្រាក់សល់ ${surplus_val:,.0f}/ខែ ចូលទៅក្នុងមូលនិធិសង្គ្រោះបន្ទាន់ និងគោលដៅសន្សំ។"
+                else:
+                    deficit_val = abs(surplus_val)
+                    surplus_label_en = f"Net Deficit: -${deficit_val:,.0f}/mo"
+                    surplus_label_km = f"ឱនភាពសុទ្ធ: -${deficit_val:,.0f}/ខែ"
+                    action_surplus_en = f"Prioritize an immediate freeze on non-essential spending. Reduce monthly living costs by at least ${deficit_val:,.0f}/mo to reach break-even and halt debt growth."
+                    action_surplus_km = f"ផ្អាកជាបន្ទាន់នូវការចំណាយមិនចាំបាច់។ កាត់បន្ថយការចំណាយយ៉ាងហោចណាស់ ${deficit_val:,.0f}/ខែ ដើម្បីលុបបំបាត់ឱនភាព និងទប់ស្កាត់ការកើនឡើងបំណុល។"
 
+                # -------------------------------------------------------------
+                # 1. Financial Plan Request ("Help me create a financial plan")
+                # -------------------------------------------------------------
+                if intent == "financial_plan_request":
                     if lang == "km" and not user_wants_english:
                         has_english_letters = bool(re.search(r"[a-zA-Z]{3,}", plan_explanation or ""))
                         if not plan_explanation or has_english_letters:
                             plan_explanation = (
                                 f"លំហូរសាច់ប្រាក់សុទ្ធប្រចាំខែរបស់អ្នកមានសញ្ញាវិជ្ជមាន +${surplus_val:,.0f} ដែលនៅសល់បន្ទាប់ពីការចំណាយចាំបាច់។ "
                                 f"អ្នកប្រឹក្សាណែនាំឱ្យបែងចែកប្រាក់សល់នេះដើម្បីបង្កើតមូលនិធិសង្គ្រោះបន្ទាន់ និងសម្រេចគោលដៅហិរញ្ញវត្ថុរបស់អ្នក។"
-                                if surplus_val > 0 else
-                                f"ការចំណាយប្រចាំខែរបស់អ្នកបច្ចុប្បន្នលើសពីចំណូលចំនួន ${abs(surplus_val):,.0f} ក្នុងមួយខែ។"
+                                if surplus_val >= 0 else
+                                f"ការចំណាយប្រចាំខែរបស់អ្នកបច្ចុប្បន្នលើសពីចំណូលចំនួន ${abs(surplus_val):,.0f} ក្នុងមួយខែ ដែលបង្កើតជាឱនភាពថវិកា។"
                             )
                         ai_response = (
-                            f"នេះជាផែនការហិរញ្ញវត្ថុផ្ទាល់ខ្លួនរបស់អ្នក ផ្អែកលើទិន្នន័យ (ចំណូល: ${inc_val:,.0f}/ខែ, ចំណាយ: ${exp_val:,.0f}/ខែ, សល់សុទ្ធ: +${surplus_val:,.0f}/ខែ)៖\n\n"
+                            f"នេះជាផែនការហិរញ្ញវត្ថុផ្ទាល់ខ្លួនរបស់អ្នក ផ្អែកលើទិន្នន័យ (ចំណូល: ${inc_val:,.0f}/ខែ, ចំណាយ: ${exp_val:,.0f}/ខែ, {surplus_label_km})៖\n\n"
                             f"១. **ក្បួនបែងចែកថវិកា (ស្តង់ដារ 50/30/20)**:\n"
                             f"   * **តម្រូវការចាំបាច់ (៥០%)**: គោលដៅប្រហែល ${needs_target:,.0f}/ខែ (ចំណាយបច្ចុប្បន្ន: ${exp_val:,.0f}/ខែ)\n"
                             f"   * **ការចំណាយផ្ទាល់ខ្លួន (៣០%)**: គោលដៅប្រហែល ${wants_target:,.0f}/ខែ\n"
@@ -205,13 +227,13 @@ def chat():
                             f"២. **អនុសាសន៍ចម្បង**:\n"
                             f"   {plan_advice}\n\n"
                             f"៣. **ជំហានអនុវត្តជាក់ស្តែង**:\n"
-                            f"   * បែងចែកប្រាក់សល់ ${surplus_val:,.0f}/ខែ ចូលទៅក្នុងមូលនិធិសង្គ្រោះបន្ទាន់។\n"
+                            f"   * {action_surplus_km}\n"
                             f"   * ពិនិត្យកាត់បន្ថយការចំណាយមិនចាំបាច់ ដើម្បីពង្រីកទំហំសន្សំប្រចាំខែ។\n\n"
                             f"**ការយល់ដឹងអំពីអនុសាសន៍របស់អ្នក**:\n{plan_explanation}"
                         )
                     else:
                         ai_response = (
-                            f"Here is your personalized Financial Plan based on your verified monthly income of ${inc_val:,.0f} and expenses of ${exp_val:,.0f} (Net Surplus: +${surplus_val:,.0f}/mo):\n\n"
+                            f"Here is your personalized Financial Plan based on your verified monthly income of ${inc_val:,.0f} and expenses of ${exp_val:,.0f} ({surplus_label_en}):\n\n"
                             f"1. **Budget Framework (50/30/20 Benchmark)**:\n"
                             f"   * **Needs (50%)**: Target ~${needs_target:,.0f}/mo (current living expenses: ${exp_val:,.0f}/mo)\n"
                             f"   * **Wants (30%)**: Target ~${wants_target:,.0f}/mo for flexible personal spending\n"
@@ -219,33 +241,150 @@ def chat():
                             f"2. **Primary Recommendation**:\n"
                             f"   {plan_advice}\n\n"
                             f"3. **Action Steps**:\n"
-                            f"   * Allocate your verified surplus of ${surplus_val:,.0f}/mo toward your emergency buffer.\n"
+                            f"   * {action_surplus_en}\n"
                             f"   * Review discretionary spending to increase your monthly savings margin.\n\n"
                             f"**Understanding Your Recommendation**:\n{plan_explanation}"
                         )
-                else:
+
+                # -------------------------------------------------------------
+                # 2. Financial Overview Query ("Show my financial overview")
+                # -------------------------------------------------------------
+                elif intent == "financial_overview_query":
+                    debt_disp_en = "Active obligations present" if has_active_debt else "No active debt"
+                    debt_disp_km = "មានបន្ទុកបំណុលសកម្ម" if has_active_debt else "គ្មានបំណុល"
+                    emp_disp_en = emp_status.title() if emp_status else "Employed"
+                    emp_disp_km = "មានការងារធ្វើ" if "employ" in emp_status.lower() and "not" not in emp_status.lower() else "មិនទាន់មានការងារ"
+                    goal_disp_en = f"${goal_val:,.0f}" if goal_val > 0 else "None specified"
+                    goal_disp_km = f"${goal_val:,.0f}" if goal_val > 0 else "មិនទាន់កំណត់"
+
                     if lang == "km" and not user_wants_english:
-                        # Clean, fully Khmer response. Do not append English sections.
+                        ai_response = (
+                            f"នេះជាទិដ្ឋភាពទូទៅនៃកម្រងព័ត៌មានហិរញ្ញវត្ថុរបស់អ្នក ផ្អែកលើទិន្នន័យផ្លូវការ៖\n\n"
+                            f"• **ប្រាក់ចំណូលប្រចាំខែ**: ${inc_val:,.0f}/ខែ\n"
+                            f"• **ការចំណាយប្រចាំខែ**: ${exp_val:,.0f}/ខែ\n"
+                            f"• **ស្ថានភាពលំហូរសាច់ប្រាក់**: {surplus_label_km}\n"
+                            f"• **បន្ទុកចំណាយធៀបនឹងចំណូល**: {exp_ratio:.1f}% នៃចំណូល\n"
+                            f"• **ស្ថានភាពបំណុល**: {debt_disp_km}\n"
+                            f"• **ស្ថានភាពការងារ**: {emp_disp_km}\n"
+                            f"• **គោលដៅសន្សំ**: {goal_disp_km}\n\n"
+                            f"**ការវាយតម្លៃចម្បង**:\n{plan_advice}\n\n"
+                            f"**ការយល់ដឹងអំពីអនុសាសន៍របស់អ្នក**:\n{plan_explanation}"
+                        )
+                    else:
+                        ai_response = (
+                            f"Here is your Financial Profile Overview based on your verified records:\n\n"
+                            f"• **Monthly Income**: ${inc_val:,.0f}/mo\n"
+                            f"• **Monthly Expenses**: ${exp_val:,.0f}/mo\n"
+                            f"• **Cash Flow Status**: {surplus_label_en}\n"
+                            f"• **Expense Burden**: {exp_ratio:.1f}% of income\n"
+                            f"• **Debt Status**: {debt_disp_en}\n"
+                            f"• **Employment**: {emp_disp_en}\n"
+                            f"• **Savings Goal**: {goal_disp_en}\n\n"
+                            f"**Key Assessment**:\n{plan_advice}\n\n"
+                            f"**Understanding Your Recommendation**:\n{plan_explanation}"
+                        )
+
+                # -------------------------------------------------------------
+                # 3. Spending Analysis Query ("Analyze my spending")
+                # -------------------------------------------------------------
+                elif intent == "spending_analysis_query":
+                    if lang == "km" and not user_wants_english:
+                        ai_response = (
+                            f"នេះជាការវិភាគលម្អិតលើការចំណាយ និងលំហូរសាច់ប្រាក់របស់អ្នក៖\n\n"
+                            f"១. **ការបែងចែក និងបន្ទុកចំណាយ**:\n"
+                            f"   * ការចំណាយបច្ចុប្បន្ន: ${exp_val:,.0f}/ខែ ធៀបនឹងចំណូល ${inc_val:,.0f}/ខែ\n"
+                            f"   * សមាមាត្រចំណាយធៀបនឹងចំណូល: {exp_ratio:.1f}%\n"
+                            f"   * ស្ថានភាពលំហូរសាច់ប្រាក់: {surplus_label_km}\n"
+                            f"   * គោលដៅចំណាយចាំបាច់ (៥០%): ~${needs_target:,.0f}/ខែ\n\n"
+                            f"២. **ការវិភាគ និងអនុសាសន៍**:\n"
+                            f"   {plan_advice}\n\n"
+                            f"៣. **ជំហានកែលម្អការចំណាយ**:\n"
+                            f"   * {action_surplus_km}\n"
+                            f"   * ពិនិត្យកាត់បន្ថយការចំណាយមិនចាំបាច់ និងការជាវសេវាផ្សេងៗដើម្បីពង្រីកប្រាក់សន្សំ។\n\n"
+                            f"**ការយល់ដឹងអំពីអនុសាសន៍របស់អ្នក**:\n{plan_explanation}"
+                        )
+                    else:
+                        ai_response = (
+                            f"Here is your Spending & Cash Flow Analysis:\n\n"
+                            f"1. **Spending Breakdown & Burden**:\n"
+                            f"   * Current Living Expenses: ${exp_val:,.0f}/mo against income of ${inc_val:,.0f}/mo\n"
+                            f"   * Expense Burden: {exp_ratio:.1f}% of income\n"
+                            f"   * Cash Flow Position: {surplus_label_en}\n"
+                            f"   * 50% Needs Benchmark Target: ~${needs_target:,.0f}/mo\n\n"
+                            f"2. **Spending Diagnosis**:\n"
+                            f"   {plan_advice}\n\n"
+                            f"3. **Optimization Steps**:\n"
+                            f"   * {action_surplus_en}\n"
+                            f"   * Audit discretionary spending and recurring subscriptions to lower your cost basis.\n\n"
+                            f"**Understanding Your Recommendation**:\n{plan_explanation}"
+                        )
+
+                # -------------------------------------------------------------
+                # 4. Savings Guidance ("Help me save money")
+                # -------------------------------------------------------------
+                else:
+                    if surplus_val > 0:
+                        cap_en = f"You have an active verified savings capacity of +${surplus_val:,.0f}/month (Income: ${inc_val:,.0f}/mo minus Expenses: ${exp_val:,.0f}/mo)."
+                        cap_km = f"អ្នកមានសមត្ថភាពសន្សំប្រាក់សុទ្ធ +${surplus_val:,.0f}/ខែ (ចំណូល: ${inc_val:,.0f}/ខែ ដកការចំណាយ: ${exp_val:,.0f}/ខែ)។"
+                    elif surplus_val == 0:
+                        cap_en = f"Your cash flow is at break-even ($0/month margin with ${inc_val:,.0f}/mo income and ${exp_val:,.0f}/mo expenses). Trimming living costs is needed to unlock savings."
+                        cap_km = f"លំហូរសាច់ប្រាក់របស់អ្នកស្ថិតក្នុងកម្រិតស្មើដើម ($0/ខែ ជាមួយចំណូល ${inc_val:,.0f}/ខែ និងចំណាយ ${exp_val:,.0f}/ខែ)។ ចាំបាច់ត្រូវកាត់បន្ថយការចំណាយខ្លះដើម្បីបង្កើតប្រាក់សន្សំ។"
+                    else:
+                        cap_en = f"Currently operating at a monthly deficit of -${abs(surplus_val):,.0f}/month (Expenses: ${exp_val:,.0f}/mo exceed Income: ${inc_val:,.0f}/mo). Deficit reduction is required before aggressive saving."
+                        cap_km = f"បច្ចុប្បន្នអ្នកមានឱនភាព -${abs(surplus_val):,.0f}/ខែ (ចំណាយ ${exp_val:,.0f}/ខែ លើសចំណូល ${inc_val:,.0f}/ខែ)។ ត្រូវដោះស្រាយឱនភាពជាមុនសិន មុននឹងចាប់ផ្តើមសន្សំប្រាក់។"
+
+                    debt_plan_en = "Prioritize minimum payments on active debts to prevent penalty fees." if has_active_debt else "Maintain your debt-free status to accelerate wealth accumulation."
+                    debt_plan_km = "ផ្តល់អាទិភាពដល់ការបង់ប្រាក់កម្ចីអប្បបរមាឱ្យទៀងទាត់ ដើម្បីចៀសវាងការផាកពិន័យ។" if has_active_debt else "រក្សាស្ថានភាពគ្មានបំណុលនេះ ដើម្បីបង្កើនល្បឿននៃការកសាងទ្រព្យសម្បត្តិ។"
+
+                    if lang == "km" and not user_wants_english:
                         has_english_letters = bool(re.search(r"[a-zA-Z]{3,}", plan_explanation or ""))
                         if not plan_explanation or has_english_letters:
                             plan_explanation = (
                                 f"លំហូរសាច់ប្រាក់សុទ្ធប្រចាំខែរបស់អ្នកមានសញ្ញាវិជ្ជមាន +${surplus_val:,.0f} ដែលនៅសល់បន្ទាប់ពីការចំណាយចាំបាច់។ "
                                 f"អ្នកប្រឹក្សាណែនាំឱ្យបែងចែកប្រាក់សល់នេះដើម្បីបង្កើតមូលនិធិសង្គ្រោះបន្ទាន់ និងសម្រេចគោលដៅហិរញ្ញវត្ថុរបស់អ្នក។"
-                                if surplus_val > 0 else
-                                f"ការចំណាយប្រចាំខែរបស់អ្នកបច្ចុប្បន្នលើសពីចំណូលចំនួន ${abs(surplus_val):,.0f} ក្នុងមួយខែ។"
+                                if surplus_val >= 0 else
+                                f"ការចំណាយប្រចាំខែរបស់អ្នកបច្ចុប្បន្នលើសពីចំណូលចំនួន ${abs(surplus_val):,.0f} ក្នុងមួយខែ ដែលបង្កើតជាឱនភាពថវិកា។"
                             )
-                        
                         ai_response = (
-                            f"ផ្អែកលើទិន្នន័យហិរញ្ញវត្ថុរបស់អ្នក (ចំណូល: ${inc_val:,.0f}/ខែ, ចំណាយ: ${exp_val:,.0f}/ខែ, សល់សុទ្ធ: ${surplus_val:,.0f}/ខែ)៖\n\n"
-                            f"{plan_advice}\n\n"
+                            f"នេះជាផែនការយុទ្ធសាស្ត្រសន្សំប្រាក់ ផ្អែកលើទិន្នន័យ (ចំណូល: ${inc_val:,.0f}/ខែ, ចំណាយ: ${exp_val:,.0f}/ខែ, {surplus_label_km})៖\n\n"
+                            f"១. **សមត្ថភាពសន្សំបច្ចុប្បន្ន**:\n"
+                            f"   * {cap_km}\n\n"
+                            f"២. **យុទ្ធសាស្ត្រសន្សំតាមលំដាប់អាទិភាព**:\n"
+                            f"   * **មូលនិធិសង្គ្រោះបន្ទាន់**: គោលដៅប្រាក់បម្រុង ៣ ទៅ ៦ ខែ (${exp_val * 3:,.0f} - ${exp_val * 6:,.0f}) សម្រាប់ករណីបន្ទាន់។\n"
+                            f"   * **ការគ្រប់គ្រងបំណុល**: {debt_plan_km}\n"
+                            f"   * **គោលដៅសន្សំ (២០%)**: គោលដៅប្រហែល ${savings_target:,.0f}/ខែ ពេលលំហូរសាច់ប្រាក់មានស្ថិរភាព។\n\n"
+                            f"៣. **ជំហានអនុវត្តជាក់ស្តែង**:\n"
+                            f"   * {action_surplus_km}\n"
+                            f"   * បង្កើតទម្លាប់សន្សំជាប្រចាំដោយស្វ័យប្រវត្តិនៅថ្ងៃទទួលបានប្រាក់ចំណូល។\n\n"
                             f"**ការយល់ដឹងអំពីអនុសាសន៍របស់អ្នក**:\n{plan_explanation}"
                         )
                     else:
                         ai_response = (
-                            f"Based on your authoritative financial profile (Income: ${inc_val:,.0f}/mo, Expenses: ${exp_val:,.0f}/mo, Net Surplus: ${surplus_val:,.0f}/mo):\n\n"
-                            f"{plan_advice}\n\n"
+                            f"Here is your personalized Savings Roadmap based on your verified records (Income: ${inc_val:,.0f}/mo, Expenses: ${exp_val:,.0f}/mo, {surplus_label_en}):\n\n"
+                            f"1. **Current Savings Capacity**:\n"
+                            f"   * {cap_en}\n\n"
+                            f"2. **Strategic Savings Priorities**:\n"
+                            f"   * **Emergency Buffer**: Target 3 to 6 months of living expenses (${exp_val * 3:,.0f} - ${exp_val * 6:,.0f}) for financial security.\n"
+                            f"   * **Debt Management**: {debt_plan_en}\n"
+                            f"   * **Savings Benchmark (20%)**: Target ~${savings_target:,.0f}/mo toward savings once cash flow is stabilized.\n\n"
+                            f"3. **Action Steps**:\n"
+                            f"   * {action_surplus_en}\n"
+                            f"   * Automate recurring transfers on payday to maintain consistent saving habits.\n\n"
                             f"**Understanding Your Recommendation**:\n{plan_explanation}"
                         )
+
+        elif intent in ("financial_plan_request", "savings_guidance", "financial_overview_query", "spending_analysis_query"):
+            # Fallback when user clicks suggestions but has not recorded income/expense yet
+            if lang == "km":
+                ai_response = (
+                    "ដើម្បីឱ្យខ្ញុំអាចផ្តល់ទិដ្ឋភាពទូទៅ វិភាគការចំណាយ ឬរៀបចំផែនការហិរញ្ញវត្ថុបានត្រឹមត្រូវ "
+                    "សូមចែករំលែកព័ត៌មានអំពីចំណូល និងការចំណាយប្រចាំខែរបស់អ្នក (ឧទាហរណ៍៖ «ចំណូលខ្ញុំ $1,500 និងចំណាយ $800 ក្នុងមួយខែ»)។"
+                )
+            else:
+                ai_response = (
+                    "To provide an accurate financial overview, spending analysis, or personalized plan, "
+                    "please share your monthly income and living expenses (e.g., 'I earn $1,500 and spend $800 each month')."
+                )
 
         elif intent in ("profile_update", "goal_update"):
             # Persist updated facts to DB, run ConsultantEngine

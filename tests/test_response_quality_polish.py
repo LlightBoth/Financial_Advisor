@@ -326,3 +326,67 @@ def test_chatbot_khmer_turn_produces_khmer_without_english_sections(auth_client,
     assert "little room for savings" not in ai_msg.lower()
     # Assert Khmer content exists
     assert re.search(r"[\u1780-\u17ff]", ai_msg)
+
+
+def test_four_welcome_suggestions_are_differentiated_and_clean_formatting(auth_client, app):
+    """
+    Verifies that the 4 suggestion buttons on the welcome card produce
+    completely distinct responses, and that deficit formatting never produces
+    broken artifacts like '+$-1,000' or advice to allocate negative surplus.
+    """
+    with app.app_context():
+        from app.models.history import History
+        user = User.query.filter_by(email="quality@test.com").first()
+        # Seed user in deficit: income $1,000, expense $2,000, debt present
+        h = History(
+            income=1000.0,
+            expense=2000.0,
+            goal_cost=5000.0,
+            martial_status="Single",
+            is_employed=True,
+            is_debt=True,
+            is_spending=True,
+            remain_percentage=-100.0,
+            expense_percentage=200.0,
+            get_advice="DEFICIT_DEBT_OVERHAUL"
+        )
+        h.users.append(user)
+        db.session.add(h)
+        db.session.commit()
+
+    suggestions = [
+        "Analyze my spending",
+        "Help me save money",
+        "Show my financial overview",
+        "Help me create a financial plan",
+    ]
+
+    responses = {}
+    for s in suggestions:
+        resp = auth_client.post("/bots/chat", json={"message": s})
+        assert resp.status_code == 200
+        data = resp.get_json()
+        ai_resp = data.get("response", "")
+        responses[s] = ai_resp
+
+        # Deficit formatting invariants
+        assert "+$-" not in ai_resp, f"Response contains broken '+$-': {ai_resp}"
+        assert "$-1,000" not in ai_resp or "Net Deficit: -$1,000" in ai_resp, f"Response has unhandled negative: {ai_resp}"
+        assert "Allocate your verified surplus of $-1,000" not in ai_resp
+
+    # Verify each response is distinct
+    resp_plan = responses["Help me create a financial plan"]
+    resp_overview = responses["Show my financial overview"]
+    resp_spending = responses["Analyze my spending"]
+    resp_savings = responses["Help me save money"]
+
+    assert "Budget Framework (50/30/20 Benchmark)" in resp_plan
+    assert "Financial Profile Overview" in resp_overview
+    assert "Spending & Cash Flow Analysis" in resp_spending
+    assert "Savings Roadmap" in resp_savings
+
+    assert resp_plan != resp_overview
+    assert resp_overview != resp_spending
+    assert resp_spending != resp_savings
+    assert resp_savings != resp_plan
+
