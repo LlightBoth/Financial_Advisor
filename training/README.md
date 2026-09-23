@@ -40,7 +40,7 @@ training/
 │       └── training_summary.json          # Loss curves and training metadata
 │
 ├── llm_output_normalizer.py    # Production text parser, intent classifier, safety boundaries & Khmer sanitizer
-├── serve_qwen_v2.py            # Production local inference server with automatic CUDA/CPU fallback (port 5006)
+├── serve_llm.py                # Production local inference server with automatic CUDA/CPU fallback (port 5006)
 ├── train_financial_advisor.py  # 4-bit QLoRA fine-tuning script using TRL / SFTTrainer
 └── merge_financial_advisor_ai.py # Script to merge LoRA adapter into 16-bit standalone base model
 ```
@@ -51,7 +51,7 @@ training/
 
 To start the model inference server:
 ```bash
-python training/serve_qwen_v2.py
+python training/serve_llm.py
 ```
 
 * **Base Model**: `Qwen/Qwen2.5-1.5B-Instruct` (auto-downloaded from Hugging Face if not cached).

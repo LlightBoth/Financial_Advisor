@@ -60,7 +60,7 @@ pip install -r requirements-llm.txt
 
 #### 🔹 Terminal 1: Run the Local LLM AI Server
 ```bash
-python training/serve_qwen_v2.py
+python training/serve_llm.py
 ```
 * **Port**: `http://127.0.0.1:5006`
 * Loads your trained **Financial Advisor AI LoRA v4** model (`training/output/financial_advisor_ai_v4/`).
@@ -117,6 +117,6 @@ Financial_Advisor/
     ├── output/          # Fine-tuned LoRA adapter weights (35MB)
     │   └── financial_advisor_ai_v4/
     ├── llm_output_normalizer.py # Safe input/output normalization & regex engine
-    ├── serve_qwen_v2.py # Model server with automatic GPU/CPU fallback
+    ├── serve_llm.py     # Model server with automatic GPU/CPU fallback
     └── train_financial_advisor.py # QLoRA fine-tuning script
 ```

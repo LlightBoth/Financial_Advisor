@@ -1,4 +1,4 @@
-# Optional dependencies to run the local Financial Advisor AI model server (training/serve_qwen_v2.py)
+# Dependencies to run the local Financial Advisor AI model server (training/serve_llm.py)
 torch>=2.2.0
 transformers>=4.40.0
 peft>=0.10.0
