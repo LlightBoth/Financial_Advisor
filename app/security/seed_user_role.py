@@ -3,7 +3,6 @@ from extension import db
 from app.models.user import User
 from app.models.role import Role
 
-
 def seed_roles():
     role_names = ["user", "admin", "editor"]
 
@@ -123,6 +122,7 @@ def seed_users():
             db.or_(
                 User.username == data["username"],
                 User.email == data["email"],
+                User.full_name == data["full_name"],
             )
         ).first()
 

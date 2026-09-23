@@ -1,0 +1,404 @@
+/* ==========================================================
+   About / FAQ / Team Page — Tech-Styled Animated Theme
+   Builds on top of landing.css tokens (--primary, --bg-main, etc.)
+   ========================================================== */
+
+/* --- Animated Tech Grid Background --- */
+.tech-bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.tech-grid {
+    position: absolute;
+    inset: -10%;
+    background-image:
+        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    animation: gridDrift 26s linear infinite;
+}
+
+@keyframes gridDrift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(48px, 48px); }
+}
+
+.tech-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: var(--orb-opacity, 0.2);
+    animation: floatOrb 16s ease-in-out infinite alternate, hueLoop 12s linear infinite;
+}
+
+.tech-orb-1 { width: 480px; height: 480px; top: -120px; left: -80px; background: radial-gradient(circle, #3b82f6 0%, rgba(59,130,246,0) 70%); }
+.tech-orb-2 { width: 420px; height: 420px; top: 40%; right: -100px; background: radial-gradient(circle, #8b5cf6 0%, rgba(139,92,246,0) 70%); animation-delay: -5s; }
+.tech-orb-3 { width: 380px; height: 380px; bottom: -60px; left: 25%; background: radial-gradient(circle, #10b981 0%, rgba(16,185,129,0) 70%); animation-delay: -9s; }
+
+@keyframes hueLoop {
+    0%   { filter: blur(90px) hue-rotate(0deg); }
+    100% { filter: blur(90px) hue-rotate(360deg); }
+}
+
+/* Floating tech icon particles (loop, colorful) */
+.tech-particle {
+    position: absolute;
+    font-size: 1.4rem;
+    color: var(--primary);
+    opacity: 0.35;
+    animation: particleFloat 14s ease-in-out infinite;
+}
+.tech-particle:nth-child(odd) { animation-duration: 18s; }
+.tech-particle.c-purple { color: #8b5cf6; }
+.tech-particle.c-green { color: #10b981; }
+.tech-particle.c-amber { color: #f59e0b; }
+.tech-particle.c-blue { color: #3b82f6; }
+
+@keyframes particleFloat {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+    50%  { transform: translateY(-40px) rotate(180deg); opacity: 0.5; }
+    100% { transform: translateY(0) rotate(360deg); opacity: 0.15; }
+}
+
+/* --- Page Hero --- */
+.about-hero {
+    position: relative;
+    z-index: 10;
+    padding: 9rem 1.5rem 4rem;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-hero-title {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.25rem;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981, #3b82f6);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientLoop 8s linear infinite;
+}
+
+@keyframes gradientLoop {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+.about-hero-subtitle {
+    font-size: clamp(1.02rem, 2vw, 1.2rem);
+    color: var(--text-muted) !important;
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* --- Shared Section Wrapper --- */
+.about-section {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    scroll-margin-top: 95px;
+}
+
+.reveal-item {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.reveal-item.in-view {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Purpose Checklist --- */
+.purpose-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.purpose-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--feature-card-bg) !important;
+    border: 1px solid var(--feature-card-border) !important;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.purpose-item:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary) !important;
+    box-shadow: 0 14px 30px -14px rgba(59, 130, 246, 0.25);
+}
+
+.purpose-check {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    color: #fff;
+    background: var(--primary-gradient);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+
+.purpose-item:nth-child(2n) .purpose-check { background: var(--emerald-gradient); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
+.purpose-item:nth-child(3n) .purpose-check { background: var(--purple-gradient); box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
+.purpose-item:nth-child(4n) .purpose-check { background: var(--amber-gradient); box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); }
+
+.purpose-text {
+    color: var(--text-muted) !important;
+    font-size: 0.95rem;
+    line-height: 1.55;
+}
+
+.purpose-text strong {
+    color: var(--text-main) !important;
+    display: block;
+    margin-bottom: 0.15rem;
+    font-size: 1rem;
+}
+
+/* --- Benefit Cards (reuses feature-box look, new shine sweep) --- */
+.benefit-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.benefit-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+    pointer-events: none;
+}
+
+.benefit-card:hover::after {
+    left: 140%;
+}
+
+/* --- FAQ Accordion --- */
+.faq-accordion .accordion-item {
+    background: var(--feature-card-bg) !important;
+    border: 1px solid var(--feature-card-border) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.faq-accordion .accordion-button {
+    background: transparent !important;
+    color: var(--text-main) !important;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 1.15rem 1.4rem;
+    box-shadow: none !important;
+}
+
+.faq-accordion .accordion-button::after {
+    display: none;
+}
+
+.faq-toggle-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--theme-btn-bg);
+    border: 1px solid var(--border-subtle);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.9rem;
+    color: var(--primary);
+    flex-shrink: 0;
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) .faq-toggle-icon {
+    background: var(--primary-gradient);
+    color: #fff;
+    transform: rotate(180deg);
+}
+
+.faq-accordion .accordion-body {
+    color: var(--text-muted) !important;
+    font-size: 0.93rem;
+    line-height: 1.65;
+    padding: 0 1.4rem 1.4rem 3.85rem;
+}
+
+.faq-accordion .accordion-button:not(.collapsed) {
+    color: var(--primary) !important;
+}
+
+/* --- Team Section --- */
+.team-lead-card {
+    max-width: 460px;
+    margin: 0 auto 3rem;
+    text-align: center;
+    background: var(--showcase-bg) !important;
+    border: 1px solid var(--showcase-border) !important;
+    border-radius: 22px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 15px 40px -18px rgba(0,0,0,0.15);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.5rem;
+}
+
+.team-card {
+    text-align: center;
+    background: var(--feature-card-bg) !important;
+    border: 1px solid var(--feature-card-border) !important;
+    border-radius: 18px;
+    padding: 2rem 1.25rem;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+.team-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--primary) !important;
+    box-shadow: 0 20px 40px -18px rgba(0,0,0,0.18);
+}
+
+/* Rotating gradient-ring avatar frame — colorful looping tech effect */
+.avatar-ring {
+    position: relative;
+    width: 128px;
+    height: 128px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    padding: 4px;
+    background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #10b981, #f59e0b, #3b82f6);
+    animation: ringSpin 6s linear infinite;
+}
+
+.team-lead-card .avatar-ring {
+    width: 152px;
+    height: 152px;
+}
+
+@keyframes ringSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.avatar-ring-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--bg-main);
+}
+
+.avatar-ring-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-placeholder-icon {
+    font-size: 3rem;
+    color: var(--text-dim);
+}
+
+.team-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main) !important;
+    margin-bottom: 0.2rem;
+}
+
+.team-lead-card .team-name {
+    font-size: 1.3rem;
+}
+
+.team-role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.team-role-pill.lead {
+    background: rgba(139, 92, 246, 0.12);
+    border-color: rgba(139, 92, 246, 0.3);
+    color: #8b5cf6;
+}
+
+.team-social-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-top: 0.5rem;
+}
+
+.team-social-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--theme-btn-bg);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+.team-social-btn:hover {
+    color: #fff !important;
+    background: var(--primary-gradient) !important;
+    border-color: transparent !important;
+    transform: translateY(-3px) scale(1.08);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .about-hero { padding: 7rem 1.25rem 3rem; }
+    .about-section { padding: 3rem 1.25rem; }
+    .team-lead-card { padding: 2rem 1.5rem; }
+    .avatar-ring { width: 108px; height: 108px; }
+    .team-lead-card .avatar-ring { width: 128px; height: 128px; }
+}

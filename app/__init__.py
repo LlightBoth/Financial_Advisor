@@ -125,6 +125,12 @@ def create_app(config_class: type[Config] = Config):
     def home():
         return flask.render_template("landing.html")
 
+    # Public About / FAQ / Contact page
+    @app.route("/about")
+    @limiter.limit("10 per minute")
+    def about():
+        return flask.render_template("about.html")
+
 
     # ---------------------- #
     #  Prevent/Rate Limiter  #
