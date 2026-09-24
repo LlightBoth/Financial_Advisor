@@ -1,6 +1,6 @@
-# Financial Advisor AI — Model Training & Inference
+# Financial Consultant AI — Model Training & Inference
 
-This directory contains the machine learning pipelines, fine-tuning scripts, SFT training datasets, evaluation benchmarks, and the local inference server for the **Financial Advisor AI**.
+This directory contains the machine learning pipelines, fine-tuning scripts, SFT training datasets, evaluation benchmarks, and the local inference server for the **Financial Consultant AI**.
 
 ---
 

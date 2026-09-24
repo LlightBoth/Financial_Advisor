@@ -1,6 +1,6 @@
-# 💰 Financial Advisor AI
+# 💰 Financial Consultant AI
 
-An intelligent financial advisor web application built with Python (Flask), Bootstrap, and fine-tuned Local LLM (Qwen2.5-1.5B with LoRA).
+An intelligent financial consultant web application built with Python (Flask), Bootstrap, and fine-tuned Local LLM (Qwen2.5-1.5B with LoRA).
 
 It helps users manage their finances by analyzing income and expenses, tracking budgets, generating personalized 50/30/20 financial plans, and offering bilingual (English & Khmer) financial guidance.
 
@@ -64,7 +64,7 @@ pip install -r requirements-llm.txt
 python training/serve_llm.py
 ```
 * **Port**: `http://127.0.0.1:5006`
-* Loads your trained **Financial Advisor AI LoRA v4** model (`training/output/financial_advisor_ai_v4/`).
+* Loads your trained **Financial Consultant AI LoRA v4** model (`training/output/financial_advisor_ai_v4/`).
 * On first run, it auto-downloads the base `Qwen/Qwen2.5-1.5B-Instruct` model from Hugging Face.
 * Runs on NVIDIA GPU (CUDA ~1.1 GB VRAM) or automatically falls back to CPU.
 
@@ -80,17 +80,17 @@ python run.py
 
 ---
 
-## 🧠 AI Advisor Architecture
+## 🧠 AI Consultant Architecture
 
 The system operates under a strict, safety-first hybrid architecture:
 
-**User Input → Trained Financial Advisor AI → Output Normalization & Validation → ConsultantEngine → Deterministic Financial Recommendation → Financial Advisor AI Explanation → User Interface**
+**User Input → Trained Financial Consultant AI → Output Normalization & Validation → ConsultantEngine → Deterministic Financial Recommendation → Financial Consultant AI Explanation → User Interface**
 
 ### Core Architectural Principles:
-1. **Fact Extraction**: The **Financial Advisor AI** extracts financial facts and user goals from natural-language input.
+1. **Fact Extraction**: The **Financial Consultant AI** extracts financial facts and user goals from natural-language input.
 2. **Deterministic Normalization**: The **Output Normalizer & Validator** validates, bounds, and protects the extracted information.
 3. **Authoritative Decisioning**: **ConsultantEngine** performs the authoritative deterministic financial evaluation using formal financial rules and verified knowledge bases.
-4. **Natural-Language Synthesis**: The **Financial Advisor AI** generates a user-friendly explanation of the verified recommendation.
+4. **Natural-Language Synthesis**: The **Financial Consultant AI** generates a user-friendly explanation of the verified recommendation.
 5. **Strict Safety Boundary**: The AI cannot override ConsultantEngine's deterministic recommendations or give speculative investment advice.
 
 ---
