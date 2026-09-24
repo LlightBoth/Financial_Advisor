@@ -128,11 +128,44 @@ def index():
     return render_template("advisors/index.html", form=form, advice=advice_rule)
 
 
+def _format_matched_rules(advice_data):
+    """Formats matched advice rules into the structure expected by analyse.html."""
+    if not advice_data:
+        return []
+    best_advice = advice_data.get("get_advice")
+    if not best_advice:
+        return []
+
+    rule_id = getattr(best_advice, "rule_id", None)
+    if not rule_id or rule_id == "DEFAULT_FALLBACK":
+        return []
+
+    adv_text = getattr(best_advice, "advice", "") or ""
+    if isinstance(adv_text, list):
+        advice_list = adv_text
+    elif isinstance(adv_text, str) and adv_text.strip():
+        parts = [p.strip() for p in adv_text.split(".") if p.strip()]
+        advice_list = [p + "." for p in parts] if len(parts) > 1 else [adv_text]
+    else:
+        advice_list = []
+
+    return [{
+        "id": getattr(best_advice, "id", None) or getattr(best_advice, "db_id", None) or rule_id,
+        "name": getattr(best_advice, "name", None) or rule_id,
+        "certainty": getattr(best_advice, "certainty", 0.85) or 0.85,
+        "conclusion": getattr(best_advice, "conclusion", ""),
+        "advice": advice_list,
+        "category": getattr(best_advice, "category", ""),
+        "priority": getattr(best_advice, "priority", 0),
+    }]
+
+
 @advisor_bp.route("/analyse", methods=["GET", "POST"])
 @login_required
 def analyseIndex():
     form = AdvisorForm()
     advice_rule = None
+    matched_rules = []
     total_plan = PlanServices.get_user_all_plan_total(current_user)
 
     income = request.form.get("income", 0.0, type=float)
@@ -151,6 +184,7 @@ def analyseIndex():
             "is_spending": request.form.get("spending_habit", "average spend"),
         }
         advice_rule = AdvisorServices.get_advise(data)
+        matched_rules = _format_matched_rules(advice_rule)
 
         return render_template(
             "advisors/analyse.html",
@@ -158,7 +192,8 @@ def analyseIndex():
             income=income,
             expense=expense,
             total_plan=total_plan,
-            advice=advice_rule
+            advice=advice_rule,
+            matched_rules=matched_rules
         )
 
     return render_template(
@@ -167,23 +202,29 @@ def analyseIndex():
         income=income,
         expense=expense,
         total_plan=total_plan,
-        advice=advice_rule
+        advice=advice_rule,
+        matched_rules=matched_rules
     )
 
 
-@advisor_bp.route("/personal-analyse", methods=["POST"])
+@advisor_bp.route("/personal-analyse", methods=["GET", "POST"])
 @login_required
-@limiter.limit("5 per minute")
+@limiter.limit("15 per minute")
 def personalAnalyse():
-    income = float(request.form.get("income", 0.0))
-    expense = float(request.form.get("expense", 0.0))
+    form = AdvisorForm()
+    if request.method == "GET" and "income" not in request.args and "expense" not in request.args:
+        return redirect(url_for("advisors.analyseIndex"))
+
+    income = request.values.get("income", 0.0, type=float) or 0.0
+    expense = request.values.get("expense", 0.0, type=float) or 0.0
     data = {
         "income": income,
         "expense": expense,
-        "marital_status": request.form.get("marital_status", "Single")
+        "marital_status": request.values.get("marital_status", "Single")
     }
 
     advice_result = AdvisorServices.persoal_analyse(data)
+    matched_rules = _format_matched_rules(advice_result)
 
     total_plan = PlanServices.get_user_all_plan_total(current_user)
     sum_saving = income - expense
@@ -192,11 +233,13 @@ def personalAnalyse():
 
     return render_template(
         "advisors/analyse.html",
+        form=form,
         income=income,
         expense=expense,
         sum_saving=sum_saving,
         sum_saving_rate=sum_saving_rate,
         user_plans=user_plans,
         total_plan=total_plan,
-        advice=advice_result
+        advice=advice_result,
+        matched_rules=matched_rules
     )
