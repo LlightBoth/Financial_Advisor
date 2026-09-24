@@ -133,11 +133,39 @@ def load_model():
             or bool(os.environ.get("SPACES_ZERO_GPU"))
         )
     )
+
+    # In Spaces / ZeroGPU environments, prevent safetensors from allocating directly
+    # on CUDA during file loading (which causes "RuntimeError: No CUDA GPUs are available").
+    # Force weights to load into host RAM (CPU) first.
+    if is_spaces:
+        try:
+            import safetensors.torch as _st_torch
+            _orig_st_load = _st_torch.load_file
+            def _spaces_st_load(filename, **kwargs):
+                dev = kwargs.get("device")
+                if dev is None or "cuda" in str(dev):
+                    kwargs["device"] = "cpu"
+                return _orig_st_load(filename, **kwargs)
+            _st_torch.load_file = _spaces_st_load
+        except Exception:
+            pass
+
+        try:
+            import peft.utils.save_and_load as _peft_sl
+            _orig_peft_load = _peft_sl.safe_load_file
+            def _spaces_peft_load(filename, **kwargs):
+                dev = kwargs.get("device")
+                if dev is None or "cuda" in str(dev):
+                    kwargs["device"] = "cpu"
+                return _orig_peft_load(filename, **kwargs)
+            _peft_sl.safe_load_file = _spaces_peft_load
+        except Exception:
+            pass
+
     model = None
 
     # Strategy 1: Hugging Face Spaces (ZeroGPU or Space container)
-    # ZeroGPU requires base model & adapter loaded into host RAM first (without device_map="auto")
-    # before .to("cuda") which ZeroGPU intercepts and emulates until inference.
+    # Weights are loaded into host RAM first; then .to("cuda") registers with ZeroGPU emulation
     if is_spaces:
         print("[INFO] Hugging Face Spaces environment detected.")
         try:
@@ -195,14 +223,26 @@ def load_model():
     # Strategy 3: Universal CPU fallback (Guaranteed to work on any container)
     if model is None:
         print("[INFO] Loading model on CPU (float32)...")
-        base_model = AutoModelForCausalLM.from_pretrained(
-            BASE_MODEL_ID,
-            torch_dtype=torch.float32,
-            trust_remote_code=True,
-        )
-        model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
-        model = model.to("cpu")
-        print("[READY] Loaded model on CPU.")
+        try:
+            base_model = AutoModelForCausalLM.from_pretrained(
+                BASE_MODEL_ID,
+                device_map={"": "cpu"},
+                torch_dtype=torch.float32,
+                trust_remote_code=True,
+            )
+            model = PeftModel.from_pretrained(base_model, ADAPTER_DIR, device_map={"": "cpu"})
+            model = model.to("cpu")
+            print("[READY] Loaded model on CPU.")
+        except Exception as e_cpu:
+            print(f"[WARN] CPU device_map load had ({e_cpu}), trying direct CPU load...")
+            base_model = AutoModelForCausalLM.from_pretrained(
+                BASE_MODEL_ID,
+                torch_dtype=torch.float32,
+                trust_remote_code=True,
+            )
+            model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
+            model = model.to("cpu")
+            print("[READY] Loaded model on CPU.")
 
     model.eval()
 
