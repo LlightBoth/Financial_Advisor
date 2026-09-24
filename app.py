@@ -289,7 +289,33 @@ app = gr.mount_gradio_app(api_app, demo, path="/")
 
 if __name__ == "__main__":
     import uvicorn
+    import socket
+    import subprocess
+
     port = int(os.environ.get("PORT", 7860))
-    # Give any previous container process a moment to release the port
-    time.sleep(1)
+
+    # 1. Terminate any stale zombie process holding port 7860 from previous crash
+    try:
+        out = subprocess.check_output(f"fuser {port}/tcp", shell=True, stderr=subprocess.DEVNULL).decode().strip()
+        for p in out.split():
+            if p and int(p) != os.getpid():
+                print(f"[CLEANUP] Releasing stale process {p} on port {port}...")
+                os.system(f"kill -9 {p}")
+                time.sleep(1)
+    except Exception:
+        pass
+
+    # 2. Wait for socket in TIME_WAIT to release
+    for attempt in range(5):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            s.bind(("0.0.0.0", port))
+            s.close()
+            break
+        except OSError:
+            print(f"[WAIT] Port {port} busy or in TIME_WAIT (attempt {attempt+1}/5). Waiting 2s...")
+            s.close()
+            time.sleep(2)
+
     uvicorn.run(app, host="0.0.0.0", port=port)
