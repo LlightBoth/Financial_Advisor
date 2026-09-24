@@ -1,6 +1,6 @@
-# 💰 Financial Consultant AI
+# 💰 Financial Advisor AI
 
-An intelligent financial consultant web application built with Python (Flask), Bootstrap, and fine-tuned Local LLM (Qwen2.5-1.5B with LoRA).
+An intelligent financial advisor web application built with Python (Flask), Bootstrap, and fine-tuned Local LLM (Qwen2.5-1.5B with LoRA).
 
 It helps users manage their finances by analyzing income and expenses, tracking budgets, generating personalized 50/30/20 financial plans, and offering bilingual (English & Khmer) financial guidance.
 
