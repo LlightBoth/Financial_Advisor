@@ -47,6 +47,12 @@ print("Initializing Financial Advisor AI model for Hugging Face Space...")
 load_model()
 
 
+# ZeroGPU decorated synchronous generation entrypoint for REST API
+@spaces.GPU
+def run_generation(instruction: str, user_input: str, max_new_tokens: int = 256) -> str:
+    return generate_response(instruction, user_input, max_new_tokens=max_new_tokens)
+
+
 # 2. Gradio Web Interface (ZeroGPU Decorated)
 @spaces.GPU
 def gradio_chat(user_msg, history):
@@ -86,7 +92,8 @@ demo = gr.ChatInterface(
 )
 
 # 3. Mount Custom REST API Endpoints directly onto Gradio's internal FastAPI app
-# This avoids running a second uvicorn server on port 7860 and satisfies ZeroGPU
+# NOTE: Routes are defined as synchronous `def` (NOT `async def`) because ZeroGPU's
+# @spaces.GPU decorator does not support coroutines and raises NotImplementedError.
 api_app = demo.app
 
 api_app.add_middleware(
@@ -118,14 +125,12 @@ def health():
 
 
 @api_app.post("/extract")
-@spaces.GPU
-async def extract_endpoint(request: Request):
-    data = await request.json()
-    text = (data.get("text") or "").strip()
+def extract_endpoint(payload: dict):
+    text = (payload.get("text") or "").strip()
     if not text:
         return JSONResponse(status_code=400, content={"error": "Missing 'text' field"})
 
-    raw_out = generate_response(EXTRACTION_INSTRUCTION, text, max_new_tokens=150)
+    raw_out = run_generation(EXTRACTION_INSTRUCTION, text, max_new_tokens=150)
     normalized_slots = normalize_llm_output(raw_out, text)
     return {
         "success": True,
@@ -135,9 +140,7 @@ async def extract_endpoint(request: Request):
 
 
 @api_app.post("/explain")
-@spaces.GPU
-async def explain_endpoint(request: Request):
-    data = await request.json()
+def explain_endpoint(data: dict):
     lang = data.get("language") or "en"
     income = data.get("monthly_income", 0.0)
     expense = data.get("monthly_expense", 0.0)
@@ -166,7 +169,7 @@ async def explain_endpoint(request: Request):
         )
 
     instr = EXPLANATION_INSTRUCTION_KM if lang == "km" else EXPLANATION_INSTRUCTION
-    explanation = generate_response(instr, profile_str, max_new_tokens=85)
+    explanation = run_generation(instr, profile_str, max_new_tokens=85)
     context_prof = {
         "monthly_income": income,
         "monthly_expense": expense,
@@ -188,9 +191,7 @@ async def explain_endpoint(request: Request):
 
 
 @api_app.post("/chat")
-@spaces.GPU
-async def chat_endpoint(request: Request):
-    data = await request.json()
+def chat_endpoint(data: dict):
     message = (data.get("message") or "").strip()
     if not message:
         return JSONResponse(status_code=400, content={"error": "Message cannot be empty"})
@@ -201,7 +202,7 @@ async def chat_endpoint(request: Request):
     # 1. Safety Boundary Check
     if is_safety_violation(message):
         instr = SAFETY_INSTRUCTION_KM if lang == "km" else SAFETY_INSTRUCTION
-        safety_resp = generate_response(instr, message, max_new_tokens=120)
+        safety_resp = run_generation(instr, message, max_new_tokens=120)
         safety_resp = normalize_and_verify_response(safety_resp, user_input=message, lang=lang)
         return {
             "success": True,
@@ -213,7 +214,7 @@ async def chat_endpoint(request: Request):
     # 2. Concept / Educational Check
     if is_educational_query(message):
         instr = EDUCATION_INSTRUCTION_KM if lang == "km" else EDUCATION_INSTRUCTION
-        edu_resp = generate_response(instr, message, max_new_tokens=140)
+        edu_resp = run_generation(instr, message, max_new_tokens=140)
         edu_resp = normalize_and_verify_response(edu_resp, user_input=message, lang=lang)
         return {
             "success": True,
@@ -245,7 +246,7 @@ async def chat_endpoint(request: Request):
     if not has_numbers and not debt_mentioned and not emp_mentioned:
         normalized_slots = {k: None for k in CANONICAL_FIELDS}
     else:
-        raw_out = generate_response(EXTRACTION_INSTRUCTION, message, max_new_tokens=75)
+        raw_out = run_generation(EXTRACTION_INSTRUCTION, message, max_new_tokens=75)
         normalized_slots = normalize_llm_output(raw_out, message)
 
     # Build contextual response
@@ -277,6 +278,6 @@ async def chat_endpoint(request: Request):
     }
 
 
-# Native Gradio Launch (Standard Hugging Face ZeroGPU entrypoint)
+# Native Gradio Launch (Official Hugging Face ZeroGPU entrypoint)
 if __name__ == "__main__":
     demo.launch()
