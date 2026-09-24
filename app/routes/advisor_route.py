@@ -129,35 +129,35 @@ def index():
 
 
 def _format_matched_rules(advice_data):
-    """Formats matched advice rules into the structure expected by analyse.html."""
+    """Formats matched advice rules into the localized structure expected by analyse.html."""
     if not advice_data:
         return []
-    best_advice = advice_data.get("get_advice")
-    if not best_advice:
-        return []
 
-    rule_id = getattr(best_advice, "rule_id", None)
-    if not rule_id or rule_id == "DEFAULT_FALLBACK":
-        return []
+    from app.utils.rule_translations import localize_rule
+    from app.utils.i18n import get_locale
 
-    adv_text = getattr(best_advice, "advice", "") or ""
-    if isinstance(adv_text, list):
-        advice_list = adv_text
-    elif isinstance(adv_text, str) and adv_text.strip():
-        parts = [p.strip() for p in adv_text.split(".") if p.strip()]
-        advice_list = [p + "." for p in parts] if len(parts) > 1 else [adv_text]
-    else:
-        advice_list = []
+    lang = get_locale()
+    rules = advice_data.get("matched_rules")
+    if not rules:
+        best_advice = advice_data.get("get_advice")
+        if best_advice and getattr(best_advice, "certainty", 0.0) > 0:
+            rules = [best_advice]
+        elif best_advice and isinstance(best_advice, dict) and best_advice.get("certainty", 0.0) > 0:
+            rules = [best_advice]
+        else:
+            return []
 
-    return [{
-        "id": getattr(best_advice, "id", None) or getattr(best_advice, "db_id", None) or rule_id,
-        "name": getattr(best_advice, "name", None) or rule_id,
-        "certainty": getattr(best_advice, "certainty", 0.85) or 0.85,
-        "conclusion": getattr(best_advice, "conclusion", ""),
-        "advice": advice_list,
-        "category": getattr(best_advice, "category", ""),
-        "priority": getattr(best_advice, "priority", 0),
-    }]
+    formatted = []
+    for r in rules:
+        if not r:
+            continue
+        # Avoid empty advice placeholders
+        if getattr(r, "certainty", 0.0) == 0.0 and getattr(r, "conclusion", "") == "No recommendations are currently available.":
+            continue
+        formatted.append(localize_rule(r, lang))
+    return formatted
+
+
 
 
 @advisor_bp.route("/analyse", methods=["GET", "POST"])

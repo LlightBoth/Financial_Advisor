@@ -477,11 +477,19 @@ def classify_conversational_intent(message: str, has_profile: bool = False, hist
 
     # 5. Specific Conversational Queries
     # Income & Expense fact queries
-    income_query_pattern = r"\b(what\s+(is|are)\s+(my\s+)?(monthly\s+)?(income|salary|earnings|pay)|how\s+much\s+(do\s+i\s+make|do\s+i\s+earn|is\s+my\s+income))\b|តើចំណូល(របស់)?ខ្ញុំប៉ុន្មាន|ចំណូលរបស់ខ្ញុំ"
+    income_query_pattern = (
+        r"\b((check|show|tell\s+me|see|view|what\s+(is|are))\s+(my\s+)?(monthly\s+)?(income|salary|earnings|pay)"
+        r"|how\s+much\s+(do\s+i\s+make|do\s+i\s+earn|is\s+my\s+income|is\s+my\s+salary))\b"
+        r"|តើចំណូល(របស់)?ខ្ញុំប៉ុន្មាន|ចំណូលរបស់ខ្ញុំ|ពិនិត្យចំណូល"
+    )
     if re.search(income_query_pattern, msg, re.IGNORECASE):
         return "income_fact_query"
 
-    expense_query_pattern = r"\b(what\s+(is|are)\s+(my\s+)?(monthly\s+)?(expenses?|spending|bills)|how\s+much\s+do\s+i\s+spend)\b|តើការចំណាយ(របស់)?ខ្ញុំប៉ុន្មាន|ចំណាយរបស់ខ្ញុំ"
+    expense_query_pattern = (
+        r"\b((check|show|tell\s+me|see|view|what\s+(is|are))\s+(my\s+)?(monthly\s+)?(expenses?|spending|bills)"
+        r"|how\s+much\s+(do\s+i\s+spend|are\s+my\s+expenses?))\b"
+        r"|តើការចំណាយ(របស់)?ខ្ញុំប៉ុន្មាន|ចំណាយរបស់ខ្ញុំ|ពិនិត្យការចំណាយ|ពិនិត្យចំណាយ"
+    )
     if re.search(expense_query_pattern, msg, re.IGNORECASE):
         return "expense_fact_query"
 
@@ -507,7 +515,11 @@ def classify_conversational_intent(message: str, has_profile: bool = False, hist
 
     # 6. Specific Suggestion Queries (Buttons on welcome card)
     # 6a. Financial Overview ("Show my financial overview", "overview", "ទិដ្ឋភាពទូទៅ")
-    overview_pattern = r"(show\s+(my\s+)?financial\s+overview|financial\s+overview|account\s+overview|summary\s+of\s+my\s+finances|^overview$|ទិដ្ឋភាពទូទៅ|សង្ខេបហិរញ្ញវត្ថុ)"
+    overview_pattern = (
+        r"(show\s+(my\s+)?financial\s+overview|financial\s+overview|account\s+overview|summary\s+of\s+my\s+finances"
+        r"|check\s+.*(income.*expense|expense.*income|finances?|budget|\(income)"
+        r"|^overview$|ទិដ្ឋភាពទូទៅ|សង្ខេបហិរញ្ញវត្ថុ)"
+    )
     if re.search(overview_pattern, msg, re.IGNORECASE):
         return "financial_overview_query"
 

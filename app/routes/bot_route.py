@@ -407,7 +407,7 @@ def chat():
                 # Store active profile and transition state in session for subsequent turns
                 from flask import session as flask_session
                 flask_session["prev_advisor_profile"] = dict(existing_profile) if existing_profile else {}
-                flask_session["advisor_profile"] = dict(active_profile, _user_id=current_user.id)
+                flask_session["advisor_profile"] = dict(active_profile, _user_id=current_user.id, _is_conversational_override=True)
                 flask_session.modified = True
 
                 if intent == "goal_update" and goal_v is not None:
@@ -563,7 +563,11 @@ def chat():
             "total_chatbot_response_ms": total_chatbot_response_ms,
         }
 
-        print(f"[TIMING REPORT] {user_message!r} -> Total: {total_chatbot_response_ms}ms | LLM: {llm_service_ms}ms | Gen: {model_timing.get('generation_ms')}ms | Tok/s: {model_timing.get('tokens_per_second')}")
+        try:
+            safe_msg = user_message.encode('ascii', errors='backslashreplace').decode('ascii')
+            print(f"[TIMING REPORT] '{safe_msg}' -> Total: {total_chatbot_response_ms}ms | LLM: {llm_service_ms}ms | Gen: {model_timing.get('generation_ms')}ms | Tok/s: {model_timing.get('tokens_per_second')}")
+        except Exception:
+            pass
 
         return jsonify({
             "response": ai_response,

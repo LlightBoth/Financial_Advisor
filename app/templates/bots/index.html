@@ -279,7 +279,8 @@ async function loadCurrentChat() {
                 appendMessageUI(
                     message.content,
                     message.is_ai ? "ai" : "user",
-                    false
+                    false,
+                    message.created_at ? formatTime(message.created_at) : null
                 );
             });
         }
@@ -382,7 +383,7 @@ chatForm.addEventListener("submit", async event => {
    RENDER MESSAGE
 ========================= */
 
-function appendMessageUI(text, sender, shouldScroll = true) {
+function appendMessageUI(text, sender, shouldScroll = true, timeStr = null) {
     const row = document.createElement("div");
 
     const isUser = sender === "user";
@@ -396,7 +397,7 @@ function appendMessageUI(text, sender, shouldScroll = true) {
         row.innerHTML = `
             <div class="ai-message-wrapper">
                 <div class="ai-message-header justify-content-end ${khmerClass}">
-                    <span>${formatTime()}</span>
+                    <span>${timeStr || formatTime()}</span>
                     <strong class="text-body-secondary">You</strong>
                 </div>
                 <div class="ai-message user-message ${khmerClass}">
@@ -440,7 +441,7 @@ function appendMessageUI(text, sender, shouldScroll = true) {
             <div class="ai-message-wrapper">
                 <div class="ai-message-header ${khmerClass}">
                     <strong>Financial Advisor AI</strong>
-                    <span>${formatTime()}</span>
+                    <span>${timeStr || formatTime()}</span>
                 </div>
 
                 <div class="ai-message ${khmerClass}">
@@ -791,8 +792,9 @@ function scrollToBottom() {
    TIME
 ========================= */
 
-function formatTime() {
-    return new Date().toLocaleTimeString(
+function formatTime(isoDate = null) {
+    const d = isoDate ? new Date(isoDate) : new Date();
+    return d.toLocaleTimeString(
         [],
         {
             hour: "2-digit",

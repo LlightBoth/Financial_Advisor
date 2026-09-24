@@ -1,5 +1,5 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %}Financial Advice Analysis{% endblock %}
+{% block title %}{{ _("advisor.analyse_heading") }}{% endblock %}
 
 {% block content %}
 
@@ -284,12 +284,12 @@
         <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
 
             <div class="min-width-0">
-                <div class="text-body-secondary small mb-1">
-                    Financial Planning / Analysis
+                <div class="section-label mb-1">
+                    {{ _("advisor.title") }}
                 </div>
 
                 <h1 class="h3 fw-bold text-body mb-0">
-                    Financial Analysis
+                    {{ _("advisor.analyse_heading") }}
                 </h1>
             </div>
 
@@ -300,11 +300,11 @@
                 <i class="bi bi-arrow-left me-1"></i>
 
                 <span class="d-none d-sm-inline">
-                    Back to Dashboard
+                    {{ _("advisor.back_to_dashboard") }}
                 </span>
 
                 <span class="d-sm-none">
-                    Back
+                    {{ _("common.back") }}
                 </span>
             </a>
 
@@ -333,16 +333,15 @@
                             <div>
 
                                 <div class="section-label mb-2">
-                                    Personal Financial Advisor
+                                    {{ _("advisor.title") }}
                                 </div>
 
                                 <h2 class="fw-bold text-body mb-2">
-                                    Your Financial Analysis
+                                    {{ _("advisor.analyse_heading") }}
                                 </h2>
 
                                 <p class="text-body-secondary mb-0">
-                                    Your financial information has been evaluated
-                                    against the advisor's financial rules.
+                                    {{ _("advisor.hero_desc") }}
                                 </p>
 
                             </div>
@@ -357,7 +356,7 @@
                         <div class="text-lg-end">
 
                             <div class="text-body-secondary small mb-1">
-                                Rules Matched
+                                {{ _("advisor.rules_matched") }}
                             </div>
 
                             <div class="display-5 fw-bold text-primary">
@@ -365,7 +364,7 @@
                             </div>
 
                             <div class="text-body-secondary small">
-                                Personalized recommendations
+                                {{ _("advisor.personalized_recommendations") }}
                             </div>
 
                         </div>
@@ -394,11 +393,11 @@
                         <div>
 
                             <div class="text-body-secondary small text-uppercase fw-semibold">
-                                Monthly Income
+                                {{ _("advisor.analyzed_income") }}
                             </div>
 
                             <div class="text-body-secondary small mt-1">
-                                Income used by the rule engine
+                                {{ _("advisor.income_engine_desc") }}
                             </div>
 
                         </div>
@@ -428,11 +427,11 @@
                         <div>
 
                             <div class="text-body-secondary small text-uppercase fw-semibold">
-                                Monthly Expenses
+                                {{ _("advisor.analyzed_expense") }}
                             </div>
 
                             <div class="text-body-secondary small mt-1">
-                                Expenses used by the rule engine
+                                {{ _("advisor.expense_engine_desc") }}
                             </div>
 
                         </div>
@@ -462,11 +461,11 @@
                         <div>
 
                             <div class="text-body-secondary small text-uppercase fw-semibold">
-                                Monthly Surplus
+                                {{ _("advisor.monthly_surplus") }}
                             </div>
 
                             <div class="text-body-secondary small mt-1">
-                                Income remaining after expenses
+                                {{ _("advisor.surplus_desc") }}
                             </div>
 
                         </div>
@@ -525,23 +524,22 @@
                             <div class="flex-grow-1">
 
                                 <div class="section-label mb-1">
-                                    Strategic Advice
+                                    {{ _("advisor.strategic_advice") }}
                                 </div>
 
                                 <h4 class="fw-bold text-body mb-1">
-                                    Personalized Recommendations
+                                    {{ _("advisor.recommendation_title") }}
                                 </h4>
 
                                 <p class="text-body-secondary small mb-0">
-                                    Each recommendation below was matched against
-                                    your current financial profile.
+                                    {{ _("advisor.recommendation_subtitle") }}
                                 </p>
 
                             </div>
 
                             <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
                                 {{ matched_rules|length }}
-                                {{ 'Rule' if matched_rules|length == 1 else 'Rules' }}
+                                {{ _("advisor.rule") if matched_rules|length == 1 else _("advisor.rules") }}
                             </span>
 
                         </div>
@@ -597,7 +595,7 @@
                                                         </div>
 
                                                         <div class="small text-body-secondary">
-                                                            Financial rule recommendation
+                                                            {{ _("advisor.rule_recommendation_label") }}
                                                         </div>
 
                                                     </div>
@@ -627,7 +625,7 @@
                                                 <div class="d-flex justify-content-between mb-2">
 
                                                     <span class="small text-body-secondary">
-                                                        Confidence
+                                                        {{ _("advisor.confidence") }}
                                                     </span>
 
                                                     <span class="small fw-semibold text-primary">
@@ -656,7 +654,7 @@
                                                         <i class="bi bi-lightbulb text-primary"></i>
 
                                                         <span class="small fw-bold text-primary text-uppercase">
-                                                            Conclusion
+                                                            {{ _("advisor.conclusion") }}
                                                         </span>
 
                                                     </div>
@@ -678,7 +676,7 @@
                                                         <i class="bi bi-list-check text-success"></i>
 
                                                         <span class="small text-body-secondary text-uppercase fw-bold">
-                                                            Recommended Actions
+                                                            {{ _("advisor.recommended_actions") }}
                                                         </span>
 
                                                     </div>
@@ -733,16 +731,15 @@
                                     <div>
 
                                         <div class="fw-semibold text-body mb-1">
-                                            Analysis Summary
+                                            {{ _("advisor.analysis_summary") }}
                                         </div>
 
                                         <div class="small text-body-secondary">
-                                            The advisor evaluated your financial
-                                            information against
-                                            <strong>{{ matched_rules|length }}</strong>
-                                            matching rule{{ '' if matched_rules|length == 1 else 's' }}.
-                                            Recommendations are based on the facts
-                                            available during this analysis.
+                                            {% if current_lang == 'km' %}
+                                                ទីប្រឹក្សាបានវាយតម្លៃព័ត៌មានហិរញ្ញវត្ថុរបស់អ្នកធៀបនឹង <strong>{{ matched_rules|length }}</strong> វិធានត្រូវគ្នា។ អនុសាសន៍ទាំងនេះផ្អែកលើអង្គហេតុដែលមានក្នុងអំឡុងពេលវិភាគ។
+                                            {% else %}
+                                                The advisor evaluated your financial information against <strong>{{ matched_rules|length }}</strong> matching rule{{ '' if matched_rules|length == 1 else 's' }}. Recommendations are based on the facts available during this analysis.
+                                            {% endif %}
                                         </div>
 
                                     </div>
@@ -765,14 +762,12 @@
                                 </div>
 
                                 <h5 class="fw-bold text-body">
-                                    No Matching Recommendations
+                                    {{ _("advisor.no_matching_recommendations") }}
                                 </h5>
 
                                 <p class="text-body-secondary small mb-0 mx-auto"
                                    style="max-width:480px;">
-                                    None of the configured financial rules
-                                    matched the information available for
-                                    this analysis.
+                                    {{ _("advisor.no_matching_rules_desc") }}
                                 </p>
 
                             </div>
@@ -798,15 +793,15 @@
                     <div class="p-4 border-bottom">
 
                         <div class="section-label mb-1">
-                            Cash Flow
+                            {{ _("advisor.cash_flow") }}
                         </div>
 
                         <h5 class="fw-bold text-body mb-1">
-                            Financial Overview
+                            {{ _("advisor.financial_overview") }}
                         </h5>
 
                         <p class="text-body-secondary small mb-0">
-                            Monthly income distribution.
+                            {{ _("advisor.monthly_income_distribution") }}
                         </p>
 
                     </div>
@@ -820,7 +815,7 @@
                         <div class="mt-3 text-center">
 
                             <span class="text-body-secondary small">
-                                Income compared with expenses
+                                {{ _("advisor.income_vs_expense") }}
                             </span>
 
                         </div>
@@ -836,11 +831,11 @@
                     <div class="p-4 border-bottom">
 
                         <div class="section-label mb-1">
-                            Financial Snapshot
+                            {{ _("advisor.financial_snapshot") }}
                         </div>
 
                         <h5 class="fw-bold text-body mb-0">
-                            Calculated Metrics
+                            {{ _("advisor.calculated_metrics_title") }}
                         </h5>
 
                     </div>
@@ -856,7 +851,7 @@
                                 <i class="bi bi-percent text-danger"></i>
 
                                 <span class="small fw-semibold text-body-secondary">
-                                    Expense Rate
+                                    {{ _("advisor.expense_rate") }}
                                 </span>
 
                             </div>
@@ -866,7 +861,7 @@
                             </div>
 
                             <div class="small text-body-secondary">
-                                Portion of income used for expenses
+                                {{ _("advisor.expense_rate_desc") }}
                             </div>
 
                         </div>
@@ -880,7 +875,7 @@
                                 <i class="bi bi-piggy-bank text-success"></i>
 
                                 <span class="small fw-semibold text-body-secondary">
-                                    Remaining Rate
+                                    {{ _("advisor.remaining_rate") }}
                                 </span>
 
                             </div>
@@ -890,7 +885,7 @@
                             </div>
 
                             <div class="small text-body-secondary">
-                                Income remaining after expenses
+                                {{ _("advisor.remaining_rate_desc") }}
                             </div>
 
                         </div>
@@ -904,7 +899,7 @@
                                 <i class="bi bi-cash-stack text-primary"></i>
 
                                 <span class="small fw-semibold text-body-secondary">
-                                    Net Cash Flow
+                                    {{ _("advisor.monthly_net_cash_flow") }}
                                 </span>
 
                             </div>
@@ -921,7 +916,7 @@
                             </div>
 
                             <div class="small text-body-secondary">
-                                Monthly income minus expenses
+                                {{ _("advisor.net_cash_flow_desc") }}
                             </div>
 
                         </div>
@@ -935,7 +930,7 @@
                                 <i class="bi bi-bullseye text-warning"></i>
 
                                 <span class="small fw-semibold text-body-secondary">
-                                    Total Plans
+                                    {{ _("advisor.total_plans") }}
                                 </span>
 
                             </div>
@@ -945,7 +940,7 @@
                             </div>
 
                             <div class="small text-body-secondary">
-                                Combined target amount across plans
+                                {{ _("advisor.total_plans_desc") }}
                             </div>
 
                         </div>
@@ -964,8 +959,7 @@
 
             <i class="bi bi-shield-check me-1"></i>
 
-            Recommendations are generated from the financial
-            information available during this analysis.
+            {{ _("advisor.footer_disclaimer") }}
 
         </div>
 
@@ -987,16 +981,14 @@
                 </div>
 
                 <h4 class="fw-bold text-body mb-2">
-                    No Analysis Available
+                    {{ _("advisor.no_advice_available") }}
                 </h4>
 
                 <p
                     class="text-body-secondary small mb-4 mx-auto"
                     style="max-width:480px;"
                 >
-                    Valid financial information was not supplied or could
-                    not be evaluated. Please return to the advisor and
-                    provide your financial details.
+                    {{ _("advisor.no_analysis_desc") }}
                 </p>
 
                 <a
@@ -1004,7 +996,7 @@
                     class="btn btn-primary rounded-3 px-4"
                 >
                     <i class="bi bi-arrow-left me-1"></i>
-                    Return to Advisor
+                    {{ _("advisor.return_to_dashboard") }}
                 </a>
 
             </div>
@@ -1025,6 +1017,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+    const I18N_ADVISOR = {
+        noData: {{ _("advisor.chart_no_data")|tojson }},
+        noDataHint: {{ _("advisor.chart_no_data_hint")|tojson }},
+        expenses: {{ _("advisor.chart_expenses")|tojson }},
+        remaining: {{ _("advisor.chart_remaining")|tojson }}
+    };
 
     const income = {{ income|default(0)|tojson }};
     const expense = {{ expense|default(0)|tojson }};
@@ -1045,11 +1043,11 @@
                     <i class="bi bi-pie-chart fs-1 mb-3 opacity-50"></i>
 
                     <div class="fw-semibold">
-                        No financial data
+                        ${I18N_ADVISOR.noData}
                     </div>
 
                     <small>
-                        Income and expense data are required.
+                        ${I18N_ADVISOR.noDataHint}
                     </small>
 
                 </div>
@@ -1068,8 +1066,8 @@
                 data: {
 
                     labels: [
-                        "Expenses",
-                        "Remaining"
+                        I18N_ADVISOR.expenses,
+                        I18N_ADVISOR.remaining
                     ],
 
                     datasets: [{
@@ -1115,7 +1113,7 @@
                                     : "#212529",
 
                                 font: {
-                                    family: "Inter, sans-serif",
+                                    family: "'Khmer OS Battambang', Inter, sans-serif",
                                     size: 12
                                 }
                             }
