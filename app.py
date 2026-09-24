@@ -1,10 +1,3 @@
-"""
-Financial Advisor AI - Hugging Face Space App
-Serves:
-1. Interactive Gradio Web Chat UI for browser visitors.
-2. REST API endpoints (/health, /chat, /extract, /explain) for the Financial Advisor Flask app.
-"""
-
 # 1. Hugging Face ZeroGPU MUST be imported first before any other package (especially torch)
 try:
     import spaces
@@ -32,7 +25,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 import torch
-from fastapi import FastAPI, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import gradio as gr
@@ -54,13 +47,48 @@ print("Initializing Financial Advisor AI model for Hugging Face Space...")
 load_model()
 
 
+# 2. Gradio Web Interface (ZeroGPU Decorated)
 @spaces.GPU
-def run_generation(instruction: str, user_input: str, max_new_tokens: int = 256) -> str:
-    """ZeroGPU decorated inference entrypoint."""
-    return generate_response(instruction, user_input, max_new_tokens=max_new_tokens)
+def gradio_chat(user_msg, history):
+    if not user_msg:
+        return ""
+    lang = detect_language(user_msg)
+    if is_safety_violation(user_msg):
+        instr = SAFETY_INSTRUCTION_KM if lang == "km" else SAFETY_INSTRUCTION
+        return generate_response(instr, user_msg, max_new_tokens=120)
+    elif is_educational_query(user_msg):
+        instr = EDUCATION_INSTRUCTION_KM if lang == "km" else EDUCATION_INSTRUCTION
+        return generate_response(instr, user_msg, max_new_tokens=140)
+    else:
+        raw = generate_response(EXTRACTION_INSTRUCTION, user_msg, max_new_tokens=75)
+        slots = normalize_llm_output(raw, user_msg)
+        inc = slots.get("monthly_income")
+        exp = slots.get("monthly_expense")
+        if inc or exp:
+            items = []
+            if inc: items.append(f"Income: ${inc:,.2f}")
+            if exp: items.append(f"Expense: ${exp:,.2f}")
+            return f"Recorded: {', '.join(items)}. Verified by Financial Advisor AI."
+        return "I am your Financial Advisor AI. How can I assist with your budgeting and financial planning?"
 
-# 2. FastAPI Application for REST endpoints
-api_app = FastAPI(title="Financial Advisor AI API")
+
+demo = gr.ChatInterface(
+    fn=gradio_chat,
+    title="💰 Financial Advisor AI (24/7 Cloud)",
+    description="Fine-tuned Qwen2.5-1.5B model serving bilingual personal finance guidance (English & Khmer).",
+    examples=[
+        "My monthly income is $2500 and expense is $1800",
+        "Explain the 50/30/20 budget rule",
+        "តើក្បួន 50/30/20 ជាអ្វី?",
+        "Should I buy Bitcoin?",
+    ],
+    cache_examples=False,
+)
+
+# 3. Mount Custom REST API Endpoints directly onto Gradio's internal FastAPI app
+# This avoids running a second uvicorn server on port 7860 and satisfies ZeroGPU
+api_app = demo.app
+
 api_app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -90,6 +118,7 @@ def health():
 
 
 @api_app.post("/extract")
+@spaces.GPU
 async def extract_endpoint(request: Request):
     data = await request.json()
     text = (data.get("text") or "").strip()
@@ -106,6 +135,7 @@ async def extract_endpoint(request: Request):
 
 
 @api_app.post("/explain")
+@spaces.GPU
 async def explain_endpoint(request: Request):
     data = await request.json()
     lang = data.get("language") or "en"
@@ -158,6 +188,7 @@ async def explain_endpoint(request: Request):
 
 
 @api_app.post("/chat")
+@spaces.GPU
 async def chat_endpoint(request: Request):
     data = await request.json()
     message = (data.get("message") or "").strip()
@@ -246,76 +277,6 @@ async def chat_endpoint(request: Request):
     }
 
 
-# 3. Gradio Web Interface
-@spaces.GPU
-def gradio_chat(user_msg, history):
-    if not user_msg:
-        return ""
-    lang = detect_language(user_msg)
-    if is_safety_violation(user_msg):
-        instr = SAFETY_INSTRUCTION_KM if lang == "km" else SAFETY_INSTRUCTION
-        return generate_response(instr, user_msg, max_new_tokens=120)
-    elif is_educational_query(user_msg):
-        instr = EDUCATION_INSTRUCTION_KM if lang == "km" else EDUCATION_INSTRUCTION
-        return generate_response(instr, user_msg, max_new_tokens=140)
-    else:
-        raw = generate_response(EXTRACTION_INSTRUCTION, user_msg, max_new_tokens=75)
-        slots = normalize_llm_output(raw, user_msg)
-        inc = slots.get("monthly_income")
-        exp = slots.get("monthly_expense")
-        if inc or exp:
-            items = []
-            if inc: items.append(f"Income: ${inc:,.2f}")
-            if exp: items.append(f"Expense: ${exp:,.2f}")
-            return f"Recorded: {', '.join(items)}. Verified by Financial Advisor AI."
-        return "I am your Financial Advisor AI. How can I assist with your budgeting and financial planning?"
-
-
-demo = gr.ChatInterface(
-    fn=gradio_chat,
-    title="💰 Financial Advisor AI (24/7 Cloud)",
-    description="Fine-tuned Qwen2.5-1.5B model serving bilingual personal finance guidance (English & Khmer).",
-    examples=[
-        "My monthly income is $2500 and expense is $1800",
-        "Explain the 50/30/20 budget rule",
-        "តើក្បួន 50/30/20 ជាអ្វី?",
-        "Should I buy Bitcoin?",
-    ],
-    cache_examples=False,
-)
-
-# Mount Gradio onto FastAPI
-app = gr.mount_gradio_app(api_app, demo, path="/")
-
+# Native Gradio Launch (Standard Hugging Face ZeroGPU entrypoint)
 if __name__ == "__main__":
-    import uvicorn
-    import socket
-    import subprocess
-
-    port = int(os.environ.get("PORT", 7860))
-
-    # 1. Terminate any stale zombie process holding port 7860 from previous crash
-    try:
-        out = subprocess.check_output(f"fuser {port}/tcp", shell=True, stderr=subprocess.DEVNULL).decode().strip()
-        for p in out.split():
-            if p and int(p) != os.getpid():
-                print(f"[CLEANUP] Releasing stale process {p} on port {port}...")
-                os.system(f"kill -9 {p}")
-                time.sleep(1)
-    except Exception:
-        pass
-
-    # 2. Wait for socket in TIME_WAIT to release
-    for attempt in range(5):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        try:
-            s.bind(("0.0.0.0", port))
-            s.close()
-            break
-        except OSError:
-            print(f"[WAIT] Port {port} busy or in TIME_WAIT (attempt {attempt+1}/5). Waiting 2s...")
-            s.close()
-            time.sleep(2)
-
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    demo.launch()
