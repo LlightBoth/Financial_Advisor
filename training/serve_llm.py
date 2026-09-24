@@ -261,7 +261,6 @@ def load_model():
 last_generation_metrics = {}
 
 
-@gpu_decorator
 def generate_response(instruction: str, user_input: str, max_new_tokens: int = 256) -> str:
     global last_generation_metrics
     t_tok_start = time.perf_counter()

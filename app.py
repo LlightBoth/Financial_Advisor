@@ -5,6 +5,20 @@ Serves:
 2. REST API endpoints (/health, /chat, /extract, /explain) for the Financial Advisor Flask app.
 """
 
+# 1. Hugging Face ZeroGPU MUST be imported first before any other package (especially torch)
+try:
+    import spaces
+except ImportError:
+    class MockSpaces:
+        @staticmethod
+        def GPU(func=None, **kwargs):
+            if func is not None:
+                return func
+            def decorator(f):
+                return f
+            return decorator
+    spaces = MockSpaces()
+
 import os
 import sys
 import json
@@ -22,20 +36,6 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import gradio as gr
-
-# Hugging Face ZeroGPU support
-try:
-    import spaces
-except ImportError:
-    class MockSpaces:
-        @staticmethod
-        def GPU(func=None, **kwargs):
-            if func is not None:
-                return func
-            def decorator(f):
-                return f
-            return decorator
-    spaces = MockSpaces()
 
 # Import model inference and normalizer functions
 from training.serve_llm import (
@@ -281,6 +281,7 @@ demo = gr.ChatInterface(
         "តើក្បួន 50/30/20 ជាអ្វី?",
         "Should I buy Bitcoin?",
     ],
+    cache_examples=False,
 )
 
 # Mount Gradio onto FastAPI
@@ -289,4 +290,6 @@ app = gr.mount_gradio_app(api_app, demo, path="/")
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 7860))
+    # Give any previous container process a moment to release the port
+    time.sleep(1)
     uvicorn.run(app, host="0.0.0.0", port=port)
