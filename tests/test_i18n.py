@@ -55,7 +55,7 @@ def test_supported_and_default_languages():
 def test_english_translation(app):
     with app.test_request_context():
         # Default is English
-        assert _("app.name") == "Financial Advisor"
+        assert _("app.name") == "Financial Consultant"
         assert _("nav.dashboard") == "Dashboard"
         assert _("nav.income") == "Income"
         assert _("nav.expense") == "Expense"

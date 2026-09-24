@@ -12,6 +12,17 @@ CANONICAL_FIELDS = [
     "marital_status",
 ]
 
+DATA_SOURCE_ANSWER_EN = (
+    "I use financial information that you provide through this application, together with verified financial "
+    "information supplied by the application for your consultation. I do not access your social-media profiles, "
+    "bank accounts, or external transaction systems unless the application explicitly provides such data."
+)
+
+DATA_SOURCE_ANSWER_KM = (
+    "ខ្ញុំប្រើព័ត៌មានហិរញ្ញវត្ថុដែលអ្នកបានផ្តល់តាមរយៈកម្មវិធីនេះ និងព័ត៌មានហិរញ្ញវត្ថុដែលកម្មវិធីបានផ្តល់ជាបរិបទដែលបានផ្ទៀងផ្ទាត់សម្រាប់ការប្រឹក្សារបស់អ្នក។ "
+    "ខ្ញុំមិនចូលប្រើបណ្តាញសង្គម គណនីធនាគារ ឬប្រព័ន្ធប្រតិបត្តិការហិរញ្ញវត្ថុខាងក្រៅរបស់អ្នកទេ លុះត្រាតែកម្មវិធីនេះមានការរួមបញ្ចូល និងផ្តល់ទិន្នន័យនោះជាក់លាក់។"
+)
+
 def clean_numeric(val: Any) -> Optional[float]:
     """
     Normalizes currency / numeric input to float.
@@ -466,6 +477,43 @@ def classify_conversational_intent(message: str, has_profile: bool = False, hist
     casual_pattern = r"^(thanks|thank\s+you|thx|ok|okay|got\s+it|cool|great|awesome|understood|អរគុណ|បាទ|ចាស)[.!?\s]*$"
     if re.search(casual_pattern, msg, re.IGNORECASE):
         return "casual_conversation"
+
+    # 2b. Data Source / Provenance Queries
+    data_source_pattern = (
+        r"\b(where\s+(does|do|did)\s+(the\s+chatbot|you)\s+get\s+(my|the\s+user['’]?s?)\s+(financial\s+)?(information|data|income|profile)"
+        r"|where\s+did\s+you\s+get\s+my\s+income"
+        r"|how\s+do\s+you\s+know\s+my\s+income"
+        r"|what\s+data\s+do\s+you\s+use"
+        r"|do\s+you\s+access\s+my\s+(social\s+media|facebook|instagram|bank\s+account|browsing|external\s+transaction)"
+        r"|access\s+(my\s+)?(social\s+media|bank\s+account)"
+        r"|where\s+does\s+the\s+chatbot\s+get\s+(my|the\s+user['’]?s?)\s+information)\b"
+        r"|តើ\s*chatbot\s*យកព័ត៌មានហិរញ្ញវត្ថុរបស់ខ្ញុំពីណា"
+        r"|តើអ្នកយកទិន្នន័យហិរញ្ញវត្ថុរបស់ខ្ញុំពីណា"
+        r"|តើអ្នកដឹងចំណូលរបស់ខ្ញុំដោយរបៀបណា"
+        r"|តើអ្នកចូលប្រើ\s*(Facebook|facebook|បណ្តាញសង្គម|គណនីធនាគារ)"
+        r"|ចូលប្រើ\s*(Facebook|facebook|បណ្តាញសង្គម|គណនីធនាគារ)"
+    )
+    if re.search(data_source_pattern, msg, re.IGNORECASE):
+        return "data_source_query"
+
+    # 2c. Debt Assumption Queries
+    debt_assumption_pattern = (
+        r"\b((should|do)\s+you\s+assume\s+(i\s+have\s+)?no\s+debt"
+        r"|assume\s+(i\s+am\s+)?debt[- ]free"
+        r"|did\s+not\s+tell\s+you\s+(whether\s+)?(i\s+have\s+)?debt)\b"
+        r"|សន្មត់ថាគ្មានបំណុល|ស្មានថាគ្មានបំណុល"
+    )
+    if re.search(debt_assumption_pattern, msg, re.IGNORECASE):
+        return "debt_assumption_query"
+
+    # 2d. Expert System Override Queries
+    override_pattern = (
+        r"\b(ignore\s+(the\s+)?(expert\s+system|rules|deterministic)"
+        r"|tell\s+me\s+your\s+own\s+(financial\s+)?(assessment|advice|opinion|recommendation))\b"
+        r"|មិនបាច់ខ្វល់ពីប្រព័ន្ធអ្នកជំនាញ|មិនបាច់តាមច្បាប់|ផ្តល់ការវាយតម្លៃផ្ទាល់ខ្លួន"
+    )
+    if re.search(override_pattern, msg, re.IGNORECASE):
+        return "expert_system_override_query"
 
     # 3. Safety Violations (Crypto, speculative, loan underwriting)
     if is_safety_violation(message):
@@ -1021,9 +1069,113 @@ def sanitize_khmer_only_response(
                 f"លំហូរសាច់ប្រាក់សុទ្ធប្រចាំខែរបស់អ្នកមានសញ្ញាវិជ្ជមាន +${surplus_str} ដែលនៅសល់បន្ទាប់ពីការចំណាយចាំបាច់។ "
                 f"អ្នកប្រឹក្សាណែនាំឱ្យបែងចែកប្រាក់សល់នេះដើម្បីបង្កើតមូលនិធិសង្គ្រោះបន្ទាន់ និងសម្រេចគោលដៅហិរញ្ញវត្ថុរបស់អ្នក។"
             )
-            cleaned = cleaned[:exp_km_match.start()] + exp_header + km_clean_exp
+    # Clean up any trailing truncated Unicode characters
+    cleaned = cleaned.replace("\ufffd", "").strip()
+
+    # For intake requests in Khmer: ensure clear, complete guidance asking for income and expenses
+    if re.search(r"(?:ជួយខ្ញុំវាយតម្លៃ|វាយតម្លៃស្ថានភាពហិរញ្ញវត្ថុ)", user_input):
+        return (
+            "ខ្ញុំរីករាយណាស់ក្នុងការជួយអ្នកវាយតម្លៃស្ថានភាពហិរញ្ញវត្ថុ! "
+            "ដើម្បីឱ្យប្រព័ន្ធអ្នកជំនាញអាចវាយតម្លៃបានត្រឹមត្រូវ សូមផ្តល់ព័ត៌មានអំពីប្រាក់ចំណូលប្រចាំខែ "
+            "និងការចំណាយចាំបាច់ប្រចាំខែរបស់អ្នក (ព្រមទាំងស្ថានភាពបំណុល ឬគោលដៅសន្សំ ប្រសិនបើមាន)។"
+        )
+
+    # If it ends abruptly without Khmer or ASCII terminal punctuation:
+    if re.search(r"[\u1780-\u17ff]\s*$", cleaned):
+        last_char = cleaned[-1]
+        if last_char not in ("។", "!", "?", "."):
+            last_punc = max(cleaned.rfind("។"), cleaned.rfind("!"), cleaned.rfind("?"), cleaned.rfind("."))
+            if last_punc > 30:
+                cleaned = cleaned[:last_punc + 1]
 
     return cleaned.strip()
+
+
+def sanitize_provenance_and_boundaries(text: str, user_input: str = "", lang: str = "en") -> str:
+    """
+    Enforces Requirement 2:
+    Guarantees no false data-source claims:
+    Strictly removes affirmative claims that the chatbot uses public social media profiles,
+    bank accounts, external transaction systems, browsing data, or unverified external sources.
+    Preserves valid negative denials (e.g. 'I do not access social media') generated by the LLM.
+    """
+    if not text:
+        return text
+
+    affirmative_patterns = [
+        r"(?:verified\s+public\s+social\s+media|transaction\s+history\s+that\s+you\s+shared\s+openly)",
+        r"\b(?:use|uses|using|access|accessed|accesses|evaluate|evaluates|evaluating|obtain|obtains)\s+(?:your\s+)?(?:public\s+)?(?:social\s+media|facebook|instagram|bank\s+accounts?|browsing\s+data|external\s+transactions?|consumer\s+reporting|credit\s+bureaus?|publicly\s+available\s+financial\s+metrics)\b",
+        r"\b(?:from|via|through)\s+(?:your\s+)?(?:public\s+)?(?:social\s+media|bank\s+accounts?|external\s+transaction\s+history|trusted\s+consumer\s+reporting|consumer\s+reporting\s+agencies|credit\s+bureaus?|accredited\s+institutions?)\b",
+        r"\b(?:based\s+on\s+)?(?:publicly\s+available\s+financial\s+statements?|accredited\s+institutions?)\b",
+        r"(?:បាន|ប្រើ|ចូល)\s*(?:ប្រើ|មើល)?\s*(?:បណ្តាញសង្គម|គណនីធនាគារ|ប្រវត្តិប្រតិបត្តិការខាងក្រៅ)",
+    ]
+    negation_patterns = [
+        r"\b(?:not|don't|do\s+not|doesn't|does\s+not|cannot|can't|never|no|neither|without|unauthorized|do\s+not\s+have\s+access)\b",
+        r"មិន|គ្មាន|អត់|កុំ|មិនអាច|មិនដែល",
+    ]
+
+    sentences = re.split(r"(?<=[.!?\n])\s+", text)
+    cleaned_sentences = []
+    has_false_claim = False
+    for s in sentences:
+        s_strip = s.strip()
+        if not s_strip:
+            continue
+        is_affirmative = any(re.search(p, s_strip, re.IGNORECASE) for p in affirmative_patterns)
+        is_negated = any(re.search(p, s_strip, re.IGNORECASE) for p in negation_patterns)
+        if is_affirmative and not is_negated:
+            has_false_claim = True
+            continue
+        cleaned_sentences.append(s_strip)
+
+    if has_false_claim:
+        cleaned = " ".join(cleaned_sentences).strip()
+        return cleaned or (DATA_SOURCE_ANSWER_KM if lang == "km" else DATA_SOURCE_ANSWER_EN)
+
+    return text
+
+
+def sanitize_expert_system_override(text: str, user_input: str = "", lang: str = "en") -> str:
+    """
+    Enforces Requirement 1:
+    The deterministic expert system is authoritative for calculations, rules, and recommendations.
+    If the user asks to ignore the expert system or give an independent assessment, the response
+    must not claim to provide an independent assessment that ignores system rules.
+    It must uphold the expert system's authority.
+    """
+    if not text:
+        return text
+
+    is_override_q = bool(re.search(
+        r"ignore\s+(the\s+)?(expert\s+system|rules|deterministic)|tell\s+me\s+your\s+own\s+(financial\s+)?(assessment|advice|opinion|recommendation)|មិនបាច់ខ្វល់ពីប្រព័ន្ធអ្នកជំនាញ|មិនបាច់តាមច្បាប់|ផ្តល់ការវាយតម្លៃផ្ទាល់ខ្លួន",
+        user_input,
+        re.IGNORECASE
+    ))
+    if not is_override_q:
+        return text
+
+    claims_independence = bool(re.search(
+        r"\b(?:providing\s+an\s+independent|independent\s+(?:financial\s+)?(?:evaluation|assessment)|do\s+not\s+reflect\s+(?:previous\s+)?system|my\s+own\s+(?:independent\s+)?assessment)\b",
+        text,
+        re.IGNORECASE
+    ))
+
+    if claims_independence or not re.search(r"(?:cannot\s+ignore|cannot\s+override|expert\s+system\s+is\s+authoritative|role\s+is\s+to\s+explain|មិនអាច(?:មិនអើពើ|បដិសេធ))", text, re.IGNORECASE):
+        if lang == "km":
+            return (
+                "ខ្ញុំមិនអាចមិនអើពើ ឬបដិសេធប្រព័ន្ធអ្នកជំនាញប្រឹក្សាហិរញ្ញវត្ថុបានឡើយ។ "
+                "ប្រព័ន្ធអ្នកជំនាញដែលផ្អែកលើច្បាប់កំណត់ គឺជាប្រភពផ្លូវការសម្រាប់ការគណនា និងការវាយតម្លៃ។ "
+                "ក្នុងនាមជា Financial Consultant AI តួនាទីរបស់ខ្ញុំគឺពន្យល់ពីលទ្ធផល និងអនុសាសន៍ដែលបានផ្ទៀងផ្ទាត់ប៉ុណ្ណោះ។"
+            )
+        else:
+            return (
+                "I cannot ignore or override the Financial Consulting Expert System. "
+                "The deterministic expert system is the authoritative source for all financial calculations, rules, and recommendations. "
+                "As Financial Consultant AI, my role is strictly to explain the verified results produced by the expert system, "
+                "and I cannot provide an independent or unverified assessment outside its rules."
+            )
+
+    return text
 
 
 def normalize_and_verify_response(
@@ -1044,6 +1196,7 @@ def normalize_and_verify_response(
     7. Fully Khmer output when user writes in Khmer without English sections.
     8. Explanations match verified ConsultantEngine calculations (accurate surplus, no 'little room for savings').
     9. Precise ratio language (72% expense ratio: expenses consume 72% of income; 80% expense ratio: expenses consume exactly 80% of income).
+    10. Strictly prevents false data-source claims (no social media, bank accounts, or external transactions).
     """
     if not response_text:
         return ""
@@ -1060,6 +1213,12 @@ def normalize_and_verify_response(
 
     # 2. Apply sanitizations in pipeline order
     text = response_text
+
+    # Data-source & provenance safety boundary
+    text = sanitize_provenance_and_boundaries(text, user_input=user_input, lang=active_lang)
+
+    # Expert system authority boundary
+    text = sanitize_expert_system_override(text, user_input=user_input, lang=active_lang)
 
     # Missing expenses guard
     text = sanitize_missing_expenses_response(text, user_input, context_profile, lang=active_lang)
@@ -1080,6 +1239,9 @@ def normalize_and_verify_response(
     if active_lang == "km" or re.search(r"[\u1780-\u17ff]", user_input or text):
         text = sanitize_khmer_terminology(text)
         text = sanitize_khmer_only_response(text, user_input=user_input, lang=active_lang)
+
+    # System identity enforcement
+    text = re.sub(r"\bFinancial\s+Advisor\s+AI\b", "Financial Consultant AI", text)
 
     return text
 

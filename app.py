@@ -74,13 +74,13 @@ def gradio_chat(user_msg, history):
             items = []
             if inc: items.append(f"Income: ${inc:,.2f}")
             if exp: items.append(f"Expense: ${exp:,.2f}")
-            return f"Recorded: {', '.join(items)}. Verified by Financial Advisor AI."
-        return "I am your Financial Advisor AI. How can I assist with your budgeting and financial planning?"
+            return f"Recorded: {', '.join(items)}. Verified by Financial Consultant AI."
+        return "I am your Financial Consultant AI. How can I assist with your budgeting and financial planning?"
 
 
 demo = gr.ChatInterface(
     fn=gradio_chat,
-    title="💰 Financial Advisor AI (24/7 Cloud)",
+    title="💰 Financial Consulting Expert System (24/7 Cloud)",
     description="Fine-tuned Qwen2.5-1.5B model serving bilingual personal finance guidance (English & Khmer).",
     examples=[
         "My monthly income is $2500 and expense is $1800",
@@ -116,7 +116,8 @@ def health():
         vram = 0.0
     return {
         "status": "ok",
-        "service": "Trained Financial Advisor AI",
+        "service": "Financial Consulting Expert System",
+        "system_identity": "Financial Consultant AI",
         "base_model": BASE_MODEL_ID,
         "adapter": "financial_advisor_ai_v4",
         "device": "cuda" if has_cuda else "cpu",
@@ -142,39 +143,60 @@ def extract_endpoint(payload: dict):
 @api_app.post("/explain")
 def explain_endpoint(data: dict):
     lang = data.get("language") or "en"
-    income = data.get("monthly_income", 0.0)
-    expense = data.get("monthly_expense", 0.0)
-    net_cf = data.get("net_cashflow", income - expense)
-    debt_desc = data.get("debt_status") or ("debt" if data.get("debt_present") else "no debt")
-    if data.get("debt_assumed"):
-        debt_desc = "not provided (assumed no debt)" if lang == "en" else "មិនបានបញ្ជាក់ (សន្មត់ថាគ្មានបំណុល)"
+    income = data.get("monthly_income")
+    expense = data.get("monthly_expense")
+    net_cf = data.get("net_cashflow")
+    if net_cf is None and income is not None and expense is not None:
+        net_cf = income - expense
+
+    debt_desc = data.get("debt_status")
+    if not debt_desc:
+        if data.get("debt_present") is True:
+            debt_desc = "debt"
+        elif data.get("debt_present") is False:
+            debt_desc = "no debt"
+        else:
+            debt_desc = "unknown"
+
     advice_str = data.get("advice") or data.get("conclusion") or "Maintain balanced finances."
 
-    sign = "+" if net_cf >= 0 else "-"
+    inc_str = f"${income:,.2f}" if income is not None else "unknown"
+    exp_str = f"${expense:,.2f}" if expense is not None else "unknown"
+    if net_cf is not None:
+        sign = "+" if net_cf >= 0 else "-"
+        net_cf_str = f"{sign}${abs(net_cf):,.2f}"
+    else:
+        net_cf_str = "unknown"
+
     if lang == "km":
+        debt_km = "មានបំណុល" if debt_desc == "debt" else ("គ្មានបំណុល" if debt_desc == "no debt" else "មិនទាន់ដឹង (unknown)")
         profile_str = (
-            f"ទិន្នន័យហិរញ្ញវត្ថុ: ចំណូលប្រចាំខែ: ${income:,.2f}, "
-            f"ចំណាយប្រចាំខែ: ${expense:,.2f}, "
-            f"លំហូរសាច់ប្រាក់សុទ្ធ: {sign}${abs(net_cf):,.2f}, "
-            f"ស្ថានភាពបំណុល: {debt_desc}។ "
+            f"ទិន្នន័យហិរញ្ញវត្ថុដែលបានផ្ទៀងផ្ទាត់: ចំណូលប្រចាំខែ: {inc_str}, "
+            f"ចំណាយប្រចាំខែ: {exp_str}, "
+            f"លំហូរសាច់ប្រាក់សុទ្ធ: {net_cf_str}, "
+            f"ស្ថានភាពបំណុល: {debt_km}។ "
             f"អនុសាសន៍ដែលបានផ្ទៀងផ្ទាត់: {advice_str}"
         )
     else:
         profile_str = (
-            f"Financial Profile: Monthly Income: ${income:,.2f}, "
-            f"Monthly Expense: ${expense:,.2f}, "
-            f"Net Cash Flow: {sign}${abs(net_cf):,.2f}, "
+            f"Verified application financial context: Monthly Income: {inc_str}, "
+            f"Monthly Expense: {exp_str}, "
+            f"Net Cash Flow: {net_cf_str}, "
             f"Debt Status: {debt_desc}. "
             f"Verified Advice: {advice_str}"
         )
 
-    instr = EXPLANATION_INSTRUCTION_KM if lang == "km" else EXPLANATION_INSTRUCTION
+    base_instr = EXPLANATION_INSTRUCTION_KM if lang == "km" else EXPLANATION_INSTRUCTION
+    boundary = DATA_BOUNDARY_INSTRUCTION_KM if lang == "km" else DATA_BOUNDARY_INSTRUCTION
+    authority = EXPERT_SYSTEM_AUTHORITY_INSTRUCTION_KM if lang == "km" else EXPERT_SYSTEM_AUTHORITY_INSTRUCTION
+    instr = f"{base_instr}\n{boundary}\n{authority}"
+
     explanation = run_generation(instr, profile_str, max_new_tokens=85)
     context_prof = {
         "monthly_income": income,
         "monthly_expense": expense,
         "net_cashflow": net_cf,
-        "debt_status": debt_desc,
+        "debt_status": debt_desc if debt_desc != "unknown" else None,
     }
     explanation = normalize_and_verify_response(
         explanation,

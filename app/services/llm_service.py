@@ -95,15 +95,15 @@ class LLMService:
         if net_cf is None and income is not None and expense is not None:
             net_cf = income - expense
 
-        debt_status = facts.get("debt_status") or "no debt"
+        debt_status = facts.get("debt_status")
         debt_assumed = False
         if advisory_caveats:
             debt_assumed = any("debt" in str(c).lower() and "assume" in str(c).lower() for c in advisory_caveats)
 
         payload = {
-            "monthly_income": income or 0.0,
-            "monthly_expense": expense or 0.0,
-            "net_cashflow": net_cf if net_cf is not None else 0.0,
+            "monthly_income": income,
+            "monthly_expense": expense,
+            "net_cashflow": net_cf,
             "debt_status": debt_status,
             "debt_assumed": debt_assumed,
             "advice": advice_text,
