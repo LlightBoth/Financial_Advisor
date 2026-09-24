@@ -1,3 +1,12 @@
+---
+title: Financial Advisor AI
+emoji: 💰
+colorFrom: blue
+colorTo: green
+sdk: gradio
+app_file: app.py
+---
+
 # 💰 Financial Advisor AI
 
 An intelligent financial advisor web application built with Python (Flask), Bootstrap, and fine-tuned Local LLM (Qwen2.5-1.5B with LoRA).

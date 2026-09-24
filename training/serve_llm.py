@@ -30,8 +30,8 @@ if BASE_DIR not in sys.path:
 
 from training.llm_output_normalizer import normalize_llm_output, normalize_and_verify_response
 
-HOST = "127.0.0.1"
-PORT = 5006
+HOST = os.environ.get("HOST", "0.0.0.0")
+PORT = int(os.environ.get("PORT", 5006))
 
 BASE_MODEL_ID = "Qwen/Qwen2.5-1.5B-Instruct"
 # Active Adapter: V4 (Trained Financial Advisor AI v4)
@@ -166,6 +166,15 @@ def load_model():
 last_generation_metrics = {}
 
 
+try:
+    import spaces
+    gpu_decorator = spaces.GPU
+except (ImportError, Exception):
+    def gpu_decorator(fn):
+        return fn
+
+
+@gpu_decorator
 def generate_response(instruction: str, user_input: str, max_new_tokens: int = 256) -> str:
     global last_generation_metrics
     t_tok_start = time.perf_counter()
@@ -271,14 +280,41 @@ class FinancialAdvisorAIRequestHandler(BaseHTTPRequestHandler):
         self._set_headers(200)
 
     def do_GET(self):
-        if self.path == "/health":
+        if self.path in ("/", "/index.html"):
+            self._set_headers(200, content_type="text/html; charset=utf-8")
+            html = """<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Financial Advisor AI Server</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 40px; text-align: center; }
+        .card { background: #1e293b; border-radius: 12px; padding: 30px; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 1px solid #334155; }
+        h1 { color: #38bdf8; margin-top: 0; font-size: 1.6rem; }
+        .status { display: inline-block; background: #065f46; color: #34d399; padding: 6px 14px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; font-size: 0.9rem; }
+        p { color: #94a3b8; line-height: 1.6; font-size: 0.95rem; }
+        code { background: #0f172a; padding: 3px 8px; border-radius: 6px; color: #38bdf8; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="status">● Server Online (24/7)</div>
+        <h1>Financial Advisor AI Service</h1>
+        <p>Inference backend running <code>Qwen2.5-1.5B-Instruct</code> with <code>Financial Advisor AI v4</code> QLoRA adapter.</p>
+        <p>Endpoints: <code>/health</code>, <code>/chat</code>, <code>/extract</code>, <code>/explain</code></p>
+    </div>
+</body>
+</html>"""
+            self.wfile.write(html.encode("utf-8"))
+        elif self.path == "/health":
+            has_cuda = torch.cuda.is_available()
             resp = {
                 "status": "ok",
                 "service": "Trained Financial Advisor AI",
                 "base_model": BASE_MODEL_ID,
                 "adapter": "financial_advisor_ai_v4",
-                "device": "cuda",
-                "vram_allocated_gb": round(torch.cuda.memory_allocated(0) / (1024**3), 2),
+                "device": "cuda" if has_cuda else "cpu",
+                "vram_allocated_gb": round(torch.cuda.memory_allocated(0) / (1024**3), 2) if has_cuda else 0.0,
             }
             self._set_headers(200)
             self.wfile.write(json.dumps(resp).encode("utf-8"))

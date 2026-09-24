@@ -18,3 +18,8 @@ requests
 
 # Google login & oauth
 google-auth
+
+# LLM AI Dependencies for Hugging Face Spaces
+peft>=0.10.0
+accelerate>=0.28.0
+bitsandbytes>=0.43.0

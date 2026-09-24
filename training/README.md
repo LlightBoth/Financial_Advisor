@@ -74,3 +74,67 @@ pip install -r requirements-llm.txt
 # 2. Run QLoRA training
 python training/train_financial_advisor.py
 ```
+
+
+Searched for "cloudflared"
+Searched for "trycloudflare"
+Ran command: `Test-Path "d:\Year3\Finance\Financial_Advisor\.venv_train"`
+
+Here is the complete setup to run `serve_llm.py` on **Google Colab** (with Cloudflare tunnel) as well as **locally on your PC**.
+
+---
+
+### Option A: Running on Google Colab (Step-by-Step)
+
+Copy and run these cells one by one in your Google Colab notebook:
+
+#### Cell 1: Clone Repository and Enter Directory
+```python
+!git clone https://github.com/LlightBoth/Financial_Advisor.git
+%cd /content/Financial_Advisor
+```
+
+#### Cell 2: Install AI Dependencies & Cloudflare Tunnel
+```python
+!pip install -r requirements-llm.txt
+!wget -q -nc https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+!dpkg -i cloudflared-linux-amd64.deb
+```
+
+#### Cell 3: Start Cloudflare Tunnel (to get public URL)
+```python
+import subprocess, time, re
+
+# Launch tunnel on port 5006 in background
+process = subprocess.Popen(
+    ["cloudflared", "tunnel", "--url", "http://127.0.0.1:5006"],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    text=True
+)
+
+# Extract and print tunnel URL
+time.sleep(4)
+for _ in range(25):
+    line = process.stdout.readline()
+    match = re.search(r"https://[a-zA-Z0-9-]+\.trycloudflare\.com", line)
+    if match:
+        print("\n" + "=" * 55)
+        print("🔗 YOUR CLOUDFLARE URL:")
+        print(match.group(0))
+        print("=" * 55 + "\n")
+        break
+```
+
+#### Cell 4: Start the LLM Inference Server
+```python
+!python training/serve_llm.py
+```
+
+> [!IMPORTANT]
+> Copy the generated URL (e.g. `https://xxxx.trycloudflare.com`) and paste it into your local [`.env`](file:///d:/Year3/Finance/Financial_Advisor/.env#L7) file:
+> ```env
+> LLM_SERVER_URL=https://your-generated-url.trycloudflare.com
+> ```
+
+---
