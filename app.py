@@ -23,6 +23,20 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import gradio as gr
 
+# Hugging Face ZeroGPU support
+try:
+    import spaces
+except ImportError:
+    class MockSpaces:
+        @staticmethod
+        def GPU(func=None, **kwargs):
+            if func is not None:
+                return func
+            def decorator(f):
+                return f
+            return decorator
+    spaces = MockSpaces()
+
 # Import model inference and normalizer functions
 from training.serve_llm import (
     load_model, generate_response, is_safety_violation, is_educational_query,
@@ -38,6 +52,12 @@ from training.llm_output_normalizer import (
 # 1. Initialize Model
 print("Initializing Financial Advisor AI model for Hugging Face Space...")
 load_model()
+
+
+@spaces.GPU
+def run_generation(instruction: str, user_input: str, max_new_tokens: int = 256) -> str:
+    """ZeroGPU decorated inference entrypoint."""
+    return generate_response(instruction, user_input, max_new_tokens=max_new_tokens)
 
 # 2. FastAPI Application for REST endpoints
 api_app = FastAPI(title="Financial Advisor AI API")
@@ -222,6 +242,7 @@ async def chat_endpoint(request: Request):
 
 
 # 3. Gradio Web Interface
+@spaces.GPU
 def gradio_chat(user_msg, history):
     if not user_msg:
         return ""
