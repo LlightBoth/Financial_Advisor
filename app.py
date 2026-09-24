@@ -73,7 +73,12 @@ api_app.add_middleware(
 @api_app.get("/health")
 def health():
     has_cuda = torch.cuda.is_available()
-    vram = round(torch.cuda.memory_allocated(0) / (1024**3), 2) if has_cuda else 0.0
+    vram = 0.0
+    try:
+        if has_cuda:
+            vram = round(torch.cuda.memory_allocated(0) / (1024**3), 2)
+    except Exception:
+        vram = 0.0
     return {
         "status": "ok",
         "service": "Trained Financial Advisor AI",

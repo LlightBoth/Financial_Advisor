@@ -93,6 +93,16 @@ GENERAL_GUIDANCE_INSTRUCTION_KM = (
     "អ្នកគឺជាជំនួយការ AI ប្រឹក្សាហិរញ្ញវត្ថុដ៏មានប្រយោជន៍។ សូមផ្តល់ការណែនាំអំពីហិរញ្ញវត្ថុផ្ទាល់ខ្លួនជាភាសាខ្មែរធម្មជាតិ សាមញ្ញ ខ្លី និងមានប្រយោជន៍ខ្ពស់។ ចៀសវាងពាក្យពេចន៍ដែលមិនចាំបាច់។"
 )
 
+# Hugging Face ZeroGPU detection
+try:
+    import spaces
+    gpu_decorator = spaces.GPU
+    HAS_SPACES = True
+except (ImportError, Exception):
+    def gpu_decorator(fn):
+        return fn
+    HAS_SPACES = False
+
 # Global model state
 tokenizer = None
 model = None
@@ -114,9 +124,43 @@ def load_model():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    has_cuda = torch.cuda.is_available()
-    base_model = None
-    if has_cuda:
+    # Hugging Face Spaces runs on Linux containers with SPACE_ID or spaces package
+    is_spaces = (
+        sys.platform != "win32"
+        and (
+            HAS_SPACES
+            or bool(os.environ.get("SPACE_ID"))
+            or bool(os.environ.get("SPACES_ZERO_GPU"))
+        )
+    )
+    model = None
+
+    # Strategy 1: Hugging Face Spaces (ZeroGPU or Space container)
+    # ZeroGPU requires base model & adapter loaded into host RAM first (without device_map="auto")
+    # before .to("cuda") which ZeroGPU intercepts and emulates until inference.
+    if is_spaces:
+        print("[INFO] Hugging Face Spaces environment detected.")
+        try:
+            print("[INFO] Loading base model & adapter into host RAM for ZeroGPU compatibility...")
+            base_model = AutoModelForCausalLM.from_pretrained(
+                BASE_MODEL_ID,
+                torch_dtype=torch.bfloat16,
+                trust_remote_code=True,
+            )
+            model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
+            try:
+                # ZeroGPU intercepts .to("cuda") using its fake-device allocator
+                model = model.to("cuda")
+                print("[READY] Model attached to ZeroGPU (CUDA emulation mode).")
+            except Exception as e_cuda:
+                print(f"[INFO] ZeroGPU CUDA not active or running on CPU tier ({e_cuda}). Keeping on CPU.")
+                model = model.to("cpu")
+        except Exception as e:
+            print(f"[WARN] ZeroGPU model loading failed ({e}). Falling back to standard CPU loader...")
+            model = None
+
+    # Strategy 2: Local GPU with 4-bit quantization or float16 (for local development / Colab)
+    if model is None and torch.cuda.is_available() and not is_spaces:
         try:
             bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
@@ -131,6 +175,8 @@ def load_model():
                 dtype=torch.bfloat16,
                 trust_remote_code=True,
             )
+            model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
+            print("[READY] Loaded with 4-bit CUDA quantization.")
         except Exception as e:
             print(f"[WARN] 4-bit CUDA quantization failed ({e}). Loading in float16 on GPU...")
             try:
@@ -140,38 +186,39 @@ def load_model():
                     torch_dtype=torch.float16,
                     trust_remote_code=True,
                 )
+                model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
+                print("[READY] Loaded with float16 on GPU.")
             except Exception as e2:
                 print(f"[WARN] CUDA load failed ({e2}). Falling back to CPU...")
-                base_model = None
+                model = None
 
-    if base_model is None:
-        print("[INFO] CUDA GPU not detected or unavailable. Loading base model on CPU (float32)...")
+    # Strategy 3: Universal CPU fallback (Guaranteed to work on any container)
+    if model is None:
+        print("[INFO] Loading model on CPU (float32)...")
         base_model = AutoModelForCausalLM.from_pretrained(
             BASE_MODEL_ID,
-            device_map="cpu",
-            dtype=torch.float32,
+            torch_dtype=torch.float32,
             trust_remote_code=True,
         )
+        model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
+        model = model.to("cpu")
+        print("[READY] Loaded model on CPU.")
 
-    model = PeftModel.from_pretrained(base_model, ADAPTER_DIR)
     model.eval()
 
     device = next(model.parameters()).device
-    vram_str = f" VRAM allocated: {torch.cuda.memory_allocated(0) / (1024**3):.2f} GB" if has_cuda else ""
+    vram_str = ""
+    try:
+        if torch.cuda.is_available() and str(device).startswith("cuda"):
+            vram_str = f" VRAM allocated: {torch.cuda.memory_allocated(0) / (1024**3):.2f} GB"
+    except Exception:
+        pass
     print(f"[READY] Model loaded on {device}.{vram_str}")
     print(f"Server starting on http://{HOST}:{PORT}")
     print("=" * 60)
 
 
 last_generation_metrics = {}
-
-
-try:
-    import spaces
-    gpu_decorator = spaces.GPU
-except (ImportError, Exception):
-    def gpu_decorator(fn):
-        return fn
 
 
 @gpu_decorator
@@ -198,8 +245,11 @@ def generate_response(instruction: str, user_input: str, max_new_tokens: int = 2
                 pad_token_id=tokenizer.eos_token_id,
                 eos_token_id=[tokenizer.eos_token_id, 151645, 151643],
             )
-            if torch.cuda.is_available():
-                torch.cuda.synchronize()
+            if torch.cuda.is_available() and str(device).startswith("cuda"):
+                try:
+                    torch.cuda.synchronize()
+                except Exception:
+                    pass
             t_gen_end = time.perf_counter()
 
     total_tokens = int(outputs[0].shape[0])

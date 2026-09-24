@@ -51,6 +51,11 @@ def chat():
 
         # If no valid chat was supplied, create a new one
         if not ai_chat:
+            from flask import session as flask_session
+            flask_session.pop("advisor_profile", None)
+            flask_session.pop("prev_advisor_profile", None)
+            flask_session.modified = True
+
             ai_chat = AIChat(
                 descriptions="Financial Assistant",
                 counts=0
@@ -675,9 +680,18 @@ def delete_chat(chat_id):
             f"{type(e).__name__} - {e}"
         )
 
-        return jsonify({
-            "error": "Unable to delete conversation."
-        }), 500
+@bot_bp.route("/chat/reset", methods=["POST"])
+@login_required
+def reset_chat_session():
+    try:
+        from flask import session as flask_session
+        flask_session.pop("advisor_profile", None)
+        flask_session.pop("prev_advisor_profile", None)
+        flask_session.modified = True
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
     

@@ -514,11 +514,12 @@ def classify_conversational_intent(message: str, has_profile: bool = False, hist
         return "goal_approach_query"
 
     # 6. Specific Suggestion Queries (Buttons on welcome card)
-    # 6a. Financial Overview ("Show my financial overview", "overview", "ទិដ្ឋភាពទូទៅ")
+    # 6a. Financial Overview ("Show my financial overview", "overview", "ទិដ្ឋភាពទូទៅ", "វាយតម្លៃស្ថានភាពហិរញ្ញវត្ថុ")
     overview_pattern = (
         r"(show\s+(my\s+)?financial\s+overview|financial\s+overview|account\s+overview|summary\s+of\s+my\s+finances"
         r"|check\s+.*(income.*expense|expense.*income|finances?|budget|\(income)"
-        r"|^overview$|ទិដ្ឋភាពទូទៅ|សង្ខេបហិរញ្ញវត្ថុ)"
+        r"|assess.*financial|evaluat.*financial"
+        r"|^overview$|ទិដ្ឋភាពទូទៅ|សង្ខេបហិរញ្ញវត្ថុ|វាយតម្លៃ(ស្ថានភាព)?ហិរញ្ញវត្ថុ)"
     )
     if re.search(overview_pattern, msg, re.IGNORECASE):
         return "financial_overview_query"
