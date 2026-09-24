@@ -374,26 +374,20 @@ def calculate_extended_metrics(
     # CRITICAL: Uses ONLY known essential_monthly_expense.
     # Legacy total expense is NEVER used as essential expense.
     # ─────────────────────────────────────────────────────────────
-    if not _is_known(emerg_sav) or not essential_known:
+    if not _is_known(emerg_sav) or not essential_known or e_expense <= 0:
         missing = []
         if not _is_known(emerg_sav):
             missing.append("current_emergency_savings")
         if not essential_known:
             missing.append("essential_monthly_expense")
+        elif e_expense <= 0:
+            missing.append("essential_monthly_expense <= 0")
         results["emergency_fund_months"] = MetricEntry(
             value=None,
             status="UNKNOWN",
-            inputs=[],
+            inputs=["current_emergency_savings", "essential_monthly_expense"] if essential_known and _is_known(emerg_sav) else [],
             formula=f"current_emergency_savings / essential_monthly_expense "
-                    f"({', '.join(missing)} UNKNOWN)",
-        )
-    elif e_expense == 0:
-        results["emergency_fund_months"] = MetricEntry(
-            value=None,
-            status="NOT_APPLICABLE",
-            inputs=["current_emergency_savings", "essential_monthly_expense"],
-            formula="current_emergency_savings / essential_monthly_expense "
-                    "(essential expense is zero)",
+                    f"({', '.join(missing)})",
         )
     else:
         results["emergency_fund_months"] = MetricEntry(
@@ -406,17 +400,18 @@ def calculate_extended_metrics(
     # ─────────────────────────────────────────────────────────────
     # 8. Natural Goal Months
     #
-    # Matches the legacy calculate_metrics() behavior:
-    #   - goal > 0, cashflow > 0: goal / cashflow
-    #   - goal == 0, cashflow > 0: 0.0 (already achieved)
-    #   - cashflow <= 0: NOT_APPLICABLE (cannot fund)
+    # Calculates only when:
+    #   - goal_cost > 0
+    #   - net_monthly_cashflow > 0
+    # If cashflow <= 0: natural_goal_months = UNKNOWN
+    # If goal == 0 and cashflow > 0: 0.0 (already achieved)
     # ─────────────────────────────────────────────────────────────
-    if not _is_known(goal) or not _is_known(net_cashflow):
+    if not _is_known(goal) or not _is_known(net_cashflow) or net_cashflow <= 0:
         results["natural_goal_months"] = MetricEntry(
             value=None,
             status="UNKNOWN",
-            inputs=[],
-            formula="goal_cost / net_monthly_cashflow (inputs UNKNOWN)",
+            inputs=["goal_cost", "net_monthly_cashflow"] if _is_known(goal) and _is_known(net_cashflow) else [],
+            formula="goal_cost / net_monthly_cashflow (cashflow <= 0 or inputs UNKNOWN)",
         )
     elif net_cashflow > 0 and goal > 0:
         results["natural_goal_months"] = MetricEntry(
@@ -431,14 +426,6 @@ def calculate_extended_metrics(
             status="CALCULATED",
             inputs=["goal_cost"],
             formula="goal_cost is zero (already achieved)",
-        )
-    else:
-        # net_cashflow <= 0: cannot fund goal from deficit or break-even
-        results["natural_goal_months"] = MetricEntry(
-            value=None,
-            status="NOT_APPLICABLE",
-            inputs=["goal_cost", "net_monthly_cashflow"],
-            formula="goal_cost / net_monthly_cashflow (cashflow is zero or negative)",
         )
 
     return results

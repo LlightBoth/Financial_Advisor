@@ -190,14 +190,14 @@ def test_extended_explicit_zero_debt_payment():
 # ==============================================================================
 
 def test_extended_negative_cashflow_goal():
-    """net_cashflow<0, goal>0 → natural_goal_months=NOT_APPLICABLE"""
+    """net_cashflow<0, goal>0 → natural_goal_months=UNKNOWN"""
     result = calculate_extended_metrics(
         legacy_monthly_income=1000,
         legacy_monthly_expense=1500,
         goal_cost=5000,
     )
     assert result["natural_goal_months"].value is None
-    assert result["natural_goal_months"].status == "NOT_APPLICABLE"
+    assert result["natural_goal_months"].status == "UNKNOWN"
 
 
 # ==============================================================================

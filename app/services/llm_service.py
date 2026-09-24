@@ -15,6 +15,7 @@ Core Principles:
 5. The AI cannot override ConsultantEngine's recommendation.
 """
 
+import os
 import logging
 import time
 import requests
@@ -22,7 +23,11 @@ from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-LOCAL_LLM_URL = "http://127.0.0.1:5006"
+# Reads LLM server URL from environment, stripping trailing slashes to prevent 404/malformed URLs
+LOCAL_LLM_URL = os.environ.get(
+    "LLM_SERVER_URL",
+    os.environ.get("LOCAL_LLM_URL", "http://127.0.0.1:5006")
+).strip().rstrip("/")
 TIMEOUT_SECONDS = 40
 
 
