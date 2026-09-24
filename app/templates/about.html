@@ -1,600 +1,1006 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About & FAQ — Financial Consultant</title>
-    <meta name="description" content="Learn what Financial Consultant offers, browse frequently asked questions, and meet the team behind the platform.">
+    <meta
+      name="description"
+      content="Learn what Financial Consultant offers, browse frequently asked questions, and meet the team behind the platform."
+    />
 
     <!-- Bootstrap 5 & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
 
     <!-- Shared Landing Design Tokens + About Page Styles -->
-    <link href="{{ url_for('static', filename='css/landing.css') }}?v=4.4" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/about.css') }}?v=1.0" rel="stylesheet">
+    <link
+      href="{{ url_for('static', filename='css/landing.css') }}?v=4.4"
+      rel="stylesheet"
+    />
+    <link
+      href="{{ url_for('static', filename='css/about.css') }}?v=1.0"
+      rel="stylesheet"
+    />
 
     <!-- Early Theme Initialization to Prevent Flash -->
     <script>
-        (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
-        })();
+      (function () {
+        const savedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-bs-theme", savedTheme);
+      })();
     </script>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- Animated Tech Background (grid + colorful looping orbs + floating icons) -->
     <div class="tech-bg-layer" aria-hidden="true">
-        <div class="tech-grid"></div>
-        <div class="tech-orb tech-orb-1"></div>
-        <div class="tech-orb tech-orb-2"></div>
-        <div class="tech-orb tech-orb-3"></div>
+      <div class="tech-grid"></div>
+      <div class="tech-orb tech-orb-1"></div>
+      <div class="tech-orb tech-orb-2"></div>
+      <div class="tech-orb tech-orb-3"></div>
 
-        <i class="bi bi-cpu-fill tech-particle c-blue" style="top: 18%; left: 8%;"></i>
-        <i class="bi bi-shield-lock-fill tech-particle c-green" style="top: 65%; left: 5%; animation-delay: -3s;"></i>
-        <i class="bi bi-graph-up-arrow tech-particle c-purple" style="top: 30%; right: 10%; animation-delay: -6s;"></i>
-        <i class="bi bi-diagram-3-fill tech-particle c-amber" style="top: 75%; right: 7%; animation-delay: -9s;"></i>
-        <i class="bi bi-currency-dollar tech-particle c-blue" style="top: 45%; left: 45%; animation-delay: -12s;"></i>
-        <i class="bi bi-robot tech-particle c-purple" style="top: 12%; right: 35%; animation-delay: -4s;"></i>
+      <i
+        class="bi bi-cpu-fill tech-particle c-blue"
+        style="top: 18%; left: 8%"
+      ></i>
+      <i
+        class="bi bi-shield-lock-fill tech-particle c-green"
+        style="top: 65%; left: 5%; animation-delay: -3s"
+      ></i>
+      <i
+        class="bi bi-graph-up-arrow tech-particle c-purple"
+        style="top: 30%; right: 10%; animation-delay: -6s"
+      ></i>
+      <i
+        class="bi bi-diagram-3-fill tech-particle c-amber"
+        style="top: 75%; right: 7%; animation-delay: -9s"
+      ></i>
+      <i
+        class="bi bi-currency-dollar tech-particle c-blue"
+        style="top: 45%; left: 45%; animation-delay: -12s"
+      ></i>
+      <i
+        class="bi bi-robot tech-particle c-purple"
+        style="top: 12%; right: 35%; animation-delay: -4s"
+      ></i>
     </div>
 
     <!-- Navigation Header -->
     <nav class="landing-navbar">
-        <a href="{{ url_for('home') }}" class="brand-container">
-            <div class="brand-icon">
-                <i class="bi bi-wallet2"></i>
-            </div>
-            <div class="brand-title">Financial <span>Consultant</span></div>
+      <a href="{{ url_for('home') }}" class="brand-container">
+        <div class="brand-icon">
+          <i class="bi bi-wallet2"></i>
+        </div>
+        <div class="brand-title">Financial <span>Consultant</span></div>
+      </a>
+
+      <div class="nav-menu-links d-none d-lg-flex">
+        <a href="{{ url_for('home') }}#overview" class="nav-menu-link"
+          >Overview</a
+        >
+        <a href="{{ url_for('home') }}#features" class="nav-menu-link"
+          >Features</a
+        >
+        <a href="{{ url_for('home') }}#advisory" class="nav-menu-link"
+          >Advisory</a
+        >
+        <a href="{{ url_for('home') }}#security" class="nav-menu-link"
+          >Security</a
+        >
+        <a href="{{ url_for('about') }}" class="nav-menu-link active"
+          >About & FAQ</a
+        >
+      </div>
+
+      <div class="nav-actions">
+        <button
+          type="button"
+          class="theme-toggle-btn"
+          id="landingThemeToggle"
+          aria-label="Toggle Dark/Light Mode"
+          title="Toggle Dark/Light Mode"
+        >
+          <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
+        </button>
+
+        {% if current_user.is_authenticated %}
+        <a
+          href="{{ url_for('dashboards.userIndex') }}"
+          class="btn-nav-cta d-none d-sm-inline-flex"
+        >
+          <i class="bi bi-grid-1x2-fill"></i> Workspace
         </a>
+        {% else %}
+        <a
+          href="{{ url_for('auth.register') }}"
+          class="btn-nav-ghost d-none d-sm-inline-flex"
+          >Sign Up</a
+        >
+        <a href="{{ url_for('auth.login') }}" class="btn-nav-cta">
+          Get Started <i class="bi bi-arrow-right"></i>
+        </a>
+        {% endif %}
 
-        <div class="nav-menu-links d-none d-lg-flex">
-            <a href="{{ url_for('home') }}" class="nav-menu-link">Home</a>
-            <a href="#purpose" class="nav-menu-link">Purpose</a>
-            <a href="#benefits" class="nav-menu-link">Benefits</a>
-            <a href="#faq" class="nav-menu-link">FAQ</a>
-            <a href="#team" class="nav-menu-link">Team</a>
-        </div>
-
-        <div class="nav-actions">
-            <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="Toggle Dark/Light Mode" title="Toggle Dark/Light Mode">
-                <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
-            </button>
-
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboards.userIndex') }}" class="btn-nav-cta d-none d-sm-inline-flex">
-                    <i class="bi bi-grid-1x2-fill"></i> Workspace
-                </a>
-            {% else %}
-                <a href="{{ url_for('auth.register') }}" class="btn-nav-ghost d-none d-sm-inline-flex">Sign Up</a>
-                <a href="{{ url_for('auth.login') }}" class="btn-nav-cta">
-                    Get Started <i class="bi bi-arrow-right"></i>
-                </a>
-            {% endif %}
-
-            <button type="button" class="mobile-menu-btn d-lg-none" id="mobileMenuToggle" aria-label="Open Navigation Menu">
-                <i class="bi bi-list" id="mobileMenuIcon"></i>
-            </button>
-        </div>
+        <button
+          type="button"
+          class="mobile-menu-btn d-lg-none"
+          id="mobileMenuToggle"
+          aria-label="Open Navigation Menu"
+        >
+          <i class="bi bi-list" id="mobileMenuIcon"></i>
+        </button>
+      </div>
     </nav>
 
     <!-- Mobile Off-Canvas / Drawer Menu -->
     <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
-        <div class="mobile-drawer-header">
-            <a href="{{ url_for('home') }}" class="brand-container">
-                <div class="brand-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
-                <div class="brand-title">Financial <span>Consultant</span></div>
-            </a>
-            <button type="button" class="drawer-close-btn" id="mobileDrawerClose" aria-label="Close Menu">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
+      <div class="mobile-drawer-header">
+        <a href="{{ url_for('home') }}" class="brand-container">
+          <div class="brand-icon">
+            <i class="bi bi-wallet2"></i>
+          </div>
+          <div class="brand-title">Financial <span>Consultant</span></div>
+        </a>
+        <button
+          type="button"
+          class="drawer-close-btn"
+          id="mobileDrawerClose"
+          aria-label="Close Menu"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
 
-        <div class="mobile-drawer-links">
-            <a href="{{ url_for('home') }}" class="mobile-drawer-link">
-                <i class="bi bi-house-door-fill text-primary"></i> Home
-            </a>
-            <a href="#purpose" class="mobile-drawer-link">
-                <i class="bi bi-bullseye text-info"></i> Our Purpose
-            </a>
-            <a href="#benefits" class="mobile-drawer-link">
-                <i class="bi bi-stars text-warning"></i> Key Benefits
-            </a>
-            <a href="#faq" class="mobile-drawer-link">
-                <i class="bi bi-patch-question-fill text-success"></i> FAQ
-            </a>
-            <a href="#team" class="mobile-drawer-link">
-                <i class="bi bi-people-fill text-primary"></i> Meet the Team
-            </a>
-        </div>
+      <div class="mobile-drawer-links">
+        <a href="{{ url_for('home') }}#overview" class="mobile-drawer-link">
+          <i class="bi bi-house-door-fill text-primary"></i> Overview
+        </a>
+        <a href="{{ url_for('home') }}#features" class="mobile-drawer-link">
+          <i class="bi bi-stars text-warning"></i> Features
+        </a>
+        <a href="{{ url_for('home') }}#advisory" class="mobile-drawer-link">
+          <i class="bi bi-graph-up-arrow text-info"></i> Advisory
+        </a>
+        <a href="{{ url_for('home') }}#security" class="mobile-drawer-link">
+          <i class="bi bi-shield-lock-fill text-success"></i> Security
+        </a>
+        <a href="{{ url_for('about') }}" class="mobile-drawer-link">
+          <i class="bi bi-info-circle-fill text-primary"></i> About & FAQ
+        </a>
+      </div>
 
-        <div class="mobile-drawer-footer">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboards.userIndex') }}" class="btn-hero-primary w-100 justify-content-center">
-                    <i class="bi bi-grid-1x2-fill"></i> Open Dashboard
-                </a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary w-100 justify-content-center">
-                    <i class="bi bi-box-arrow-in-right"></i> Sign In
-                </a>
-                <a href="{{ url_for('auth.register') }}" class="btn-hero-primary w-100 justify-content-center">
-                    Get Started Free <i class="bi bi-arrow-right"></i>
-                </a>
-            {% endif %}
-        </div>
+      <div class="mobile-drawer-footer">
+        {% if current_user.is_authenticated %}
+        <a
+          href="{{ url_for('dashboards.userIndex') }}"
+          class="btn-hero-primary w-100 justify-content-center"
+        >
+          <i class="bi bi-grid-1x2-fill"></i> Open Dashboard
+        </a>
+        {% else %}
+        <a
+          href="{{ url_for('auth.login') }}"
+          class="btn-hero-secondary w-100 justify-content-center"
+        >
+          <i class="bi bi-box-arrow-in-right"></i> Sign In
+        </a>
+        <a
+          href="{{ url_for('auth.register') }}"
+          class="btn-hero-primary w-100 justify-content-center"
+        >
+          Get Started Free <i class="bi bi-arrow-right"></i>
+        </a>
+        {% endif %}
+      </div>
     </div>
     <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
 
     <!-- Hero -->
     <header class="about-hero">
-        <div class="hero-pill">
-            <i class="bi bi-info-circle-fill"></i> About This Platform
-        </div>
-        <h1 class="about-hero-title">Why Financial Consultant Exists</h1>
-        <p class="about-hero-subtitle">
-            To help users improve financial stability and make better decisions for their future finances —
-            by tracking spending habits, delivering financial insights, and guiding every budgeting, savings,
-            and debt-management decision along the way.
-        </p>
+      <div class="hero-pill">
+        <i class="bi bi-info-circle-fill"></i> About This Platform
+      </div>
+      <h1 class="about-hero-title">Why Financial Consultant Exists</h1>
+      <p class="about-hero-subtitle">
+        To help users improve financial stability and make better decisions for
+        their future finances — by tracking spending habits, delivering
+        financial insights, and guiding every budgeting, savings, and
+        debt-management decision along the way.
+      </p>
     </header>
 
     <!-- Purpose Section -->
     <section class="about-section" id="purpose">
-        <div class="section-header">
-            <div class="section-tag">What We Offer</div>
-            <h2 class="section-title reveal-item">Purpose Behind Every Feature</h2>
-            <p class="section-subtitle reveal-item">Every tool in this platform was designed around one goal: helping you make smarter, more confident decisions with your money.</p>
-        </div>
+      <div class="section-header">
+        <div class="section-tag">What We Offer</div>
+        <h2 class="section-title reveal-item">Purpose Behind Every Feature</h2>
+        <p class="section-subtitle reveal-item">
+          Every tool in this platform was designed around one goal: helping you
+          make smarter, more confident decisions with your money.
+        </p>
+      </div>
 
-        <div class="purpose-grid">
-            <div class="purpose-item reveal-item">
-                <div class="purpose-check"><i class="bi bi-wallet2"></i></div>
-                <div class="purpose-text">
-                    <strong>Manage Spending Habits</strong>
-                    Helps clients understand and manage day-to-day spending habits with clear, organized tracking.
-                </div>
-            </div>
-            <div class="purpose-item reveal-item">
-                <div class="purpose-check"><i class="bi bi-lightbulb-fill"></i></div>
-                <div class="purpose-text">
-                    <strong>Financial Insights & Guidance</strong>
-                    Provides financial insights and guidance drawn directly from your own income and expense data.
-                </div>
-            </div>
-            <div class="purpose-item reveal-item">
-                <div class="purpose-check"><i class="bi bi-kanban-fill"></i></div>
-                <div class="purpose-text">
-                    <strong>Financial Plan Management</strong>
-                    Assists in creating and managing financial plans so goals stay organized and on track.
-                </div>
-            </div>
-            <div class="purpose-item reveal-item">
-                <div class="purpose-check"><i class="bi bi-bullseye"></i></div>
-                <div class="purpose-text">
-                    <strong>Short & Long-Term Goals</strong>
-                    Helps set short-term and long-term financial goals, from a monthly budget to a future milestone.
-                </div>
-            </div>
-            <div class="purpose-item reveal-item">
-                <div class="purpose-check"><i class="bi bi-pie-chart-fill"></i></div>
-                <div class="purpose-text">
-                    <strong>Income, Expense & Savings Analysis</strong>
-                    Analyzes income, expenses, and savings together to enhance overall financial stability.
-                </div>
-            </div>
-            <div class="purpose-item reveal-item">
-                <div class="purpose-check"><i class="bi bi-shield-check"></i></div>
-                <div class="purpose-text">
-                    <strong>Tailored Budgeting & Debt Plans</strong>
-                    Provides tailored plans for budgeting, savings, and debt management, built around your own numbers.
-                </div>
-            </div>
+      <div class="purpose-grid">
+        <div class="purpose-item reveal-item">
+          <div class="purpose-check"><i class="bi bi-wallet2"></i></div>
+          <div class="purpose-text">
+            <strong>Manage Spending Habits</strong>
+            Helps clients understand and manage day-to-day spending habits with
+            clear, organized tracking.
+          </div>
         </div>
+        <div class="purpose-item reveal-item">
+          <div class="purpose-check"><i class="bi bi-lightbulb-fill"></i></div>
+          <div class="purpose-text">
+            <strong>Financial Insights & Guidance</strong>
+            Provides financial insights and guidance drawn directly from your
+            own income and expense data.
+          </div>
+        </div>
+        <div class="purpose-item reveal-item">
+          <div class="purpose-check"><i class="bi bi-kanban-fill"></i></div>
+          <div class="purpose-text">
+            <strong>Financial Plan Management</strong>
+            Assists in creating and managing financial plans so goals stay
+            organized and on track.
+          </div>
+        </div>
+        <div class="purpose-item reveal-item">
+          <div class="purpose-check"><i class="bi bi-bullseye"></i></div>
+          <div class="purpose-text">
+            <strong>Short & Long-Term Goals</strong>
+            Helps set short-term and long-term financial goals, from a monthly
+            budget to a future milestone.
+          </div>
+        </div>
+        <div class="purpose-item reveal-item">
+          <div class="purpose-check"><i class="bi bi-pie-chart-fill"></i></div>
+          <div class="purpose-text">
+            <strong>Income, Expense & Savings Analysis</strong>
+            Analyzes income, expenses, and savings together to enhance overall
+            financial stability.
+          </div>
+        </div>
+        <div class="purpose-item reveal-item">
+          <div class="purpose-check"><i class="bi bi-shield-check"></i></div>
+          <div class="purpose-text">
+            <strong>Tailored Budgeting & Debt Plans</strong>
+            Provides tailored plans for budgeting, savings, and debt management,
+            built around your own numbers.
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Benefits Section -->
     <section class="about-section" id="benefits">
-        <div class="section-header">
-            <div class="section-tag">Key Highlights</div>
-            <h2 class="section-title reveal-item">What You Gain After Using It</h2>
-            <p class="section-subtitle reveal-item">Financial Consultant was built to strengthen financial stability through daily use — here is the benefit you actually feel.</p>
+      <div class="section-header">
+        <div class="section-tag">Key Highlights</div>
+        <h2 class="section-title reveal-item">What You Gain After Using It</h2>
+        <p class="section-subtitle reveal-item">
+          Financial Consultant was built to strengthen financial stability through
+          daily use — here is the benefit you actually feel.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-box benefit-card reveal-item">
+          <div class="feature-icon-wrap blue">
+            <i class="bi bi-robot"></i>
+          </div>
+          <h3 class="feature-title">AI Financial Advice</h3>
+          <p class="feature-desc">
+            Smart expense analysis and intelligent savings recommendations
+            generated from your real financial data.
+          </p>
         </div>
 
-        <div class="features-grid">
-            <div class="feature-box benefit-card reveal-item">
-                <div class="feature-icon-wrap blue">
-                    <i class="bi bi-robot"></i>
-                </div>
-                <h3 class="feature-title">AI Financial Advice</h3>
-                <p class="feature-desc">Smart expense analysis and intelligent savings recommendations generated from your real financial data.</p>
-            </div>
-
-            <div class="feature-box benefit-card reveal-item">
-                <div class="feature-icon-wrap green">
-                    <i class="bi bi-cash-stack"></i>
-                </div>
-                <h3 class="feature-title">Better Money Management</h3>
-                <p class="feature-desc">Clear cash flow tracking and goal setting keep every income source and expense fully accounted for.</p>
-            </div>
-
-            <div class="feature-box benefit-card reveal-item">
-                <div class="feature-icon-wrap purple">
-                    <i class="bi bi-mortarboard-fill"></i>
-                </div>
-                <h3 class="feature-title">Stronger Financial Literacy</h3>
-                <p class="feature-desc">Enhances your financial knowledge and budgeting decision-making skills with every recommendation.</p>
-            </div>
-
-            <div class="feature-box benefit-card reveal-item">
-                <div class="feature-icon-wrap amber">
-                    <i class="bi bi-emoji-smile-fill"></i>
-                </div>
-                <h3 class="feature-title">Less Financial Stress</h3>
-                <p class="feature-desc">Minimizes the cognitive load of expense planning, so you can focus less on stress and more on your goals.</p>
-            </div>
+        <div class="feature-box benefit-card reveal-item">
+          <div class="feature-icon-wrap green">
+            <i class="bi bi-cash-stack"></i>
+          </div>
+          <h3 class="feature-title">Better Money Management</h3>
+          <p class="feature-desc">
+            Clear cash flow tracking and goal setting keep every income source
+            and expense fully accounted for.
+          </p>
         </div>
+
+        <div class="feature-box benefit-card reveal-item">
+          <div class="feature-icon-wrap purple">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <h3 class="feature-title">Stronger Financial Literacy</h3>
+          <p class="feature-desc">
+            Enhances your financial knowledge and budgeting decision-making
+            skills with every recommendation.
+          </p>
+        </div>
+
+        <div class="feature-box benefit-card reveal-item">
+          <div class="feature-icon-wrap amber">
+            <i class="bi bi-emoji-smile-fill"></i>
+          </div>
+          <h3 class="feature-title">Less Financial Stress</h3>
+          <p class="feature-desc">
+            Minimizes the cognitive load of expense planning, so you can focus
+            less on stress and more on your goals.
+          </p>
+        </div>
+      </div>
     </section>
 
     <!-- FAQ Section -->
     <section class="about-section" id="faq">
-        <div class="section-header">
-            <div class="section-tag">Got Questions?</div>
-            <h2 class="section-title reveal-item">Frequently Asked Questions</h2>
-            <p class="section-subtitle reveal-item">Everything you need to know before you get started.</p>
+      <div class="section-header">
+        <div class="section-tag">Got Questions?</div>
+        <h2 class="section-title reveal-item">Frequently Asked Questions</h2>
+        <p class="section-subtitle reveal-item">
+          Everything you need to know before you get started.
+        </p>
+      </div>
+
+      <div
+        class="accordion faq-accordion reveal-item"
+        id="faqAccordion"
+        style="max-width: 860px; margin: 0 auto"
+      >
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button
+              class="accordion-button"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#faq1"
+              aria-expanded="true"
+              aria-controls="faq1"
+            >
+              <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span>
+              What exactly is Financial Consultant?
+            </button>
+          </h3>
+          <div
+            id="faq1"
+            class="accordion-collapse collapse show"
+            data-bs-parent="#faqAccordion"
+          >
+            <div class="accordion-body">
+              Financial Consultant is an intelligent financial advisory web
+              application built with Python Flask. It analyzes your income,
+              expenses, and savings to help you build stronger financial
+              stability, set realistic goals, and receive tailored, rule-based
+              recommendations for budgeting, saving, and debt management.
+            </div>
+          </div>
         </div>
 
-        <div class="accordion faq-accordion reveal-item" id="faqAccordion" style="max-width: 860px; margin: 0 auto;">
-
-            <div class="accordion-item">
-                <h3 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
-                        <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span> What exactly is Financial Consultant?
-                    </button>
-                </h3>
-                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Financial Consultant is an intelligent financial advisory web application built with Python Flask. It analyzes your income, expenses, and savings to help you build stronger financial stability, set realistic goals, and receive tailored, rule-based recommendations for budgeting, saving, and debt management.
-                    </div>
-                </div>
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#faq2"
+              aria-expanded="false"
+              aria-controls="faq2"
+            >
+              <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span>
+              How does the AI/expert-system advisory engine work?
+            </button>
+          </h3>
+          <div
+            id="faq2"
+            class="accordion-collapse collapse"
+            data-bs-parent="#faqAccordion"
+          >
+            <div class="accordion-body">
+              The platform evaluates the income, expense ratios, and savings
+              habits you record against a set of financial rules and facts. It
+              then generates personalized advice and next-step suggestions —
+              from adjusting a budget category to accelerating a savings goal —
+              automatically, without you needing any financial expertise.
             </div>
-
-            <div class="accordion-item">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
-                        <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span> How does the AI/expert-system advisory engine work?
-                    </button>
-                </h3>
-                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        The platform evaluates the income, expense ratios, and savings habits you record against a set of financial rules and facts. It then generates personalized advice and next-step suggestions — from adjusting a budget category to accelerating a savings goal — automatically, without you needing any financial expertise.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
-                        <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span> Is my financial data safe and private?
-                    </button>
-                </h3>
-                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Yes. Your session is protected with cryptographic session security, password hashing, and role-based access control, so only you can view and manage your own financial records.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
-                        <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span> Can I track multiple income sources and expenses?
-                    </button>
-                </h3>
-                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        Yes. You can log multiple income and expense entries, categorize them, and let the system analyze your combined cash flow to enhance your overall financial stability.
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5" aria-expanded="false" aria-controls="faq5">
-                        <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span> How do I set and track a savings goal?
-                    </button>
-                </h3>
-                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">
-                        After creating your account, open your workspace and create a financial plan with a short-term or long-term goal. The system tracks your progress automatically as you log income and expenses.
-                    </div>
-                </div>
-            </div>
-
+          </div>
         </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#faq3"
+              aria-expanded="false"
+              aria-controls="faq3"
+            >
+              <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span>
+              Is my financial data safe and private?
+            </button>
+          </h3>
+          <div
+            id="faq3"
+            class="accordion-collapse collapse"
+            data-bs-parent="#faqAccordion"
+          >
+            <div class="accordion-body">
+              Yes. Your session is protected with cryptographic session
+              security, password hashing, and role-based access control, so only
+              you can view and manage your own financial records.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#faq4"
+              aria-expanded="false"
+              aria-controls="faq4"
+            >
+              <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span>
+              Can I track multiple income sources and expenses?
+            </button>
+          </h3>
+          <div
+            id="faq4"
+            class="accordion-collapse collapse"
+            data-bs-parent="#faqAccordion"
+          >
+            <div class="accordion-body">
+              Yes. You can log multiple income and expense entries, categorize
+              them, and let the system analyze your combined cash flow to
+              enhance your overall financial stability.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#faq5"
+              aria-expanded="false"
+              aria-controls="faq5"
+            >
+              <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span>
+              How do I set and track a savings goal?
+            </button>
+          </h3>
+          <div
+            id="faq5"
+            class="accordion-collapse collapse"
+            data-bs-parent="#faqAccordion"
+          >
+            <div class="accordion-body">
+              After creating your account, open your workspace and create a
+              financial plan with a short-term or long-term goal. The system
+              tracks your progress automatically as you log income and expenses.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#faq6"
+              aria-expanded="false"
+              aria-controls="faq6"
+            >
+              <span class="faq-toggle-icon"><i class="bi bi-plus-lg"></i></span>
+              Who do I contact if I need help?
+            </button>
+          </h3>
+          <div
+            id="faq6"
+            class="accordion-collapse collapse"
+            data-bs-parent="#faqAccordion"
+          >
+            <div class="accordion-body">
+              Reach out any time at
+              <a href="mailto:support@financialconsultant.ai"
+                >support@financialconsultant.ai</a
+              >, or contact any team member directly using the links in the
+              <a href="#team">Meet the Team</a> section below.
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Team Section -->
     <section class="about-section" id="team">
-        <div class="section-header">
-            <div class="section-tag">Built By</div>
-            <h2 class="section-title reveal-item">Meet the Team</h2>
-            <p class="section-subtitle reveal-item">The people behind Financial Consultant — supervised, designed, and developed as an Expert System project.</p>
+      <div class="section-header">
+        <div class="section-tag">Lead Project By</div>
+        <h2 class="section-title reveal-item">Lecturer</h2>
+        <p class="section-subtitle reveal-item">
+          The people behind Financial Consultant — supervised, designed, and
+          developed as an Expert System project.
+        </p>
+      </div>
+
+      <!-- Lecturer / Supervisor -->
+      <div class="team-lead-card reveal-item">
+        <div class="avatar-ring">
+          <span class="avatar-badge"
+            ><i class="bi bi-currency-dollar"></i
+          ></span>
+          <div class="avatar-ring-inner">
+            <img
+              src="{{ url_for('static', filename='images/team/lecturer-sek-socheat.png') }}"
+              alt="Dr. Sek Socheat"
+            />
+          </div>
+        </div>
+        <span class="team-role-pill lead"
+          ><i class="bi bi-mortarboard-fill"></i> Project Supervisor /
+          Lecturer</span
+        >
+        <div class="team-name">Dr. Sek Socheat</div>
+        <div class="team-social-row">
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=socheat.sek@gmail.com"
+            class="team-social-btn"
+            aria-label="Email"
+            title="Email"
+            ><i class="bi bi-envelope-fill"></i
+          ></a>
+          <a
+            href="https://kh.linkedin.com/in/socheat-sek-00077970"
+            class="team-social-btn"
+            aria-label="LinkedIn"
+            title="LinkedIn"
+            ><i class="bi bi-linkedin"></i
+          ></a>
+          <a
+            href="https://web.facebook.com/MrSekSocheat/?_rdc=1&_rdr"
+            class="team-social-btn"
+            aria-label="Facebook"
+            title="Facebook"
+            ><i class="bi bi-facebook"></i
+          ></a>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-tag">Built By</div>
+        <h2 class="section-title reveal-item">Team Members</h2>
+        <p class="section-subtitle reveal-item">
+          The people behind Financial Consultant — coding, designed, and developed
+          as an Expert System project.
+        </p>
+      </div>
+
+      <!-- Members -->
+      <div class="team-grid">
+        <div class="team-card reveal-item">
+          <div class="avatar-ring">
+            <div class="avatar-ring-inner">
+              <img
+                src="{{ url_for('static', filename='images/team/both.jpg') }}"
+                alt="Mr. Kong Virakboth"
+              />
+            </div>
+          </div>
+          <span class="team-role-pill"
+            ><i class="bi bi-code-slash"></i> Team Member</span
+          >
+          <div class="team-name">Mr. Kong Virakboth</div>
+          <div class="team-social-row">
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=k.virakboth639@gmail.com"
+              class="team-social-btn"
+              aria-label="Email"
+              title="Email"
+              ><i class="bi bi-envelope-fill"></i
+            ></a>
+            <a
+              href="#"
+              class="team-social-btn"
+              aria-label="LinkedIn"
+              title="LinkedIn"
+              ><i class="bi bi-linkedin"></i
+            ></a>
+            <a
+              href="https://github.com/LlightBoth"
+              class="team-social-btn"
+              aria-label="GitHub"
+              title="GitHub"
+              ><i class="bi bi-github"></i
+            ></a>
+          </div>
         </div>
 
-        <!-- Lecturer / Supervisor -->
-        <div class="team-lead-card reveal-item">
-            <div class="avatar-ring">
-                <div class="avatar-ring-inner">
-                    <img src="{{ url_for('static', filename='images/team/lecturer-sek-socheat.png') }}" alt="Dr. Sek Socheat">
-                </div>
+        <div class="team-card reveal-item">
+          <div class="avatar-ring">
+            <div class="avatar-ring-inner">
+              <img
+                src="{{ url_for('static', filename='images/team/member-lim-longfou.jpg') }}"
+                alt="Mr. Lim Longfou"
+              />
             </div>
-            <span class="team-role-pill lead"><i class="bi bi-mortarboard-fill"></i> Project Supervisor / Lecturer</span>
-            <div class="team-name">Dr. Sek Socheat</div>
-            <div class="team-social-row">
-                <a href="#" class="team-social-btn" aria-label="Email" title="Email"><i class="bi bi-envelope-fill"></i></a>
-                <a href="#" class="team-social-btn" aria-label="LinkedIn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                <a href="#" class="team-social-btn" aria-label="GitHub" title="GitHub"><i class="bi bi-github"></i></a>
-            </div>
+          </div>
+          <span class="team-role-pill"
+            ><i class="bi bi-code-slash"></i> Team Member</span
+          >
+          <div class="team-name">Mr. Lim Longfou</div>
+          <div class="team-social-row">
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=foufou9172@gmail.com"
+              class="team-social-btn"
+              aria-label="Email"
+              title="Email"
+              ><i class="bi bi-envelope-fill"></i
+            ></a>
+            <a
+              href="https://kh.linkedin.com/in/lim-longfou-398475355"
+              class="team-social-btn"
+              aria-label="LinkedIn"
+              title="LinkedIn"
+              ><i class="bi bi-linkedin"></i
+            ></a>
+            <a
+              href="https://github.com/nunorton22-2026"
+              class="team-social-btn"
+              aria-label="GitHub"
+              title="GitHub"
+              ><i class="bi bi-github"></i
+            ></a>
+          </div>
         </div>
 
-        <!-- Members -->
-        <div class="team-grid">
-            <div class="team-card reveal-item">
-                <div class="avatar-ring">
-                    <div class="avatar-ring-inner">
-                        <img src="{{ url_for('static', filename='images/team/member-kong-virakboth.jpg') }}" alt="Mr. Kong Virakboth">
-                    </div>
-                </div>
-                <span class="team-role-pill"><i class="bi bi-code-slash"></i> Team Member</span>
-                <div class="team-name">Mr. Kong Virakboth</div>
-                <div class="team-social-row">
-                    <a href="#" class="team-social-btn" aria-label="Email" title="Email"><i class="bi bi-envelope-fill"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="LinkedIn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="GitHub" title="GitHub"><i class="bi bi-github"></i></a>
-                </div>
+        <div class="team-card reveal-item">
+          <div class="avatar-ring">
+            <div class="avatar-ring-inner">
+              <img
+                src="{{ url_for('static', filename='images/team/Kokman.jpg') }}"
+                alt="Mr. Lim Longfou"
+              />
             </div>
-
-            <div class="team-card reveal-item">
-                <div class="avatar-ring">
-                    <div class="avatar-ring-inner">
-                        <img src="{{ url_for('static', filename='images/team/member-lim-longfou.jpg') }}" alt="Mr. Lim Longfou">
-                    </div>
-                </div>
-                <span class="team-role-pill"><i class="bi bi-code-slash"></i> Team Member</span>
-                <div class="team-name">Mr. Lim Longfou</div>
-                <div class="team-social-row">
-                    <a href="#" class="team-social-btn" aria-label="Email" title="Email"><i class="bi bi-envelope-fill"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="LinkedIn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="GitHub" title="GitHub"><i class="bi bi-github"></i></a>
-                </div>
-            </div>
-
-            <div class="team-card reveal-item">
-                <div class="avatar-ring">
-                    <div class="avatar-ring-inner">
-                        <i class="bi bi-person-fill avatar-placeholder-icon"></i>
-                    </div>
-                </div>
-                <span class="team-role-pill"><i class="bi bi-code-slash"></i> Team Member</span>
-                <div class="team-name">Mr. Tang Kokman</div>
-                <div class="team-social-row">
-                    <a href="#" class="team-social-btn" aria-label="Email" title="Email"><i class="bi bi-envelope-fill"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="LinkedIn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="GitHub" title="GitHub"><i class="bi bi-github"></i></a>
-                </div>
-            </div>
-
-            <div class="team-card reveal-item">
-                <div class="avatar-ring">
-                    <div class="avatar-ring-inner">
-                        <i class="bi bi-person-fill avatar-placeholder-icon"></i>
-                    </div>
-                </div>
-                <span class="team-role-pill"><i class="bi bi-code-slash"></i> Team Member</span>
-                <div class="team-name">Mr. Ros Sophornarith</div>
-                <div class="team-social-row">
-                    <a href="#" class="team-social-btn" aria-label="Email" title="Email"><i class="bi bi-envelope-fill"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="LinkedIn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
-                    <a href="#" class="team-social-btn" aria-label="GitHub" title="GitHub"><i class="bi bi-github"></i></a>
-                </div>
-            </div>
+          </div>
+          <span class="team-role-pill"
+            ><i class="bi bi-code-slash"></i> Team Member</span
+          >
+          <div class="team-name">Mr. Tang Kokman</div>
+          <div class="team-social-row">
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=kokman078@gmail.com"
+              class="team-social-btn"
+              aria-label="Email"
+              title="Email"
+              ><i class="bi bi-envelope-fill"></i
+            ></a>
+            <a
+              href="#"
+              class="team-social-btn"
+              aria-label="LinkedIn"
+              title="LinkedIn"
+              ><i class="bi bi-linkedin"></i
+            ></a>
+            <a
+              href="https://github.com/kokman092"
+              class="team-social-btn"
+              aria-label="GitHub"
+              title="GitHub"
+              ><i class="bi bi-github"></i
+            ></a>
+          </div>
         </div>
+
+        <div class="team-card reveal-item">
+          <div class="avatar-ring">
+            <div class="avatar-ring-inner">
+              <img
+                src="{{ url_for('static', filename='images/team/rith.jpg') }}"
+                alt="Mr. Lim Longfou"
+              />
+            </div>
+          </div>
+          <span class="team-role-pill"
+            ><i class="bi bi-code-slash"></i> Team Member</span
+          >
+          <div class="team-name">Mr. Ros Sophornarith</div>
+          <div class="team-social-row">
+            <a href="#" class="team-social-btn" aria-label="Email" title="Email"
+              ><i class="bi bi-envelope-fill"></i
+            ></a>
+            <a
+              href="#"
+              class="team-social-btn"
+              aria-label="LinkedIn"
+              title="LinkedIn"
+              ><i class="bi bi-linkedin"></i
+            ></a>
+            <a
+              href="#"
+              class="team-social-btn"
+              aria-label="GitHub"
+              title="GitHub"
+              ><i class="bi bi-github"></i
+            ></a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Bottom CTA Banner -->
     <section class="cta-banner-section">
-        <div class="cta-banner-card">
-            <h2 class="cta-banner-title">Ready to Take Control of Your Finances?</h2>
-            <p class="cta-banner-desc">Create a free account and start receiving tailored financial guidance today.</p>
-            <div class="hero-cta-group" style="margin-bottom: 0;">
-                <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
-                    <span>Create Free Account</span>
-                    <i class="bi bi-chevron-right"></i>
-                </a>
-                <a href="#" class="btn-hero-secondary">
-                    <i class="bi bi-envelope-fill"></i>
-                    <span>Contact Us</span>
-                </a>
-            </div>
+      <div class="cta-banner-card">
+        <h2 class="cta-banner-title">
+          Ready to Take Control of Your Finances?
+        </h2>
+        <p class="cta-banner-desc">
+          Create a free account and start receiving tailored financial guidance
+          today.
+        </p>
+        <div class="hero-cta-group" style="margin-bottom: 0">
+          <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
+            <span>Create Free Account</span>
+            <i class="bi bi-chevron-right"></i>
+          </a>
+          <a
+            href="mailto:support@financialconsultant.ai"
+            class="btn-hero-secondary"
+          >
+            <i class="bi bi-envelope-fill"></i>
+            <span>Contact Us</span>
+          </a>
         </div>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer class="landing-footer">
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-brand-col">
-                    <a href="{{ url_for('home') }}" class="brand-container">
-                        <div class="brand-icon">
-                            <i class="bi bi-wallet2"></i>
-                        </div>
-                        <div class="brand-title">Financial <span>Consultant</span></div>
-                    </a>
-                    <p class="footer-desc">
-                        Intelligent personal wealth planning and deterministic financial advisory engine. Helping you budget smarter and reach your goals faster.
-                    </p>
-                    <div class="footer-status-pill">
-                        <div class="status-dot-pulse"></div>
-                        <span>System Status: Operational</span>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="footer-col-title">Platform</div>
-                    <ul class="footer-links">
-                        <li><a href="{{ url_for('home') }}#overview"><i class="bi bi-chevron-right text-primary"></i> Overview</a></li>
-                        <li><a href="{{ url_for('home') }}#features"><i class="bi bi-chevron-right text-primary"></i> Core Features</a></li>
-                        <li><a href="{{ url_for('home') }}#advisory"><i class="bi bi-chevron-right text-primary"></i> Wealth Advisory</a></li>
-                        <li><a href="{{ url_for('home') }}#security"><i class="bi bi-chevron-right text-primary"></i> Security & Privacy</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <div class="footer-col-title">Company</div>
-                    <ul class="footer-links">
-                        <li><a href="#purpose">About</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                        <li><a href="#team">Our Team</a></li>
-                        <li><a href="#">Contact</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <div class="footer-col-title">Legal</div>
-                    <ul class="footer-links">
-                        <li><a href="{{ url_for('home') }}#security">Privacy</a></li>
-                        <li><a href="{{ url_for('home') }}#security">Terms of Service</a></li>
-                        <li><a href="{{ url_for('home') }}#security">Cookies</a></li>
-                        <li><a href="{{ url_for('home') }}#security">EULA</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <div class="footer-col-title">Access</div>
-                    <ul class="footer-links">
-                        {% if current_user.is_authenticated %}
-                            <li><a href="{{ url_for('dashboards.userIndex') }}"><i class="bi bi-grid-1x2-fill text-primary"></i> Open Workspace</a></li>
-                            <li><a href="{{ url_for('settings.empIndex') }}"><i class="bi bi-person-gear text-primary"></i> Account Settings</a></li>
-                        {% else %}
-                            <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right text-primary"></i> Sign In to Terminal</a></li>
-                            <li><a href="{{ url_for('auth.register') }}"><i class="bi bi-stars text-primary"></i> Create Free Account</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
+      <div class="footer-container">
+        <div class="footer-grid">
+          <div class="footer-brand-col">
+            <a href="{{ url_for('home') }}" class="brand-container">
+              <div class="brand-icon">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="brand-title">Financial <span>Consultant</span></div>
+            </a>
+            <p class="footer-desc">
+              Intelligent personal wealth planning and deterministic financial
+              consultant engine. Helping you budget smarter and reach your goals
+              faster.
+            </p>
+            <div class="footer-status-pill">
+              <div class="status-dot-pulse"></div>
+              <span>System Status: Operational</span>
             </div>
+          </div>
 
-            <div class="footer-bottom-bar">
-                <div class="footer-copyright">
-                    <span>&copy; 2026 Financial Consultant App. All rights reserved.</span>
-                </div>
-            </div>
+          <div>
+            <div class="footer-col-title">Platform</div>
+            <ul class="footer-links">
+              <li>
+                <a href="{{ url_for('home') }}#overview"
+                  ><i class="bi bi-chevron-right text-primary"></i> Overview</a
+                >
+              </li>
+              <li>
+                <a href="{{ url_for('home') }}#features"
+                  ><i class="bi bi-chevron-right text-primary"></i> Core
+                  Features</a
+                >
+              </li>
+              <li>
+                <a href="{{ url_for('home') }}#advisory"
+                  ><i class="bi bi-chevron-right text-primary"></i> Wealth
+                  Advisory</a
+                >
+              </li>
+              <li>
+                <a href="{{ url_for('home') }}#security"
+                  ><i class="bi bi-chevron-right text-primary"></i> Security &
+                  Privacy</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="footer-col-title">Company</div>
+            <ul class="footer-links">
+              <li><a href="#purpose">About</a></li>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="#team">Our Team</a></li>
+              <li><a href="mailto:support@financialconsultant.ai">Contact</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="footer-col-title">Legal</div>
+            <ul class="footer-links">
+              <li><a href="{{ url_for('home') }}#security">Privacy</a></li>
+              <li>
+                <a href="{{ url_for('home') }}#security">Terms of Service</a>
+              </li>
+              <li><a href="{{ url_for('home') }}#security">Cookies</a></li>
+              <li><a href="{{ url_for('home') }}#security">EULA</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="footer-col-title">Access</div>
+            <ul class="footer-links">
+              {% if current_user.is_authenticated %}
+              <li>
+                <a href="{{ url_for('dashboards.userIndex') }}"
+                  ><i class="bi bi-grid-1x2-fill text-primary"></i> Open
+                  Workspace</a
+                >
+              </li>
+              <li>
+                <a href="{{ url_for('settings.empIndex') }}"
+                  ><i class="bi bi-person-gear text-primary"></i> Account
+                  Settings</a
+                >
+              </li>
+              {% else %}
+              <li>
+                <a href="{{ url_for('auth.login') }}"
+                  ><i class="bi bi-box-arrow-in-right text-primary"></i> Sign In
+                  to Terminal</a
+                >
+              </li>
+              <li>
+                <a href="{{ url_for('auth.register') }}"
+                  ><i class="bi bi-stars text-primary"></i> Create Free
+                  Account</a
+                >
+              </li>
+              {% endif %}
+            </ul>
+          </div>
         </div>
+
+        <div class="footer-bottom-bar">
+          <div class="footer-copyright">
+            <span>&copy; 2026 Financial Consultant App. All rights reserved.</span>
+          </div>
+        </div>
+      </div>
     </footer>
 
     <!-- Theme & Mobile Drawer Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function() {
-            const html = document.documentElement;
-            const toggleBtn = document.getElementById('landingThemeToggle');
-            const toggleIcon = document.getElementById('landingThemeIcon');
+      (function () {
+        const html = document.documentElement;
+        const toggleBtn = document.getElementById("landingThemeToggle");
+        const toggleIcon = document.getElementById("landingThemeIcon");
 
-            function applyTheme(theme) {
-                html.setAttribute('data-bs-theme', theme);
-                localStorage.setItem('theme', theme);
-                if (toggleIcon) {
-                    toggleIcon.className = theme === 'dark' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars-fill text-dark';
+        function applyTheme(theme) {
+          html.setAttribute("data-bs-theme", theme);
+          localStorage.setItem("theme", theme);
+          if (toggleIcon) {
+            toggleIcon.className =
+              theme === "dark"
+                ? "bi bi-sun-fill text-warning"
+                : "bi bi-moon-stars-fill text-dark";
+          }
+        }
+
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        applyTheme(savedTheme);
+
+        if (toggleBtn) {
+          toggleBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const currentTheme = html.getAttribute("data-bs-theme") || "dark";
+            applyTheme(currentTheme === "dark" ? "light" : "dark");
+          });
+        }
+
+        // Mobile Drawer toggle
+        const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+        const mobileDrawerClose = document.getElementById("mobileDrawerClose");
+        const mobileNavDrawer = document.getElementById("mobileNavDrawer");
+        const mobileDrawerBackdrop = document.getElementById(
+          "mobileDrawerBackdrop",
+        );
+
+        function openDrawer() {
+          if (mobileNavDrawer && mobileDrawerBackdrop) {
+            mobileNavDrawer.classList.add("open");
+            mobileDrawerBackdrop.classList.add("open");
+            document.body.style.overflow = "hidden";
+          }
+        }
+
+        function closeDrawer() {
+          if (mobileNavDrawer && mobileDrawerBackdrop) {
+            mobileNavDrawer.classList.remove("open");
+            mobileDrawerBackdrop.classList.remove("open");
+            document.body.style.overflow = "";
+          }
+        }
+
+        if (mobileMenuToggle)
+          mobileMenuToggle.addEventListener("click", openDrawer);
+        if (mobileDrawerClose)
+          mobileDrawerClose.addEventListener("click", closeDrawer);
+        if (mobileDrawerBackdrop)
+          mobileDrawerBackdrop.addEventListener("click", closeDrawer);
+
+        document
+          .querySelectorAll(".mobile-drawer-link")
+          .forEach(function (link) {
+            link.addEventListener("click", closeDrawer);
+          });
+
+        // Smooth Precision Scrolling for Anchor Links (in-page only)
+        document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+          anchor.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (!href || href === "#") return;
+
+            const target = document.querySelector(href);
+            if (target) {
+              e.preventDefault();
+              closeDrawer();
+
+              const navbar = document.querySelector(".landing-navbar");
+              const navHeight = navbar ? navbar.offsetHeight : 80;
+              const targetPosition =
+                target.getBoundingClientRect().top +
+                window.pageYOffset -
+                navHeight -
+                20;
+
+              window.scrollTo({ top: targetPosition, behavior: "smooth" });
+
+              if (history.pushState) {
+                history.pushState(null, null, href);
+              }
+            }
+          });
+        });
+
+        // Scroll-triggered reveal animation for cards/sections
+        const revealItems = document.querySelectorAll(".reveal-item");
+        if ("IntersectionObserver" in window && revealItems.length) {
+          const observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("in-view");
+                  observer.unobserve(entry.target);
                 }
-            }
+              });
+            },
+            { threshold: 0.15 },
+          );
 
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            applyTheme(savedTheme);
-
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const currentTheme = html.getAttribute('data-bs-theme') || 'dark';
-                    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-                });
-            }
-
-            // Mobile Drawer toggle
-            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-            const mobileDrawerClose = document.getElementById('mobileDrawerClose');
-            const mobileNavDrawer = document.getElementById('mobileNavDrawer');
-            const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
-
-            function openDrawer() {
-                if (mobileNavDrawer && mobileDrawerBackdrop) {
-                    mobileNavDrawer.classList.add('open');
-                    mobileDrawerBackdrop.classList.add('open');
-                    document.body.style.overflow = 'hidden';
-                }
-            }
-
-            function closeDrawer() {
-                if (mobileNavDrawer && mobileDrawerBackdrop) {
-                    mobileNavDrawer.classList.remove('open');
-                    mobileDrawerBackdrop.classList.remove('open');
-                    document.body.style.overflow = '';
-                }
-            }
-
-            if (mobileMenuToggle) mobileMenuToggle.addEventListener('click', openDrawer);
-            if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeDrawer);
-            if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeDrawer);
-
-            document.querySelectorAll('.mobile-drawer-link').forEach(function(link) {
-                link.addEventListener('click', closeDrawer);
-            });
-
-            // Smooth Precision Scrolling for Anchor Links (in-page only)
-            document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-                anchor.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    if (!href || href === '#') return;
-
-                    const target = document.querySelector(href);
-                    if (target) {
-                        e.preventDefault();
-                        closeDrawer();
-
-                        const navbar = document.querySelector('.landing-navbar');
-                        const navHeight = navbar ? navbar.offsetHeight : 80;
-                        const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 20;
-
-                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-
-                        if (history.pushState) {
-                            history.pushState(null, null, href);
-                        }
-                    }
-                });
-            });
-
-            // Scroll-triggered reveal animation for cards/sections
-            const revealItems = document.querySelectorAll('.reveal-item');
-            if ('IntersectionObserver' in window && revealItems.length) {
-                const observer = new IntersectionObserver(function(entries) {
-                    entries.forEach(function(entry) {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('in-view');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.15 });
-
-                revealItems.forEach(function(item, index) {
-                    item.style.transitionDelay = (index % 4) * 0.08 + 's';
-                    observer.observe(item);
-                });
-            } else {
-                revealItems.forEach(function(item) { item.classList.add('in-view'); });
-            }
-        })();
+          revealItems.forEach(function (item, index) {
+            item.style.transitionDelay = (index % 4) * 0.08 + "s";
+            observer.observe(item);
+          });
+        } else {
+          revealItems.forEach(function (item) {
+            item.classList.add("in-view");
+          });
+        }
+      })();
     </script>
-</body>
+  </body>
 </html>
