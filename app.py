@@ -35,6 +35,9 @@ from training.serve_llm import (
     load_model, generate_response, is_safety_violation, is_educational_query,
     EXTRACTION_INSTRUCTION, EXPLANATION_INSTRUCTION, EXPLANATION_INSTRUCTION_KM,
     SAFETY_INSTRUCTION, SAFETY_INSTRUCTION_KM, EDUCATION_INSTRUCTION, EDUCATION_INSTRUCTION_KM,
+    DATA_BOUNDARY_INSTRUCTION, DATA_BOUNDARY_INSTRUCTION_KM,
+    EXPERT_SYSTEM_AUTHORITY_INSTRUCTION, EXPERT_SYSTEM_AUTHORITY_INSTRUCTION_KM,
+    GENERAL_GUIDANCE_INSTRUCTION, GENERAL_GUIDANCE_INSTRUCTION_KM,
     BASE_MODEL_ID
 )
 from training.llm_output_normalizer import (
@@ -53,29 +56,163 @@ def run_generation(instruction: str, user_input: str, max_new_tokens: int = 256)
     return generate_response(instruction, user_input, max_new_tokens=max_new_tokens)
 
 
+def _process_chat_logic(message: str, existing_profile: dict = None, lang: str = None) -> dict:
+    if not message or not message.strip():
+        return {"response": "", "type": "empty", "slots": {}}
+
+    clean_msg = message.strip()
+    active_lang = lang or detect_language(clean_msg)
+    profile = existing_profile or {}
+
+    # 1. Greeting Check (Dynamic generation with sampling for natural variety)
+    is_greeting = bool(re.search(
+        r"^(hello|hi|hey|greetings|good\s+(morning|afternoon|evening)|howdy|សួស្តី|ជំរាបសួរ|ជម្រាបសួរ)[.!?\s]*$",
+        clean_msg,
+        re.IGNORECASE
+    ))
+    if is_greeting:
+        if active_lang == "km":
+            instr = (
+                "អ្នកគឺជា Financial Consultant AI (ជំនួយការ AI ប្រឹក្សាហិរញ្ញវត្ថុ) សម្រាប់ពន្យល់លទ្ធផលនៃប្រព័ន្ធអ្នកជំនាញប្រឹក្សាហិរញ្ញវត្ថុ។ "
+                "សូមឆ្លើយតបការសួស្តីដោយរួសរាយ និងខ្លី (១-២ ល្បះ)។ សួរថាអាចជួយអ្វីខ្លះទាក់ទងនឹងការរៀបចំថវិកា ការសន្សំ ឬសំណួរហិរញ្ញវត្ថុ។ "
+                "មិនត្រូវលើកឡើងពីតួលេខហិរញ្ញវត្ថុណាមួយឡើយ។"
+            )
+        else:
+            instr = (
+                "You are the explanation assistant for a rule-based Financial Consulting Expert System. "
+                "Your identity is Financial Consultant AI. "
+                "Respond warmly and concisely: greet the user as Financial Consultant AI, "
+                "and ask how you can help with budgeting, savings, or financial planning today. "
+                "Do not claim to be human. Do not mention financial figures or external sources."
+            )
+        resp = generate_response(instr, clean_msg, max_new_tokens=60, do_sample=True, temperature=0.7)
+        resp = normalize_and_verify_response(resp, user_input=clean_msg, lang=active_lang)
+        return {"response": resp, "type": "greeting", "slots": {}}
+
+    # 2. Safety Boundary Check
+    if is_safety_violation(clean_msg):
+        instr = f"{SAFETY_INSTRUCTION_KM if active_lang == 'km' else SAFETY_INSTRUCTION}\n{DATA_BOUNDARY_INSTRUCTION_KM if active_lang == 'km' else DATA_BOUNDARY_INSTRUCTION}"
+        resp = generate_response(instr, clean_msg, max_new_tokens=120)
+        resp = normalize_and_verify_response(resp, user_input=clean_msg, lang=active_lang)
+        return {"response": resp, "type": "safety_refusal", "slots": {}}
+
+    # 3. Data Source / Provenance Check
+    is_data_source_q = bool(re.search(
+        r"(where\s+(does|do|did)\s+(the\s+chatbot|you)\s+get\s+(my|the\s+user['’]?s?)\s+(financial\s+)?(information|data|income|profile)"
+        r"|where\s+did\s+you\s+get\s+my\s+income|how\s+do\s+you\s+know\s+my\s+income|what\s+data\s+do\s+you\s+use"
+        r"|do\s+you\s+access\s+my\s+(social\s+media|facebook|instagram|bank\s+account|browsing|external\s+transaction)"
+        r"|access\s+(my\s+)?(social\s+media|bank\s+account))",
+        clean_msg,
+        re.IGNORECASE
+    ))
+    if is_data_source_q:
+        instr = (
+            f"You are the explanation assistant for a rule-based Financial Consulting Expert System.\n"
+            f"{DATA_BOUNDARY_INSTRUCTION_KM if active_lang == 'km' else DATA_BOUNDARY_INSTRUCTION}\n"
+            f"Explain clearly that you only use financial information provided by the user through this application, "
+            f"and never access social media, bank accounts, or external transaction systems."
+            if active_lang != "km" else
+            f"អ្នកគឺជា Financial Consultant AI។\n{DATA_BOUNDARY_INSTRUCTION_KM}\n"
+            f"សូមពន្យល់ថា អ្នកប្រើតែព័ត៌មានដែលអ្នកប្រើប្រាស់បានផ្តល់តាមរយៈកម្មវិធីនេះប៉ុណ្ណោះ និងមិនចូលប្រើបណ្តាញសង្គម ឬគណនីធនាគារឡើយ។"
+        )
+        resp = generate_response(instr, clean_msg, max_new_tokens=100)
+        resp = normalize_and_verify_response(resp, user_input=clean_msg, lang=active_lang)
+        return {"response": resp, "type": "data_provenance", "slots": {}}
+
+    # 4. Expert System Override Refusal
+    is_override_q = bool(re.search(
+        r"ignore\s+(the\s+)?(expert\s+system|rules|deterministic)|tell\s+me\s+your\s+own\s+(financial\s+)?(assessment|advice|opinion|recommendation)"
+        r"|មិនបាច់ខ្វល់ពីប្រព័ន្ធអ្នកជំនាញ|ផ្តល់ការវាយតម្លៃផ្ទាល់ខ្លួន",
+        clean_msg,
+        re.IGNORECASE
+    ))
+    if is_override_q:
+        instr = (
+            "You are Financial Consultant AI for the Financial Consulting Expert System. "
+            "Decline politely: explain that the deterministic Financial Consulting Expert System is the authoritative source "
+            "for calculations and verified recommendations. Your role is strictly to explain those results."
+            if active_lang != "km" else
+            "អ្នកគឺជា Financial Consultant AI សម្រាប់ពន្យល់លទ្ធផលរបស់ប្រព័ន្ធអ្នកជំនាញប្រឹក្សាហិរញ្ញវត្ថុ។ "
+            "សូមបដិសេធដោយសុភាព និងពន្យល់ថា ប្រព័ន្ធអ្នកជំនាញគឺជាប្រភពផ្លូវការសម្រាប់ការគណនា និងអនុសាសន៍។"
+        )
+        resp = generate_response(instr, clean_msg, max_new_tokens=90)
+        resp = normalize_and_verify_response(resp, user_input=clean_msg, lang=active_lang)
+        return {"response": resp, "type": "expert_system_override_refusal", "slots": {}}
+
+    # 5. Concept / Educational Check
+    if is_educational_query(clean_msg):
+        instr = f"{EDUCATION_INSTRUCTION_KM if active_lang == 'km' else EDUCATION_INSTRUCTION}\n{DATA_BOUNDARY_INSTRUCTION_KM if active_lang == 'km' else DATA_BOUNDARY_INSTRUCTION}"
+        resp = generate_response(instr, clean_msg, max_new_tokens=140)
+        resp = normalize_and_verify_response(resp, user_input=clean_msg, lang=active_lang)
+        return {"response": resp, "type": "financial_education", "slots": {}}
+
+    # 6. Extraction & Numbers
+    has_numbers = bool(re.search(r"\d", clean_msg))
+    debt_mentioned = detect_debt_status(clean_msg) is not None
+    emp_mentioned = detect_employment_status(clean_msg) is not None
+
+    if not has_numbers and not debt_mentioned and not emp_mentioned:
+        normalized_slots = {k: None for k in CANONICAL_FIELDS}
+    else:
+        raw_out = generate_response(EXTRACTION_INSTRUCTION, clean_msg, max_new_tokens=75)
+        normalized_slots = normalize_llm_output(raw_out, clean_msg)
+
+    inc = normalized_slots.get("monthly_income")
+    exp = normalized_slots.get("monthly_expense")
+    goal = normalized_slots.get("goal_cost")
+
+    if inc is not None or exp is not None or goal is not None:
+        items = []
+        if inc is not None: items.append(f"Income: ${inc:,.2f}/mo")
+        if exp is not None: items.append(f"Expenses: ${exp:,.2f}/mo")
+        if goal is not None: items.append(f"Goal: ${goal:,.2f}")
+        summary_str = ", ".join(items)
+
+        if inc is not None and exp is not None:
+            cf = inc - exp
+            sign = "+" if cf >= 0 else "-"
+            resp = (
+                f"Recorded verified profile: {summary_str}. Net Cash Flow: {sign}${abs(cf):,.2f}/month. "
+                f"How would you like to plan or allocate your savings?"
+                if active_lang != "km" else
+                f"បានកត់ត្រាទិន្នន័យហិរញ្ញវត្ថុ៖ {summary_str}។ លំហូរសាច់ប្រាក់សុទ្ធ៖ {sign}${abs(cf):,.2f}/ខែ។ "
+                f"តើអ្នកចង់ឱ្យខ្ញុំជួយរៀបចំផែនការ ឬបែងចែកការសន្សំយ៉ាងដូចម្តេចដែរ?"
+            )
+        else:
+            resp = (
+                f"Recorded: {summary_str}. "
+                f"{'Please provide your monthly expenses to evaluate your cash flow.' if exp is None else 'Please provide your monthly income.'}"
+                if active_lang != "km" else
+                f"បានកត់ត្រា៖ {summary_str}។ "
+                f"{'សូមផ្តល់ព័ត៌មានអំពីការចំណាយប្រចាំខែ ដើម្បីគណនាលំហូរសាច់ប្រាក់។' if exp is None else 'សូមផ្តល់ព័ត៌មានអំពីប្រាក់ចំណូលប្រចាំខែ។'}"
+            )
+        resp = normalize_and_verify_response(resp, user_input=clean_msg, context_profile=normalized_slots, lang=active_lang)
+        return {"response": resp, "type": "financial_profile_extracted", "slots": normalized_slots}
+
+    # 7. General Conversational Guidance (dynamic sampling)
+    instr = (
+        f"{GENERAL_GUIDANCE_INSTRUCTION_KM}\n{DATA_BOUNDARY_INSTRUCTION_KM}\n{EXPERT_SYSTEM_AUTHORITY_INSTRUCTION_KM}"
+        if active_lang == "km" else
+        f"{GENERAL_GUIDANCE_INSTRUCTION}\n{DATA_BOUNDARY_INSTRUCTION}\n{EXPERT_SYSTEM_AUTHORITY_INSTRUCTION}"
+    )
+    resp = generate_response(instr, clean_msg, max_new_tokens=100, do_sample=True, temperature=0.7)
+    resp = normalize_and_verify_response(resp, user_input=clean_msg, context_profile=profile, lang=active_lang)
+    return {"response": resp, "type": "general_guidance", "slots": normalized_slots}
+
+
 # 2. Gradio Web Interface (ZeroGPU Decorated)
 @spaces.GPU
 def gradio_chat(user_msg, history):
-    if not user_msg:
+    if not user_msg or not user_msg.strip():
         return ""
-    lang = detect_language(user_msg)
-    if is_safety_violation(user_msg):
-        instr = SAFETY_INSTRUCTION_KM if lang == "km" else SAFETY_INSTRUCTION
-        return generate_response(instr, user_msg, max_new_tokens=120)
-    elif is_educational_query(user_msg):
-        instr = EDUCATION_INSTRUCTION_KM if lang == "km" else EDUCATION_INSTRUCTION
-        return generate_response(instr, user_msg, max_new_tokens=140)
-    else:
-        raw = generate_response(EXTRACTION_INSTRUCTION, user_msg, max_new_tokens=75)
-        slots = normalize_llm_output(raw, user_msg)
-        inc = slots.get("monthly_income")
-        exp = slots.get("monthly_expense")
-        if inc or exp:
-            items = []
-            if inc: items.append(f"Income: ${inc:,.2f}")
-            if exp: items.append(f"Expense: ${exp:,.2f}")
-            return f"Recorded: {', '.join(items)}. Verified by Financial Consultant AI."
-        return "I am your Financial Consultant AI. How can I assist with your budgeting and financial planning?"
+    result = _process_chat_logic(user_msg)
+    return result.get("response", "")
+
+
+# Synchronous ZeroGPU entrypoint for REST API /chat
+@spaces.GPU
+def run_chat_service(message: str, existing_profile: dict = None, lang: str = None) -> dict:
+    return _process_chat_logic(message, existing_profile=existing_profile, lang=lang)
 
 
 demo = gr.ChatInterface(
@@ -218,85 +355,16 @@ def chat_endpoint(data: dict):
     if not message:
         return JSONResponse(status_code=400, content={"error": "Message cannot be empty"})
 
-    lang = data.get("language") or detect_language(message)
+    lang = data.get("language")
     existing_profile = data.get("existing_profile") or {}
 
-    # 1. Safety Boundary Check
-    if is_safety_violation(message):
-        instr = SAFETY_INSTRUCTION_KM if lang == "km" else SAFETY_INSTRUCTION
-        safety_resp = run_generation(instr, message, max_new_tokens=120)
-        safety_resp = normalize_and_verify_response(safety_resp, user_input=message, lang=lang)
-        return {
-            "success": True,
-            "type": "safety_refusal",
-            "language": lang,
-            "response": safety_resp,
-        }
-
-    # 2. Concept / Educational Check
-    if is_educational_query(message):
-        instr = EDUCATION_INSTRUCTION_KM if lang == "km" else EDUCATION_INSTRUCTION
-        edu_resp = run_generation(instr, message, max_new_tokens=140)
-        edu_resp = normalize_and_verify_response(edu_resp, user_input=message, lang=lang)
-        return {
-            "success": True,
-            "type": "financial_education",
-            "language": lang,
-            "response": edu_resp,
-        }
-
-    # 3. Greeting Check
-    is_greeting = bool(re.search(r"^(hello|hi|hey|greetings|good\s+(morning|afternoon|evening)|howdy|សួស្តី|ជំរាបសួរ|ជម្រាបសួរ)[.!?\s]*$", message.strip(), re.IGNORECASE))
-    if is_greeting:
-        greet_resp = (
-            "សួស្តី! ខ្ញុំជា Financial Consultant AI (ជំនួយការ AI ប្រឹក្សាហិរញ្ញវត្ថុ)។ តើខ្ញុំអាចជួយអ្នកក្នុងការរៀបចំថវិកា ការសន្សំ ឬសំណួរហិរញ្ញវត្ថុអ្វីខ្លះថ្ងៃនេះ?"
-            if lang == "km"
-            else "Hello! I am your Financial Consultant AI. How can I help you with your budgeting, savings, or financial planning today?"
-        )
-        return {
-            "success": True,
-            "type": "greeting",
-            "language": lang,
-            "response": greet_resp,
-        }
-
-    # 4. Fast-path & Fact Extraction
-    has_numbers = bool(re.search(r"\d", message))
-    debt_mentioned = detect_debt_status(message) is not None
-    emp_mentioned = detect_employment_status(message) is not None
-
-    if not has_numbers and not debt_mentioned and not emp_mentioned:
-        normalized_slots = {k: None for k in CANONICAL_FIELDS}
-    else:
-        raw_out = run_generation(EXTRACTION_INSTRUCTION, message, max_new_tokens=75)
-        normalized_slots = normalize_llm_output(raw_out, message)
-
-    # Build contextual response
-    profile_summary = []
-    if normalized_slots.get("monthly_income"):
-        profile_summary.append(f"Income: ${normalized_slots['monthly_income']:,.2f}")
-    if normalized_slots.get("monthly_expense"):
-        profile_summary.append(f"Expenses: ${normalized_slots['monthly_expense']:,.2f}")
-
-    if profile_summary:
-        resp_text = (
-            f"ខ្ញុំបានកត់ត្រាព័ត៌មានហិរញ្ញវត្ថុរបស់អ្នក៖ {', '.join(profile_summary)}។"
-            if lang == "km"
-            else f"I have noted your financial details: {', '.join(profile_summary)}."
-        )
-    else:
-        resp_text = (
-            "សូមប្រាប់ខ្ញុំអំពីប្រាក់ចំណូល និងការចំណាយប្រចាំខែរបស់អ្នក ដើម្បីឱ្យខ្ញុំអាចជួយរៀបចំផែនការហិរញ្ញវត្ថុបានល្អបំផុត។"
-            if lang == "km"
-            else "Please share your monthly income and expenses so I can help analyze your financial health."
-        )
-
+    result = run_chat_service(message, existing_profile=existing_profile, lang=lang)
     return {
         "success": True,
-        "type": "financial_profile_extracted",
-        "language": lang,
-        "slots": normalized_slots,
-        "response": resp_text,
+        "type": result.get("type", "chat_response"),
+        "language": lang or detect_language(message),
+        "slots": result.get("slots", {}),
+        "response": result.get("response", ""),
     }
 
 
