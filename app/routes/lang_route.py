@@ -49,3 +49,25 @@ def set_language(language: str):
     if current_user.is_authenticated:
         return redirect(url_for("dashboards.userIndex"))
     return redirect(url_for("home"))
+
+
+@lang_bp.route("/set-language", methods=["POST"])
+def set_language_post():
+    """Set language from settings form."""
+
+    language = request.form.get("language")
+
+    if language not in SUPPORTED_LANGUAGES:
+        abort(400, description=f"Unsupported language code: {language}")
+
+    session["lang"] = language
+
+    target = request.referrer
+
+    if target and is_safe_url(target):
+        return redirect(target)
+
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboards.userIndex"))
+
+    return redirect(url_for("home"))

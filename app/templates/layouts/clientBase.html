@@ -44,13 +44,18 @@
     
     <!-- Sidebar -->
     <nav class="sidebar d-flex flex-column py-3 px-3">
-        <div class="sidebar-brand-wrapper d-flex align-items-center justify-content-between mb-4">
-            <a href="/" class="d-flex align-items-center text-white text-decoration-none gap-2">
-                <div class="sidebar-logo-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
-                <span class="fs-5 fw-bold brand-text">Financial <span>Consultant</span></span>
-            </a>
+        <div class="sidebar-brand-wrapper d-flex align-items-center justify-content-between">
+            <div class="sidebar-brand px-3 mt-2 mb-4">
+                <a href="/" class="sidebar-brand-link text-decoration-none">
+                    <div class="sidebar-logo-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <span class="brand-title">Financial</span>
+                        <span class="brand-subtitle">Consultant</span>
+                    </div>
+                </a>
+            </div>
 
             <div class="burger-menu">
                 <i class="bi bi-list fs-2 text-white"></i>
@@ -125,6 +130,9 @@
         </div>
     </nav>
 
+    <!-- Import Calculator from components -->
+    {% include "components/calculator.html" %}
+
     <!-- Top Header Navigation -->
     <header class="px-4 py-3 d-flex justify-content-between align-items-center">
         <nav aria-label="breadcrumb">
@@ -135,18 +143,6 @@
         </nav>
 
         <div class="d-flex align-items-center gap-2">
-            <!-- Language Switcher -->
-            <div class="d-flex align-items-center me-2">
-                <div class="btn-group btn-group-sm" role="group" aria-label="Language Selector">
-                    <a href="{{ url_for('lang.set_language', language='en') }}" 
-                       class="btn btn-sm {% if current_lang == 'en' %}btn-primary{% else %}btn-outline-secondary{% endif %}" 
-                       title="English">English</a>
-                    <span class="d-flex align-items-center text-muted px-1">|</span>
-                    <a href="{{ url_for('lang.set_language', language='km') }}" 
-                       class="btn btn-sm {% if current_lang == 'km' %}btn-primary{% else %}btn-outline-secondary{% endif %}" 
-                       title="ខ្មែរ">ខ្មែរ</a>
-                </div>
-            </div>
 
             <!-- Header Quick Theme Toggle -->
              <a class="btn btn-sm d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill demo-btn"

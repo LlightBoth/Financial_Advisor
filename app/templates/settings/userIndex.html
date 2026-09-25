@@ -1,185 +1,1182 @@
 {% extends "layouts/clientBase.html" %}
-{% block title %} Account Settings {% endblock %}
+{% block title %}Account Settings{% endblock %}
 
 {% block content %}
+
 <style>
-:root {
-    --settings-indigo: #3b82f6;
-}
+    :root {
+        --settings-primary: #3b82f6;
 
-/* Settings Navigation Tabs */
-.tab-content-wrapper .nav-pills .nav-link,
+        --settings-surface: var(--bs-tertiary-bg);
+        --settings-border: var(--bs-border-color);
+        --settings-text: var(--bs-body-color);
+        --settings-muted: var(--bs-secondary-color);
 
-.nav-pills .nav-link:hover {
-    color: var(--bs-body-color);
-    background-color: var(--bs-tertiary-bg);
-}
+        --settings-primary-soft: rgba(59, 130, 246, 0.10);
+        --settings-primary-border: rgba(59, 130, 246, 0.22);
 
-.nav-pills .nav-link.active {
-    background: rgba(59, 130, 246, 0.12) !important;
-    color: var(--text-secondary) !important;
-}
+        --settings-danger-soft: rgba(220, 53, 69, 0.08);
+        --settings-danger-border: rgba(220, 53, 69, 0.25);
+    }
 
-.nav-pills .nav-link.text-danger.active {
-    background: rgba(220, 53, 69, 0.12) !important;
-    color: var(--bs-danger) !important;
-    box-shadow: inset 3px 0 0 var(--bs-danger);
-}
+    /* =========================================
+       MAIN CARD
+       ========================================= */
 
-/* Adaptive Settings Card */
-.settings-card {
-    background: var(--bs-tertiary-bg);
-    border: 1px solid var(--bs-border-color);
-    border-radius: 16px;
-    padding: 2.25rem;
-    color: var(--bs-body-color);
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.04);
-}
+    .settings-card {
+        background: var(--settings-surface);
+        border: 1px solid var(--settings-border);
+        border-radius: 18px;
 
-.settings-card h4, 
-.settings-card h5, 
-.settings-card h6 {
-    color: var(--bs-heading-color);
-    font-weight: 600;
-}
+        color: var(--settings-text);
 
-/* Form Control Glass */
-.form-control-glass {
-    background-color: var(--bs-body-bg) !important;
-    border: 1px solid var(--bs-border-color) !important;
-    color: var(--bs-body-color) !important;
-    border-radius: 8px;
-    padding: 0.65rem 0.9rem;
-}
+        box-shadow:
+            0 0.25rem 1.25rem rgba(0, 0, 0, 0.035);
 
-.form-control-glass:focus {
-    border-color: var(--settings-indigo) !important;
-    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
-}
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
 
-/* Danger Zone Special Styling */
-.settings-card.danger-zone-card {
-    border-color: rgba(220, 53, 69, 0.3);
-}
+    .settings-content-card {
+        padding: 1.75rem;
+    }
+
+    .settings-card h4,
+    .settings-card h5,
+    .settings-card h6 {
+        color: var(--bs-heading-color);
+        font-weight: 650;
+    }
+
+    /* =========================================
+       SIDEBAR
+       ========================================= */
+
+    .settings-sidebar {
+        padding: 14px !important;
+        position: sticky;
+        top: 90px;
+    }
+
+    .settings-sidebar-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 8px 8px 16px;
+        margin-bottom: 8px;
+
+        border-bottom: 1px solid var(--settings-border);
+    }
+
+    .settings-sidebar-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background: var(--settings-primary-soft);
+        color: var(--settings-primary);
+    }
+
+    .settings-sidebar-header h6 {
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+    }
+
+    .settings-sidebar-header small {
+        color: var(--settings-muted) !important;
+        font-size: 0.74rem;
+    }
+
+    /* =========================================
+       NAVIGATION
+       ========================================= */
+
+    .settings-nav {
+        gap: 5px;
+    }
+
+    .settings-nav .nav-link {
+        width: 100%;
+        padding: 10px;
+        border-radius: 12px;
+
+        color: var(--settings-text);
+        background: transparent;
+
+        transition:
+            background-color 0.2s ease,
+            color 0.2s ease;
+    }
+
+    .settings-nav .nav-link:hover {
+        background: var(--settings-primary-soft);
+        color: var(--settings-primary);
+    }
+
+    .settings-nav .nav-link.active {
+        background: var(--settings-primary-soft);
+        color: var(--settings-primary);
+
+        box-shadow:
+            inset 0 0 0 1px var(--settings-primary-border);
+    }
+
+    .settings-nav .nav-link.text-danger {
+        color: var(--bs-danger) !important;
+    }
+
+    .settings-nav .nav-link.text-danger:hover,
+    .settings-nav .nav-link.text-danger.active {
+        background: var(--settings-danger-soft);
+        color: var(--bs-danger) !important;
+
+        box-shadow:
+            inset 0 0 0 1px var(--settings-danger-border);
+    }
+
+    .settings-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .settings-nav-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: rgba(128, 128, 128, 0.08);
+        color: var(--settings-muted);
+
+        transition: all 0.2s ease;
+    }
+
+    .settings-nav .nav-link.active .settings-nav-icon {
+        background: var(--settings-primary);
+        color: #fff;
+    }
+
+    .settings-nav .nav-link.text-danger.active .settings-nav-icon {
+        background: var(--bs-danger);
+        color: #fff;
+    }
+
+    .settings-nav-content {
+        flex: 1;
+        min-width: 0;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings-nav-title {
+        font-size: 0.87rem;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .settings-nav-content small {
+        margin-top: 3px;
+        color: var(--settings-muted);
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+
+    .settings-nav-arrow {
+        font-size: 0.65rem;
+        color: var(--settings-muted);
+
+        opacity: 0;
+        transform: translateX(-4px);
+
+        transition: all 0.2s ease;
+    }
+
+    .settings-nav .nav-link:hover .settings-nav-arrow,
+    .settings-nav .nav-link.active .settings-nav-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .settings-nav .nav-link.active .settings-nav-arrow {
+        color: var(--settings-primary);
+    }
+
+    .settings-nav .nav-link.text-danger.active .settings-nav-arrow {
+        color: var(--bs-danger);
+    }
+
+    /* =========================================
+       CONTENT HEADER
+       ========================================= */
+
+    .settings-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
+
+        border-bottom: 1px solid var(--settings-border);
+    }
+
+    .settings-heading h4 {
+        font-size: 1.15rem;
+        margin-bottom: 4px;
+    }
+
+    .settings-heading p {
+        color: var(--settings-muted) !important;
+        font-size: 0.78rem;
+        margin-bottom: 0;
+    }
+
+    .settings-heading-icon {
+        width: 44px;
+        height: 44px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        background: var(--settings-primary-soft);
+        color: var(--settings-primary);
+    }
+
+    .settings-heading-icon.danger {
+        background: var(--settings-danger-soft);
+        color: var(--bs-danger);
+    }
+
+    /* =========================================
+       PREFERENCE ITEM
+       ========================================= */
+
+    .preference-item {
+        padding: 1.15rem;
+
+        border: 1px solid var(--settings-border);
+        border-radius: 14px;
+
+        background: rgba(128, 128, 128, 0.025);
+
+        transition:
+            border-color 0.2s ease,
+            background-color 0.2s ease;
+    }
+
+    .preference-item:hover {
+        background: var(--settings-primary-soft);
+        border-color: var(--settings-primary-border);
+    }
+
+    .preference-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: var(--settings-primary-soft);
+        color: var(--settings-primary);
+    }
+
+    .preference-title {
+        color: var(--settings-text);
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .preference-description {
+        color: var(--settings-muted);
+        font-size: 0.76rem;
+        line-height: 1.4;
+        margin: 0;
+    }
+
+    .language-select {
+        width: 190px;
+        flex-shrink: 0;
+    }
+
+    /* =========================================
+       FORM CONTROLS
+       ========================================= */
+
+    .form-control-glass {
+        background-color: var(--bs-body-bg) !important;
+        border: 1px solid var(--settings-border) !important;
+        color: var(--settings-text) !important;
+
+        border-radius: 10px;
+        padding: 0.65rem 0.9rem;
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .form-control-glass:focus {
+        background-color: var(--bs-body-bg) !important;
+        color: var(--settings-text) !important;
+
+        border-color: var(--settings-primary) !important;
+
+        box-shadow:
+            0 0 0 0.2rem rgba(59, 130, 246, 0.12) !important;
+    }
+
+    .form-control-glass::placeholder {
+        color: var(--settings-muted);
+    }
+
+    .form-select.form-control-glass option {
+        background-color: var(--bs-body-bg);
+        color: var(--settings-text);
+    }
+
+    /* =========================================
+       SECURITY
+       ========================================= */
+
+    .security-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+
+        border-radius: 12px;
+
+        background: var(--settings-primary-soft);
+        border: 1px solid var(--settings-primary-border);
+    }
+
+    .security-info-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--settings-primary);
+    }
+
+    .security-info strong {
+        color: var(--settings-text);
+        font-size: 0.8rem;
+    }
+
+    .security-info p {
+        color: var(--settings-muted);
+        font-size: 0.74rem;
+        margin: 2px 0 0;
+    }
+
+    .password-group {
+        padding: 1.15rem;
+
+        border: 1px solid var(--settings-border);
+        border-radius: 14px;
+
+        background: rgba(128, 128, 128, 0.025);
+    }
+
+    .form-label-settings {
+        color: var(--settings-muted);
+        font-size: 0.72rem;
+        font-weight: 650;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 7px;
+    }
+
+    /* =========================================
+       DANGER ZONE
+       ========================================= */
+
+    .danger-zone-card {
+        border-color: var(--settings-danger-border);
+    }
+
+    .danger-zone-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        padding: 1.15rem;
+
+        border-radius: 14px;
+
+        background: var(--settings-danger-soft);
+        border: 1px solid var(--settings-danger-border);
+    }
+
+    .danger-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        background: rgba(220, 53, 69, 0.12);
+        color: var(--bs-danger);
+    }
+
+    .danger-zone-content h6 {
+        color: var(--bs-danger);
+        font-size: 0.9rem;
+        margin-bottom: 3px;
+    }
+
+    .danger-zone-content p {
+        color: var(--settings-muted);
+        font-size: 0.75rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* =========================================
+       ACTIONS
+       ========================================= */
+
+    .settings-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+
+        border-top: 1px solid var(--settings-border);
+    }
+
+    .settings-actions .btn,
+    .danger-zone-content .btn {
+        border-radius: 9px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 9px 18px;
+    }
+
+    /* =========================================
+       MODAL
+       ========================================= */
+
+    .settings-modal {
+        background: var(--settings-surface);
+        color: var(--settings-text);
+
+        border: 1px solid var(--settings-border);
+        border-radius: 16px;
+
+        overflow: hidden;
+    }
+
+    .settings-modal .modal-header,
+    .settings-modal .modal-footer {
+        border-color: var(--settings-border) !important;
+    }
+
+    .settings-modal .modal-title {
+        font-size: 1rem;
+    }
+
+    .delete-warning {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+
+        padding: 1rem;
+
+        border-radius: 12px;
+
+        background: var(--settings-danger-soft);
+        border: 1px solid var(--settings-danger-border);
+    }
+
+    .delete-warning-icon {
+        color: var(--bs-danger);
+        margin-top: 2px;
+    }
+
+    .delete-warning p {
+        color: var(--settings-muted);
+        font-size: 0.76rem;
+        line-height: 1.45;
+        margin: 0;
+    }
+
+    .delete-confirm-label {
+        color: var(--settings-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* =========================================
+       MOBILE
+       ========================================= */
+
+    @media (max-width: 991.98px) {
+        .settings-sidebar {
+            position: static;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .settings-content-card {
+            padding: 1.25rem;
+        }
+
+        .preference-item > .d-flex {
+            flex-wrap: wrap;
+        }
+
+        .language-select {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .danger-zone-content {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .danger-zone-content .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .settings-heading-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .settings-actions {
+            flex-direction: column-reverse;
+        }
+
+        .settings-actions .btn {
+            width: 100%;
+        }
+    }
 </style>
 
-<div class="container py-5">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+<div class="container py-4 py-lg-5">
+
     <div class="row g-4">
-        <!-- Sidebar Navigation -->
+
+        <!-- =========================================
+             SIDEBAR
+             ========================================= -->
         <div class="col-lg-3">
-            <div class="settings-card p-3 shadow-sm">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist">
-                    <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#tab-app" type="button">
-                        <i class="fas fa-sliders-h me-2"></i> Preferences
-                    </button>
-                    <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-security" type="button">
-                        <i class="fas fa-shield-alt me-2"></i> Password & Security
-                    </button>
-                    <button class="nav-link text-start text-danger" data-bs-toggle="pill" data-bs-target="#tab-danger" type="button">
-                        <i class="fas fa-exclamation-triangle me-2"></i> Danger Zone
-                    </button>
+
+            <div class="settings-card settings-sidebar">
+
+                <div class="settings-sidebar-header">
+
+                    <div class="settings-sidebar-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+
+                    <div>
+                        <h6 class="mb-0">
+                            Account Settings
+                        </h6>
+
+                        <small>
+                            Manage your account
+                        </small>
+                    </div>
+
                 </div>
+
+
+                <div class="nav flex-column nav-pills settings-nav"
+                     id="v-pills-tab"
+                     role="tablist">
+
+                    <!-- Preferences -->
+                    <button class="nav-link active text-start"
+                            data-bs-toggle="pill"
+                            data-bs-target="#tab-app"
+                            type="button"
+                            role="tab"
+                            aria-controls="tab-app"
+                            aria-selected="true">
+
+                        <div class="settings-nav-item">
+
+                            <div class="settings-nav-icon">
+                                <i class="fas fa-sliders-h"></i>
+                            </div>
+
+                            <div class="settings-nav-content">
+                                <span class="settings-nav-title">
+                                    Preferences
+                                </span>
+
+                                <small>
+                                    Customize your app
+                                </small>
+                            </div>
+
+                            <i class="fas fa-chevron-right settings-nav-arrow"></i>
+
+                        </div>
+
+                    </button>
+
+
+                    <!-- Security -->
+                    <button class="nav-link text-start"
+                            data-bs-toggle="pill"
+                            data-bs-target="#tab-security"
+                            type="button"
+                            role="tab"
+                            aria-controls="tab-security"
+                            aria-selected="false">
+
+                        <div class="settings-nav-item">
+
+                            <div class="settings-nav-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+
+                            <div class="settings-nav-content">
+                                <span class="settings-nav-title">
+                                    Password & Security
+                                </span>
+
+                                <small>
+                                    Protect your account
+                                </small>
+                            </div>
+
+                            <i class="fas fa-chevron-right settings-nav-arrow"></i>
+
+                        </div>
+
+                    </button>
+
+
+                    <!-- Danger Zone -->
+                    <button class="nav-link text-start text-danger"
+                            data-bs-toggle="pill"
+                            data-bs-target="#tab-danger"
+                            type="button"
+                            role="tab"
+                            aria-controls="tab-danger"
+                            aria-selected="false">
+
+                        <div class="settings-nav-item">
+
+                            <div class="settings-nav-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+
+                            <div class="settings-nav-content">
+                                <span class="settings-nav-title">
+                                    Danger Zone
+                                </span>
+
+                                <small>
+                                    Destructive account actions
+                                </small>
+                            </div>
+
+                            <i class="fas fa-chevron-right settings-nav-arrow"></i>
+
+                        </div>
+
+                    </button>
+
+                </div>
+
             </div>
+
         </div>
 
-        <!-- Content Area -->
-        <div class="col-lg-9 tab-content-wrapper">
+
+        <!-- =========================================
+             CONTENT
+             ========================================= -->
+        <div class="col-lg-9">
+
             <div class="tab-content" id="v-pills-tabContent">
-                
-                <!-- App Preferences Tab -->
-                <div class="tab-pane fade show active" id="tab-app">
-                    <div class="settings-card">
-                        <h4 class="mb-1">App Preferences</h4>
-                        <p class="text-secondary small mb-4">Manage your general layout and language configurations.</p>
-                        <form>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-semibold text-uppercase text-secondary">Display Language</label>
-                                    <select name="language" class="form-select form-control-glass">
-                                        <option value="en" selected>English (US)</option>
-                                        <option value="kh">Khmer (coming soon)</option>
-                                    </select>
-                                </div>
+
+
+                <!-- =====================================
+                     PREFERENCES
+                     ===================================== -->
+                <div class="tab-pane fade show active"
+                     id="tab-app"
+                     role="tabpanel">
+
+                    <div class="settings-card settings-content-card">
+
+                        <div class="settings-heading">
+
+                            <div>
+                                <h4>
+                                    App Preferences
+                                </h4>
+
+                                <p>
+                                    Manage your general layout and language configurations.
+                                </p>
                             </div>
-                            <button type="button" onclick="alert('On Working...')" class="btn btn-primary mt-4 px-4 rounded-pill">Save Changes</button>
-                        </form>
+
+                            <div class="settings-heading-icon">
+                                <i class="fas fa-sliders-h"></i>
+                            </div>
+
+                        </div>
+
+
+                        <form action="{{ url_for('lang.set_language_post') }}"
+                                  method="POST">
+
+                                <input type="hidden"
+                                       name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+
+                                <!-- Language -->
+                                <div class="preference-item">
+
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <div class="preference-icon">
+                                            <i class="fas fa-language"></i>
+                                        </div>
+
+
+                                        <div class="flex-grow-1">
+
+                                            <div class="preference-title">
+                                                Display Language
+                                            </div>
+
+                                            <p class="preference-description">
+                                                Choose the language used throughout the application.
+                                            </p>
+
+                                        </div>
+
+
+                                        <div class="language-select">
+
+                                            <select id="language"
+                                                    name="language"
+                                                    class="form-select form-control-glass">
+
+                                                <option value="en"
+                                                    {% if current_lang == 'en' %}selected{% endif %}>
+                                                    🇺🇸 English (US)
+                                                </option>
+
+                                                <option value="km"
+                                                    {% if current_lang == 'km' %}selected{% endif %}>
+                                                    🇰🇭 ខ្មែរ
+                                                </option>
+
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Actions -->
+                                <div class="settings-actions">
+
+                                    <button type="reset"
+                                            class="btn btn-outline-secondary">
+
+                                        <i class="fas fa-undo me-1"></i>
+                                        Cancel
+
+                                    </button>
+
+                                    <button type="submit"
+                                            class="btn btn-primary">
+
+                                        <i class="fas fa-check me-1"></i>
+                                        Save Changes
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
                     </div>
+
                 </div>
 
-                <!-- Password & Security Tab -->
-                <div class="tab-pane fade" id="tab-security">
-                    <div class="settings-card">
-                        <h4 class="mb-1">Update Password</h4>
-                        <p class="text-secondary small mb-4">Ensure your account is using a long, random password to stay secure.</p>
-                        <form action="/profiles/{{current_user.id}}/change_pw" method="POST">
+
+                <!-- =====================================
+                     SECURITY
+                     ===================================== -->
+                <div class="tab-pane fade"
+                     id="tab-security"
+                     role="tabpanel">
+
+                    <div class="settings-card settings-content-card">
+
+                        <div class="settings-heading">
+
+                            <div>
+                                <h4>
+                                    Password & Security
+                                </h4>
+
+                                <p>
+                                    Keep your account secure by regularly updating your password.
+                                </p>
+                            </div>
+
+                            <div class="settings-heading-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+
+                        </div>
+
+
+                        <div class="security-info">
+
+                            <div class="security-info-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+
+                            <div>
+                                <strong>
+                                    Keep your password secure
+                                </strong>
+
+                                <p>
+                                    Use a strong password that you don't use on other websites.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <form action="/profiles/{{ current_user.id }}/change_pw"
+                              method="POST">
+
                             {{ form.hidden_tag() }}
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold text-uppercase text-secondary">Current Password</label>
-                                {{ form.current_password(class="form-control form-control-glass") }}
+
+                            <div class="password-group">
+
+                                <div class="mb-4">
+
+                                    <label class="form-label-settings">
+                                        Current Password
+                                    </label>
+
+                                    {{ form.current_password(
+                                        class="form-control form-control-glass",
+                                        placeholder="Enter your current password"
+                                    ) }}
+
+                                </div>
+
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label-settings">
+                                            New Password
+                                        </label>
+
+                                        {{ form.new_password(
+                                            class="form-control form-control-glass",
+                                            placeholder="Enter a new password"
+                                        ) }}
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label-settings">
+                                            Confirm New Password
+                                        </label>
+
+                                        {{ form.confirm_password(
+                                            class="form-control form-control-glass",
+                                            placeholder="Confirm your new password"
+                                        ) }}
+
+                                    </div>
+
+                                </div>
+
                             </div>
 
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-semibold text-uppercase text-secondary">New Password</label>
-                                    {{ form.new_password(class="form-control form-control-glass") }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-semibold text-uppercase text-secondary">Confirm New Password</label>
-                                    {{ form.confirm_password(class="form-control form-control-glass") }}
-                                </div>
+
+                            <div class="settings-actions">
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    <i class="fas fa-key me-1"></i>
+                                    Update Password
+
+                                </button>
+
                             </div>
 
-                            <button type="submit" class="btn btn-warning px-4 rounded-pill fw-semibold">
-                                Update Password
-                            </button>
                         </form>
+
                     </div>
+
                 </div>
 
-                <!-- Danger Zone Tab -->
-                <div class="tab-pane fade" id="tab-danger">
-                    <div class="settings-card danger-zone-card">
-                        <h4 class="text-danger mb-1">Danger Zone</h4>
-                        <p class="text-secondary small mb-4">Irreversible and destructive actions regarding your client account.</p>
-                        
-                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-3 rounded-3 bg-body border border-danger-subtle gap-3">
+
+                <!-- =====================================
+                     DANGER ZONE
+                     ===================================== -->
+                <div class="tab-pane fade"
+                     id="tab-danger"
+                     role="tabpanel">
+
+                    <div class="settings-card settings-content-card danger-zone-card">
+
+                        <div class="settings-heading">
+
                             <div>
-                                <h6 class="mb-1 text-danger">Delete Account</h6>
-                                <p class="small text-secondary mb-0">Once you delete your account, all data will be permanently wiped.</p>
+                                <h4 class="text-danger">
+                                    Danger Zone
+                                </h4>
+
+                                <p>
+                                    Destructive and irreversible actions for your account.
+                                </p>
                             </div>
-                            <button type="button" class="btn btn-outline-danger px-4 rounded-pill text-nowrap" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                Delete Account
-                            </button>
+
+                            <div class="settings-heading-icon danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+
                         </div>
+
+
+                        <div class="danger-zone-content">
+
+                            <div class="d-flex align-items-start gap-3">
+
+                                <div class="danger-icon">
+                                    <i class="fas fa-trash-alt"></i>
+                                </div>
+
+                                <div>
+
+                                    <h6>
+                                        Delete Account
+                                    </h6>
+
+                                    <p>
+                                        Permanently delete your account and all associated data.
+                                        This action cannot be undone.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <button type="button"
+                                    class="btn btn-outline-danger text-nowrap"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+
+                                <i class="fas fa-trash-alt me-1"></i>
+                                Delete Account
+
+                            </button>
+
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
+
+<!-- =========================================
+     DELETE ACCOUNT MODAL
+     ========================================= -->
+<div class="modal fade"
+     id="deleteModal"
+     tabindex="-1"
+     aria-labelledby="deleteModalLabel"
+     aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content settings-card p-0 shadow-lg">
-            <div class="modal-header border-bottom border-subtle px-4 py-3">
-                <h5 class="modal-title text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Are you absolutely sure?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+        <div class="modal-content settings-modal shadow-lg">
+
+            <div class="modal-header px-4 py-3">
+
+                <h5 class="modal-title text-danger fw-bold"
+                    id="deleteModalLabel">
+
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Delete Account
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
             </div>
-            <div class="modal-body px-4 py-3">
-                <p class="text-secondary small mb-2">This action cannot be undone. To confirm, please type your username below:</p>
-                <input type="text" class="form-control form-control-glass" placeholder="{{ current_user.username }}">
+
+
+            <div class="modal-body px-4 py-4">
+
+                <div class="delete-warning mb-4">
+
+                    <div class="delete-warning-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+
+                    <p>
+                        This action is permanent. Your account and associated
+                        information may be permanently removed.
+                    </p>
+
+                </div>
+
+
+                <label for="deleteUsername"
+                       class="delete-confirm-label mb-2">
+
+                    Type your username to confirm
+
+                </label>
+
+                <input type="text"
+                       id="deleteUsername"
+                       class="form-control form-control-glass"
+                       placeholder="{{ current_user.username }}"
+                       autocomplete="off">
+
             </div>
-            <div class="modal-footer border-top border-subtle px-4 py-3">
-                <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
-                <form action="/users/{{current_user.id}}/delete" method="POST" class="m-0">
-                    {{form.hidden_tag()}}
-                    <button type="submit" class="btn btn-danger rounded-pill px-4">Confirm Deletion</button>
+
+
+            <div class="modal-footer px-4 py-3">
+
+                <button type="button"
+                        class="btn btn-outline-secondary rounded-pill px-3"
+                        data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <form action="/users/{{ current_user.id }}/delete"
+                      method="POST"
+                      class="m-0">
+
+                    {{ form.hidden_tag() }}
+
+                    <button type="submit"
+                            id="confirmDeleteButton"
+                            class="btn btn-danger rounded-pill px-4"
+                            disabled>
+
+                        <i class="fas fa-trash-alt me-1"></i>
+                        Confirm Deletion
+
+                    </button>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const usernameInput = document.getElementById("deleteUsername");
+    const deleteButton = document.getElementById("confirmDeleteButton");
+
+    if (usernameInput && deleteButton) {
+
+        usernameInput.addEventListener("input", function () {
+
+            const expectedUsername = "{{ current_user.username }}";
+
+            deleteButton.disabled =
+                usernameInput.value.trim() !== expectedUsername;
+
+        });
+
+    }
+
+});
+</script>
+
 {% endblock %}

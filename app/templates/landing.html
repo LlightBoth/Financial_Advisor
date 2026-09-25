@@ -50,38 +50,35 @@
             <a href="{{ url_for('about') }}" class="nav-menu-link">About & FAQ</a>
         </div>
 
-        <div class="nav-actions">
-            <!-- Language Switcher -->
-            <div class="d-flex align-items-center me-2">
-                <div class="btn-group btn-group-sm" role="group" aria-label="{{ _('common.language') }}">
-                    <a href="{{ url_for('lang.set_language', language='en', next=url_for('home')) }}" 
-                       class="btn btn-sm {% if current_lang == 'en' %}btn-primary text-white{% else %}btn-outline-secondary text-secondary{% endif %} py-1 px-2" 
-                       style="font-size: 0.8rem; border-radius: 6px;"
-                       title="English">English</a>
-                    <span class="d-flex align-items-center text-muted px-1">|</span>
-                    <a href="{{ url_for('lang.set_language', language='km', next=url_for('home')) }}" 
-                       class="btn btn-sm {% if current_lang == 'km' %}btn-primary text-white{% else %}btn-outline-secondary text-secondary{% endif %} py-1 px-2" 
-                       style="font-size: 0.8rem; border-radius: 6px;"
-                       title="ខ្មែរ">ខ្មែរ</a>
-                </div>
+        <!-- Dark/Light Mode Toggle Button -->
+        <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="{{ _('landing.toggle_theme') }}" title="{{ _('landing.toggle_theme') }}">
+            <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
+        </button>
+
+        <!-- Language Switcher -->
+        <div class="d-flex align-items-center me-2">
+            <div class="btn-group btn-group-sm"
+                role="group"
+                aria-label="{{ _('common.language') }}">
+
+                <a href="{{ url_for('lang.set_language', language='en', next=url_for('home')) }}"
+                class="btn {% if current_lang == 'en' %}btn-primary text-white{% else %}btn-outline-secondary{% endif %}">
+                    English
+                </a>
+
+                <a href="{{ url_for('lang.set_language', language='km', next=url_for('home')) }}"
+                class="btn {% if current_lang == 'km' %}btn-primary text-white{% else %}btn-outline-secondary{% endif %}">
+                    ខ្មែរ
+                </a>
             </div>
+        </div>
 
-            <!-- Dark/Light Mode Toggle Button -->
-            <button type="button" class="theme-toggle-btn" id="landingThemeToggle" aria-label="{{ _('landing.toggle_theme') }}" title="{{ _('landing.toggle_theme') }}">
-                <i class="bi bi-moon-stars-fill" id="landingThemeIcon"></i>
-            </button>
+        <a href="{{ url_for('auth.login') }}" class="btn-nav-ghost d-none d-sm-inline-flex mx-2">{{ _("nav.login") }}</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">
+            {{ _("landing.get_started") }} <i class="bi bi-arrow-right"></i>
+        </a>
 
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboards.userIndex') }}" class="btn-nav-cta d-none d-sm-inline-flex">
-                    <i class="bi bi-grid-1x2-fill"></i> {{ _("common.workspace") }}
-                </a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn-nav-ghost d-none d-sm-inline-flex">{{ _("nav.login") }}</a>
-                <a href="{{ url_for('auth.register') }}" class="btn-nav-cta">
-                    {{ _("landing.get_started") }} <i class="bi bi-arrow-right"></i>
-                </a>
-            {% endif %}
-
+        <div class="nav-actions">
             <!-- Mobile Menu Toggle Button (Hamburger) -->
             <button type="button" class="mobile-menu-btn d-lg-none" id="mobileMenuToggle" aria-label="{{ _('landing.open_nav_menu') }}">
                 <i class="bi bi-list" id="mobileMenuIcon"></i>
@@ -122,18 +119,12 @@
         </div>
 
         <div class="mobile-drawer-footer">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboards.userIndex') }}" class="btn-hero-primary w-100 justify-content-center">
-                    <i class="bi bi-grid-1x2-fill"></i> {{ _("landing.open_dashboard") }}
-                </a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary w-100 justify-content-center">
-                    <i class="bi bi-box-arrow-in-right"></i> {{ _("nav.login") }}
-                </a>
-                <a href="{{ url_for('auth.register') }}" class="btn-hero-primary w-100 justify-content-center">
-                    {{ _("landing.get_started_free") }} <i class="bi bi-arrow-right"></i>
-                </a>
-            {% endif %}
+            <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary w-100 justify-content-center">
+                <i class="bi bi-box-arrow-in-right"></i> {{ _("nav.login") }}
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="btn-hero-primary w-100 justify-content-center">
+                {{ _("landing.get_started_free") }} <i class="bi bi-arrow-right"></i>
+            </a>
         </div>
     </div>
     <div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
@@ -245,13 +236,7 @@
                 <p class="feature-desc">{{ _("landing.feature_cashflow_desc") }}</p>
             </div>
 
-            <div class="feature-box">
-                <div class="feature-icon-wrap amber">
-                    <i class="bi bi-journal-check"></i>
-                </div>
-                <h3 class="feature-title">{{ _("landing.feature_ledger_title") }}</h3>
-                <p class="feature-desc">{{ _("landing.feature_ledger_desc") }}</p>
-            </div>
+           
         </div>
     </section>
 
@@ -413,9 +398,9 @@
                     </span>
                 </div>
 
-                <a href="#overview" class="footer-back-to-top">
+                <!-- <a href="#overview" class="footer-back-to-top">
                     <i class="bi bi-arrow-up"></i> {{ _("landing.footer_back_to_top") }}
-                </a>
+                </a> -->
             </div>
         </div>
     </footer>
