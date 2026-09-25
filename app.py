@@ -43,7 +43,7 @@ from training.llm_output_normalizer import (
 )
 
 # 1. Initialize Model
-print("Initializing Financial Advisor AI model for Hugging Face Space...")
+print("Initializing Financial Consultant AI model for Hugging Face Space...")
 load_model()
 
 
@@ -249,9 +249,9 @@ def chat_endpoint(data: dict):
     is_greeting = bool(re.search(r"^(hello|hi|hey|greetings|good\s+(morning|afternoon|evening)|howdy|សួស្តី|ជំរាបសួរ|ជម្រាបសួរ)[.!?\s]*$", message.strip(), re.IGNORECASE))
     if is_greeting:
         greet_resp = (
-            "សួស្តី! ខ្ញុំជាជំនួយការប្រឹក្សាហិរញ្ញវត្ថុ AI របស់អ្នក។ តើខ្ញុំអាចជួយអ្នកក្នុងការរៀបចំផែនការហិរញ្ញវត្ថុ ថវិកា ឬការសន្សំយ៉ាងដូចម្តេចដែរ?"
+            "សួស្តី! ខ្ញុំជា Financial Consultant AI (ជំនួយការ AI ប្រឹក្សាហិរញ្ញវត្ថុ)។ តើខ្ញុំអាចជួយអ្នកក្នុងការរៀបចំថវិកា ការសន្សំ ឬសំណួរហិរញ្ញវត្ថុអ្វីខ្លះថ្ងៃនេះ?"
             if lang == "km"
-            else "Hello! I am your Financial Advisor AI. How can I help you with your budgeting, savings, or financial planning today?"
+            else "Hello! I am your Financial Consultant AI. How can I help you with your budgeting, savings, or financial planning today?"
         )
         return {
             "success": True,
